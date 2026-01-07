@@ -1,6 +1,6 @@
 """
 Automatic replication of Figure 1 from Bryson (1996) using LLM-driven iterative code generation.
-rere
+
 What this does:
 1) Summarize the paper PDF to extract Figure 1 construction details (variables, methods, plotting specifications).
 2) Map codebook/instruction CSV to dataset columns for variable alignment.
