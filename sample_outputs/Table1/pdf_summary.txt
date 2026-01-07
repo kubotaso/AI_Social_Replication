@@ -1,0 +1,73 @@
+Here is what Table 1 contains and how it was estimated, plus the data source and variable construction it relies on.
+
+Data source
+- 1993 General Social Survey (GSS), NORC: stratified national sample of non-institutionalized U.S. adults.
+- Music module asked all 1,606 respondents to rate 18 music genres on a 5-point Likert scale (1=like very much to 5=dislike very much) with a “don’t know much about it” option.
+
+Dependent variable used in Table 1
+- Musical exclusiveness (count): number of genres a respondent rated “dislike” or “dislike very much” across the 18 genres.
+- “Don’t know” responses treated as missing; respondents with such responses were dropped for this outcome, leaving 912 valid cases overall before model-specific listwise deletion.
+- Distribution in text: mean 5.78, SD 3.76, possible range 0–18.
+
+Independent variables used in Table 1 (and coding)
+- Education: years of schooling (continuous).
+- Household income per capita: household income divided by household size (continuous).
+- Occupational prestige: NORC occupational prestige score (continuous).
+- Female: 1=female, 0=male.
+- Age: in years (continuous).
+- Race/ethnicity indicators (reference: non-Hispanic White): Black; Hispanic; Other race.
+- Religion indicators (reference: all others): Conservative Protestant; No religion.
+- Region: Southern (1=resident in South).
+- Political intolerance: additive 0–15 scale counting “intolerant” responses to 15 Stouffer-style civil liberties items (allow speech, teach, library book) for five target groups (anti-religion, racist, communist, pro–military rule, homosexual). Reliability alpha=.916. Asked of two-thirds of the GSS sample.
+
+Statistical methods for Table 1
+- Ordinary Least Squares (OLS) regressions with standardized coefficients (betas) reported.
+- Three nested specifications; two-tailed significance tests with p<.05, .01, .001 denoted by *, **, ***.
+- Model Ns reflect listwise deletion and the fact the intolerance battery was asked of only two-thirds of respondents.
+- Fit statistics reported: R2, adjusted R2, constant.
+
+Table 1 (title)
+- “Standardized OLS Coefficients from the Regression of the Number of Music Genres Disliked on Measures of Socioeconomic Status, Group Identities, and Political Intolerance: General Social Survey, 1993.”
+
+Regression models in Table 1 and all included variables
+1) SES Model (N=787; R2=.107; Adj R2=.104; Constant=10.920)
+   - Education: −.322*** (fewer dislikes with more schooling)
+   - Household income per capita: −.037 (ns)
+   - Occupational prestige: .016 (ns)
+
+2) Demographic Model (adds group-identity controls) (N=756; R2=.151; Adj R2=.139; Constant=8.507)
+   - Education: −.246***
+   - Household income per capita: −.054 (ns)
+   - Occupational prestige: −.006 (ns)
+   - Female: −.083* (women report fewer dislikes → men more exclusive)
+   - Age: .140*** (older → more dislikes)
+   - Black: .029 (ns)
+   - Hispanic: −.029 (ns)
+   - Other race: .005 (ns)
+   - Conservative Protestant: .059 (ns)
+   - No religion: −.012 (ns)
+   - Southern: .097** (South → more dislikes)
+
+3) Political Intolerance Model (adds intolerance scale) (N=503; R2=.169; Adj R2=.148; Constant=6.516)
+   - Education: −.151**
+   - Household income per capita: −.009 (ns)
+   - Occupational prestige: −.022 (ns)
+   - Female: −.095*
+   - Age: .110*
+   - Black: .049 (ns)
+   - Hispanic: .031 (ns)
+   - Other race: .053 (ns)
+   - Conservative Protestant: .066 (ns)
+   - No religion: .024 (ns)
+   - Southern: .121**
+   - Political intolerance: .164*** (more politically intolerant → more musical dislikes)
+
+Related tables and measures referenced
+- Table 2: Two OLS models splitting the dependent variable into (a) dislikes of six genres disproportionately liked by Black/Hispanic respondents (rap, reggae, blues/R&B, jazz, gospel, Latin) and (b) dislikes of the other 12 genres; key added predictor is a 0–5 racism scale (alpha=.54) built from GSS racial attitude items.
+- Table 3: Frequencies for the 18 genre ratings (shows overall like/dislike distributions, useful for understanding the dependent variable’s construction).
+- Figure 1 (not a table): Logistic regressions of disliking each genre on “musical tolerance” (number of genres not disliked) controlling for education.
+
+Bottom line from Table 1
+- Education robustly decreases musical exclusiveness; income and occupational prestige are negligible once education is controlled.
+- Political intolerance positively predicts musical exclusiveness.
+- Men, older adults, and Southerners report more dislikes, net of SES and intolerance.

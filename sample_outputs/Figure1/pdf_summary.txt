@@ -1,0 +1,66 @@
+What to reproduce
+
+Figure title
+- “The Effect of Being Musically Tolerant on Disliking Each Music Genre Compared to the Educational Composition of Genre Audiences”
+
+Data source
+- 1993 General Social Survey (GSS), Culture Module.
+- Musical taste battery: 18 genres rated on a 5-point Likert scale: 1=Like very much, 2=Like it, 3=Mixed feelings, 4=Dislike it, 5=Dislike very much; plus “Don’t know much about it.”
+- Education: years of schooling.
+
+Sample and case handling
+- Start from all 1993 GSS respondents asked the music battery.
+- Treat “Don’t know much about it” as missing for the music items.
+- Respondents with any “Don’t know” are dropped from the analysis of dislikes (paper states this elimination, leaving 912 valid cases for the dislikes scale; logistic Ns can vary by genre but use the same rule).
+- No weights are mentioned/used.
+
+Key variables
+
+1) Dislike indicator for each genre j (dependent variable in 18 separate models)
+- For each genre j, create Dislike_j = 1 if response ∈ {4, 5}; Dislike_j = 0 if response ∈ {1, 2, 3}.
+- Exclude “Don’t know” responses.
+
+2) Musical tolerance score excluding focal genre j (main predictor)
+- First define exclusiveness as the count of dislikes (responses 4 or 5) across all 18 genres.
+- Musical tolerance = number of genres not disliked = 18 − exclusiveness.
+- For model j, exclude genre j from the count: Tolerance_excl_j = 17 − (number of dislikes among the other 17 genres).
+- Unit: one additional genre “not disliked” among the other 17.
+
+3) Education (control)
+- Years of education (continuous).
+
+4) Mean education of genre audience (for plotting only)
+- For each genre, compute the mean years of education among respondents who “like” the genre (responses 1 or 2).
+- Also compute the sample mean years of education (across the analysis sample) for the reference line.
+
+Statistical method to produce coefficients
+- Fit 18 separate logistic regressions (one per genre):
+  logit P(Dislike_j=1) = α_j + β1_j·Tolerance_excl_j + β2_j·Education.
+- Record β1_j (the coefficient for musical tolerance) for each genre.
+- All reported β1_j are negative and significant at p < .0001 (per paper).
+
+Genres and plotting order (x-axis)
+- Order genres left to right by the size of β1_j (from most negative—largest reduction in odds of disliking with tolerance—to least negative). In the paper’s figure the labels appear, left→right:
+  Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber, Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk, Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel.
+
+Plot construction
+
+- X-axis: “Type of Music” with the 18 genres in the order above.
+- Left Y-axis: “Coefficient for Musical Tolerance as it Affects the Probability of Disliking Each Music Genre” (logit coefficients β1_j). Scale spans roughly −0.5 to −0.1 (exact values come from your estimates).
+- Right Y-axis: “Mean Educational Level of Respondents Who Report Liking Each Music Genre” (years). Include range to cover approximately 10–15 years and a horizontal reference line for the “Sample Mean Education.”
+
+Lines/series
+- Series 1: Solid line (optionally with markers) for β1_j across genres (left Y-axis).
+- Series 2: Dot–dash line for “Mean Education of Genre Audience” across genres (right Y-axis).
+- Series 3: Dotted horizontal line for “Sample Mean Education” (right Y-axis reference).
+
+Annotations/notes
+- Note under figure: “Coefficients represent the effects of being musically tolerant (number of genres not disliked, excluding the one involved in the dependent variable) from logistic regression equations where disliking each genre is the dependent variable and education is controlled. All coefficients are significant at p < .0001.”
+
+Transformations and coding summary
+- Dependent variable: binary (dislike vs. not dislike).
+- Predictor: count of non-disliked genres among the other 17.
+- Model: logistic (log-odds).
+- Education: continuous covariate in years.
+- “Like” for audience means = responses 1 or 2 only.
+- “Don’t know much about it” = missing; such respondents excluded from analysis.

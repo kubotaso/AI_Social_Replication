@@ -1,0 +1,254 @@
+Below is a direct mapping from the constructs in your analysis summary to the concrete GSS data fields in the variable documentation, followed by how each construct should be built from those fields.
+
+---
+
+## 1. Core genre-attitude variables (Table 3)
+
+Table‑3 “attitude toward 18 music genres” items are exactly the 18 GSS variables listed in the CSV. Each has the same response scale:
+
+- 1 = like very much  
+- 2 = like it  
+- 3 = mixed feelings  
+- 4 = dislike it  
+- 5 = dislike very much  
+- NA codes (d, m, n, etc.) = don’t know / no answer / not applicable, etc.
+
+**Mapping of genres in the paper ⇔ GSS variables**
+
+1. Big Band / Swing → `bigband`  
+2. Bluegrass → `blugrass`  
+3. Country/Western → `country`  
+4. Blues/R&B → `blues`  
+5. Broadway musicals / Show tunes → `musicals`  
+6. Classical / Chamber → `classicl`  
+7. Folk → `folk`  
+8. Gospel → `gospel`  
+9. Jazz → `jazz`  
+10. Latin / Salsa / Mariachi → `latin`  
+11. Mood / Easy listening / Pop/easy listening → `moodeasy`  
+12. New Age / Space music → `newage`  
+13. Opera → `opera`  
+14. Rap → `rap`  
+15. Reggae → `reggae`  
+16. Contemporary pop/rock → `conrock`  
+17. Oldies rock → `oldies`  
+18. Heavy metal → `hvymetal`
+
+These 18 variables are the sole source for:
+
+- Table 3 frequency distributions (categories 1–5 plus non-substantive responses).  
+- Table 3 mean ratings (treating 1–5 as numeric, excluding NA codes).  
+- All downstream dislike/tolerance/familiarity measures in the models.
+
+---
+
+## 2. “Dislike” vs. “non-dislike” coding
+
+Across all analyses that use dislikes:
+
+- For each music variable listed above:  
+  - **Dislike** (indicator = 1) if value ∈ {4, 5}.  
+  - **Non-dislike** (indicator = 0) if value ∈ {1, 2, 3}.  
+  - **Missing** if value is any NA code in the GSS metadata (e.g., `NA(d)`, `NA(m)`, `NA(n)`, etc.).
+
+This unified recode is used for:
+
+- Overall count of dislikes (0–18).  
+- Count of dislikes in the “minority genres” subset (6 genres).  
+- Count of dislikes in the remaining 12 genres.  
+- Binary DVs (“dislikes this genre”) in the logistic regressions.
+
+---
+
+## 3. Overall musical exclusiveness: count of dislikes (Table 1 DV)
+
+**Concept:** “Number of genres disliked” (0–18).
+
+**Input variables:** the full set of 18:
+
+`bigband blugrass country blues musicals classicl folk gospel jazz latin moodeasy newage opera rap reggae conrock oldies hvymetal`
+
+**Construction:**
+
+1. For each of the 18 variables, define a genre-specific dislike indicator:
+   - `genre_dislike = 1` if genre variable ∈ {4, 5}.  
+   - `genre_dislike = 0` if genre variable ∈ {1, 2, 3}.  
+   - Missing otherwise.
+
+2. **Sample restriction for this scale (as described in the paper):**  
+   Drop respondents with any “don’t know much about it” / DK / NA on any genre. Operationally, this can be implemented as:
+
+   - If any of the 18 variables is coded in any NA category (including `NA(d) don’t know`, `NA(m) dk, na, iap`, `NA(n) no answer`, etc.), then set the overall count to missing for that respondent.
+
+3. Sum across the 18 dislike indicators for each respondent:
+
+   - `overall_dislikes = Σ(genre_dislike for all 18 genres)`,  
+   - range: 0 to 18.
+
+This `overall_dislikes` variable is **exactly** the DV used in all three OLS models in Table 1.
+
+---
+
+## 4. Subscales by racial/ethnic association (Table 2 DVs)
+
+The same 18 GSS music items are partitioned into:
+
+### 4.1 “Minority-associated” genres (6-genre dislike count)
+
+**Minority-associated genres (per the article’s definition):**
+
+- Rap → `rap`  
+- Reggae → `reggae`  
+- Blues/R&B → `blues`  
+- Jazz → `jazz`  
+- Gospel → `gospel`  
+- Latin/Salsa/Mariachi → `latin`
+
+**Construction:**
+
+- Use the same 1/0 “dislike” coding as above (4–5 = 1, 1–3 = 0, NA = missing) for each of these 6 variables.  
+- Sum to create:
+
+  - `dislikes_minority_genres = rap_dislike + reggae_dislike + blues_dislike + jazz_dislike + gospel_dislike + latin_dislike`,  
+  - range: 0 to 6.
+
+This `dislikes_minority_genres` is the DV for the **left panel** OLS model in Table 2.
+
+### 4.2 “Other 12” genres (non-minority subscale)
+
+**Remaining 12 genres:**
+
+- `bigband`  
+- `blugrass`  
+- `country`  
+- `musicals`  
+- `classicl`  
+- `folk`  
+- `moodeasy`  
+- `newage`  
+- `opera`  
+- `conrock`  
+- `oldies`  
+- `hvymetal`
+
+**Construction:**
+
+- Again, recode each to a dislike indicator (4–5 = 1, 1–3 = 0, NA = missing).  
+- Sum across these 12 indicators:
+
+  - `dislikes_other_genres = Σ(dislike of those 12 genres)`,  
+  - range: 0 to 12.
+
+This `dislikes_other_genres` is the DV for the **right panel** OLS model in Table 2.
+
+---
+
+## 5. Genre-specific binary DVs (logistic models / Figure 1)
+
+For each of the 18 genres, a separate logistic regression uses a genre-specific binary DV:
+
+**Generic construction for a focal genre variable `g` in:**
+
+`{bigband, blugrass, country, blues, musicals, classicl, folk, gospel, jazz, latin, moodeasy, newage, opera, rap, reggae, conrock, oldies, hvymetal}`
+
+1. **DV for that model:**
+
+   - `dislike_g = 1` if `g ∈ {4, 5}`.  
+   - `dislike_g = 0` if `g ∈ {1, 2, 3}`.  
+   - Missing otherwise.
+
+2. **Key IV: musical tolerance excluding the focal genre** (see next section).  
+3. **Control:** education (from GSS education variable; not defined in CSV but standard GSS).
+
+Each genre’s logistic regression uses:
+
+- DV: `dislike_g`.  
+- IVs include: “tolerance excluding g” and education.
+
+---
+
+## 6. Musical tolerance: count of genres not disliked
+
+**Concept:** Number of genres not disliked, usually excluding the focal genre when that genre is the logistic DV.
+
+**Base from the same 18 variables**:
+
+- For each genre `g`, we already defined:
+
+  - `dislike_g` as above.  
+  - Then define `not_dislike_g = 1 – dislike_g` (so `not_dislike_g = 1` if rating ∈ {1, 2, 3}, 0 if ∈ {4, 5}; missing if original value is NA).
+
+### 6.1 Overall tolerance (for concept/descriptives)
+
+If needed conceptually:
+
+- `overall_tolerance = Σ(not_dislike_g for all 18 genres)`, range 0–18.
+
+### 6.2 Tolerance excluding a focal genre (used in logistic regressions)
+
+For a logistic model where the DV is `dislike_g`:
+
+- Construct `tolerance_excl_g` as the sum across the other 17 genres:
+
+  - `tolerance_excl_g = Σ(not_dislike_h for all h ≠ g)`.
+
+This `tolerance_excl_g` variable is the “musical tolerance” predictor plotted in Figure 1 (one such tolerance variable per logistic regression, each excluding its own focal genre).
+
+---
+
+## 7. Breadth of familiarity: count of “don’t know” responses (H6 DV)
+
+**Concept:** Number of “don’t know much about it” responses across the 18 genres.
+
+In the NORC distributions, “don’t know much about it” is implemented as one or more NA codes (the documentation collapses DK/NA/IAP under `NA(m)` and related categories).
+
+**Operationalization with the provided metadata:**
+
+- For each of the 18 music variables, define a DK/NA indicator:
+
+  - `dk_g = 1` if value is any non-substantive NA code (e.g., `NA(d)`, `NA(m)`, `NA(n)`, etc.).  
+  - `dk_g = 0` if value ∈ {1, 2, 3, 4, 5}.
+
+- Sum across all 18:
+
+  - `num_dk_genres = Σ(dk_g for all 18 genres)`,  
+  - range: 0 to 18.
+
+This `num_dk_genres` variable is used as:
+
+- The DV in the education–familiarity correlation and mean comparisons for H6.  
+- The basis for the sample restriction when building the main exclusiveness scale (respondents with `num_dk_genres > 0` are excluded from that scale, per the article).
+
+---
+
+## 8. Linking to independent variables (for completeness of mapping)
+
+Although not in your CSV excerpt, the analysis summary refers to standard GSS constructs. When you build the models, the music-based DVs above are combined with these IVs (using the usual corresponding GSS variables):
+
+- Education (years of schooling) → `educ` or equivalent.  
+- Household income per capita → derived from household income (`realinc` or similar) divided by household size.  
+- Occupational prestige → `prestg80` or appropriate prestige score.  
+- Gender → `sex` (coded female = 1).  
+- Age → `age`.  
+- Race/ethnicity → `race`, `hispanic` (to make Black/Hispanic/Other dummies, White non-Hispanic as reference).  
+- Religion/denomination → `relig`, `denom`, `other` to derive Protestant, conservative Protestant, no religion.  
+- Region (South) → `region` or `srcbelt` (South dummy).  
+- Political intolerance scale (0–15) → summed from 15 civil-liberties items.  
+- Racism scale (0–5) → summed from 5 race-attitudes items.
+
+These IVs are not derived from the music items; they only enter as predictors.
+
+---
+
+## 9. Compact summary of the mapping
+
+- **Table 3 items** = 18 GSS music fields: `bigband` through `hvymetal`.  
+- **Dislike coding** for all analyses: 4–5 = dislike; 1–3 = not dislike; NA codes = missing.  
+- **Overall musical exclusiveness** = sum of dislikes across those 18 (0–18), dropping respondents with any DK/NA on any genre.  
+- **Minority-genre dislikes** = sum of dislikes across `rap`, `reggae`, `blues`, `jazz`, `gospel`, `latin` (0–6).  
+- **Other-genre dislikes** = sum of dislikes across the remaining 12 music variables (0–12).  
+- **Genre-specific dislike DVs** = binary from each single music variable (4–5 vs. 1–3).  
+- **Musical tolerance** = count of genres not disliked (1–3), either 0–18 overall or 0–17 when excluding the focal genre in logistic models.  
+- **Breadth of familiarity** = count of NA/DK codes across the 18 music variables (0–18).
+
+These mappings are sufficient to recreate the dependent variables and key derived constructs described in the analysis summary from the specific GSS 1993 music-module fields in your CSV.

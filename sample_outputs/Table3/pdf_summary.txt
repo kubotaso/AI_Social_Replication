@@ -1,0 +1,265 @@
+Here’s what Table 3 contains and how it fits into the paper’s models, variables, and methods.
+
+---
+
+## Data source
+
+- **Survey:** 1993 General Social Survey (GSS), National Opinion Research Center.
+- **Sample:** 1,606 non-institutionalized U.S. adults; N varies slightly by item because of missing data.
+- **Music module:** Respondents rated **18 musical genres** on a 5-point Likert scale.
+
+---
+
+## Table 3 itself
+
+**Title:**  
+“Table 3. Frequency Distributions for Attitude toward 18 Music Genres: General Social Survey, 1993”
+
+**Core variables in Table 3**
+
+For each of 18 genres, Table 3 shows:
+
+- **Dependent variable:** Attitude toward that musical genre.
+- **Response categories (coding implicit but clear):**
+  1. Like very much  
+  2. Like it  
+  3. Mixed feelings  
+  4. Dislike it  
+  5. Dislike very much  
+  (M) Don’t know much about it  
+  (M) No answer
+- **Also:** The **mean** value (1–5 scale) for each genre.
+
+**18 music genres listed (columns):**
+
+1. Latin/Salsa  
+2. Jazz  
+3. Blues/R&B (Blues/Rhythm & Blues)  
+4. Show tunes  
+5. Oldies  
+6. Classical/Chamber  
+7. Reggae  
+8. Swing/Big Band  
+9. New Age/Space music  
+10. Opera  
+11. Bluegrass  
+12. Folk  
+13. Pop/Easy listening  
+14. Contemporary rock  
+15. Rap  
+16. Heavy metal  
+17. Country/Western  
+18. Gospel  
+
+Table 3 is **descriptive**, not a regression table. It provides distributions and mean attitudes by genre, which the author then interprets in light of the regression-based results.
+
+---
+
+## How Table 3 connects to the regression models
+
+### 1. Construction of the main dependent variables
+
+Using the 5-point ratings from Table 3, Bryson defines several derived variables used in regressions:
+
+1. **Musical exclusiveness (overall dislikes)**
+   - Source items: the 18 genre-attitude variables displayed in Table 3.
+   - Coding:  
+     - “Dislike it” (category 4) and “Dislike very much” (category 5) are counted as **dislikes**.  
+     - “Like very much,” “Like it,” and “Mixed feelings” are not counted.  
+     - “Don’t know much about it” is treated as missing for that genre; respondents with any DK on any genre are dropped (final N=912 mentioned for this scale).
+   - **Scale:** Count of dislikes from 0 to 18.
+   - Descriptives: mean = 5.78, SD = 3.76.
+
+2. **Two subscales of dislikes by racial/ethnic association of audiences** (used in Table 2)
+   - Based on cross-tabs (not shown) using GSS: identify genres disproportionately liked by Black or Hispanic respondents (p < .001).
+   - **Minority-associated genres (6):**
+     - Rap
+     - Reggae
+     - Blues/R&B
+     - Jazz
+     - Gospel
+     - Latin/Salsa
+   - **Subscale 1 (minority genres):** Count of dislikes (4 or 5) across these six.
+   - **Subscale 2 (remaining 12 genres):** Count of dislikes across the other 12.
+
+3. **Musical tolerance (used in the logistic regressions summarized in Figure 1)**
+   - Defined as the **number of genres not disliked** (i.e., 18 – number of dislikes), typically excluding the focal genre when it is the dependent variable in a logistic model.
+
+4. **Breadth of familiarity**
+   - Number of “don’t know much about it” responses across the 18 genres (using the “M” category in Table 3).
+   - Used descriptively to test whether DKs decline with education.
+
+**Thus, every regression-based dependent variable is built from the 18 attitudinal items whose distributions are presented in Table 3.**
+
+---
+
+## Independent variables used in the models
+
+These are not in Table 3, but they are the predictors used with the Table‑3-based outcomes.
+
+### Socioeconomic status (SES)
+
+- **Education:** Years of schooling (continuous).
+- **Household income per capita:** Continuous (logged or scaled—paper says “per capita,” treated linearly).
+- **Occupational prestige:** Standard GSS occupational prestige score (continuous).
+
+### Demographic and identity controls
+
+- **Gender:** Female (dummy).
+- **Age:** Continuous.
+- **Race/ethnicity:**
+  - Black (dummy)
+  - Hispanic (dummy)
+  - Other race (dummy)
+  - (Reference: non-Hispanic White)
+- **Religion:**
+  - Protestant (dummy)
+  - No religion (dummy)
+  - (Reference: other religions)
+- **Region:** Southern (dummy).
+- **Conservative Protestant:** Dummy (labeled “Conservative Protestant” in tables).
+
+### Intergroup affect / ideology
+
+1. **Political intolerance scale** (0–15; α=.9163)
+   - Count of **intolerant** responses (refusal to extend civil liberties) across 15 items:
+     - 5 target groups:
+       1. Person “against churches and religion”
+       2. Person who “believes that Blacks are genetically inferior”
+       3. Person who “admits he is a Communist”
+       4. Person who “advocates doing away with elections and letting the military run the country”
+       5. Person who “admits he is a homosexual”
+     - For each group: whether respondent would allow them to  
+       a) make a speech in the community,  
+       b) teach in a college or university,  
+       c) have a book in the public library.
+   - Each intolerant response = 1; sum across 15.
+
+2. **Racism scale** (0–5; α=.54)
+   - Five dichotomous items (coded in “racist” direction):
+     1. Objection to children attending a >50% Black school.
+     2. Opposition to busing Black and White children between districts.
+     3. Denying discrimination as main cause of Blacks’ worse jobs/income/housing.
+     4. Denying lack of educational opportunity as the cause.
+     5. Affirming that Blacks’ situation is because they “don’t have the motivation or will power.”
+
+---
+
+## Regression models involving Table‑3-based variables
+
+### A. OLS regressions on overall musical exclusiveness (Table 1)
+
+**Dependent variable:**
+- Number of genres disliked (0–18), built from Table-3 items.
+
+**Model 1: SES Model**
+- DV: number of genres disliked.
+- IVs:
+  - Education
+  - Household income per capita
+  - Occupational prestige
+- Method: OLS; standardized coefficients.
+- Purpose: Test High-Status Exclusiveness (H1) vs Educated Tolerance (H2).
+
+**Model 2: Demographic Model**
+- DV: number of genres disliked.
+- IVs:
+  - Education, household income per capita, occupational prestige
+  - Female
+  - Age
+  - Black, Hispanic, Other race
+  - Conservative Protestant
+  - No religion
+  - Southern
+- Method: OLS; standardized coefficients.
+- Purpose: Assess whether demographic identities explain the education–exclusiveness link.
+
+**Model 3: Political Intolerance Model**
+- DV: number of genres disliked.
+- IVs:
+  - Education, income per capita, occupational prestige
+  - Female
+  - Age
+  - Black, Hispanic, Other race
+  - Conservative Protestant
+  - No religion
+  - Southern
+  - Political intolerance scale
+- Method: OLS; standardized coefficients.
+- Purpose: Test H3 (political intolerance → musical exclusiveness) and see if political intolerance mediates education/age effects.
+
+---
+
+### B. OLS regressions on dislikes separated by racialized genres (Table 2)
+
+These models use the **two dislike subscales** derived from the Table-3 genres.
+
+**Model 1 (left panel): Dislike of rap, reggae, blues/R&B, jazz, gospel, and Latin**
+
+- DV: count of dislikes among the 6 minority-associated genres.
+- IVs:
+  - Racism score
+  - Education
+  - Household income per capita
+  - Occupational prestige
+  - Female
+  - Age
+  - Black, Hispanic, Other race
+  - Conservative Protestant
+  - No religion
+  - Southern
+- Method: OLS; standardized coefficients.
+- Purpose: Test H4: high racism → more dislikes of genres disproportionately liked by people of color.
+
+**Model 2 (right panel): Dislike of the 12 remaining genres**
+
+- DV: count of dislikes among the remaining 12 genres.
+- Same IVs as above.
+- Purpose: establish that racism specifically predicts dislikes of minority-associated genres, not dislikes in general.
+
+---
+
+### C. Logistic regressions on disliking each individual genre (summarized in Figure 1)
+
+These models use **binary DVs**, constructed from the Table‑3 attitudes.
+
+For each of the 18 genres, Bryson estimates:
+
+- **DV:** Dislikes genre (1 if category 4 or 5; 0 otherwise).
+- **Key IV:** Musical tolerance (number of genres not disliked), **excluding** the focal genre.
+- **Control:** Education (years).
+- Method: Logistic regression.
+- Output used: Coefficient of musical tolerance for each genre, then plotted in Figure 1.
+- Purpose: Test H5 — whether people with generally tolerant musical tastes are systematically more likely to exclude low-status genres (those with least educated audiences).
+
+---
+
+### D. Descriptive correlation of education with “don’t know” responses (Hypothesis 6)
+
+- **DV:** Number of “don’t know much about it” responses across the 18 genres (from Table 3).
+- **IV:** Education.
+- Method: Pearson correlation; also mean comparison.
+- Findings:
+  - Corr(education, # DK) = −0.15 (p < .01).
+  - Mean education:  
+    - At least one DK: 12.6 years  
+    - No DK answers: 13.4 years (p < .0001).
+- Purpose: Test H6 — whether breadth of familiarity (low DK count) increases with education, supporting the idea of “multicultural capital.”
+
+---
+
+## Summary specific to your request
+
+- **Table 3** presents:
+  - The raw **frequency distributions and means** of attitudes toward each of **18 genres** on a 1–5 scale plus DK/NA categories.
+- Those 18 variables are used to construct:
+  - **Count of dislikes across all genres** (main DV in Table 1).
+  - **Count of dislikes of six minority-associated genres** and of the **other 12 genres** (DVs in Table 2).
+  - **Binary dislike indicators** for each genre (DVs in the logistic models summarized in Figure 1).
+  - **Count of “don’t know” responses** (familiarity measure for H6).
+- **Statistical methods involving these variables:**
+  - **OLS regression** with standardized coefficients (Tables 1 and 2).
+  - **Logistic regression** (genre-by-genre models for Figure 1).
+  - **Bivariate correlations** and mean comparisons for DK responses.
+
+If you want, I can itemize the exact recodes (e.g., how 1–5 become dislike vs. non-dislike, or show a schematic of the three levels of outcomes: overall count, subscale counts, and binary per-genre).

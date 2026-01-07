@@ -1,0 +1,60 @@
+Mapping from the Analysis Summary to the provided GSS variable fields (1993 culture module)
+
+Universe and case selection
+- Use the 1993 GSS cross-section (culture module year). Keep respondents with valid data on the dependent-variable genre items and the covariates used in each model. Missing values follow NORC’s missing codes and are treated as missing (not “dislike”).
+
+Dependent variables (two separate counts of dislikes)
+- Response recode for each music item (applies to all 18 items listed below):
+  - Dislike indicator = 1 if value in {4=dislike it, 5=dislike very much}
+  - Dislike indicator = 0 if value in {1=like very much, 2=like it, 3=mixed feelings}
+  - Missing for that item if value is any NA code (e.g., NA(d) don’t know)
+- Minority-associated genres count (Model A DV):
+  - Sum of the six dislike indicators for: rap, reggae, blues, jazz, gospel, latin
+  - Fields: rap, reggae, blues, jazz, gospel, latin
+  - Resulting DV: count_minority_dislikes = rap_dis + reggae_dis + blues_dis + jazz_dis + gospel_dis + latin_dis (sum over non-missing; if all six missing, set DV missing)
+- Remaining-genres count (Model B DV):
+  - Sum of the twelve dislike indicators for: bigband, blugrass, country, musicals, classicl, folk, moodeasy, newage, opera, conrock, oldies, hvymetal
+  - Fields: bigband, blugrass, country, musicals, classicl, folk, moodeasy, newage, opera, conrock, oldies, hvymetal
+  - Resulting DV: count_remaining_dislikes = sum of the 12 corresponding “_dis” indicators (sum over non-missing; if all 12 missing, set DV missing)
+
+Key independent variable
+- Racism score (summed across dichotomies, coded in the “racist” direction):
+  - Items and codings using provided fields:
+    - busing: 2=oppose → 1 (racist); 1=favor → 0; NA → missing
+    - racdif1 (discrimination mainly cause): 2=no → 1 (racist); 1=yes → 0; NA → missing
+    - racdif3 (lack of educational opportunity mainly cause): 2=no → 1 (racist); 1=yes → 0; NA → missing
+    - racdif4 (lack of motivation/will mainly cause): 1=yes → 1 (racist); 2=no → 0; NA → missing
+  - Combine by summing available items (each 0/1) to form racism_score; set missing if all four items are missing for a respondent.
+  - Note: The “>50% Black at school” item referenced in the summary is not in the provided CSV; the racism score here uses the four listed items from the CSV.
+
+Controls
+- Education (years): educ (use raw years as provided; treat NORC missing codes as missing)
+- Household income per capita: realinc divided by adults
+  - realinc = family income in constant 1986 dollars (use raw; missing if NORC missing)
+  - adults = number of household members age 18+ (use raw; missing if NORC missing or equals 0)
+  - income_pc = realinc / adults (set missing if either component missing or adults=0)
+- Occupational prestige: prestg80 (use raw prestige score; missing if NORC missing)
+- Female indicator: from sex
+  - female = 1 if sex==2 (female), 0 if sex==1 (male); missing if NORC missing
+- Age (years): age (use raw; missing if NORC missing)
+- Race/ethnicity indicators (reference = non-Hispanic White):
+  - Black: black = 1 if race==2, 0 if race in {1,3}; missing if NORC missing
+  - Other race: other_race = 1 if race==3, 0 if race in {1,2}; missing if NORC missing
+  - Hispanic indicator: not available in the provided CSV (no hispanic/origin field present)
+- Conservative Protestant indicator:
+  - Requires a reltrad/fundamentalist classification not derivable from the provided coarse denomination categories alone. Not available from the CSV fields provided (relig and denom as listed are insufficient to reproduce the “Conservative Protestant” indicator used in the paper).
+- No religion indicator: from relig
+  - norelig = 1 if relig==4 (none), 0 if relig in {1,2,3,5–13}; missing if NORC missing
+- Southern indicator: from region
+  - south = 1 if region==3 (South), 0 if region in {1,2,4}; missing if NORC missing
+
+Music-item field list (for clarity)
+- Minority-associated set (Model A): rap, reggae, blues, jazz, gospel, latin
+- Remaining set (Model B): bigband (swing/big band), blugrass (bluegrass), country (country/western), musicals (show tunes), classicl (classical/chamber), folk, moodeasy (pop/easy listening), newage (new age/space), opera, conrock (contemporary pop/rock), oldies, hvymetal (heavy metal)
+
+Model specification notes tied to fields
+- Run two separate OLS regressions:
+  - Model A DV: count_minority_dislikes
+  - Model B DV: count_remaining_dislikes
+- Predictors in both models (using the mappings above): racism_score, educ, income_pc, prestg80, female, age, black, other_race, norelig, south; plus the Conservative Protestant and Hispanic indicators are not available from the provided CSV.
+- Standardization for reporting standardized coefficients: standardize continuous predictors and DVs within the analysis sample (do not standardize binary indicators) before OLS, or compute standardized betas post hoc; mapping above supplies the raw fields needed.

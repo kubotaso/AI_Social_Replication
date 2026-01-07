@@ -1,0 +1,36 @@
+Core columns you need from the GSS 1993 Culture module
+
+Must-have
+- year — to restrict to 1993
+- educ — respondent’s highest year of school completed (years)
+
+Music battery: 18 genre items (5-point like→dislike plus “don’t know much about it”)
+Exact NORC variable names vary slightly by release, but in the GSS cumulative files they are the 18 “music taste” items with names starting with MUS and labels like “Please tell me whether you like very much, like, mixed feelings, dislike, dislike very much, or don’t know much about …”. Use the following mapping and verify names via labels:
+
+- Latin/Salsa — MUSLATIN (fallback: variable label contains “Latin or Salsa”)
+- Jazz — MUSJAZZ (fallback: label contains “Jazz”)
+- Blues/R&B — MUSBLUES (fallback: label contains “Blues or rhythm and blues” or “Blues/R&B”)
+- Show Tunes — MUSSHOW (fallback: label contains “Show tunes” or “Broadway show tunes”)
+- Oldies — MUSOLDIE or MUSOLDIES (fallback: label contains “Oldies”)
+- Classical/Chamber — MUSCLASS or MUSCLAS (fallback: label contains “Classical or chamber music”)
+- Reggae — MUSREGGA or MUSREGGAE (fallback: label contains “Reggae”)
+- Swing/Big Band — MUSSWING or MUSBIGBAN (fallback: label contains “Swing or big band”)
+- New Age/Space — MUSNEWAGE or MUSNEWAG (fallback: label contains “New age or space music”)
+- Opera — MUSOPERA (fallback: label contains “Opera”)
+- Bluegrass — MUSBLUEG or MUSBLUEGR (fallback: label contains “Bluegrass”)
+- Folk — MUSFOLK (fallback: label contains “Folk”)
+- Pop/Easy Listening — MUSPOP or MUSEASY (fallback: label contains “Pop or easy listening”)
+- Contemporary Rock — MUSROCK or MUSCROCK (fallback: label contains “Contemporary rock”)
+- Rap — MUSRAP (fallback: label contains “Rap”)
+- Heavy Metal — MUSHEMET, MUSHEAVY, or MUSHMETL (fallback: label contains “Heavy metal”)
+- Country/Western — MUSCOUN, MUSCW, or MUSCWEST (fallback: label contains “Country and western”)
+- Gospel — MUSGOSPEL or MUSGOSPL (fallback: label contains “Gospel”)
+
+Robust selection recipe if names differ in your file
+- Filter variables to those:
+  - Asked in 1993 (var_yrtab includes 1993) and culture module,
+  - Whose labels begin “Please tell me whether you like very much, like, mixed feelings, dislike, dislike very much, or don’t know much about …” and contain exactly one of the 18 genre strings above.
+- Then rename to the 18 genre keys listed for clarity in your code.
+
+Optional helper
+- id — respondent identifier (useful for checks; not required analytically)
