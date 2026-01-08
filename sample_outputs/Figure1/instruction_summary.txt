@@ -1,36 +1,49 @@
-Core columns you need from the GSS 1993 Culture module
+Here are the dataset columns you need to reproduce Figure 1, mapped to the 18 genre labels plus education. I list the most common GSS variable names used for the 1993 Culture Module, and include robust alternates in case your extract uses slightly different names.
 
-Must-have
-- year — to restrict to 1993
-- educ — respondent’s highest year of school completed (years)
+Core covariate
+- Education (years): educ
 
-Music battery: 18 genre items (5-point like→dislike plus “don’t know much about it”)
-Exact NORC variable names vary slightly by release, but in the GSS cumulative files they are the 18 “music taste” items with names starting with MUS and labels like “Please tell me whether you like very much, like, mixed feelings, dislike, dislike very much, or don’t know much about …”. Use the following mapping and verify names via labels:
+Music preference battery (1993 Culture Module; 1–5 scale with “don’t know much about it” and “no answer” codes to be set missing)
+- Latin/Salsa: latinsa
+  - Robust alternates to search for if not found: latin, latsalsa, mlatinsa, mlatin
+- Jazz: jazz
+  - Alternates: mjazz
+- Blues/R&B: blues
+  - Alternates: bluesrb, mblues
+- Show Tunes: showtune
+  - Alternates: showtun, shows, mshowtu
+- Oldies: oldies
+  - Alternates: moldies
+- Classical/Chamber: classmus
+  - Alternates: classical, clschmbr, classchm, mclass
+- Reggae: reggae
+  - Alternates: mreggae
+- Swing/Big Band: swing
+  - Alternates: bigband, mswing
+- New Age/Space: newage
+  - Alternates: mnewage
+- Opera: opera
+  - Alternates: mopera
+- Bluegrass: bluegras
+  - Alternates: bluegrss, mbluegra
+- Folk: folk
+  - Alternates: mfolk
+- Pop/Easy Listening: pop
+  - Alternates: easylist, easylis, mpop
+- Contemporary Rock: conrock
+  - Alternates: controck, rockcont, mconrock
+- Rap: rap
+  - Alternates: mrap
+- Heavy Metal: heavymtl
+  - Alternates: heavymet, mheavym, mheavymt
+- Country/Western: country
+  - Alternates: mcountry
+- Gospel: gospel
+  - Alternates: mgospel
 
-- Latin/Salsa — MUSLATIN (fallback: variable label contains “Latin or Salsa”)
-- Jazz — MUSJAZZ (fallback: label contains “Jazz”)
-- Blues/R&B — MUSBLUES (fallback: label contains “Blues or rhythm and blues” or “Blues/R&B”)
-- Show Tunes — MUSSHOW (fallback: label contains “Show tunes” or “Broadway show tunes”)
-- Oldies — MUSOLDIE or MUSOLDIES (fallback: label contains “Oldies”)
-- Classical/Chamber — MUSCLASS or MUSCLAS (fallback: label contains “Classical or chamber music”)
-- Reggae — MUSREGGA or MUSREGGAE (fallback: label contains “Reggae”)
-- Swing/Big Band — MUSSWING or MUSBIGBAN (fallback: label contains “Swing or big band”)
-- New Age/Space — MUSNEWAGE or MUSNEWAG (fallback: label contains “New age or space music”)
-- Opera — MUSOPERA (fallback: label contains “Opera”)
-- Bluegrass — MUSBLUEG or MUSBLUEGR (fallback: label contains “Bluegrass”)
-- Folk — MUSFOLK (fallback: label contains “Folk”)
-- Pop/Easy Listening — MUSPOP or MUSEASY (fallback: label contains “Pop or easy listening”)
-- Contemporary Rock — MUSROCK or MUSCROCK (fallback: label contains “Contemporary rock”)
-- Rap — MUSRAP (fallback: label contains “Rap”)
-- Heavy Metal — MUSHEMET, MUSHEAVY, or MUSHMETL (fallback: label contains “Heavy metal”)
-- Country/Western — MUSCOUN, MUSCW, or MUSCWEST (fallback: label contains “Country and western”)
-- Gospel — MUSGOSPEL or MUSGOSPL (fallback: label contains “Gospel”)
+Practical verification tips (if names differ in your file)
+- These 18 variables appear only in 1993 (year == 1993) and have identical response scales: 1 = like very much, 2 = like it, 3 = mixed feelings, 4 = dislike it, 5 = dislike very much, plus explicit “don’t know much about it” and “no answer” codes (commonly 8 and 9 in GSS; treat any value outside 1–5 as missing).
+- If your extract uses different names, search variable labels for the exact genre strings (e.g., “Latin/Salsa”, “Show Tunes”, “Pop/Easy Listening”, “Contemporary Rock”, “Heavy Metal”, “Classical/Chamber”, “Swing/Big Band”, “New Age/Space”, “Blues/R&B”). The battery typically has a common stem like “How much do you like or dislike the following types of music”.
+- Case and length can vary by extract; names may be uppercase in some releases (e.g., LATINSA, SHOWTUNE, HEAVYMTL).
 
-Robust selection recipe if names differ in your file
-- Filter variables to those:
-  - Asked in 1993 (var_yrtab includes 1993) and culture module,
-  - Whose labels begin “Please tell me whether you like very much, like, mixed feelings, dislike, dislike very much, or don’t know much about …” and contain exactly one of the 18 genre strings above.
-- Then rename to the 18 genre keys listed for clarity in your code.
-
-Optional helper
-- id — respondent identifier (useful for checks; not required analytically)
+With educ plus these 18 genre items, you can compute Y_g, TOL_g, run the 18 logistic regressions, and build the overlays (per-genre mean educ among likers and overall mean educ) exactly as specified.

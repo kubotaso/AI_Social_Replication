@@ -1,0 +1,102 @@
+Discrepancy report (ground-truth vs. your generated figure)
+
+What matches
+- Two y-axes, left range −0.5…−0.1 and right range 12…15.
+- X categories and order mostly match.
+- Dotted horizontal reference line at y2=13 is present.
+- No legend (labels are done via annotations).
+
+Exact discrepancies
+1) Line–style mapping is reversed
+- Ground-truth: Coefficient for Musical Tolerance = solid black line. Mean Education of Genre Audience = black dash–dot line.
+- Generated: Mean Education is drawn as a solid line; the coefficient series is dash–dot.
+
+2) Annotations point to the wrong items/are poorly placed
+- “Mean Education of Genre Audience” arrow points to the coefficient series in the generated plot.
+- “Coefficient for Musical Tolerance” text overlaps the left y-axis label and does not clearly point to the solid line.
+- Arrow placement for “Sample Mean Education” is different (y is OK, but text should be above the dotted line with a short downward arrow).
+
+3) One x tick label is wrong
+- Ground-truth uses “Heavy Metal”; generated uses “Metal”.
+
+4) Minor presentation differences
+- The dash–dot pattern in the ground-truth is a long–dash/short–gap/dot/short–gap pattern; your dash–dot spacing looks different.
+- Axis label spacing: the left y-axis label is cramped and overlaps with the annotation; the ground-truth has extra padding.
+- Line widths are a touch thin compared to the original.
+
+How to fix (data handling)
+- Do not sort or re-order genres; use the exact sequence below:
+  ["Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical","Reggae","Swing","New Age/Space","Opera","Bluegrass","Folk","Easy Listening","Pop/Rock","Rap","Heavy Metal","Country","Gospel"]
+- Use the original coefficient vector and mean-education vector 1:1; no smoothing or interpolation; no aggregation across bins.
+- Sample mean education is a single constant (13) used only for the horizontal reference line on the right y-axis.
+
+Matplotlib code changes (exact calls to adjust)
+
+- Ensure the two series are plotted on their intended axes with correct styles
+  # x positions
+  x = np.arange(len(genres))
+
+  # Left axis: coefficients (solid black)
+  ln_coef, = ax1.plot(x, coef, color='k', linestyle='-', linewidth=2.0, zorder=3)
+
+  # Right axis: mean education (dash–dot black with custom pattern)
+  ln_edu, = ax2.plot(x, mean_edu, color='k', linewidth=2.0, zorder=2)
+  ln_edu.set_linestyle((0, (7, 3, 2, 3)))  # long dash, gap, dot, gap (closer to print original)
+
+- Horizontal reference line and order
+  ax2.axhline(13, color='0.45', linestyle=':', linewidth=1.2, zorder=1)
+
+- X ticks (fix “Heavy Metal” and ensure order)
+  ax1.set_xticks(x)
+  ax1.set_xticklabels(genres, rotation=45, ha='right')
+
+- Axis ranges and ticks (match exactly)
+  ax1.set_ylim(-0.5, -0.1)
+  ax1.set_yticks(np.arange(-0.5, -0.09, 0.1))
+  ax2.set_ylim(12, 15)
+  ax2.set_yticks([12, 13, 14, 15])
+
+- Improve axis/spine visual parity with the original
+  for s in ['left','right','top','bottom']:
+      ax1.spines[s].set_linewidth(1.5)
+  ax2.spines['right'].set_linewidth(1.5)
+  ax1.tick_params(direction='out', width=1.2)
+  ax2.tick_params(direction='out', width=1.2)
+
+- Correct the annotations and arrows (put them on the correct axes and positions)
+  # Mean education label/arrow (attach to ax2 so y uses the right scale)
+  ax2.annotate('Mean Education of Genre Audience',
+               xy=(9, mean_edu[9]), xycoords='data',
+               xytext=(2.0, 14.6), textcoords='data',
+               arrowprops=dict(arrowstyle='->', lw=1.2),
+               ha='left', va='bottom', annotation_clip=False)
+
+  # Coefficient label/arrow (attach to ax1 so y uses the left scale)
+  ax1.annotate('Coefficient for Musical Tolerance',
+               xy=(1, coef[1]), xycoords='data',
+               xytext=(-0.4, -0.43), textcoords='data',
+               arrowprops=dict(arrowstyle='->', lw=1.2),
+               ha='left', va='top', annotation_clip=False)
+
+  # Sample mean education label/arrow (short arrow down to dotted line)
+  ax2.annotate('Sample Mean Education',
+               xy=(8.0, 13), xycoords='data',
+               xytext=(8.0, 13.15), textcoords='data',
+               arrowprops=dict(arrowstyle='-|>', lw=1.0),
+               ha='center', va='bottom', annotation_clip=False)
+
+- Labels and padding (avoid overlap with annotations)
+  ax1.set_ylabel("Coefficients for Musical Tolerance as It Affects One's Probability of Disliking Each Music Genre", labelpad=18)
+  ax2.set_ylabel("Mean Educational Level of Respondents Who Reported Liking Each Music Genre", labelpad=18)
+  ax1.set_xlabel("Type of Music")
+
+- Keep the figure margins tight but not clipping text
+  fig.tight_layout(rect=[0.02, 0.08, 0.98, 0.98])
+
+Quick checklist to verify after changes
+- Coefficient line is solid; mean-education line is dash–dot with long-dash/dot pattern.
+- “Mean Education of Genre Audience” arrow touches the dash–dot line; “Coefficient for Musical Tolerance” arrow touches the solid line near the left side.
+- X-label reads “Heavy Metal,” not “Metal.”
+- Right axis spans 12–15 with ticks at 12, 13, 14, 15; left axis spans −0.5…−0.1 with 0.1 steps.
+- Dotted horizontal line sits exactly at y2=13.
+- No markers, no legend, black-and-white styling, thicker spines like the print original.
