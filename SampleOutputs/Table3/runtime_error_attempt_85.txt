@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Table3.py", line 297, in try_run_generated_code
+    result = mod.run_analysis(str(data_path))  # type: ignore[attr-defined]
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260119_074740/Table3/generated_analysis_retry_85.py", line 171, in run_analysis
+    counts_1_5, dk_n, na_n, mean_val = _extract_counts_and_mean(df[var], var)
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260119_074740/Table3/generated_analysis_retry_85.py", line 143, in _extract_counts_and_mean
+    raise ValueError(
+    ...<7 lines>...
+    )
+ValueError: Cannot compute separate '(M) Don\'t know much about it' vs '(M) No answer' counts for LATIN: this CSV export does not preserve distinguishable DK/NA categories for all missing/non-1..5 values. Unclassified missing/non-1..5 count=233 (of total rows=1606). Detected DK=0, NA=0. Numeric diagnostics: non-1..5=233, NaN=233. Example unclassified raw values: [nan, nan, nan, nan, nan, nan, nan, nan, nan, nan]. Re-export data preserving DK vs No-answer codes (e.g., '[NA(d)]' and '[NA(n)]' or distinct numeric codes).

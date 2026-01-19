@@ -1,0 +1,165 @@
+Score: 10/100
+============================================================
+
+### 1) Table/Model identity and DV interpretation mismatches
+
+**Mismatch: Model labels and dependent variables don’t match the paper.**
+- **Generated ModelA** is labeled `Table2_ModelA_dislike_minority6` with **N=203**, but the true Model 1 is **N=644** and DV is *“Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music.”*
+- **Generated ModelB** is labeled `Table2_ModelB_dislike_other12` with **N=197**, but the true Model 2 is **N=605** and DV is *“Dislike of the 12 Remaining Genres.”*
+
+**How to fix**
+- Ensure you are using the **1993 GSS** sample and **the same inclusion criteria** as Bryson (1996). Your N is ~200, which strongly suggests:
+  - you filtered to a subset (e.g., complete cases on extra variables not in the paper; or wrong year; or only one ballot/form),
+  - or you constructed the DV(s) differently (missing genre items causing listwise deletion).
+- Recreate the exact two DVs:
+  - Model 1 DV = count of disliked among the **6 “minority-associated” genres** listed.
+  - Model 2 DV = count of disliked among the **other 12 genres**.
+- Use the same regression type: **OLS with standardized coefficients** (see section 3 for how to standardize correctly).
+
+---
+
+### 2) Variable name mismatches (and missing coefficient reporting)
+
+**Mismatch: “Education (years)” vs “Education.”**
+- Paper: **Education**
+- Generated: **Education (years)**  
+This is mostly cosmetic, but it signals you may be using *years* vs *degree categories*; the paper’s “Education” in GSS is typically years, but you must verify you matched Bryson’s coding.
+
+**Mismatch: “Constant” shown as NaN in `std_beta`**
+- Generated tables show **Constant std_beta = NaN**, but then show a “Constant” significance-starred value under `std_beta_star` (e.g., **2.824***, **7.073***).
+- In the true table, constants are **2.415*** (Model 1) and **7.860** (Model 2). (Also: the table reports constants but they are not “standardized”.)
+
+**How to fix**
+- If you are outputting **standardized coefficients**, do **not** present the constant as a standardized beta. Either:
+  1) report constant as **unstandardized intercept** in a separate column, or  
+  2) omit the intercept from the “standardized beta” table and list it separately (as Bryson does).
+- Align naming exactly to paper (optional but recommended): “Education”, not “Education (years)”.
+
+---
+
+### 3) Standard errors and p-values: fundamentally incompatible with the “True Results” table
+
+**Mismatch: Generated includes p-values and implies SEs, but the true table has no SEs.**
+- The true Table 2 **does not report standard errors** (only standardized coefficients + stars).
+- Your generated output includes **p-values** for every coefficient.
+
+**How to fix**
+- If your goal is to “match Table 2,” you must reproduce **standardized coefficients and significance markers**, not SEs/p-values.
+- You have two options:
+  - **Option A (recommended for matching the PDF):** Remove SE/p-value columns entirely; compute stars based on your own regression p-values but do not claim they come from Table 2.
+  - **Option B:** Keep p-values, but explicitly label the table as “Replication (p-values computed from our model), not reported in Bryson (1996).” Do not present them as extracted “true” values.
+
+---
+
+### 4) Coefficient-by-coefficient mismatches (Model 1 / Generated ModelA)
+
+True Model 1 coefficients vs Generated ModelA `std_beta`:
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | **0.130** ** | 0.1318 (p=.081) | Coefficient close, but **significance differs** (true **p<.01**, generated ~.08). |
+| Education | -0.175*** | -0.2517 | Too negative (stronger effect than true). |
+| HH income per capita | -0.037 | 0.0241 | **Sign flips**. |
+| Occupational prestige | -0.020 | 0.0041 | Sign flips and near zero. |
+| Female | -0.057 | -0.0310 | Too small in magnitude. |
+| Age | 0.163*** | 0.1511* | Similar magnitude, weaker significance. |
+| Black | -0.132*** | -0.1204 | Similar magnitude, **significance differs** (true *** vs generated ns). |
+| Hispanic | -0.058 | -0.0334 | Smaller magnitude. |
+| Other race | -0.017 | -0.0100 | Close-ish. |
+| Conservative Protestant | 0.063 | 0.0778 | Somewhat larger. |
+| No religion | 0.057 | NaN | **Missing entirely**. |
+| Southern | 0.024 | -0.0233 | **Sign flips**. |
+| Constant | 2.415*** | 2.824*** | Does not match. Also “standardized constant” issue (above). |
+
+**How to fix Model 1 mismatches**
+- The pattern (wrong N, some sign flips, missing “No religion”) strongly indicates **different coding and/or a different analytic sample**.
+- Specific fixes to check:
+  1) **No religion missing (NaN):** your “No religion” dummy is likely perfectly collinear or all-missing in your subset. Rebuild religion dummies to match the paper:
+     - Conservative Protestant (dummy)
+     - No religion (dummy)
+     - Implicit reference category = everyone else (or mainline/other religion; depends on paper coding)
+  2) **Southern sign flip:** ensure “Southern” is coded 1=South (Census region) and not reversed or using a different region scheme.
+  3) **Income per capita sign flip:** verify you used *per capita household income* consistent with Bryson. If you used raw household income, logged income, or a differently scaled variable, you can change sign/magnitude under standardization.
+  4) **Education too strong:** often happens if:
+     - you used a different education variable (e.g., degree categories transformed oddly),
+     - or your sample is restricted (range restriction can inflate standardized effects).
+  5) **Fix sample size first.** With N≈203, you will not match the published coefficients/stars reliably.
+
+---
+
+### 5) Coefficient-by-coefficient mismatches (Model 2 / Generated ModelB)
+
+True Model 2 coefficients vs Generated ModelB `std_beta`:
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.080 | -0.0120 | **Sign flips**. |
+| Education | -0.242*** | -0.2623** | Close-ish magnitude, but star level differs. |
+| HH income per capita | -0.065 | -0.0606 | Very close. |
+| Occupational prestige | 0.005 | -0.1040 | **Huge mismatch** (sign and magnitude). |
+| Female | -0.070 | -0.1011 | Somewhat stronger negative. |
+| Age | 0.126** | -0.0019 | **Completely off (sign/magnitude)**. |
+| Black | 0.042 | -0.0125 | Sign flip. |
+| Hispanic | -0.029 | 0.1242 | Sign flip + much larger. |
+| Other race | 0.047 | 0.1369 | Too large. |
+| Conservative Protestant | 0.048 | 0.1142 | Too large. |
+| No religion | 0.024 | NaN | **Missing entirely**. |
+| Southern | 0.069 | 0.1937** | Much larger. |
+| Constant | 7.860 | 7.073*** | Does not match; also star mismatch (true table shows no stars on constant in Model 2 as presented). |
+
+**How to fix Model 2 mismatches**
+- These are too large to be “rounding” problems; they indicate you are **not estimating the same model**.
+- Highest priority checks:
+  1) **Age is essentially zero** in your generated model but clearly positive in the paper. This often happens if:
+     - you accidentally standardized age incorrectly (e.g., using a constant/empty vector after filtering),
+     - you used a different age variable (e.g., age squared only, or centered then standardized wrongly),
+     - or you used a different DV construction that breaks the relationship.
+  2) **Occupational prestige**: paper ~0; your model is -0.104. Check you used the same prestige measure (e.g., SEI vs NORC prestige) and correct coding (higher=more prestige).
+  3) **Racism score sign flip**: verify you coded racism so that **higher = more racist** (as implied by positive coefficient in both models in the paper, esp. Model 1). A reversed scale will flip the sign.
+  4) **Hispanic sign flip**: check dummy coding and reference category; ensure you didn’t code “Hispanic” as “non-Hispanic” by mistake.
+
+---
+
+### 6) Fit statistics mismatches (R², adjusted R², k, N)
+
+**Mismatch: N, R², and adjusted R² differ.**
+- True:
+  - Model 1: **N=644**, R²=.145, Adj R²=.129
+  - Model 2: **N=605**, R²=.147, Adj R²=.130
+- Generated:
+  - ModelA: **N=203**, R²=.165, Adj R²=.117
+  - ModelB: **N=197**, R²=.201, Adj R²=.153
+
+**How to fix**
+- Match the paper’s **sample construction** first (again: year=1993, correct music items, correct missing-data strategy).
+- Confirm you have the same **k=12 predictors** *plus intercept* (your table says k=12, but your handling of “No religion” suggests the design matrix isn’t actually the same).
+
+---
+
+### 7) Significance marker mismatches
+
+**Mismatch: stars don’t correspond to true stars.**
+Examples:
+- Model 1 racism: true **0.130** (**) vs generated shows no star (p=.081).
+- Model 1 black: true -0.132*** vs generated ns.
+- Model 2 education: true -0.242*** vs generated -0.262**.
+
+**How to fix**
+- Once the model and sample match, stars should align approximately.
+- If you are trying to *exactly* match published stars, you must also match:
+  - weighting (if used),
+  - exact listwise deletion rules,
+  - any recodes (top-coding, missing handling),
+  - and potentially the exact computation of the racism scale.
+
+---
+
+## Summary of what you should change to make the generated analysis match the true table
+
+1) **Rebuild the analytic sample to match Bryson (1996)** (1993 GSS; correct inclusion; avoid accidental over-deletion). Your N must move from ~200 to ~644/~605.  
+2) **Reconstruct both DVs exactly** (6 minority-associated genres vs remaining 12).  
+3) **Ensure racism scale direction matches the paper** (higher = more racist).  
+4) **Recode predictors to match table definitions** (income per capita, prestige measure/coding, South coding, race/ethnicity dummies, religion dummies including “No religion”).  
+5) **Output format**: remove SEs/p-values as “true” (they aren’t in Table 2). Report standardized betas + stars; treat intercept separately (unstandardized).  
+
+If you share your codebook choices (which GSS variables used for each construct, and how you computed them), I can pinpoint exactly which recode is causing each sign flip (racism, southern, Hispanic, prestige, age) and why “No religion” is dropping out.

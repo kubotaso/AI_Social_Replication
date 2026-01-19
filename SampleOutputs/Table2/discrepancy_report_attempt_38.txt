@@ -1,0 +1,201 @@
+Score: 12/100
+============================================================
+
+## 1) Structural problems (what the generated output is claiming vs what the paper actually contains)
+
+### A. Standard errors are invented / not comparable
+- **True Table 2:** reports **standardized coefficients only** + significance stars. **No SEs are reported.**
+- **Generated output:** provides **unstandardized coefficients, SEs, t, p-values** in `ModelA_full` and `ModelB_full`, and then (separately) a “paper style” table with standardized betas and stars.
+
+**Why this is a mismatch:** You cannot “compare SEs” to the paper, because the paper provides none. Any SEs in the generated output are necessarily coming from a re-estimation on some dataset (and here, clearly not the GSS 1993 sample used in the paper).
+
+**Fix:**  
+- If your goal is to match Table 2: **do not report SEs/t/p at all**, and do not claim they come from Table 2. Report only standardized betas and stars.
+- If your goal is to *reproduce* Table 2 from GSS: you must use **GSS 1993 microdata**, same coding, and then you *can* compute SEs—but they still won’t “match the table” because the table doesn’t print them.
+
+---
+
+### B. Sample sizes and model fit do not match at all
+- **True Model 1:** N=644, R²=.145, Adj R²=.129  
+- **Generated ModelA_fit:** N=28, R²=.725, Adj R²=.588
+- **True Model 2:** N=605, R²=.147, Adj R²=.130  
+- **Generated ModelB_fit:** N=23, R²=.531, Adj R²=.263
+
+**Fix:** Use the correct dataset (GSS 1993), correct DV construction, and correct exclusions/weights (if used). With N in the 20s, you are not reproducing the published analysis.
+
+---
+
+### C. Predictors were dropped for “zero variance”—that should not happen in the GSS analysis
+Generated notes:
+- ModelA dropped: `hispanic, other_race, no_religion`
+- ModelB dropped: `black, hispanic, other_race, no_religion`
+
+But the paper includes these variables and reports coefficients for them (even if small).
+
+**Fix:** Your estimation dataset subset is wrong (too small / too homogeneous). Ensure race/religion categories actually vary (and are coded correctly) in the analytic sample.
+
+---
+
+## 2) Variable-by-variable mismatches in standardized coefficients (and stars)
+
+Below I align the *order* implied by your “paper style” betas to the paper’s variables. The generated tables do **not label rows**, which itself is a major discrepancy (see Fix at the end).
+
+### Model A (paper’s Model 1 DV: dislike minority-liked genres)
+
+**True standardized coefficients (with stars):**
+- Racism 0.130**
+- Education -0.175***
+- Income -0.037
+- Occ prestige -0.020
+- Female -0.057
+- Age 0.163***
+- Black -0.132***
+- Hispanic -0.058
+- Other race -0.017
+- Cons Prot 0.063
+- No religion 0.057
+- Southern 0.024
+- Constant 2.415***
+
+**Generated `ModelA_paper_style` betas (in order shown):**
+1) 0.030998  
+2) -0.718822 **  
+3) 0.114519  
+4) 0.445509 *  
+5) -0.133564  
+6) 0.223384  
+7) -0.159979  
+8) NaN  
+9) NaN  
+10) 0.231543  
+11) NaN  
+12) -0.174464  
+13) 2.754222  
+
+Assuming row 1 corresponds to Racism, row 2 Education, etc. (the only plausible mapping, since there are 13 entries including constant):
+
+#### Mismatches (coefficient, sign, magnitude, stars)
+- **Racism:** generated **0.031** (no stars) vs true **0.130** (**). Wrong magnitude and missing significance.
+- **Education:** generated **-0.719** (**) vs true **-0.175** (***). Magnitude wildly off; stars don’t match.
+- **Income:** generated **0.115** vs true **-0.037**. **Sign wrong**.
+- **Occupational prestige:** generated **0.446*** vs true **-0.020**. **Sign wrong** and magnitude wrong; significance wrong.
+- **Female:** generated **-0.134** vs true **-0.057**. Magnitude off (sign matches).
+- **Age:** generated **0.223** vs true **0.163***. Missing stars; magnitude off.
+- **Black:** generated **-0.160** vs true **-0.132***. Missing stars; magnitude somewhat off.
+- **Hispanic:** generated **NaN** vs true **-0.058**. Missing entirely.
+- **Other race:** generated **NaN** vs true **-0.017**. Missing entirely.
+- **Conservative Protestant:** generated **0.232** vs true **0.063**. Magnitude off a lot.
+- **No religion:** generated **NaN** vs true **0.057**. Missing entirely.
+- **Southern:** generated **-0.174** vs true **0.024**. **Sign wrong**.
+- **Constant:** generated **2.754** vs true **2.415***. Different value and missing stars.
+
+**Fixes specific to Model A:**
+1) **Label rows** with variable names and enforce a merge/join by name when formatting the table (prevents silent reordering mistakes).
+2) Use correct data and coding so **Hispanic/Other race/No religion aren’t dropped**.
+3) Ensure you are reporting **standardized coefficients**: in your “full” tables, `beta_std` is incorrectly equal to the constant for the constant row (and likely computed inconsistently).
+4) Apply the paper’s **star thresholds** (* p<.05, ** p<.01, *** p<.001) using two-tailed tests.
+
+---
+
+### Model B (paper’s Model 2 DV: dislike other 12 genres)
+
+**True standardized coefficients (with stars):**
+- Racism 0.080
+- Education -0.242***
+- Income -0.065
+- Occ prestige 0.005
+- Female -0.070
+- Age 0.126**
+- Black 0.042
+- Hispanic -0.029
+- Other race 0.047
+- Cons Prot 0.048
+- No religion 0.024
+- Southern 0.069
+- Constant 7.860
+
+**Generated `ModelB_paper_style` betas:**
+1) 0.067395  
+2) -0.908526 *  
+3) 0.114733  
+4) 0.400219  
+5) 0.081203  
+6) -0.235459  
+7) NaN  
+8) NaN  
+9) NaN  
+10) 0.155874  
+11) NaN  
+12) 0.158088  
+13) 9.156478  
+
+Again mapping row order to the paper’s variable order:
+
+#### Mismatches
+- **Racism:** 0.067 vs 0.080 (close-ish, but still not equal).
+- **Education:** -0.909* vs -0.242*** (magnitude and stars wrong).
+- **Income:** +0.115 vs -0.065 (**sign wrong**).
+- **Occ prestige:** +0.400 vs +0.005 (magnitude wrong).
+- **Female:** +0.081 vs -0.070 (**sign wrong**).
+- **Age:** -0.235 vs +0.126** (**sign wrong**).
+- **Black:** NaN vs +0.042 (missing; also your fit table says black was dropped).
+- **Hispanic:** NaN vs -0.029 (missing).
+- **Other race:** NaN vs +0.047 (missing).
+- **Cons Prot:** 0.156 vs 0.048 (magnitude off).
+- **No religion:** NaN vs 0.024 (missing).
+- **Southern:** 0.158 vs 0.069 (magnitude off).
+- **Constant:** 9.156 vs 7.860 (wrong).
+
+**Fixes specific to Model B:**
+Same as Model A, plus: the signs flipping for Female and Age strongly suggests the DV or coding is not the same construct as in the paper (or the sample is radically different). Rebuild DV exactly as Bryson defines it and verify coding for Female/Age direction.
+
+---
+
+## 3) Interpretation mismatches you should correct
+
+### A. Do not interpret NaNs as “no effect”
+In the generated output, NaNs appear because predictors were dropped. In the paper, those predictors are in the model (even if insignificant).
+
+**Fix:** In the write-up, explicitly state: “variable dropped due to no variation in analytic sample” (if you keep this analysis). But if you claim to match Bryson, you must fix the sample so they are **not dropped**.
+
+### B. Constant and “beta_std” confusion
+Your `ModelA_full` and `ModelB_full` show `beta_std` for the constant equal to the unstandardized constant (e.g., 2.754222). A standardized beta for a constant is typically not meaningful and generally not reported that way.
+
+**Fix:**  
+- Don’t compute/report standardized beta for the intercept.  
+- For predictors: compute beta as \( b \times \frac{\sigma_x}{\sigma_y} \) using the estimation sample.
+
+---
+
+## 4) Formatting / workflow discrepancies causing silent errors (and how to fix)
+
+### Problem: “paper_style” tables are unlabeled
+Because there are no variable names, you cannot verify alignment, and you can easily shift rows when some predictors drop (creating wrong comparisons).
+
+**Fix (must-do):**
+- Always output a table with an explicit `term` column (variable name).
+- When building the “paper style” table, **left-join** by `term` onto a template ordered exactly like the paper’s Table 2 variable order. Missing terms should show as blank with an explanatory footnote, not NaN.
+
+### Problem: stars don’t correspond to the paper’s thresholds
+E.g., Education in Model A shows ** but in your full table p=0.004876 (that would be ** under p<.01, but the paper has ***). With a correct N (hundreds), the p-values would change; but also your star mapping may be inconsistent.
+
+**Fix:** Implement exactly:
+- * p < .05
+- ** p < .01
+- *** p < .001  
+(two-tailed)
+
+---
+
+## 5) Minimal checklist to make the generated analysis match Bryson Table 2
+
+1) **Use GSS 1993 data** and replicate the paper’s sample restrictions.
+2) Construct both DVs exactly:
+   - DV1: number of disliked genres among {Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin}
+   - DV2: number of disliked genres among the other 12 genres
+3) Code predictors to match: racism score, education, income per capita, occupational prestige, female, age, race dummies (black/hispanic/other), conservative Protestant, no religion, southern.
+4) Estimate OLS and compute **standardized coefficients** for predictors (not intercept).
+5) Produce output table with **only standardized coefficients + stars** (no SEs), matching the paper’s variable names and order.
+6) Verify that N and R² match approximately (N=644/605; R²≈.145/.147). If not, your sample/DV coding is still off.
+
+If you want, paste the variable-name mapping you used (or your code/output with term labels), and I can point to the exact row-ordering/coding error that produced the sign flips and NaNs.

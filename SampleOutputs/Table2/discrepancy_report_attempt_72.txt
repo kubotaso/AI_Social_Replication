@@ -1,0 +1,171 @@
+Score: 21/100
+============================================================
+
+### 0) Fundamental reporting problem (SEs and p-values)
+**Mismatch:** Your “Generated Results” report **p-values, stars derived from them, and imply standard errors**, but the **True Results table reports only standardized coefficients and significance markers** and **explicitly does not include SEs**. Therefore, your p-values (and any SEs behind them) **cannot be “matched” to Table 2** unless you re-run the regression on the GSS data.
+
+**How to fix:**
+- If the goal is to **reproduce the paper’s Table 2**, **remove p-values and SEs entirely** and keep only standardized betas + the paper’s stars.
+- If the goal is to show **a replication analysis**, then you must (a) state it is a replication, (b) report SEs/p-values from your replication, and (c) accept that they may differ due to weighting, sample restrictions, missing data handling, and variable construction. But then don’t label it as “Bryson 1996 Table 2” unless it matches design choices.
+
+---
+
+## 1) Variable name mismatches (and missing variable)
+### Model 1 / ModelA
+**Mismatch:** True table includes **Hispanic**; your ModelA_table has **no Hispanic variable**.
+- True: *Hispanic = -0.058*
+- Generated: (missing)
+
+**How to fix:** Add a dummy (or factor level) for **Hispanic** consistent with Bryson’s coding. Ensure the race/ethnicity categories match the paper.
+
+**Mismatch:** Naming differences that can conceal coding errors:
+- True: “Racism score” vs Generated: `racism_score` (OK, rename only)
+- True: “Household income per capita” vs Generated: `hh_income_per_capita` (OK)
+- True: “Occupational prestige” vs Generated: `occupational_prestige` (OK)
+- True: “Conservative Protestant” vs Generated: `conservative_protestant` (OK)
+- True: “Southern” vs Generated: `southern` (OK)
+
+**Potential structural issue:** Race dummies in the paper are **Black, Hispanic, Other race** (implicitly compared to White). Your set is **black, other_race** and no Hispanic. That changes coefficients for race and possibly other covariates.
+
+### Model 2 / ModelB
+Same missing **Hispanic** problem.
+
+---
+
+## 2) Coefficient mismatches (direction/magnitude/significance)
+
+### Model 1 (True vs Generated ModelA)
+| Variable | True beta | Generated beta_std | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.130** | 0.139* | Stars wrong (** vs *), beta slightly off |
+| Education | -0.175*** | -0.261*** | Too negative (large difference) |
+| HH income pc | -0.037 | -0.034 | Close |
+| Occ prestige | -0.020 | 0.030 | **Sign flip** |
+| Female | -0.057 | -0.026 | Too small in magnitude |
+| Age | 0.163*** | 0.191*** | Larger than true |
+| Black | -0.132*** | -0.127* | Stars wrong (*** vs *), beta close |
+| Hispanic | -0.058 | (missing) | Omitted variable |
+| Other race | -0.017 | 0.004 | **Sign flip** |
+| Cons Prot | 0.063 | 0.079 | Slightly larger |
+| No religion | 0.057 | NaN | Not estimated / dropped |
+| Southern | 0.024 | 0.022 | Close |
+| Constant | 2.415*** | 2.654*** | Different (and you show NaN beta but print 2.654*** elsewhere) |
+
+**How to fix likely causes:**
+1. **Sample size is drastically wrong** (see Section 4). That alone can change all betas and significance.
+2. **Hispanic omitted**: add it; otherwise race effects and even non-race covariates can shift.
+3. **“No religion” is NaN**: indicates the variable is being dropped (collinearity, all-missing, or mis-coded). Fix coding so it varies and is not perfectly collinear with the intercept + other religion dummies.
+4. **Standardization method**: “standardized coefficients” in the paper typically means **standardize variables (or compute beta = b * SDx/SDy)**. Ensure you standardize *exactly* as Bryson (and don’t standardize dummy variables differently unless you replicate his approach).
+5. **Weights/design**: GSS often uses weights; Bryson may have used them (paper-specific). Using/unusing weights changes betas and SEs.
+
+### Model 2 (True vs Generated ModelB)
+| Variable | True beta | Generated beta_std | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.080 | -0.005 | **Sign + magnitude mismatch** |
+| Education | -0.242*** | -0.224*** | Close-ish |
+| HH income pc | -0.065 | -0.095 | More negative |
+| Occ prestige | 0.005 | -0.012 | Small sign mismatch |
+| Female | -0.070 | -0.091 | More negative |
+| Age | 0.126** | 0.091 | Too small; stars wrong (** vs none) |
+| Black | 0.042 | 0.112 | Much larger |
+| Hispanic | -0.029 | (missing) | Omitted variable |
+| Other race | 0.047 | 0.132* | Much larger; stars wrong (none vs *) |
+| Cons Prot | 0.048 | 0.080 | Larger |
+| No religion | 0.024 | NaN | Dropped |
+| Southern | 0.069 | 0.142** | Much larger; stars wrong (none vs **) |
+| Constant | 7.860 | 5.674*** | Different and stars inconsistent with paper (paper shows no stars) |
+
+**How to fix likely causes:**
+- Same core issues: **wrong N, missing Hispanic, dropped no_religion, possible different DV construction** (very likely here because racism effect changes sign).
+- Verify the **DV definitions** exactly:
+  - Model 1 DV: number of disliked among the “minority-liked” genres (rap, reggae, blues/R&B, jazz, gospel, latin).
+  - Model 2 DV: number of disliked among the **12 remaining genres**.
+  Small mistakes in genre inclusion/exclusion or coding “dislike” will strongly alter coefficients (including racism).
+
+---
+
+## 3) Significance markers (stars) mismatches
+Even ignoring the impossibility of deriving p-values from the PDF table, your stars don’t match the paper’s stars in many places:
+
+### Model 1:
+- Racism should be ** (p<.01), you show *
+- Black should be ***, you show *
+- Several nonsignificant variables are fine, but because N differs, your star pattern is not comparable.
+
+### Model 2:
+- Age should be **, you show none
+- Southern should have no stars, you show **
+- Other race should have no stars, you show *
+- Constant: paper shows **7.860** without stars; you show *** (and different value)
+
+**How to fix:**
+- If reproducing Table 2: **hard-code the stars exactly as in the paper** (since Table 2 already provides them) and do not recompute stars from p-values.
+- If replicating: compute stars from your model—but then don’t compare them as if they must match Table 2 unless all design choices match.
+
+---
+
+## 4) Model fit and sample size (major discrepancies)
+**Mismatch (Model 1):**
+- True N = **644**, R² = **.145**, Adj R² = **.129**
+- Generated N = **327**, R² = **.190**, Adj R² = **.164**
+
+**Mismatch (Model 2):**
+- True N = **605**, R² = **.147**, Adj R² = **.130**
+- Generated N = **308**, R² = **.166**, Adj R² = **.138**
+
+Your N is roughly **half** of what it should be in both models. That is not a minor difference; it indicates a major sample restriction, join/merge loss, or listwise deletion caused by miscoding/missingness.
+
+**How to fix:**
+1. **Audit case loss by variable** (missingness table). Identify which variable(s) cut N from ~644 to ~327.
+2. Ensure you used **GSS 1993** and the same universe restrictions as Bryson (e.g., respondents asked all music items).
+3. Check you didn’t inadvertently:
+   - filter to a subgroup (e.g., only Whites, only one gender, only complete cases for extra variables not in the paper),
+   - drop cases due to converting “don’t know/refused/not asked” to NA too aggressively,
+   - merge in external data incorrectly (inner join instead of left join).
+4. Apply the same **listwise deletion rules** as the paper (or explicitly document differences).
+
+---
+
+## 5) “No religion = NaN” and “Constant beta = NaN” formatting/estimation errors
+**Mismatch:** In both models:
+- `no_religion` has NaN beta/p
+- `Constant` has NaN beta but you display a starred constant value in `beta_std_star` (2.654***, 5.674***)
+
+This suggests your table-building code is broken or variables are dropped but your formatter still prints something.
+
+**How to fix:**
+- Fix the model matrix so `no_religion` is a valid regressor:
+  - If religion is categorical: include **one omitted reference category** (e.g., mainline Protestant) and include “No religion” as one of the non-reference dummies.
+  - Ensure `no_religion` is not all missing and not identical to another column.
+- Fix extraction of coefficients:
+  - If you standardize variables before regression, the intercept is not “standardized”; decide whether to report it separately (unstandardized) like the paper does.
+  - Ensure your table uses the coefficient estimate column, not mixing estimate with formatted strings.
+
+---
+
+## 6) Interpretation mismatch (what the DV actually is)
+**Mismatch risk:** Your model labels:
+- `Table2_ModelA_Dislike_Minority6`
+- `Table2_ModelB_Dislike_Other12`
+
+Those labels are consistent in spirit, but given the coefficient/sign differences (especially racism in Model 2), you likely did **not** construct the DV exactly like Bryson.
+
+**How to fix:**
+- Reconstruct the DV to match the paper precisely:
+  - Count of **disliked** genres, not “not liked,” not “liked,” not “missing treated as dislike.”
+  - Use the exact genre list for each model.
+  - Confirm the direction: higher DV = **more disliked genres**.
+
+---
+
+## 7) Concrete checklist to make “generated” match “true”
+1. Use **GSS 1993** and replicate the **exact sample** (music module respondents); target N≈644 and N≈605 after listwise deletion consistent with the paper.
+2. Construct DVs exactly:
+   - Model 1: count dislikes among {Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin}.
+   - Model 2: count dislikes among the other 12 genres.
+3. Include all covariates exactly as Table 2: add **Hispanic** and ensure race reference category is **White**.
+4. Fix religion coding so **No religion** is estimated (not NaN) and only one category is omitted.
+5. Compute **standardized coefficients** in the same way as the paper; report **no SEs** (since Table 2 doesn’t have them).
+6. Use the paper’s **stars** (not p-values) if you are reproducing the table; otherwise explicitly label as replication and accept differences.
+
+If you share your code/data-processing steps (especially DV construction, race/religion coding, and missing-data handling), I can pinpoint exactly which step is causing the N-halving and the sign flips (e.g., occupational prestige, other race, racism in Model 2).

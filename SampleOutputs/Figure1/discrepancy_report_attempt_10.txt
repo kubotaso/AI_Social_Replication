@@ -1,0 +1,151 @@
+Score: 92/100
+============================================================
+
+## Discrepancy report (GT top vs Generated bottom)
+
+### 1) Series-to-axis mapping is swapped (major)
+- **GT:**  
+  - **Solid line** = *Coefficient for Musical Tolerance* (left y-axis, negative values around −0.2 to −0.45).  
+  - **Dash-dot line** = *Mean Education of Genre Audience* (right y-axis, ~12–15, generally increasing toward the right).
+- **Generated:**  
+  - **Solid line** is plotted on the **left axis** but shows a smooth monotonic increase (behavior of the *education* series).  
+  - **Dash-dot line** behaves like the *tolerance coefficient* series (negative jagged), implying the two series are **assigned to the wrong y-axes and/or swapped in plotting**.
+
+**Impact:** The visual story is reversed.
+
+---
+
+### 2) Wrong line styles for the two series (major)
+- **GT:** Education = **dash-dot**; Tolerance coefficient = **solid**.
+- **Generated:** Education appears **solid**; tolerance appears **dash-dot**.
+
+---
+
+### 3) Education series shape is incorrectly smoothed/monotonic (major)
+- **GT (education / right axis):** Rises overall but has **noticeable step-like increases and small plateaus**; not perfectly monotonic and not uniformly smoothed.
+- **Generated (education-looking line):** Very **smooth and monotonic**, suggesting **sorting, cumulative averaging, interpolation, rolling mean, or other smoothing/aggregation** was applied (or values were not the per-genre means).
+
+---
+
+### 4) Annotation leader lines point to the wrong series (major)
+- **GT:**  
+  - “Mean Education of Genre Audience” arrow points to the **dash-dot** education line (upper left region).  
+  - “Coefficient for Musical Tolerance” arrow points to the **solid** coefficient line (lower left region).
+- **Generated:** Because the series are swapped, the arrows/labels now effectively refer to the **wrong line** (even if the text positions look similar).
+
+---
+
+### 5) X-category order differs (minor/none)
+- The genre order visually appears the **same** in both (Latin/Salsa → … → Gospel). No clear discrepancy here.
+
+---
+
+### 6) Axes ranges/ticks (mostly match)
+- **Left y-axis:** −0.5 to −0.1 in both (tick labels shown as “-.1 … -.5”).
+- **Right y-axis:** 12 to 15 in both.
+- **Horizontal dotted line (“Sample Mean Education”)** is at ~13 in both and looks correctly placed.
+
+(So the main issues are *mapping, styles, and data processing*.)
+
+---
+
+## Exact fixes (data processing + matplotlib) to match GT
+
+### A) Fix the data you plot (remove unintended smoothing/sorting)
+- **Ensure per-genre means are computed directly** and not post-processed:
+  - Compute education per genre: `edu_mean = df.groupby('genre')['education'].mean()`
+  - Compute coefficient series from the model output **in the original genre order** (not sorted by value, not rolling-averaged).
+- **Do not apply** any of the following to the plotted series:
+  - `sort_values()` (unless GT explicitly sorts genres—which it doesn’t)
+  - `rolling().mean()`, `ewm()`, interpolation, spline fits
+  - cumulative means (`expanding().mean()`)
+- **Reindex both series to the same explicit category order** (the x-axis order in the figure):
+  - Define `genre_order = [...]` exactly as in GT
+  - `edu_mean = edu_mean.reindex(genre_order)`
+  - `coef = coef.reindex(genre_order)`
+
+### B) Plot each series on the correct axis with the correct linestyle
+- Use `twinx()` and **plot coefficient on left**, education on right:
+
+```python
+fig, ax = plt.subplots(figsize=(12, 6))
+ax2 = ax.twinx()
+
+x = np.arange(len(genre_order))
+
+# LEFT axis: coefficient (solid)
+ax.plot(x, coef.values, color='black', linestyle='-', linewidth=2)
+
+# RIGHT axis: mean education (dash-dot)
+ax2.plot(x, edu_mean.values, color='black', linestyle='-.', linewidth=2)
+```
+
+### C) Lock axis limits/ticks to match GT
+```python
+ax.set_ylim(-0.5, -0.1)
+ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])
+ax.set_yticklabels(['-.5','-.4','-.3','-.2','-.1'])
+
+ax2.set_ylim(12, 15)
+ax2.set_yticks([12, 13, 14, 15])
+```
+
+### D) Keep the dotted “Sample Mean Education” line on the education scale (right axis)
+- Draw the horizontal reference using **ax2** (because it’s an education mean):
+```python
+sample_mean_edu = df['education'].mean()
+ax2.axhline(sample_mean_edu, color='black', linestyle=':', linewidth=1.5)
+```
+- If GT’s line is exactly at **13.0** (not the computed mean), hard-code it:
+```python
+ax2.axhline(13.0, color='black', linestyle=':', linewidth=1.5)
+```
+
+### E) Fix x ticks/rotation/labels to match
+```python
+ax.set_xticks(x)
+ax.set_xticklabels(genre_order, rotation=45, ha='right')
+ax.set_xlabel('Type of Music', fontweight='bold')
+```
+
+### F) Fix annotations so they point to the correct lines
+- Point “Mean Education…” to a point on the **dash-dot** (ax2) series:
+```python
+i = 2  # pick the same genre index as GT's arrow target
+ax2.annotate('Mean Education of Genre Audience',
+             xy=(x[i], edu_mean.values[i]), xycoords='data',
+             xytext=(x[i]+1.0, 14.2), textcoords='data',
+             arrowprops=dict(arrowstyle='-', color='black'),
+             fontsize=14, fontweight='bold')
+```
+
+- Point “Coefficient…” to a point on the **solid** (ax) series:
+```python
+j = 2
+ax.annotate('Coefficient for Musical Tolerance',
+            xy=(x[j], coef.values[j]), xycoords='data',
+            xytext=(x[j]+1.0, -0.47), textcoords='data',
+            arrowprops=dict(arrowstyle='-', color='black'),
+            fontsize=14, fontweight='bold')
+```
+
+- For “Sample Mean Education” arrow, anchor it on the dotted line (on **ax2**):
+```python
+ax2.annotate('Sample Mean Education',
+             xy=(x[6], sample_mean_edu),
+             xytext=(x[6], sample_mean_edu-0.35),
+             ha='center',
+             arrowprops=dict(arrowstyle='-|>', color='black'),
+             fontsize=14, fontweight='bold')
+```
+
+### G) If your education line became monotonic due to sorting by education
+- Remove any code like:
+```python
+df = df.sort_values('education')
+```
+- Or if you must sort elsewhere, ensure plotting uses `genre_order` reindexing (Section A).
+
+---
+
+If you paste the snippet where you build `coef` and `edu_mean` (and any sorting/rolling steps), I can point to the exact line(s) causing the monotonic smoothing and the axis/series swap.

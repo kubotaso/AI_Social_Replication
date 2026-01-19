@@ -1,0 +1,162 @@
+Score: 75/100
+============================================================
+
+## 1) Wrong table produced / row items don’t match the “true results” structure
+
+### Mismatch: You generated only **Table 3-like** numbers, but the “True Results” includes **Tables 1, 2, and 3**
+- **True Results** contain:
+  - **Table 1**: regression coefficients (3 model columns, variables like Education, Age, etc.)
+  - **Table 2**: regression coefficients (2 columns)
+  - **Table 3**: frequency distributions for 18 genres
+- **Generated Results** contain **only** the Table 3 frequency block (and even that is incomplete).
+
+**Fix**
+- If you intended to reproduce the entire “True Results,” you must generate **three separate tables**:
+  1) Table 1 with its variables and three model columns + R², Adj R², N  
+  2) Table 2 with its variables and two columns + R², Adj R², N  
+  3) Table 3 with the 18-genre frequency distributions + means  
+- If you intended to generate only Table 3, label it as such and do not include Table 1/2 in “true” comparison.
+
+---
+
+## 2) Row category mismatches (missing row items)
+
+### Mismatch: Missing the two “M” rows in the generated table
+In **True Table 3**, each genre has **7** frequency rows + mean:
+
+1. (1) Like very much  
+2. (2) Like it  
+3. (3) Mixed feelings  
+4. (4) Dislike it  
+5. (5) Dislike very much  
+6. (M) Don’t know much about it  
+7. (M) No answer  
+8. Mean
+
+In **Generated Results**, you have:
+- 5 numeric rows (for 1–5)
+- then **two rows of NaN**
+- then the mean row
+
+So the **row items are present structurally**, but the last two frequency categories are not populated (they’re NaN rather than counts).
+
+**Fix**
+- Replace the two NaN rows with the correct “M” counts from the true table (see section 3 below).
+- Also add explicit row labels to prevent losing category names (e.g., “(M) Don’t know much about it”, “(M) No answer”)—right now they appear as unlabeled NaN rows.
+
+---
+
+## 3) Frequency count mismatches (all are in the two missing “M” rows)
+
+### Mismatch: “Don’t know much about it” counts are missing for every genre
+Your generated table shows **NaN** for this row across all 18 genres. True values are:
+
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+**Fix**
+- Fill the 6th row with these values (and label it correctly).
+
+### Mismatch: “No answer” counts are missing for every genre
+Your generated table shows **NaN** for this row across all genres. True values are:
+
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+**Fix**
+- Fill the 7th row with these values (and label it correctly).
+
+---
+
+## 4) Frequencies for categories (1)–(5): they match (no discrepancies)
+
+For all 18 genres, your first five numeric rows match the true table exactly. Examples:
+- Latin/Salsa: 85, 325, 416, 403, 144 match
+- Heavy Metal: 48, 123, 189, 400, 766 match
+- Gospel: 356, 571, 364, 197, 71 match
+
+**No fixes needed** for rows (1)–(5).
+
+---
+
+## 5) Summary statistics (means): they match (minor rounding only)
+
+Your mean row values match the true means (differences only in display precision):
+- Latin/Salsa 3.142753 → True 3.14
+- Jazz 2.60528 → True 2.61
+- Heavy Metal 4.122543 → True 4.12  
+etc.
+
+**Fix (optional)**
+- Round means to 2 decimals to match the published table formatting.
+
+---
+
+## 6) Missing/extra columns or column categories
+
+### Column set: matches Table 3’s 18 genres
+Your generated output includes the same 18 genre columns as True Table 3:
+Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber, Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk, Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel.
+
+**No missing/extra genre columns**.
+
+### But: missing “Attitude” column / row labels
+The true table includes an “Attitude” stub column (labels for response categories). Your generated table omits it, which is why the two “M” rows appear as unlabeled NaNs.
+
+**Fix**
+- Add an “Attitude” index/column and populate it with the 8 row labels listed above.
+
+---
+
+## 7) Percentages are not reported (true table also doesn’t report them)
+
+You asked to compare “frequency counts or percentages.” The **true Table 3 provides counts only**, not percentages. The generated table also provides counts only.
+
+**Fix (only if you want percentages)**
+- Compute percentages using a consistent denominator (typically total responses including missing categories if matching the table’s base), and add them as additional columns or parentheses. But then the “true” table you’re comparing against would need those percentages too.
+
+---
+
+## What to change so “Generated Results” matches “True Results” exactly (Table 3)
+
+1) Replace the two NaN rows with:
+- Row 6: “(M) Don’t know much about it” counts (listed above)
+- Row 7: “(M) No answer” counts (listed above)
+
+2) Add the “Attitude” row labels (or set them as the DataFrame index) so those two rows aren’t anonymous.
+
+3) Optionally round the mean row to 2 decimals to match the published formatting.
+
+Everything else in your generated Table 3 (rows 1–5 and mean values) already matches the true table.

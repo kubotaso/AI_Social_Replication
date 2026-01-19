@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Table1.py", line 293, in try_run_generated_code
+    result = mod.run_analysis(str(data_path))  # type: ignore[attr-defined]
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260119_074740/Table1/generated_analysis_retry_14.py", line 309, in run_analysis
+    tab1, fit1, before1, dropped1, frame1 = fit_model(df, dv, m1_x, "Model 1 (SES)", labels)
+                                            ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260119_074740/Table1/generated_analysis_retry_14.py", line 129, in fit_model
+    betas_std = standardized_betas_from_unstandardized(y.to_numpy(), Xc.to_numpy()[:, 1:], res.params)  # not used directly
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260119_074740/Table1/generated_analysis_retry_14.py", line 51, in standardized_betas_from_unstandardized
+    for col in X.columns:
+               ^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'columns'

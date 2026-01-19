@@ -1,0 +1,132 @@
+Score: 10/100
+============================================================
+
+### 1) Fit statistics: **all mismatched / missing in the generated output**
+**Generated:** `n = 0`, `r2 = NaN`, `adj_r2 = NaN` for all three models.  
+**True:** Model 1 `n=787, R²=.107, adj R²=.104`; Model 2 `n=756, R²=.151, adj R²=.139`; Model 3 `n=503, R²=.169, adj R²=.148`.
+
+**What went wrong (diagnosis):**
+- Your model frames are **empty** (`Empty DataFrame ... Index: []`). That forces `n=0` and makes all estimates `NaN`.
+- The missingness audit shows why frames became empty: at least one required predictor is missing for (almost) everyone in the constructed dataset—especially `inc_pc` (100% missing) and race dummies (`hispanic`, `otherrace` ~93% missing). With listwise deletion, that can drop the sample to zero.
+
+**How to fix:**
+- **Fix the variable construction/merges** so key predictors are populated (see Sections 3–4 below).
+- Recreate each model’s analysis dataset using **rowwise complete cases only on variables in that model**, after fixing variable coding:
+  - Model 1 complete cases on `num_genres_disliked, educ_yrs, inc_pc, prestg80` should yield `n≈787`.
+  - Model 2 adds demographic dummies, should yield `n≈756`.
+  - Model 3 adds `pol_intol`, should yield `n≈503`.
+- Confirm the sample sizes by printing `df_model.shape[0]` before fitting.
+
+---
+
+### 2) Coefficients / SE / p-values: **generated output is entirely NaN and structurally inconsistent with the true table**
+**Generated:** columns `b`, `beta`, `p`, but every value is `NaN`.  
+**True:** Table reports **standardized coefficients (β)** with significance stars; **standard errors are not reported**; constants are **unstandardized**.
+
+**Mismatches:**
+1. **No coefficient values at all** (NaNs) vs. the nonzero βs and constants in the true table.
+2. **Standard errors**: generated output implies they were computed (you have `p` values), but the “true results” table explicitly says **SEs are not reported**. So even if your regression ran, your output format does not match what the paper/table provides.
+3. **Interpretation level**: the true table’s main reported coefficients are **standardized β**, but your table includes both `b` and `beta` without clarifying which should be compared. The comparison must be: **your `beta` ↔ true β**, and **your constant `b` ↔ true constant** (because constants aren’t standardized).
+
+**How to fix:**
+- Decide what you are trying to “match”:
+  - If matching the paper: **report standardized coefficients only (β)**, plus the **unstandardized constant**, plus R²/adj R²/n, and add significance stars from p-values.
+  - Do **not** present SEs if the “true” benchmark doesn’t include them (or label them as “not reported” and don’t compare).
+- Compute standardized coefficients correctly (see Section 5).
+
+---
+
+### 3) Variable name mismatches: **internal names vs. displayed labels are inconsistent, and some appear incorrectly created**
+There are two layers: (a) internal variable names in `model_frames`, and (b) printed labels in the regression tables.
+
+**Observed:**
+- Internal vars: `educ_yrs`, `inc_pc`, `prestg80`, `pol_intol`, `num_genres_disliked`, `female`, `age`, `black`, `hispanic`, `otherrace`, `cons_prot`, `norelig`, `south`.
+- Printed terms: “Education (years)”, “Household income per capita”, “Occupational prestige”, etc.
+
+**Mismatches / likely issues:**
+- The *names* themselves aren’t the problem; the **coding is** (see missingness below). But you should ensure consistent mapping so you don’t accidentally compare the wrong variable.
+- Race variables: the benchmark table has **Black, Hispanic, Other race** (implying White is the reference). Your internal names match (`black`, `hispanic`, `otherrace`), but their missingness suggests they were not properly generated as 0/1 dummies.
+
+**How to fix:**
+- Create an explicit **name map** between internal vars and table labels, and validate that each exists and has plausible distributions:
+  - e.g., `df['hispanic'].value_counts(dropna=False)` should show mostly 0/1, not mostly missing.
+- Ensure reference categories match the paper (typically White, Male, non-Southern, etc.). If you used different reference categories, coefficients won’t match even if the model runs.
+
+---
+
+### 4) Missingness discrepancies: **your constructed variables are missing for most/all cases**
+Key mismatches relative to the true models (which clearly had hundreds of usable cases):
+
+- `inc_pc`: **100% missing** (0 nonmissing out of 1606)  
+  → This alone guarantees Model 1/2/3 frames collapse to 0 under complete-case selection.
+- `hispanic` and `otherrace`: **93.3% missing**  
+  → Even if `inc_pc` were fixed, these would destroy Models 2–3.
+- `pol_intol`: 47% missing; outcome: 44% missing  
+  → Some missing is expected, but your final n should still be nonzero and should roughly align with 787/756/503 if coded as in the source.
+
+**How to fix (most likely causes and repairs):**
+1. **Income per capita (`inc_pc`) construction error**
+   - Common failure modes:
+     - Dividing by household size when household size is missing/zero for all.
+     - Merging income with household size using mismatched IDs/years.
+     - Income variable is present but coded with special missing values (e.g., 0, 98, 99, 999, “DK/NA”) not converted to NA correctly or converted *everything* to NA.
+   - Fix:
+     - Verify source variables exist and have nonmissing values before transformation.
+     - Recode GSS-style missing codes to NA **correctly** (only the specific codes, not all values).
+     - If “per capita” requires household size, ensure household size is valid and nonzero; otherwise compute income category midpoint and divide only where hhsize is valid.
+
+2. **Race dummy creation error**
+   - 93% missing usually indicates you created dummies from a variable that is itself mostly missing due to recoding.
+   - Fix:
+     - Start from the raw race/ethnicity variables used by the paper (GSS often has `race` and a separate `hispanic` indicator; coding differs by year).
+     - Create:
+       - `black = 1(race==Black)`
+       - `hispanic = 1(hispanic_origin==Yes)` (or whatever the year uses)
+       - `otherrace = 1(race==Other)` **excluding** those counted as Hispanic if the paper treats Hispanic separately (important for comparability).
+     - Set all non-target groups explicitly to 0, not NA.
+
+3. **Listwise deletion applied too early or too broadly**
+   - If you drop missing cases on the full set of variables for Model 3 before building Model 1, you can inadvertently force Model 1’s n to match Model 3 (or to 0).
+   - Fix:
+     - Build separate `df_m1`, `df_m2`, `df_m3` using complete cases **only for the variables in that model**.
+
+---
+
+### 5) Coefficient-type mismatch: **you must compare standardized β, not raw b**
+The true table reports **standardized OLS coefficients (β)** for predictors.
+
+**Generated output includes both `b` and `beta`, but:**
+- If `beta` wasn’t computed (or was computed on an empty frame), you can’t compare.
+- If you compute β incorrectly (e.g., standardizing including 0/1 dummies differently than the paper did), you’ll diverge.
+
+**How to fix:**
+- Fit the OLS on unstandardized variables (for correct constant), then compute standardized betas as:
+  - For each predictor \(x_j\):  \(\beta_j = b_j \times \frac{\text{SD}(x_j)}{\text{SD}(y)}\)
+  - Do **not** standardize the intercept; keep it as unstandardized constant (like the table).
+- Ensure SDs are computed on the **analysis sample for that model** (after listwise deletion), because SDs change with the sample and affect β.
+
+---
+
+### 6) Interpretation / reporting mismatches
+**Generated:** reports p-values but no stars; implies SEs exist; provides both `b` and `beta`.  
+**True:** provides β and significance stars; explicitly no SEs in the table; constants shown; R²/adj R²/n shown.
+
+**How to fix the reporting to match the “true results”:**
+- Output table columns: `Variable`, `β`, (optional) `sig` stars; plus Constant as `b` not β; plus fit stats.
+- Derive stars from p-values using the same thresholds (* <.05, ** <.01, *** <.001).
+- Do not claim SEs are “true” if your benchmark doesn’t provide them; mark as “not reported” or omit.
+
+---
+
+### 7) What you should see after fixes (targets to validate)
+Once the data issues are fixed and β computed properly, your output should reproduce these benchmarks:
+
+- **Model 1:** Education β ≈ -0.322***; income β ≈ -0.037 (ns); prestige β ≈ 0.016 (ns); Constant ≈ 10.920; R²≈.107; n≈787.
+- **Model 2:** Education β ≈ -0.246***; Female β ≈ -0.083*; Age β ≈ 0.140***; Southern β ≈ 0.097**; Constant ≈ 8.507; R²≈.151; n≈756.
+- **Model 3:** Political intolerance β ≈ 0.164***; Education attenuates to β ≈ -0.151**; Constant ≈ 6.516; R²≈.169; n≈503.
+
+If your coefficients still differ materially after fixing missingness and standardization, the remaining culprits are usually: different coding of the dependent variable, different construction of income per capita, different reference categories for dummies, or using weights (the paper may or may not).
+
+---
+
+If you share the code (or at least the raw variable names and your recode rules for income/race/political intolerance and the DV), I can pinpoint exactly why `inc_pc`, `hispanic`, and `otherrace` ended up missing and specify the precise recoding changes needed.

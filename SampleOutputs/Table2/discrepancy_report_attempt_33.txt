@@ -1,0 +1,230 @@
+Score: 29/100
+============================================================
+
+## 1) Table type mismatch (standardized-only vs mixed / unstandardized)
+
+### Mismatch
+- **True Table 2 reports standardized coefficients only** (with significance markers). It **does not report SEs, t, or p**.
+- The generated output includes:
+  - “paper style” tables that *look* standardized (column `coef`), but
+  - also “full” tables with **unstandardized coefficients (`b_unstd`), SEs, t, p**, and a `beta` column (standardized).
+- Worse, the “paper style” coefficients don’t consistently match the “full table” betas (see §3).
+
+### Fix
+- If the goal is to match Bryson Table 2, output **only standardized coefficients** and stars computed from p-values **only if you are re-estimating from microdata**.
+- If you do not have the original microdata / exact replication setup, you **cannot** legitimately supply SEs/p-values. Remove SE/t/p from the reported “Table 2” replication.
+- If you *are* re-estimating: ensure the `paper_style.coef` column is **exactly the standardized coefficient** (`beta`) from the fitted model.
+
+---
+
+## 2) Sample size and model fit mismatches (N, R², Adj R²)
+
+### Model 1 / ModelA
+**True:** N=644; R²=.145; Adj R²=.129  
+**Generated ModelA_fit:** N=327; R²=.1896; Adj R²=.1639
+
+**Mismatch:** N is about half; R² and Adj R² don’t match.
+
+### Model 2 / ModelB
+**True:** N=605; R²=.147; Adj R²=.130  
+**Generated ModelB_fit:** N=308; R²=.1658; Adj R²=.1377
+
+**Mismatch:** again N about half; fit stats differ.
+
+### Fix
+To match the paper:
+- Use **GSS 1993** and the **same inclusion rules** (listwise deletion on the variables in the model, using the paper’s constructed scales).
+- Ensure the DVs are constructed exactly as Bryson did:
+  - Model 1 DV: *count of disliked among Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin*
+  - Model 2 DV: *count of disliked among the remaining 12 genres*
+- Apply any survey weights / restrictions used in the paper (if any).
+- Ensure **missing data handling** matches (likely listwise deletion after scale construction). Your N=327/308 suggests you may be:
+  - using a subset (e.g., only respondents with complete racism scale items),
+  - filtering incorrectly,
+  - or dropping many cases due to coding/merging errors.
+
+---
+
+## 3) Internal inconsistency: “paper_style coef” vs “full beta”
+
+### Mismatch
+In ModelA, `paper_style` reports `racism_score = 0.139476*`, but `ModelA_table_full` shows:
+- `beta` for racism_score = **0.139476** (matches), but
+- `b_unstd` = **0.147383**, while paper_style shows `coef` 0.139476 (so paper_style is using beta—fine).
+
+However, there’s a bigger issue: `paper_style` lists `racism_score` as **0.139476**, but the **true coefficient is 0.130** (and **significance is `**`**, not `*`).
+
+Also in ModelB, `paper_style` uses `racism_score = -0.005081`, but true is **+0.080**.
+
+### Fix
+- Ensure paper_style is drawing from the correct statistic (standardized beta) consistently.
+- Then address the **replication** issues (data/coding/specification) that are making betas differ in sign/magnitude.
+
+---
+
+## 4) Variable name mismatches and missing variables (Hispanic omitted; other_race meaning drift)
+
+### Mismatch: Hispanic is missing entirely
+**True table includes both:**
+- **Hispanic**
+- **Other race**
+
+**Generated tables include:**
+- `other_race` but **no `hispanic`**
+
+This is a major specification mismatch. In the paper, “Other race” is *not* “Hispanic”; Hispanic is its own indicator.
+
+### Fix
+- Create separate dummy variables:
+  - `black` (non-Hispanic Black vs reference category)
+  - `hispanic` (Hispanic vs reference)
+  - `other_race` (other non-Hispanic non-White vs reference)
+- Use the same **reference category** as the paper (almost certainly **White, non-Hispanic**).
+- Refit models with `hispanic` included. This will also likely change the `black` and `other_race` coefficients.
+
+---
+
+## 5) “No religion” incorrectly handled (dropped / NaN vs estimated)
+
+### Mismatch
+**True:** “No religion” is included with coefficients:
+- Model 1: **0.057**
+- Model 2: **0.024**
+
+**Generated:**
+- `no_religion` appears in paper-style tables as **NaN**
+- Model fit says it was **dropped for zero variance**
+- In the full tables, `no_religion` is absent.
+
+This indicates a coding error: either you accidentally created `no_religion` as all missing, all zero, or filtered to a subgroup where it is constant.
+
+### Fix
+- Verify `no_religion` coding from the original religion variable(s).
+  - It should be a 0/1 dummy with nontrivial variation in the sample.
+- Check that you didn’t:
+  - subset to only religious respondents,
+  - overwrite the column,
+  - or treat “no religion” as missing rather than a category.
+- After correction, the predictor count should match the requested set **without dropping**.
+
+---
+
+## 6) Coefficient mismatches (standardized betas)
+
+Below I compare **generated “paper_style coef”** to **true standardized coefficients**. (These are the numbers the paper actually reports.)
+
+### Model 1 (Dislike of minority-associated genres)
+
+| Variable | Generated | True | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.139 | 0.130** | value off; stars wrong |
+| Education | -0.261*** | -0.175*** | much more negative |
+| HH income pc | -0.034 | -0.037 | close (ok-ish) |
+| Occ prestige | 0.030 | -0.020 | wrong sign |
+| Female | -0.026 | -0.057 | magnitude off |
+| Age | 0.191*** | 0.163*** | somewhat higher |
+| Black | -0.127* | -0.132*** | stars wrong (and slightly off) |
+| Hispanic | (missing) | -0.058 | omitted variable |
+| Other race | 0.004 | -0.017 | wrong sign |
+| Cons Protestant | 0.079 | 0.063 | close-ish |
+| No religion | NaN | 0.057 | missing due to coding error |
+| Southern | 0.022 | 0.024 | close |
+| Constant | 2.654*** | 2.415*** | off |
+
+### Model 2 (Dislike of remaining 12 genres)
+
+| Variable | Generated | True | Mismatch |
+|---|---:|---:|---|
+| Racism score | -0.005 | 0.080 | wrong sign and magnitude |
+| Education | -0.224*** | -0.242*** | somewhat off |
+| HH income pc | -0.095 | -0.065 | more negative |
+| Occ prestige | -0.012 | 0.005 | wrong sign |
+| Female | -0.091 | -0.070 | somewhat off |
+| Age | 0.091 | 0.126** | too small; stars missing |
+| Black | 0.112 | 0.042 | too large |
+| Hispanic | (missing) | -0.029 | omitted variable |
+| Other race | 0.132* | 0.047 | too large; stars differ |
+| Cons Protestant | 0.080 | 0.048 | too large |
+| No religion | NaN | 0.024 | missing due to coding error |
+| Southern | 0.142** | 0.069 | too large; stars differ |
+| Constant | 5.674*** | 7.860 | far off (and paper reports no stars here) |
+
+### Fix (for coefficient mismatches)
+These mismatches are too systematic to be rounding error; they indicate **non-replication** due to:
+1) wrong dataset year/sample,  
+2) wrong DV construction (counts differ),  
+3) missing/incorrect predictors (Hispanic omitted; no_religion broken),  
+4) different standardization method (see next section), and/or  
+5) different coding of key variables (racism scale especially).
+
+Correct all of those, then refit.
+
+---
+
+## 7) Standardization/interpretation problems (what “standardized OLS coefficients” means)
+
+### Mismatch risk
+The paper’s “standardized OLS coefficient” typically means:
+- either running OLS on z-scored variables (DV and continuous IVs; dummies usually left 0/1 but software still yields a “beta”), or
+- reporting the standardized beta computed from unstandardized b using SD(x), SD(y).
+
+Your output contains both `b_unstd` and `beta`, suggesting you compute beta post hoc—which is fine, but only if:
+- SDs are computed on the same estimation sample,
+- weights (if any) are handled the same way,
+- and dummy-variable standardization conventions match the paper/software used.
+
+### Fix
+- Match Bryson’s standardization method. Practically:
+  - Use the same software convention (often SPSS “Beta”).
+  - Compute betas using the estimation sample SDs.
+  - Decide and document how dummies are treated; use the same for all models.
+
+---
+
+## 8) Interpretation/significance marker mismatches
+
+### Mismatch
+Significance stars differ frequently, e.g.:
+- Model 1 racism: true ** (p<.01) vs generated * (p≈.013)
+- Model 1 black: true *** vs generated *
+- Model 2 age: true ** vs generated none
+- Model 2 southern: true no star vs generated **
+
+But because Table 2 **doesn’t provide SEs**, you cannot “check” stars against the PDF unless you replicate from microdata.
+
+### Fix
+- If replicating from microdata: compute p-values and apply the paper’s thresholds.
+- If not replicating: **do not invent SEs/p-values/stars**; copy only what the table reports.
+
+---
+
+## 9) Dependent-variable naming mismatch (minor but indicates construct mismatch)
+
+### Mismatch
+Generated DVs:
+- `dislike_minority_genres`
+- `dislike_other12_genres`
+
+True DVs are described more specifically:
+- “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music”
+- “Dislike of the 12 Remaining Genres”
+
+This isn’t just naming: it flags potential **wrong genre set mapping**.
+
+### Fix
+- Explicitly map which GSS music items are included in each count.
+- Verify you used exactly 6 genres in Model 1 and the complementary 12 in Model 2.
+
+---
+
+## What you need to change so the generated analysis matches Table 2
+
+1) **Add the Hispanic dummy** and keep “Other race” separate.  
+2) **Fix `no_religion` coding** so it varies and is estimated (not dropped).  
+3) Use **GSS 1993** and replicate Bryson’s **sample construction** to recover N=644 and N=605 (or explain any unavoidable differences).  
+4) Rebuild both DVs to match the paper’s **exact genre groupings** and coding of “dislike.”  
+5) Ensure the **racism score scale** is constructed identically (items, direction, missing-data rule).  
+6) Report **only standardized coefficients** (and the paper’s stars) if you’re matching the published table; omit SE/t/p unless you’re doing a microdata replication and clearly label it as such.  
+7) Ensure the “paper_style” coefficient column is **the standardized beta** and matches the “full” beta exactly.
+
+If you share your codebook/coding rules for (a) racism_score, (b) genre dislike items, and (c) race/ethnicity + religion dummies, I can pinpoint which specific coding step is most likely driving the sign flips (especially racism in Model 2 and occ_prestige in both models).

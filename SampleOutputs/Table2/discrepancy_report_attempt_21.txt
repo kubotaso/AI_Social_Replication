@@ -1,0 +1,167 @@
+Score: 17/100
+============================================================
+
+## A. Global problems (before coefficient-by-coefficient)
+
+### 1) Wrong sample sizes and fit statistics
+- **Generated ModelA_fit:** n=327, R²=.190, adj R²=.164  
+  **True Model 1:** **N=644**, R²=.145, adj R²=.129
+- **Generated ModelB_fit:** n=308, R²=.166, adj R²=.138  
+  **True Model 2:** **N=605**, R²=.147, adj R²=.130
+
+**How to fix**
+- Use the **full GSS 1993 analytic sample** and the paper’s inclusion/exclusion rules (listwise deletion on the paper’s variables). Your n’s are roughly half of what they should be—this usually indicates:
+  - accidental subsetting (e.g., only one wave/ballot/half-sample),
+  - dropping too many cases due to recoding to missing,
+  - or using a restricted module rather than the full GSS sample.
+- Recreate the **exact DVs** (see section C) and ensure you are not accidentally requiring non-missing on genre items that are not part of the model’s DV.
+
+### 2) You reported standard errors, but the “true” table has none
+- **Generated:** SEs and t-stats are shown.
+- **True:** Table 2 **does not report SEs** (only standardized coefficients + stars).
+
+**How to fix**
+- If the goal is to match Table 2, **don’t claim the SEs come from the table**. Either:
+  1) remove SE/t/p columns when presenting “paper-style” results, or  
+  2) explicitly label SEs as **replication-derived**, not “extracted.”
+
+### 3) Intercept/constant is fundamentally inconsistent
+- **Generated:** `const` ≈ 0 (because you standardized everything including the DV and/or used standardized betas with standardized DV).
+- **True:** Constant is **2.415*** (Model 1) and **7.860** (Model 2) in the paper.
+
+**How to fix**
+- To match the paper:
+  - Use **unstandardized DV** (count of disliked genres) and standardize predictors only *if you want standardized coefficients*, or compute standardized coefficients from an unstandardized regression.
+  - In practice: run OLS on the original DV, then report **standardized betas** for predictors (most software can compute them), but keep the intercept from the unstandardized model if you’re reproducing the table format.
+  - If you standardize the DV, your intercept will be ~0 by construction and will never match 2.415/7.860.
+
+### 4) Variable set mismatch: missing “No religion” and missing “Hispanic”
+- **True models include:** **Hispanic** and **No religion**.
+- **Generated models include:** `other_race` but **no `hispanic`**, and you note `no_religion` was “dropped post standardization.”
+
+**How to fix**
+- Ensure `no_religion` is coded as a **0/1 indicator with nonzero variance** in the analytic sample. “Dropped post standardization” usually means it became constant (all 0s or all 1s) after filtering—i.e., a coding or subsetting error.
+- Add a **Hispanic** dummy (as in the table) distinct from `other_race`.
+- Race dummies should match the paper’s categories: White (reference), Black, Hispanic, Other race.
+
+### 5) Interpretation error baked into model naming
+- Your ModelA DV label looks like “dislike_minority6” which is close, but your coefficients don’t align well; ModelB DV “dislike_other12” is close but again doesn’t align.
+  
+**How to fix**
+- Reconstruct the exact two DVs used by Bryson:
+  - **Model 1 DV:** count of dislikes among **Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin**.
+  - **Model 2 DV:** count of dislikes among the **other 12** genres.
+- Confirm the coding of “dislike” (e.g., dislike vs like/neutral). Any reversal will flip signs.
+
+---
+
+## B. Term/variable name mismatches (exact)
+### Model 1 variable names (paper) vs generated
+- Paper: **Racism score** → Generated: `racism_score` (OK)
+- Paper: **Education** → Generated: `education_years` (name differs; also coefficient differs)
+- Paper: **Household income per capita** → Generated: `hh_income_per_capita` (OK in meaning)
+- Paper: **Occupational prestige** → Generated: `occ_prestige` (OK)
+- Paper: **Female** → Generated: `female` (OK)
+- Paper: **Age** → Generated: `age_years` (OK)
+- Paper: **Black** → Generated: `black` (OK)
+- Paper: **Hispanic** → **Missing** (major mismatch)
+- Paper: **Other race** → Generated: `other_race` (OK)
+- Paper: **Conservative Protestant** → Generated: `cons_protestant` (OK)
+- Paper: **No religion** → **Missing/dropped** (major mismatch)
+- Paper: **Southern** → Generated: `south` (OK)
+- Paper: **Constant** → Generated: `const` ~0 (not OK; see A3)
+
+Same issues for Model 2.
+
+**How to fix**
+- Align your regression specification to include **all** variables in Table 2, especially **Hispanic** and **No religion**.
+- Use the same reference categories (White, non–Conservative Protestant, has religion, non-South, male, etc.).
+
+---
+
+## C. Coefficient + significance mismatches (Model 1)
+
+True Model 1 coefficients (Table 2) vs Generated ModelA_paper_style:
+
+| Variable | True | Generated | What’s wrong | Fix |
+|---|---:|---:|---|
+| Racism score | **0.130** (**) | 0.139 (*) | star level off; value slightly high | correct N/spec; ensure DV & racism scale match; stars should be based on your replication p-values but should resemble **p<.01** with correct spec |
+| Education | **-0.175*** | -0.261*** | magnitude too negative | likely different education measure (years vs degree) and/or wrong sample; match paper’s education coding and N |
+| HH income pc | -0.037 | -0.034 | close (OK) | keep but confirm income-per-capita construction matches paper |
+| Occ prestige | **-0.020** | +0.030 | **sign wrong** | prestige measure or coding likely differs; check prestige variable and missing-data handling |
+| Female | -0.057 | -0.026 | too small (toward 0) | sample/spec/coding differences |
+| Age | 0.163*** | 0.191*** | too large | age scaling/coding differences; ensure age in years; check DV coding |
+| Black | **-0.132*** | -0.127 (*) | star level wrong (*** vs *), value close | with correct N/spec should be more significant |
+| Hispanic | **-0.058** | (missing) | omitted variable | add Hispanic dummy |
+| Other race | -0.017 | 0.004 | sign mismatch but small | fix race coding and include Hispanic properly |
+| Cons Protestant | 0.063 | 0.079 | a bit high | add no_religion + hispanic; correct N |
+| No religion | 0.057 | (dropped) | omitted variable | fix coding so it’s not constant/dropped |
+| Southern | 0.024 | 0.022 | close (OK) | — |
+| Constant | 2.415*** | ~0 | totally wrong due to standardizing DV | run model with unstandardized DV; don’t standardize DV |
+
+---
+
+## D. Coefficient + significance mismatches (Model 2)
+
+True Model 2 coefficients vs Generated ModelB_paper_style:
+
+| Variable | True | Generated | What’s wrong | Fix |
+|---|---:|---:|---|
+| Racism score | 0.080 (ns) | -0.005 (ns) | sign and magnitude wrong | DV construction and/or racism scale mismatch; also missing covariates (Hispanic, no religion) and wrong N |
+| Education | -0.242*** | -0.224*** | somewhat off | align education coding + N |
+| HH income pc | -0.065 | -0.095 | too negative | check income pc construction and sample |
+| Occ prestige | 0.005 | -0.012 | sign mismatch | check prestige coding |
+| Female | -0.070 | -0.091 | too negative | sample/coding |
+| Age | 0.126** | 0.091 (ns) | too small + wrong significance | age coding and/or DV; also N/spec |
+| Black | 0.042 | 0.112 (ns at p=.056) | much larger | race coding/sample mismatch; add Hispanic and no religion |
+| Hispanic | -0.029 | (missing) | omitted variable | add Hispanic dummy |
+| Other race | 0.047 | 0.132* | much larger + star mismatch | race coding/sample mismatch |
+| Cons Protestant | 0.048 | 0.080 | too large | spec mismatch |
+| No religion | 0.024 | (dropped) | omitted | fix |
+| Southern | 0.069 | 0.142** | way too large | likely South definition/sample issue |
+| Constant | 7.860 | ~0 | wrong (DV standardized) | use unstandardized DV |
+
+---
+
+## E. Interpretation mismatches (what your generated output would imply vs paper)
+
+1) **Model 2 racism effect**
+- **Paper:** Racism score is **positive (0.080) but not significant**.
+- **Generated:** Racism is essentially **zero/slightly negative**.
+**Fix:** Rebuild DV2 (“12 remaining genres”) exactly and ensure racism scale matches; add missing covariates; correct N.
+
+2) **Occupational prestige direction**
+- **Paper:** Model 1 negative (-0.020), Model 2 near zero positive (0.005).
+- **Generated:** Model 1 positive; Model 2 negative.
+**Fix:** Verify you are using the same occupational prestige variable (GSS often has multiple prestige scores; coding direction matters).
+
+3) **Race category effects depend on including Hispanic explicitly**
+- Omitting Hispanic can contaminate “Other race” and even shift Black estimates depending on how respondents are categorized.
+**Fix:** Create mutually exclusive dummies (Black, Hispanic, Other) with White as reference.
+
+---
+
+## F. Concrete steps to make the generated analysis match Table 2
+
+1) **Recreate DVs exactly**
+- DV1 = count of “dislike” responses for: Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin.
+- DV2 = count of “dislike” responses for the other 12 genres used by Bryson.
+- Use the same dislike coding (do not reverse).
+
+2) **Use the correct analytic sample**
+- Start from **GSS 1993**.
+- Apply the same missing-data rule as the paper (likely listwise on variables in the model, not on unused genre items).
+- Target N should be **644** and **605** for Models 1 and 2 respectively; if not, diagnose which variable is causing extra loss.
+
+3) **Correct covariates and coding**
+- Include: Racism score, Education, HH income per capita, Occupational prestige, Female, Age, Black, Hispanic, Other race, Conservative Protestant, No religion, Southern.
+- Ensure binary indicators are 0/1 and not constant after filtering (fix `no_religion`).
+
+4) **Match “standardized coefficient” reporting**
+- Do **not** standardize the DV if you want the intercept to match the paper.
+- Report standardized betas for predictors (post-estimation), and keep the intercept from the unstandardized model if you are reproducing the table.
+
+5) **Stars**
+- Use the paper’s thresholds (* p<.05, ** p<.01, *** p<.001, two-tailed) and compute them from your replication p-values; they should align closely once N/spec match.
+
+If you share your variable construction (especially the racism scale, the 18 genre items, and how you coded “no religion” and “Hispanic”), I can pinpoint the most likely source of the N drop and the sign flips (prestige, racism in Model 2).

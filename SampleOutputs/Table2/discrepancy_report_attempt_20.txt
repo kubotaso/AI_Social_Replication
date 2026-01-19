@@ -1,0 +1,208 @@
+Score: 18/100
+============================================================
+
+## Global discrepancies (apply to both models)
+
+1. **Standard errors / p-values are invented**
+   - **Generated:** reports `p_value_replication` for every term (and shows `sig` stars derived from those p-values).
+   - **True (paper):** **Table 2 does not report SEs or p-values**; it reports **standardized coefficients with significance markers only**.
+   - **Fix:** Do **not** claim SEs or p-values “from Table 2.” If you must show p-values, you need the microdata and must re-estimate the model; otherwise, present only the standardized betas and the paper’s stars.
+
+2. **Unstandardized coefficients are missing/incorrectly handled**
+   - **Generated:** column `b_unstd` is `NaN` for all predictors and only gives a constant.
+   - **True:** table is standardized; **unstandardized b’s are not provided**. (The constant is shown, but the rest are standardized.)
+   - **Fix:** Either (a) remove `b_unstd` entirely (preferred, to match Table 2), or (b) compute unstandardized coefficients from the raw data and clearly label them as new results (not from Table 2).
+
+3. **Sample size and fit statistics don’t match**
+   - **Generated Model A fit:** N=419, R²=0.1587, Adj R²=0.1381  
+     **True Model 1:** N=644, R²=.145, Adj R²=.129
+   - **Generated Model B fit:** N=412, R²=0.1661, Adj R²=0.1453  
+     **True Model 2:** N=605, R²=.147, Adj R²=.130
+   - **Fix:** Use the same sample restrictions as Bryson (1993 GSS; same missing-data handling, same constructed DVs/IVs). Your current pipeline is dropping ~1/3 of cases. Common causes:
+     - listwise deletion on variables not used in the original table,
+     - different coding that creates extra missingness,
+     - using a subset (e.g., only a module) instead of full GSS 1993 sample,
+     - wrong year(s) or pooled years.
+
+4. **Variable list is incomplete / mismatched**
+   - **Generated:** no `hispanic` row in either model; includes `other_race`.
+   - **True:** includes **both `Hispanic` and `Other race`** (and `Black`), plus **`No religion`**.
+   - **Fix:** Add a separate `hispanic` indicator and ensure race categories match the paper (reference category is presumably White, non-Hispanic). Also include `no_religion` with an actual coefficient.
+
+5. **`no_religion` is missing (NaN)**
+   - **Generated:** `no_religion` has NaN coefficient/p-value in both models.
+   - **True:** `No religion` is **0.057** (Model 1) and **0.024** (Model 2).
+   - **Fix:** This usually means perfect collinearity or a coding error (e.g., `no_religion` is all missing, all zeros, or is the reference category of a religion factor but still being printed). Recode religion dummies so exactly one category is omitted as reference and `no_religion` is estimable.
+
+---
+
+## Model-by-model term mismatches (coefficients + signs + significance)
+
+### Model A (paper Model 1: “Dislike minority genres”)
+
+**Key mismatches:**
+- **racism_score**
+  - Generated: **0.1459** with `**` (p≈.0035)
+  - True: **0.130** with `**`
+  - Fix: Minor numeric discrepancy—likely different sample/coding/standardization. Match N=644 and Bryson’s variable construction; then re-standardize consistently.
+
+- **education_years**
+  - Generated: **-0.2613***  
+  - True: **-0.175***  
+  - Fix: same as above (sample/coding). Also check whether Bryson uses “Education” in years vs degree categories converted to years.
+
+- **hh_income_per_capita**
+  - Generated: **-0.0199** (ns)
+  - True: **-0.037** (ns)
+  - Fix: income equivalization and coding likely differ. Confirm “per capita” definition and any top-coding/income midpoints used.
+
+- **occ_prestige**
+  - Generated: **+0.0564** (ns) **SIGN ERROR**
+  - True: **-0.020** (ns)
+  - Fix: verify prestige scale and merge. A sign flip often comes from (a) reverse-coding, (b) using a different occupational status variable, or (c) standardizing after imputing/recoding incorrectly.
+
+- **female**
+  - Generated: **-0.0082** (ns; near zero)
+  - True: **-0.057** (ns)
+  - Fix: check coding (0/1 direction, inclusion of nonbinary/missing codes, weights). Ensure female=1 matches the paper.
+
+- **age_years**
+  - Generated: **0.1087*** (p≈.027)
+  - True: **0.163*** (stronger, p<.001)
+  - Fix: mismatch indicates sample restriction/age coding differences (age in years vs categories; truncation). Restore N and original coding.
+
+- **black**
+  - Generated: **-0.1627** with `**`
+  - True: **-0.132*** (more significant)
+  - Fix: again likely sample/weighting. Also confirm race coding and whether Hispanic is separated (it is in the paper). Omitting Hispanic can distort Black coefficient and SEs.
+
+- **other_race**
+  - Generated: **+0.0265** (ns) **SIGN ERROR**
+  - True: **-0.017** (ns)
+  - Fix: race coding mismatch and missing Hispanic category are prime suspects.
+
+- **cons_protestant**
+  - Generated: **0.0775** (ns)
+  - True: **0.063** (ns)
+  - Fix: likely close; but still suggests different construction of “conservative Protestant” classification.
+
+- **south**
+  - Generated: **0.0086** (ns)
+  - True: **0.024** (ns)
+  - Fix: verify region coding; ensure “South” matches Census region definition in GSS.
+
+- **Constant**
+  - Generated: **2.713***  
+  - True: **2.415***  
+  - Fix: with standardized predictors, the constant should be near the mean of the DV (given standardization conventions). This difference again signals DV construction/sample mismatch.
+
+**Variables missing entirely (Model 1):**
+- **Hispanic**: True coefficient **-0.058**; Generated: missing.
+- **No religion**: True **0.057**; Generated: NaN.
+
+---
+
+### Model B (paper Model 2: “Dislike remaining 12 genres”)
+
+**Key mismatches:**
+- **racism_score**
+  - Generated: **0.0086** (ns)
+  - True: **0.080** (ns)
+  - Fix: big discrepancy. Check racism scale construction (items, coding direction, standardization). Also sample mismatch (N 412 vs 605).
+
+- **education_years**
+  - Generated: **-0.2266***  
+  - True: **-0.242***  
+  - Fix: fairly close; still adjust sample/coding to match.
+
+- **hh_income_per_capita**
+  - Generated: **-0.0655** (ns)
+  - True: **-0.065** (ns)
+  - Fix: this one matches well (good sign).
+
+- **occ_prestige**
+  - Generated: **-0.0458** (ns) **SIGN ERROR**
+  - True: **+0.005** (ns)
+  - Fix: same prestige variable/coding issue as Model A.
+
+- **female**
+  - Generated: **-0.0778** (ns; p≈.093)
+  - True: **-0.070** (ns)
+  - Fix: close; sample differences likely.
+
+- **age_years**
+  - Generated: **0.0418** (ns) **MAGNITUDE + SIGNIFICANCE WRONG**
+  - True: **0.126** with `**`
+  - Fix: age coding and/or sample issue is substantial here.
+
+- **black**
+  - Generated: **+0.1018***  
+  - True: **+0.042** (ns)
+  - Fix: omission/miscoding of Hispanic and race categories can inflate this. Also check weights and DV definition.
+
+- **other_race**
+  - Generated: **+0.1027***  
+  - True: **+0.047** (ns)
+  - Fix: again race/Hispanic omission and sample differences.
+
+- **cons_protestant**
+  - Generated: **0.1056***  
+  - True: **0.048** (ns)
+  - Fix: conservative Protestant classification likely differs (e.g., different denomination grouping).
+
+- **south**
+  - Generated: **0.1443** with `**`
+  - True: **0.069** (ns)
+  - Fix: region coding and sample mismatch; also could be that “South” is being conflated with something else (e.g., “born in South”).
+
+- **Constant**
+  - Generated: **5.898***  
+  - True: **7.860** (no stars shown in paper table)
+  - Fix: DV construction mismatch (count of disliked genres among 12 remaining). Your DV mean seems much lower.
+
+**Variables missing entirely (Model 2):**
+- **Hispanic**: True coefficient **-0.029**; Generated: missing.
+- **No religion**: True **0.024**; Generated: NaN.
+
+---
+
+## Interpretation mismatches (what you should and should not claim)
+
+- **Generated implicitly interprets significance via p-values** (since it prints p-values and stars).
+- **True table’s inference is only via the paper’s stars**; you cannot claim your p-values “match” without re-estimation on the same data.
+- **Fix:** If the goal is to “match the paper,” present:
+  - standardized betas exactly as in Table 2,
+  - the paper’s significance markers,
+  - N, R², Adj R² exactly as reported,
+  - and explicitly note: “SEs not provided in Table 2.”
+
+---
+
+## Concrete steps to make the generated analysis match Table 2
+
+1. **Recreate the two DVs exactly**
+   - DV1: count of dislikes among the 6 “minority-associated” genres listed.
+   - DV2: count of dislikes among the other 12 genres.
+   - Ensure the same dislike threshold and missing handling per genre.
+
+2. **Use the correct dataset/sample**
+   - GSS **1993** (not pooled, not another year).
+   - Apply the same eligibility restrictions (e.g., valid responses on genre dislikes and covariates).
+   - Avoid unnecessary listwise deletion: only drop cases missing on variables in the model.
+
+3. **Fix race/ethnicity coding**
+   - Include **Black**, **Hispanic**, **Other race** with **White non-Hispanic as reference** (as implied by the table).
+   - Do not collapse Hispanic into “other_race.”
+
+4. **Fix religion coding**
+   - Ensure `conservative_protestant` and `no_religion` are both estimable and not accidentally set as reference/collinear.
+   - Confirm definition of “conservative Protestant” matches Bryson.
+
+5. **Standardize consistently**
+   - Table reports **standardized OLS coefficients**. Confirm you’re reporting standardized betas (not standardized X only, not partially standardized).
+   - If you standardize within the estimation sample, do so after the sample is finalized.
+
+6. **Remove SE/p-value columns unless you truly replicate from microdata**
+   - To match Table 2, drop `p_value_replication` entirely, or relabel it as “from our re-estimation” and stop comparing it to the paper (since paper doesn’t provide it).
+
+If you paste your variable coding rules (especially for racism score, prestige, conservative Protestant, and the two DV constructions), I can pinpoint which coding choice is producing each sign flip (notably occupational prestige and other_race) and the major N shortfall.

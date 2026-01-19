@@ -1,0 +1,88 @@
+## Mapping from analysis variables (Table 3) to GSS data fields (and coding)
+
+### 1) Analysis dataset scope / selection
+- **Target table**: *“Frequency Distributions for Attitude toward 18 Music Genres: General Social Survey, 1993”*
+- **Required filter**:
+  - **Analysis variable: Survey year (1993 only)**  
+    - **Data field**: `YEAR`  
+    - **Keep**: `YEAR == 1993`  
+    - **Exclude**: any `YEAR` coded as missing `[NA(...)]` (per codebook)
+
+No other respondent characteristics (AGE, SEX, etc.) are needed to produce Table 3.
+
+---
+
+### 2) Table columns (18 music genres) → data fields
+Each table column is a separate GSS item measuring “like/dislike” for that genre. The mapping is:
+
+1. **Latin/Salsa** → `LATIN` (Latin/Mariachi/Salsa)  
+2. **Jazz** → `JAZZ`  
+3. **Blues/R&B** → `BLUES` (Blues or Rhythm and Blues)  
+4. **Show Tunes** → `MUSICALS` (Broadway musicals/show tunes)  
+5. **Oldies** → `OLDIES` (Oldies rock)  
+6. **Classical/Chamber** → `CLASSICL` (Classical music—symphony & chamber)  
+7. **Reggae** → `REGGAE`  
+8. **Swing/Big Band** → `BIGBAND` (Big Band/Swing)  
+9. **New Age/Space** → `NEWAGE` (New age/space music)  
+10. **Opera** → `OPERA`  
+11. **Bluegrass** → `BLUGRASS`  
+12. **Folk** → `FOLK`  
+13. **Pop/Easy Listening** → `MOODEASY` (Mood/easy listening)  
+14. **Contemporary Rock** → `CONROCK` (Contemporary pop/rock)  
+15. **Rap** → `RAP`  
+16. **Heavy Metal** → `HVYMETAL`  
+17. **Country/Western** → `COUNTRY`  
+18. **Gospel** → `GOSPEL`
+
+---
+
+### 3) Table rows (attitude response categories) → coding from each music variable
+All 18 genre variables share the same substantive coding for attitude:
+
+**Substantive (non-missing) response categories (used for counts and mean):**
+- **(1) Like very much** → code `1`
+- **(2) Like it** → code `2`
+- **(3) Mixed feelings** → code `3`
+- **(4) Dislike it** → code `4`
+- **(5) Dislike very much** → code `5`
+
+**“M” categories in the table (counted in rows, but excluded from mean):**
+- **(M) Don’t know much about it** → stored as a missing code: `[NA(d)]` (“don’t know” in this instrument; used here to represent “don’t know much about it”)
+- **(M) No answer** → stored as a missing code: `[NA(n)]`
+
+**Other missing codes that may appear and should be treated as missing (“M”) as well** (not substantive, excluded from mean; may be included under the table’s generic “M” treatment if present):
+`[NA(i)] iap`, `[NA(m)] dk/na/iap`, `[NA(r)] refused`, `[NA(s)] skipped on web`, `[NA(u)] uncodeable`, `[NA(x)] not available in this release`, `[NA(y)] not available in this year`, `[NA(z)] see codebook`, `[NA(p)] not imputable`, `[NA(j)] I don’t have a job (generic missing label in this release)`.
+
+**Implementation for Table 3 rows:**
+- For each genre variable (e.g., `JAZZ`), produce frequency counts for:
+  - codes `1,2,3,4,5`
+  - missing bucket “M” split into:
+    - `Don’t know much about it` = `[NA(d)]`
+    - `No answer` = `[NA(n)]`
+  - (Any other `[NA(...)]` should be treated as missing; whether they appear as additional “M” counts or are folded into “No answer” depends on your table spec—Table 3 only displays the two “M” rows named above.)
+
+---
+
+### 4) Mean row (numeric summary) → computation rule and coding
+For each genre column, compute **Mean attitude score** using the **1–5 scale**:
+
+- **Mean for a genre** = arithmetic mean of the genre variable values **restricted to valid codes `1–5`**
+- **Exclude from mean**: all `[NA(...)]` categories, including:
+  - `[NA(d)]` (“don’t know much about it”)
+  - `[NA(n)]` (“no answer”)
+  - any other listed missing codes
+
+This yields the intended direction:
+- lower mean = more favorable (closer to “like very much” = 1)
+- higher mean = more unfavorable (closer to “dislike very much” = 5)
+
+---
+
+### 5) What is *not* needed for Table 3
+The following documented fields are not required to build the Table 3 frequency distributions/means (they are used in other analyses/tables, but not the descriptive table requested): `ID`, `AGE`, `EDUC`, `SEX`, `RACE`, `INCOME`, `RINCOME`, `REALINC`, `REGION`, `RELIG`, `DENOM`, `POLVIEWS`, tolerance items (`SPK*`, `COL*`, `LIB*`), etc.
+
+---
+
+## Minimal variable list required to run Table 3
+- **Filter**: `YEAR`
+- **Music attitude items (18)**: `LATIN, JAZZ, BLUES, MUSICALS, OLDIES, CLASSICL, REGGAE, BIGBAND, NEWAGE, OPERA, BLUGRASS, FOLK, MOODEASY, CONROCK, RAP, HVYMETAL, COUNTRY, GOSPEL`

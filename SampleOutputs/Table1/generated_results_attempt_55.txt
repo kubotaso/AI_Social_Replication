@@ -1,0 +1,146 @@
+## fit_stats
+                          model   n       r2   adj_r2  dropped
+                  Model 1 (SES) 747 0.088274 0.084592         
+          Model 2 (Demographic) 507 0.138367 0.119220         
+Model 3 (Political intolerance) 286 0.148319 0.114127 hispanic
+
+## model1_full
+                       term         b      beta            p sig
+                   Constant 10.637845       NaN 8.659509e-52    
+          Education (years) -0.374451 -0.292447 3.458708e-12 ***
+Household income per capita -0.000009 -0.038625 3.095946e-01    
+      Occupational prestige  0.005155  0.020021 6.311403e-01    
+
+## model2_full
+                       term         b      beta            p sig
+                   Constant  9.662755       NaN 5.611724e-20    
+          Education (years) -0.342088 -0.265809 2.919295e-07 ***
+Household income per capita -0.000013 -0.054328 2.366967e-01    
+      Occupational prestige -0.002574 -0.009615 8.474228e-01    
+                     Female -0.615571 -0.088879 3.659792e-02   *
+                        Age  0.024607  0.102136 2.022173e-02   *
+                      Black  0.420021  0.037198 3.979421e-01    
+                   Hispanic -2.582940 -0.033172 4.283488e-01    
+                 Other race -0.392780 -0.026826 5.266050e-01    
+    Conservative Protestant  0.642193  0.082737 7.261863e-02    
+                No religion -0.203158 -0.017533 6.860562e-01    
+                   Southern  0.467627  0.060383 1.663541e-01    
+
+## model3_full
+                        term         b      beta        p sig
+                    Constant  7.634768       NaN 0.000001    
+           Education (years) -0.225884 -0.156780 0.025279   *
+ Household income per capita -0.000012 -0.050120 0.424671    
+       Occupational prestige -0.004430 -0.015473 0.819384    
+                      Female -0.886891 -0.125812 0.028513   *
+                         Age  0.023043  0.091297 0.125654    
+                       Black  0.987470  0.084700 0.144759    
+                    Hispanic       NaN       NaN      NaN    
+                  Other race  0.835729  0.052941 0.357705    
+     Conservative Protestant  0.304942  0.037780 0.531322    
+                 No religion  0.287340  0.023874 0.685048    
+                    Southern  0.534268  0.068403 0.248447    
+Political intolerance (0–15)  0.148411  0.182604 0.003909  **
+
+## model1_table1style
+                       term    Table1
+                   Constant    10.638
+          Education (years) -0.292***
+Household income per capita    -0.039
+      Occupational prestige     0.020
+
+## model2_table1style
+                       term    Table1
+                   Constant     9.663
+          Education (years) -0.266***
+Household income per capita    -0.054
+      Occupational prestige    -0.010
+                     Female   -0.089*
+                        Age    0.102*
+                      Black     0.037
+                   Hispanic    -0.033
+                 Other race    -0.027
+    Conservative Protestant     0.083
+                No religion    -0.018
+                   Southern     0.060
+
+## model3_table1style
+                        term  Table1
+                    Constant   7.635
+           Education (years) -0.157*
+ Household income per capita  -0.050
+       Occupational prestige  -0.015
+                      Female -0.126*
+                         Age   0.091
+                       Black   0.085
+                    Hispanic        
+                  Other race   0.053
+     Conservative Protestant   0.038
+                 No religion   0.024
+                    Southern   0.068
+Political intolerance (0–15) 0.183**
+
+## table1_combined
+                       term   Model 1   Model 2 Model 3
+                   Constant    10.638     9.663   7.635
+          Education (years) -0.292*** -0.266*** -0.157*
+Household income per capita    -0.039    -0.054  -0.050
+      Occupational prestige     0.020    -0.010  -0.015
+
+## missingness
+           variable  nonmissing  missing  pct_missing
+          pol_intol         850      756    47.073474
+num_genres_disliked         893      713    44.396015
+           hispanic        1044      562    34.993773
+             inc_pc        1459      147     9.153176
+           educ_yrs        1464      142     8.841843
+         prestg80_v        1526       80     4.981320
+          cons_prot        1597        9     0.560399
+            norelig        1597        9     0.560399
+              age_v        1601        5     0.311333
+             female        1606        0     0.000000
+              black        1606        0     0.000000
+          otherrace        1606        0     0.000000
+              south        1606        0     0.000000
+
+## estimation_frames
+{'model1':       num_genres_disliked  educ_yrs        inc_pc  prestg80_v
+0                    10.0      11.0  17685.000000        42.0
+1                     2.0      16.0  17685.000000        42.0
+2                     4.0      16.0  35370.000000        52.0
+6                     3.0      12.0  21615.000000        46.0
+8                     0.0      18.0  34626.666667        49.0
+...                   ...       ...           ...         ...
+1598                  4.0      13.0  25970.000000        72.0
+1599                 13.0      12.0   9825.000000        46.0
+1600                 10.0      17.0  51940.000000        65.0
+1604                  3.0      16.0  21615.000000        49.0
+1605                  7.0      18.0  14285.324250        44.0
+
+[747 rows x 4 columns], 'model2':       num_genres_disliked  educ_yrs        inc_pc  ...  cons_prot  norelig  south
+0                    10.0      11.0  17685.000000  ...        0.0      0.0    0.0
+1                     2.0      16.0  17685.000000  ...        0.0      1.0    0.0
+2                     4.0      16.0  35370.000000  ...        0.0      0.0    0.0
+6                     3.0      12.0  21615.000000  ...        0.0      0.0    0.0
+8                     0.0      18.0  34626.666667  ...        0.0      0.0    0.0
+...                   ...       ...           ...  ...        ...      ...    ...
+1598                  4.0      13.0  25970.000000  ...        0.0      0.0    1.0
+1599                 13.0      12.0   9825.000000  ...        0.0      0.0    1.0
+1600                 10.0      17.0  51940.000000  ...        1.0      0.0    1.0
+1604                  3.0      16.0  21615.000000  ...        0.0      0.0    0.0
+1605                  7.0      18.0  14285.324250  ...        0.0      0.0    0.0
+
+[507 rows x 12 columns], 'model3':       num_genres_disliked  educ_yrs        inc_pc  ...  norelig  south  pol_intol
+0                    10.0      11.0  17685.000000  ...      0.0    0.0        1.0
+1                     2.0      16.0  17685.000000  ...      1.0    0.0        0.0
+2                     4.0      16.0  35370.000000  ...      0.0    0.0        0.0
+6                     3.0      12.0  21615.000000  ...      0.0    0.0        5.0
+8                     0.0      18.0  34626.666667  ...      0.0    0.0        0.0
+...                   ...       ...           ...  ...      ...    ...        ...
+1579                 10.0      11.0  14738.000000  ...      0.0    0.0       11.0
+1584                  8.0      17.0  14285.324250  ...      0.0    0.0        3.0
+1596                 11.0      17.0  25970.000000  ...      0.0    1.0        7.0
+1600                 10.0      17.0  51940.000000  ...      0.0    1.0        0.0
+1604                  3.0      16.0  21615.000000  ...      0.0    0.0        5.0
+
+[286 rows x 13 columns]}

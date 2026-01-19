@@ -1,0 +1,158 @@
+Score: 34/100
+============================================================
+
+### 1) Fundamental reporting/interpretation errors
+
+**Mismatch A — You report p-values and imply standard errors; the true table does not include SEs (and therefore no p-values can be “checked” against the PDF).**  
+- **Generated:** `p_value`, `sig` derived from your model output; no SE column shown, but p-values necessarily come from SEs.  
+- **True (paper):** Table 2 reports **standardized coefficients and significance markers only**; **no SEs** are provided, so you cannot claim your SEs/p-values match “Table 2”.
+- **Fix:**  
+  1) If your goal is to reproduce Table 2, **drop SEs/p-values entirely** and compare only **standardized betas and stars** (and N, R², adj R²).  
+  2) Alternatively, if you want to keep p-values/SEs, you must say: “SEs/p-values are from our re-estimation on GSS 1993 and are not in Bryson’s Table 2.” Do **not** label them as “true results.”
+
+**Mismatch B — “Constant” is handled incorrectly.**  
+- **Generated tables:** first row is ~0 with p=1.0, which looks like an intercept from a **z-scored DV** or a model where both DV and predictors were standardized.  
+- **True table:** constant is **2.415*** (Model 1) and **7.860** (Model 2) in **raw DV units** (counts 0–6 and 0–12). Those are not ~0.
+- **Fix:**  
+  - To match Bryson’s table: run OLS on the **raw DV** (counts), and standardize **predictors** only if you want “standardized coefficients” (typical approach is to standardize all variables except the intercept, or compute standardized betas post hoc).  
+  - Do **not** z-score the DV if you intend to reproduce Bryson’s intercepts.
+
+---
+
+### 2) Sample size and fit statistics mismatches (major)
+
+**Mismatch C — N is far too small in both models.**  
+- **Generated:** Model 1 N=327; Model 2 N=308.  
+- **True:** Model 1 N=644; Model 2 N=605.  
+- **Fix:** Your analysis is dropping ~half the cases. Likely causes:
+  1) **Overly aggressive listwise deletion** due to missingness (your missingness table shows very high missing rates for some variables: 29%–48%–36% etc.).  
+  2) Variables constructed differently than in Bryson (e.g., income per capita, prestige) causing extra missing.  
+  3) You *dropped* “no_religion” after z-score (see below), which suggests preprocessing issues.
+
+  To match Bryson:
+  - Use the same GSS 1993 sample and **recode missing values exactly as Bryson** (GSS has special missing codes like 8/9/98/99; treating them as real values can also distort).  
+  - Replicate Bryson’s **case selection rules** (e.g., restricting to respondents with valid genre dislikes and covariates, but not unnecessarily restricting further).
+  - Check each variable’s valid N before modeling; ensure your constructed variables do not introduce avoidable missingness.
+
+**Mismatch D — R² and adjusted R² don’t match.**  
+- **Generated:**  
+  - Model 1 R²=.1896, adj=.1639  
+  - Model 2 R²=.1658, adj=.1377  
+- **True:**  
+  - Model 1 R²=.145, adj=.129  
+  - Model 2 R²=.147, adj=.130  
+- **Fix:** Once you fix **N**, variable construction, and standardization approach (esp. DV scaling), the R² should move closer. Right now the fit differences are consistent with “different sample + different variables + different preprocessing.”
+
+---
+
+### 3) Predictor set mismatches (variable names and inclusion)
+
+**Mismatch E — “No religion” is in the true model but is reported as dropped in your fit output.**  
+- **Generated fit:** `dropped_predictors_after_zscore: no_religion` (both models).  
+- **True table:** includes “No religion” with coefficients (.057 in M1; .024 in M2).  
+- **Fix:** “no_religion” is probably constant (all 0/1) *in the reduced sample* or became all missing/one category after filtering, so z-scoring failed and you dropped it.  
+  - Fix the sample and recodes so “no_religion” varies.  
+  - Don’t automatically drop predictors after z-score; instead, diagnose why variance is 0 (bad recode, filtering bug, or using the wrong reference category).
+
+**Mismatch F — “Southern” appears in the true table but is not clearly present in your coefficient lists.**  
+- True includes “Southern” (0.024 in M1; 0.069 in M2).  
+- Your generated tables have 11 coefficient rows (including intercept) but no variable names, so it’s impossible to verify mapping; however your fit says k_including_const=11, while the true table has **13 rows including constant** (12 predictors + constant).  
+- **Fix:** Ensure the full predictor list is included:
+  - Racism, education, income per capita, prestige, female, age, black, hispanic, other race, conservative protestant, no religion, southern (+ constant).
+  - Output tables must include **variable names** in the same order as the paper to allow auditing.
+
+**Mismatch G — Your k (number of parameters) is too small.**  
+- **Generated:** k_including_const = 11.  
+- **True:** 12 predictors + constant = 13 parameters.  
+- **Fix:** You are missing ~2 predictors (very likely **Southern** and **No religion** (dropped), or something similar). Rebuild the model formula to include all covariates.
+
+---
+
+### 4) Coefficient-by-coefficient mismatches (and how to fix)
+
+Because your generated tables **omit variable names**, the safest conclusion is: **your coefficients cannot be matched reliably to the true variables**, which is itself a discrepancy.
+
+That said, some mismatches are clear from the values/signs relative to the true table:
+
+#### Model 1 (true key coefficients)
+- Racism **+0.130** (**)  
+- Education **-0.175***  
+- Age **+0.163***  
+- Black **-0.132***  
+- Conservative Protestant **+0.063** (ns)  
+- No religion **+0.057** (ns)  
+- Southern **+0.024** (ns)
+
+**Generated Model 1 includes:** +0.139* (close to racism), -0.261*** (too large in magnitude vs education -0.175), +0.191*** (too large vs age 0.163), -0.127* (close-ish to black -0.132 but wrong significance), and several small/ns values.
+
+**Fixes for these coefficient mismatches:**
+1) **Use the same variable coding** as Bryson. Examples of common coding errors:
+   - “Racism score”: must match Bryson’s scale construction (often an index from multiple items). If you used a different racism measure, the beta will differ.
+   - “Education”: ensure it’s coded as years or degree categories exactly as Bryson used.
+   - “Income per capita”: Bryson uses **household income per capita**; if you used raw household income or log income, your coefficients will differ and missingness will differ.
+   - “Occupational prestige”: must match the GSS prestige score variable and treatment of missing (not-in-labor-force etc.).
+2) **Match the sample definition** (again: N should be 644). Coefficients are very sensitive to sample restrictions.
+3) **Standardization method:** Bryson reports standardized coefficients. If you standardized differently (z-scoring all variables including DV; or using sample SD after listwise deletion; or weighting), you will not match.
+
+#### Model 2 (true key coefficients)
+- Racism **+0.080** (ns)  
+- Education **-0.242***  
+- Age **+0.126** (**)  
+- Black **+0.042** (ns)  
+- Southern **+0.069** (ns)
+
+**Generated Model 2 includes:** racism ~ -0.005 (wrong sign and near zero), education -0.224*** (close-ish), age +0.091 (too small and ns), “other race” (?) +0.132* and “southern” (?) +0.142** (too large).
+
+**Fixes:**
+- The racism sign flip strongly suggests **you are not using the same racism index**, or you reversed it, or you used a different attitudinal item. Reconstruct the racism score exactly as in Bryson (same items, same direction, same scaling).
+- Southern looks too big (0.142 vs 0.069). That can happen if you:
+  - inadvertently model a different DV,
+  - omit key controls (making region pick up omitted-variable variance),
+  - restrict sample in a way correlated with region.
+
+---
+
+### 5) DV construction mismatches
+
+**Mismatch H — Your DVs may not match Bryson’s genre groupings and coding.**  
+- True DVs are counts of disliked genres in two specific sets: (0–6) and (0–12).  
+- Your model labels suggest you attempted this, but the N and coefficient patterns strongly suggest the constructed DVs or “dislike” coding might differ (e.g., treating “don’t know” as dislike, or excluding “never heard”, etc.).
+- **Fix:** Verify for each genre:
+  - What response codes count as “dislike” in Bryson? (e.g., “dislike” vs “like” vs “indifferent” vs “never heard”).  
+  - Ensure the **same six genres** in Model 1 and the **complement 12** in Model 2.
+  - Ensure the count is computed only when each genre response is valid (or use Bryson’s approach if he allowed partial information—your N suggests heavy listwise deletion across 18 items).
+
+---
+
+### 6) Output formatting mismatches that prevent auditing
+
+**Mismatch I — Generated tables lack variable names and SEs; true table has variable names and stars (no SEs).**  
+- You were asked to compare “variable names, coefficients, standard errors, or interpretation.” You cannot compare variable-name alignment if you don’t print them.
+- **Fix:** Produce a coefficient table with:
+  - exact variable labels as in Bryson (Racism score, Education, etc.)
+  - standardized beta
+  - significance stars using the paper’s thresholds
+  - **no SE column** if claiming to match Table 2.
+
+---
+
+## Minimal checklist to make the generated analysis match Bryson Table 2
+
+1) **Rebuild variables to match Bryson**  
+   - Racism index (same items, direction, scaling)  
+   - Household income **per capita** (same computation, handle missing)  
+   - Occupational prestige (same variable, missing handling)  
+   - Religion dummies (including “No religion” and “Conservative Protestant”) with correct reference group  
+   - Region: “Southern” dummy
+
+2) **Rebuild DVs exactly** (0–6 and 0–12 dislike counts) with Bryson-consistent handling of “don’t know/never heard/missing”.
+
+3) **Match sample selection** so N≈644 and 605.
+
+4) **Estimate OLS on raw DV**; compute standardized coefficients in a way consistent with the table. Do not z-score DV if you want Bryson’s constants.
+
+5) **Do not drop “no_religion” automatically**; fix the underlying variance/coding issue.
+
+6) **Report what the paper reports**: standardized betas + stars, plus N, R², adj R²; do not claim SE extraction from Table 2.
+
+If you paste the code (or at least the exact variable mapping and model formulas), I can identify precisely which two predictors are missing from your k=11 specification and map each generated coefficient row to the intended variable to pinpoint every remaining coefficient mismatch.

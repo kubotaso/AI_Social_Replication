@@ -1,0 +1,172 @@
+Score: 15/100
+============================================================
+
+Below is a line-by-line audit of where the **Generated Results** diverge from the **True Results** (Table 1 from the paper). I group issues into: (A) fit statistics / sample sizes, (B) coefficient tables (variable-by-variable), (C) missingness/stepwise logic, and (D) interpretation/formatting. For each mismatch I give the concrete fix needed so the generated analysis matches the paper.
+
+---
+
+## A) Fit statistics and N: major mismatches
+
+### 1) N is wrong in every model
+- **True:** Model 1 N=787; Model 2 N=756; Model 3 N=503  
+- **Generated:** Model 1 N=747; Model 2 N=43; Model 3 N=23  
+- **Why this is a discrepancy:** The paper’s models are estimated on hundreds of cases; the generated model 2 and 3 Ns are implausibly tiny and indicate the code is restricting to a minuscule complete-case subset (likely due to a miscoded variable with extreme missingness—see section C).
+- **Fix:**
+  1. Ensure the same **GSS 1993** subset and the same eligibility criteria as the paper (same DV, same recodes, same exclusions).
+  2. Fix the **Hispanic** variable coding/merging (you currently have ~93% missing; that alone can collapse N).
+  3. Use the paper’s casewise deletion rules *after* correct recodes; then confirm complete-case N matches 787/756/503.
+
+### 2) R² and adjusted R² are wrong
+- **True:**  
+  - M1 R²=0.107; adj R²=0.104  
+  - M2 R²=0.151; adj R²=0.139  
+  - M3 R²=0.169; adj R²=0.148
+- **Generated:**  
+  - M1 R²=0.088; adj R²=0.085  
+  - M2 R²=0.462; adj R²=0.293  
+  - M3 R²=0.657; adj R²=0.372
+- **Fix:**
+  - Once N and variables are correctly specified, re-run OLS and recompute R².  
+  - The huge R² values in generated M2/M3 are consistent with tiny N and/or near-collinearity/perfect separation-like artifacts from missingness; resolving the data pipeline should bring R² down to ~0.15–0.17.
+
+### 3) “Dropped” variables in fit_stats contradict the paper
+- **Generated:** M2 dropped `otherrace`; M3 dropped `hispanic, otherrace` (NaNs)
+- **True:** Those variables are included and have coefficients in Models 2 and 3.
+- **Fix:** Ensure the race dummy variables have **variation** and are not all-NA after filtering. This almost certainly traces to incorrect coding of race/ethnicity and/or filtering to complete cases on a broken `hispanic` variable.
+
+---
+
+## B) Coefficients: sign, magnitude, and significance mismatches
+
+### Critical conceptual mismatch: **paper reports standardized coefficients (β), generated mixes b and β**
+- **True Table 1:** β (standardized) for predictors; constants unstandardized.
+- **Generated output:** shows both `b` and `beta`, but your “Table1 style” uses **beta values** (good) while your underlying models/interpretation appear inconsistent (and the constants/fit stats don’t match anyway).
+- **Fix:** To match the paper:
+  1. Fit OLS on unstandardized variables.
+  2. Report **standardized coefficients** for predictors (β) and **unstandardized intercept**.
+  3. Do **not** invent SEs for Table 1 (paper doesn’t report them).
+
+Below I compare the **standardized coefficients (β)** shown in your `table1_combined` to the True Results.
+
+---
+
+### Model 1 (SES)
+
+| Variable | True β | Generated β | Mismatch | Fix |
+|---|---:|---:|---|
+| Education | -0.322*** | -0.292*** | magnitude off | After fixing sample/coding, re-estimate; also ensure education is in **years** and standardized the same way. |
+| Income pc | -0.037 | -0.039 | close (minor) | Likely resolves with correct N/sample. |
+| Prestige | 0.016 | 0.020 | small difference | Same as above. |
+| Constant | 10.920 | 10.638 | off | Use correct estimation sample (N=787) and correct DV scaling. |
+| R² | 0.107 | 0.088 | off | Correct sample/recode pipeline. |
+
+---
+
+### Model 2 (Demographic): widespread sign flips and wrong significance
+
+| Variable | True β | Generated β | What’s wrong | Fix |
+|---|---:|---:|---|
+| Education | -0.246*** | -0.730** | wildly too large | Caused by tiny N/collinearity from missingness + incorrect Hispanic coding; fix data and refit. |
+| Income pc | -0.054 | +0.109 | sign flip | Likely different sample + possibly income coding direction (or not per-capita); confirm `inc_pc` construction matches paper. |
+| Prestige | -0.006 | +0.406* | sign flip + huge | Prestige should be near zero/slightly negative; your value indicates the model is not comparable (wrong N and/or wrong DV). |
+| Female | -0.083* | +0.079 | sign flip | Check coding: paper likely uses Female=1; if you coded male=1 or inverted, you’ll flip sign. |
+| Age | +0.140*** | +0.021 | far too small | Wrong sample or age scaling; ensure age is in years and standardized for β. |
+| Black | +0.029 | -0.014 | sign flip | Check dummy coding and reference group; also verify race variable construction matches paper. |
+| Hispanic | -0.029 | -0.020 | close in value but your estimation is broken | Even if close, your `hispanic` is massively missing and later becomes NaN; fix coding. |
+| Other race | +0.005 | blank/NA | dropped | Fix dummy construction so it’s not constant/NA after filtering. |
+| Cons. Protestant | +0.059 | +0.422* | much too large | Likely due to tiny N and/or wrong definition of conservative Protestant. Recode per paper. |
+| No religion | -0.012 | +0.151 | sign flip | Check coding (No religion vs. any religion) and reference category. |
+| Southern | +0.097** | +0.165 | too large and missing stars | Fix sample, then apply correct p-value thresholds (two-tailed). |
+| Constant | 8.507 | 8.975 | off | Same: sample mismatch and/or DV mismatch. |
+| R² | 0.151 | 0.462 | much too high | Artifact of tiny N and broken missingness. |
+
+---
+
+### Model 3 (Political intolerance): almost entirely inconsistent (and variables missing)
+
+| Variable | True β | Generated β | What’s wrong | Fix |
+|---|---:|---:|---|
+| Education | -0.151** | -0.043 | too small, wrong sig | Correct sample/coding; ensure pol intolerance added without destroying N. |
+| Income pc | -0.009 | -0.132 | too large | Likely incorrect income measure/sample. |
+| Prestige | -0.022 | +0.332 | sign flip | Again indicates model mismatch. |
+| Female | -0.095* | +0.288 | sign flip | Fix female coding and/or DV coding. |
+| Age | +0.110* | +0.329 | too large | Scaling or sample issue. |
+| Black | +0.049 | -0.190 | sign flip | Fix dummy coding/reference. |
+| Hispanic | +0.031 | NA | dropped | Fix Hispanic variable missingness/coding. |
+| Other race | +0.053 | NA | dropped | Fix race dummy. |
+| Cons. Protestant | +0.066 | +0.693** | too large | Recode and fix sample. |
+| No religion | +0.024 | +0.291 | too large | Recode. |
+| Southern | +0.121** | +0.267 | too large | Recode/sample. |
+| Political intolerance | +0.164*** | +0.221 (ns) | wrong sig and magnitude | Ensure same intolerance scale (0–? and direction), and correct sample N=503; then compute β and p-values. |
+| Constant | 6.516 | -4.545 | totally wrong | Strong sign the DV or scaling is wrong and/or sample is wrong. |
+| R² | 0.169 | 0.657 | far too high | Tiny N and/or miscoding. |
+
+---
+
+## C) Missingness + stepwise audit reveal the root cause
+
+### 1) `hispanic` is catastrophically missing in your data
+- **Generated missingness:** `hispanic` 93.3% missing (1498/1606 missing)
+- **But the paper includes Hispanic in Models 2 and 3 with N=756 and N=503**, which is incompatible with 93% missing unless the paper used a different variable or you misconstructed it.
+
+**Fix (most important):**
+- Rebuild Hispanic from the correct GSS field(s) for 1993 (often `HISPANIC`/`HISP`/`ETHNIC` varies by extract).  
+- Ensure it is coded 0/1 (or a set of race/ethnicity dummies) and **not set to missing for non-Hispanics**.
+- After recode, verify: missingness of Hispanic should be low enough to permit N=756 and N=503.
+
+### 2) Your “stepwise_n_audit” is internally inconsistent with fit_stats
+- **stepwise_n_audit says:**  
+  - M2 added vars … n_complete = 56  
+  - M3 added pol_intol … n_complete = 491
+- **fit_stats says:**  
+  - Model 2 n = 43  
+  - Model 3 n = 23
+- **Fix:**
+  - Ensure you compute `n_complete` using the *exact same dataset* and *exact same variable list* used in each model fit.
+  - You likely computed “n_complete” on one intermediate dataframe and fit models on another (or after additional filtering).
+
+### 3) Political intolerance missingness doesn’t line up with Model 3 N
+- **Generated:** `pol_intol` missing 47% (N nonmissing=850), so complete-case N of ~503 is plausible only if other predictors don’t slash N further. But in your fitted model you got N=23.
+- **Fix:** Once Hispanic/race are fixed and complete-case selection is consistent, Model 3 N should land near 503.
+
+---
+
+## D) Interpretation/formatting mismatches with the paper
+
+### 1) You report SEs/p-values as if Table 1 contains them
+- **True note:** SEs not reported; Table 1 shows β and significance stars only.
+- **Generated:** provides p-values and SE-like inference outputs.
+- **Fix:** If your goal is to reproduce Table 1, suppress SEs/p-values in the presented table and only show β + stars. You can still compute p-values internally to assign stars, but don’t present SEs as “extracted”.
+
+### 2) Constant handling
+- **Paper:** constants are unstandardized and positive (10.920; 8.507; 6.516).
+- **Generated:** constants differ a lot and Model 3 constant is negative (-4.545).
+- **Fix:** Ensure DV is exactly “Number of Music Genres Disliked” coded the same direction and range as the paper; then re-fit on correct sample.
+
+---
+
+# What to change so the generated analysis matches the true Table 1
+
+1. **Fix Hispanic and race dummies construction**
+   - Hispanic must be a valid indicator with low missingness.
+   - “Other race” must not be constant/NA; ensure correct reference category and coding.
+
+2. **Align variable definitions to the paper**
+   - DV: `num_genres_disliked` must match the paper’s construction.
+   - Income: confirm it is truly *per-capita* and coded in the same units as the paper used.
+   - Religion: confirm “Conservative Protestant” and “No religion” match the paper’s categories.
+
+3. **Ensure consistent complete-case selection per model**
+   - Model 1 complete cases on (DV + educ + inc_pc + prestige) → N=787
+   - Model 2 complete cases on Model 1 vars + demographics → N=756
+   - Model 3 complete cases on Model 2 vars + intolerance → N=503
+
+4. **Report standardized coefficients (β) for predictors**
+   - Standardize predictors (and/or use a standardization method that reproduces β).
+   - Keep intercept unstandardized.
+
+5. **Recompute and verify**
+   - Check N, R², adj R² against the true values first.
+   - Then check βs and star patterns.
+
+If you share the exact variable names from your GSS extract/codebook (especially the source fields used to build `hispanic`, `otherrace`, `cons_prot`, `norelig`, and the DV), I can point to the most likely recode mistake producing the 93% missingness and the sign flips.

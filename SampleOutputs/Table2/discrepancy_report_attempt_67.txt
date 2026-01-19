@@ -1,0 +1,267 @@
+Score: 26/100
+============================================================
+
+Below is a line-by-line audit of where the **Generated Results** fail to match Bryson (1996) Table 2, and what you need to change so they align.
+
+---
+
+## 1) Fundamental reporting mismatch: SEs and p-values should not exist (from Table 2 alone)
+
+### What’s wrong
+- The **True Results (Table 2)** report **standardized coefficients + significance stars only**.
+- The generated output reports **unstandardized b, standard errors, t, p-values**, and then maps p-values to stars.
+- Because the PDF table does **not provide SEs**, any SEs/p-values in the generated output cannot be “extracted from Table 2” and therefore cannot be validated against it.
+
+### How to fix
+- If your goal is to reproduce **Table 2 exactly**, output only:
+  - standardized coefficients (betas)
+  - star markers exactly as in the table
+  - N, R², Adjusted R² (as in the table)
+- Remove (or clearly label as “re-estimated from microdata”) the columns: `b`, `std_err`, `t`, `p_value`.
+
+---
+
+## 2) Sample size (N) mismatches (major)
+
+### What’s wrong
+- **Model 1 true N = 644**; generated uses **N = 294**.
+- **Model 2 true N = 605**; generated uses **N = 281**.
+
+This alone guarantees coefficients and fit stats will not match the paper.
+
+### How to fix
+- Use the **GSS 1993** sample construction used by Bryson.
+- Ensure you match:
+  - the same year (1993),
+  - the same inclusion/exclusion rules,
+  - the same handling of missing data (likely listwise deletion across the full predictor set),
+  - any weights if used (paper typically states this; if weights were used, apply them consistently).
+- After cleaning, confirm that the analysis dataset sizes are **exactly 644 and 605**.
+
+---
+
+## 3) R² and Adjusted R² mismatches
+
+### What’s wrong
+**Model 1**
+- True: **R² = .145; Adj R² = .129**
+- Generated: **R² = 0.170; Adj R² = 0.141**
+
+**Model 2**
+- True: **R² = .147; Adj R² = .130**
+- Generated: **R² = 0.148; Adj R² = 0.116**
+
+Model 2 R² is close, but Adj R² is not; Model 1 is off.
+
+### How to fix
+Once you fix **N, coding, and included predictors**, recompute R²/Adj R². If still off:
+- verify you included the **same predictors** (see dropped variable issue below),
+- verify **standardization method** doesn’t affect R² (it shouldn’t for OLS with same DV/predictors, but data selection/coding will),
+- check whether the paper used **weights** (weighted R² can differ).
+
+---
+
+## 4) Variable-name / variable-inclusion mismatches (explicit dropped predictor)
+
+### What’s wrong
+- Generated fit tables say: `dropped_zero_variance_predictors = no_religion`
+- But Table 2 includes **No religion** in both models, with nonzero coefficients:
+  - Model 1: No religion = **0.057**
+  - Model 2: No religion = **0.024**
+
+So your “no_religion” variable is either mis-coded (e.g., everyone coded 0/1 incorrectly) or your restricted sample makes it constant.
+
+### How to fix
+- Reconstruct “No religion” exactly as Bryson did (typically from a religion/denomination variable).
+- Confirm it varies in the analytic sample before fitting.
+- If your sample restriction caused no variation, your sample definition is wrong (ties back to the N mismatch).
+
+---
+
+## 5) Coefficient mismatches: Model 1 (Rap/Reggae/Blues/Jazz/Gospel/Latin dislike)
+
+Below I compare **Generated ModelA_paper_style (std_beta_star)** to the **True Table 2 coefficients**. Because your generated table lacks variable names, I infer order from ModelA_full (after the constant). The mapping appears to be:
+
+1 Racism score  
+2 Education  
+3 Household income per capita  
+4 Occupational prestige  
+5 Female  
+6 Age  
+7 Black  
+8 Hispanic  
+9 Other race  
+10 Conservative Protestant  
+11 No religion  
+12 Southern  
+(Constant separately)
+
+### Mismatches (Model 1)
+- **Racism score**
+  - True: **0.130** (**)  
+  - Generated: **0.123*** with p=.042 → only *  
+  - Problem: coefficient slightly off; **significance level wrong** (paper has **).
+- **Education**
+  - True: **-0.175***  
+  - Generated: **-0.257***  
+  - Problem: magnitude substantially too large (more negative).
+- **Household income per capita**
+  - True: **-0.037**  
+  - Generated: **-0.004**  
+  - Problem: near zero instead of modest negative.
+- **Occupational prestige**
+  - True: **-0.020**  
+  - Generated: **0.019**  
+  - Problem: **sign flipped**.
+- **Female**
+  - True: **-0.057**  
+  - Generated: **-0.034**  
+  - Problem: magnitude mismatch.
+- **Age**
+  - True: **0.163***  
+  - Generated: **0.161** with ** (p=.007)  
+  - Problem: coefficient close, but star level differs (*** vs **).
+- **Black**
+  - True: **-0.132***  
+  - Generated: **-0.150***? actually generated shows `-0.150*` (p=.0169)  
+  - Problem: **significance far weaker** than paper (should be ***).
+- **Hispanic**
+  - True: **-0.058**  
+  - Generated: appears as `NaN` row in paper-style output; in full model there is a coefficient `-0.006` (p=.91) which does not match  
+  - Problem: either Hispanic is missing/NaN in formatted table and/or coefficient way off.
+- **Other race**
+  - True: **-0.017**  
+  - Generated: **0.108** (p=.068)  
+  - Problem: **sign flipped and magnitude wrong**.
+- **Conservative Protestant**
+  - True: **0.063**  
+  - Generated: `NaN` in paper-style output; in full model there is `0.010` (p=.863)  
+  - Problem: missing in formatted output and coefficient does not match.
+- **No religion**
+  - True: **0.057**  
+  - Generated: dropped (zero variance)  
+  - Problem: cannot match table if omitted.
+- **Southern**
+  - True: **0.024**  
+  - Generated: unclear / missing row(s); formatted table includes extra NaNs which suggests formatting/merge errors  
+  - Problem: likely not being displayed correctly and/or not coded the same.
+
+**Constant**
+- True: **2.415***  
+- Generated (unstandardized): **2.919***  
+- Problem: intercept differs substantially. (Intercept differences can arise from different DV construction or sample.)
+
+### How to fix Model 1 mismatches
+1. **Match the DV construction** exactly (count of disliked among those 6 genres; confirm “dislike” coding and whether DK/NA treated as missing vs 0).
+2. **Match predictor coding**:
+   - income per capita (equivalization and scaling),
+   - occupational prestige scale,
+   - race/ethnicity dummies (reference group and coding),
+   - conservative Protestant definition,
+   - southern definition.
+3. Fix the **sample** and missing-data handling to hit **N=644**.
+4. Do not drop “no religion”; fix its coding and variation.
+
+---
+
+## 6) Coefficient mismatches: Model 2 (12 remaining genres)
+
+Again, generated output lacks variable names, but order in ModelB_full after the constant suggests the same predictor sequence.
+
+### Key mismatches (Model 2)
+- **Racism score**
+  - True: **0.080** (no star)  
+  - Generated: **-0.016**  
+  - Problem: **sign flipped** and much smaller.
+- **Education**
+  - True: **-0.242***  
+  - Generated: **-0.171***? actually `-0.171*` (p=.0156)  
+  - Problem: magnitude too small and significance too weak.
+- **Household income per capita**
+  - True: **-0.065**  
+  - Generated: **-0.088**  
+  - Problem: magnitude off (not huge), but depends on correct coding/sample.
+- **Occupational prestige**
+  - True: **0.005**  
+  - Generated: **-0.046**  
+  - Problem: sign mismatch.
+- **Female**
+  - True: **-0.070**  
+  - Generated: **-0.079**  
+  - This one is fairly close.
+- **Age**
+  - True: **0.126** (**)  
+  - Generated: **0.094** (no star)  
+  - Problem: too small and not significant enough.
+- **Black**
+  - True: **0.042**  
+  - Generated: **0.130***? actually `0.130*`  
+  - Problem: much larger and significant when it shouldn’t be.
+- **Hispanic**
+  - True: **-0.029**  
+  - Generated: missing/NaN in paper-style, but full model includes a coefficient likely corresponding to Hispanic: `0.135*`  
+  - Problem: sign mismatch + magnitude.
+- **Other race**
+  - True: **0.047**  
+  - Generated: `0.088` (ns)  
+  - Problem: magnitude mismatch.
+- **Conservative Protestant**
+  - True: **0.048**  
+  - Generated: missing/NaN or `0.127*` depending on row mapping  
+  - Problem: display and/or mapping error and coefficient mismatch.
+- **No religion**
+  - True: **0.024**  
+  - Generated: dropped (zero variance)  
+  - Problem: cannot match table if omitted.
+- **Southern**
+  - True: **0.069**  
+  - Generated: not clearly shown / likely mismapped.
+
+**Constant**
+- True: **7.860** (no stars shown in your transcription; in paper it may or may not be starred)  
+- Generated: **5.345***  
+- Problem: large intercept discrepancy → DV definition and/or sample mismatch.
+
+### How to fix Model 2 mismatches
+Same as Model 1, plus:
+- verify the “12 remaining genres” set exactly matches Bryson’s classification,
+- confirm the DV is a **count** on the same range, with the same missing-data rule (do you require respondents to have answered all 12 items? Bryson likely has a specific rule).
+
+---
+
+## 7) Formatting / table-construction errors (NaNs and missing labels)
+
+### What’s wrong
+- In both `ModelA_paper_style` and `ModelB_paper_style`, there are multiple `NaN` rows, and the constant row appears as `NaN 2.919***`.
+- That indicates your “paper style” table is being produced by merging vectors without variable names or by misaligning indices (e.g., concatenating constant with betas incorrectly).
+
+### How to fix
+- Always carry an explicit `variable` column and merge/join by `variable`, not by row order.
+- Example structure:
+  - build a dataframe with `variable, std_beta, p_value`
+  - add `stars` from p-values
+  - ensure the intercept is labeled `Constant` and stored as a row with `std_beta = NA` (since standardized beta for intercept is undefined) rather than creating index misalignment.
+
+---
+
+## 8) Interpretation mismatch: “significance stars” do not match the paper’s stars
+
+Even where coefficients are close (e.g., Age in Model 1), your star assignment is based on your computed p-values from your (incorrect) sample/model, not the paper’s.
+
+### How to fix
+- If reproducing Table 2, use the **paper’s stars as given**, not recalculated ones.
+- If re-estimating from microdata, then you can report p-values/stars—but then you must stop calling it “Table 2 (Bryson 1996)” replication and instead label it “re-estimated using GSS 1993” and explain any deviations.
+
+---
+
+## Minimal checklist to make the generated analysis match Table 2
+
+1. **Use the correct dataset/year**: GSS 1993, as Bryson used.  
+2. **Recreate both DVs exactly** (genre sets + dislike coding + missing rule).  
+3. **Recreate predictors exactly** (especially religion categories and race dummies).  
+4. **Apply the same sample restrictions and missing-data handling** to hit **N=644 and N=605**.  
+5. **Do not drop “No religion”**; fix its coding so it varies.  
+6. **Report only standardized coefficients + Bryson’s stars** (or clearly label as re-estimated if you insist on SE/p).  
+7. **Fix the table-building code** to remove NaNs and ensure coefficients are attached to correct variable names.
+
+If you share your variable coding rules (especially the DV construction and religion/race coding), I can pinpoint which specific recodes are most likely causing the sign flips (notably racism in Model 2 and occupational prestige in both models).

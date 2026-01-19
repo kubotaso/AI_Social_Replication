@@ -1,0 +1,163 @@
+Score: 25/100
+============================================================
+
+## 1) Structural/reporting mismatches (what the “true” table contains vs what was generated)
+
+### A. Wrong estimand: generated tables mix unstandardized and standardized results
+- **True Table 2 reports standardized coefficients only** (plus significance stars). It does **not** report unstandardized coefficients, *t*, *p*, or standard errors.
+- **Generated Results report**: `b_unstd`, `beta_std`, `std_err`, `t`, `p_value`.
+
+**How to fix**
+- If your goal is to match Bryson (1996) Table 2, you must output **only standardized coefficients** and (optionally) significance markers—**no SE/t/p**, unless you compute them from the microdata yourself (but then it still won’t match the PDF table because the PDF omits them).
+- Drop the `b_unstd`, `std_err`, `t`, `p_value` columns from the “matching” output. Keep only `beta_std` and add stars based on p-values *you compute*, clearly labeled as “computed from GSS microdata,” not “from Table 2.”
+
+### B. Wrong sample sizes and fit statistics
+- **True Model 1**: **N = 644**, **R² = .145**, **Adj R² = .129**
+- **Generated ModelA_fit**: **N = 294**, **R² = 0.170**, **Adj R² = 0.141**
+- **True Model 2**: **N = 605**, **R² = .147**, **Adj R² = .130**
+- **Generated ModelB_fit**: **N = 281**, **R² = 0.148**, **Adj R² = 0.116**
+
+**How to fix**
+- You are not using the same analytic sample. To match:
+  - Use **GSS 1993** only.
+  - Construct the exact two DVs as Bryson did (see below) and apply the same missing-data handling (likely listwise deletion across all model variables).
+  - Ensure the same covariates and coding.
+- After reproducing the sample and variables, your N should come out close to **644/605** (exactly those if you replicate perfectly).
+
+### C. Wrong number of predictors shown (missing “Southern” and unclear intercept handling)
+- **True table includes 12 predictors + Constant** (13 rows total): Racism, Education, Income pc, Occ prestige, Female, Age, Black, Hispanic, Other race, Conservative Protestant, No religion, Southern, Constant.
+- **Generated tables have 11 coefficient rows** (looks like Constant + 10 predictors), meaning **at least one predictor is missing**. The obvious missing one is **Southern**.
+
+**How to fix**
+- Add the **Southern** indicator to both models exactly as in the paper.
+- Verify you are not accidentally dropping a category (e.g., if race dummies are coded differently) or excluding a religion dummy.
+- Output rows with explicit variable names so this is auditable.
+
+### D. Variable names are missing entirely in the generated tables
+- Generated tables show numeric rows with no variable labels, so you cannot verify correspondence to the true covariates.
+
+**How to fix**
+- Print a labeled coefficient table with the exact variable names from Table 2 (Racism score, Education, etc.).
+- Ensure ordering matches the published table.
+
+---
+
+## 2) Coefficient mismatches (direction/magnitude) by model
+
+Because the generated tables are unlabeled, the only coefficient we can confidently match is the **Constant** (it’s the only unstandardized coefficient in the published table). For the rest, we can compare **your `beta_std` column** against the **true standardized coefficients**, but only if we assume your row order corresponds to the paper’s order. Under that assumption, there are major mismatches.
+
+### Model 1 (Dislike of minority-linked genres): mismatches
+**True (standardized):**
+- Racism **0.130**
+- Education **-0.175**
+- Income pc **-0.037**
+- Occ prestige **-0.020**
+- Female **-0.057**
+- Age **0.163**
+- Black **-0.132**
+- Hispanic **-0.058**
+- Other race **-0.017**
+- Cons Prot **0.063**
+- No religion **0.057**
+- Southern **0.024**
+- Constant **2.415** (unstandardized)
+
+**Generated ModelA (assuming same order):**
+- Constant (b_unstd) = **2.919** (should be **2.415**) → mismatch
+- Racism beta_std = **0.123** (close to **0.130**) → minor mismatch
+- Education beta_std = **-0.257** (should be **-0.175**) → mismatch (too negative)
+- Income beta_std = **-0.004** (should be **-0.037**) → mismatch (near zero)
+- Occ prestige beta_std = **0.019** (should be **-0.020**) → **sign mismatch**
+- Female beta_std = **-0.034** (should be **-0.057**) → mismatch
+- Age beta_std = **0.161** (close to **0.163**) → close
+- Black beta_std = **-0.150** (vs **-0.132**) → moderate mismatch
+- Hispanic beta_std = **-0.006** (vs **-0.058**) → mismatch (far too small)
+- Other race beta_std = **0.108** (vs **-0.017**) → **sign mismatch and large**
+- Cons Prot beta_std = **0.010** (vs **0.063**) → mismatch
+- No religion beta_std = ??? (your table ends here; also Southern is missing) → mismatch/omission
+
+**How to fix**
+- The pattern (several coefficients near 0, sign flips, and wrong constant) strongly suggests **your DV and/or covariates are not coded/constructed the same** and/or you are on a **different sample/year**.
+- Rebuild:
+  1. **DV construction**: confirm the exact set of genres in Model 1 (Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin) and how “disliked” is counted (binary dislike per genre summed). Any difference (e.g., including “neutral,” treating missing as 0, different coding of “dislike”) will change coefficients.
+  2. **Race dummies**: ensure White is the reference and you include **Black, Hispanic, Other race** as separate indicators consistent with Bryson.
+  3. **Religion dummies**: “Conservative Protestant” and “No religion” must be coded the same, with the same omitted category.
+  4. Include **Southern**.
+  5. Restrict to **GSS 1993** and apply **listwise deletion** across the full model set.
+  6. Compute standardized coefficients as in OLS: standardize Xs and Y (or use the equivalence from unstandardized b’s and SDs), and report those.
+
+### Model 2 (Dislike of remaining 12 genres): mismatches
+**True (standardized):**
+- Racism **0.080**
+- Education **-0.242**
+- Income pc **-0.065**
+- Occ prestige **0.005**
+- Female **-0.070**
+- Age **0.126**
+- Black **0.042**
+- Hispanic **-0.029**
+- Other race **0.047**
+- Cons Prot **0.048**
+- No religion **0.024**
+- Southern **0.069**
+- Constant **7.860**
+
+**Generated ModelB (assuming same order):**
+- Constant (b_unstd) = **5.345** (should be **7.860**) → large mismatch
+- Racism beta_std = **-0.016** (should be **+0.080**) → **sign mismatch**
+- Education beta_std = **-0.171** (should be **-0.242**) → mismatch
+- Income beta_std = **-0.088** (should be **-0.065**) → mismatch
+- Occ prestige beta_std = **-0.046** (should be **+0.005**) → **sign mismatch**
+- Female beta_std = **-0.079** (should be **-0.070**) → close-ish
+- Age beta_std = **0.094** (should be **0.126**) → mismatch
+- Black beta_std = **0.130** (should be **0.042**) → too large
+- Hispanic beta_std = **0.135** (should be **-0.029**) → **sign mismatch**
+- Other race beta_std = **0.088** (should be **0.047**) → mismatch
+- Cons Prot beta_std = **0.127** (should be **0.048**) → too large
+- No religion beta_std = missing? (and Southern missing) → omission
+
+**How to fix**
+- Same fixes as Model 1, plus:
+  - Verify the **Model 2 DV** is *exactly* “the 12 remaining genres” (i.e., total disliked across the other 12, not the full 18, not a different subset).
+  - The **constant** being dramatically off (5.345 vs 7.860) is consistent with a different DV range/definition or different number of genres included in the count.
+
+---
+
+## 3) Standard errors and interpretation mismatches
+
+### A. Standard errors: cannot be “true” relative to Table 2
+- Your generated SEs cannot be checked against the PDF because **the PDF provides none**.
+- Presenting SEs as if they come from Table 2 is therefore a **reporting discrepancy**.
+
+**How to fix**
+- Either:
+  1. Remove SEs entirely when claiming to reproduce Table 2; or
+  2. Keep SEs but explicitly label them as **computed from your replication dataset**, and then your coefficients, N, and R² must also match (or be justified if they differ).
+
+### B. Interpretation mismatch risk: wrong sign implies wrong substantive conclusion
+Examples if your mapping/order is correct:
+- Model 2 racism: **true is +0.080 (positive)**; generated is **negative**. That flips the conclusion about whether racism predicts disliking the “other 12” genres.
+- Model 2 Hispanic: **true negative (-0.029)**; generated positive.
+
+**How to fix**
+- Do not write interpretations until:
+  - variables are labeled,
+  - coefficients match the published direction/magnitude,
+  - the DV and sample are verified.
+
+---
+
+## 4) Minimal checklist to make the generated analysis match the published Table 2
+
+1. **Use GSS 1993 only**.
+2. **Recreate both DVs exactly**:
+   - Model 1: count of disliked among {Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin}.
+   - Model 2: count of disliked among the other 12 genres (confirm the exact list from the instrument).
+   - Use the same rule for “dislike” and missing (don’t recode missing as 0).
+3. **Include all predictors** from Table 2:
+   - Racism score, Education, HH income per capita, Occ prestige, Female, Age, Black, Hispanic, Other race, Conservative Protestant, No religion, **Southern**.
+4. **Match coding and reference categories** (especially race and religion).
+5. **Listwise delete** cases with missing on any included variable so N aligns (644/605).
+6. **Report standardized coefficients only** (and stars), and match R²/Adj R².
+
+If you provide your variable coding (especially the genre “dislike” items, racism scale construction, and the exact model formula/output with labels), I can pinpoint exactly which row corresponds to which covariate and identify *additional* mismatches beyond the “missing Southern / wrong N / wrong DV” problems.

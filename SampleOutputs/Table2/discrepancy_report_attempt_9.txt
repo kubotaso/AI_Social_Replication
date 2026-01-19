@@ -1,0 +1,237 @@
+Score: 10/100
+============================================================
+
+### 1) Table structure/what can and cannot be compared
+
+**Mismatch:** Your *Generated Results* tables report **standard errors/p-values and unstandardized coefficients** (`b_unstd`, `p_value`) and also include a `beta_std`.  
+**True Table 2** reports **standardized coefficients only** (with significance stars) and **explicitly does not report SEs**.
+
+**Fix:**  
+- If your goal is to match Bryson (1996) Table 2, output **only standardized betas + significance markers** (and optionally N, R², adj. R²).  
+- Do **not** fabricate SEs/p-values. If you have the raw GSS data and replicate the regression, you *can* compute SEs—but then your output would no longer be “Table 2 from the PDF,” it would be a replication table “computed from microdata,” and should be labeled accordingly.
+
+---
+
+### 2) Model labeling and dependent variables
+
+#### Model A
+**Generated DV:** `dislike_minority_genres` (looks aligned conceptually)  
+**True DV name:** “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music”
+
+**Mismatch:** Only naming—concept is fine.
+
+**Fix:** Rename DV in the table title to match the paper wording.
+
+#### Model B
+**Generated DV:** `dislike_other12_genres`  
+**True DV name:** “Dislike of the 12 Remaining Genres”
+
+**Mismatch:** Only naming—concept is fine.
+
+**Fix:** Rename DV accordingly.
+
+---
+
+### 3) Sample size and fit statistics (big mismatches)
+
+#### Model 1 / ModelA_fit
+- **Generated N = 327; R² = 0.1896; Adj R² = 0.1639**
+- **True N = 644; R² = .145; Adj R² = .129**
+
+**Mismatch:** N is about half; R²/Adj R² don’t match.
+
+**Fix:**  
+- Use the correct analytic sample and missing-data handling used by Bryson (1996). Common causes:
+  - You may have subsetted (e.g., only respondents with non-missing genre dislikes *and* all covariates), but Bryson’s N indicates a larger sample.
+  - Different year(s): Table 2 is **GSS 1993**. Ensure you’re not accidentally filtering additional years or excluding too many cases.
+  - Different construction of DV or predictors causing more missingness (e.g., income per capita requiring household size; occupational prestige coding; racism scale item nonresponse).
+- To match N=644/605, reproduce:
+  - the exact GSS extract,
+  - variable recodes,
+  - and Bryson’s listwise deletion rules (or imputation, if used—though Table 2 suggests standard listwise OLS).
+
+#### Model 2 / ModelB_fit
+- **Generated N = 308; R² = 0.1658; Adj R² = 0.1377**
+- **True N = 605; R² = .147; Adj R² = .130**
+
+**Mismatch:** Same issue—N far too small; R² doesn’t match.
+
+**Fix:** Same as above.
+
+---
+
+### 4) Variable list/ordering mismatches (including missing “Southern”)
+
+Compare true Model 1 variables (12 predictors + constant):  
+Racism, Education, Income pc, Occ prestige, Female, Age, Black, Hispanic, Other race, Cons Prot, No religion, **Southern**, Constant.
+
+Your generated tables have **12 rows before the constant**, but one of them is a **row of all NaNs with b_unstd=0**, indicating a broken/missing term. Also, **“Southern” is not clearly present** in either generated model.
+
+**Fix:**  
+- Ensure all predictors are included explicitly and appear with names in the output.
+- Remove the “NaN row” by fixing the model matrix construction (often caused by:
+  - a column of all zeros,
+  - a perfectly collinear dummy,
+  - or an empty category after filtering).
+- Verify you included **Southern** (Bryson includes it in both models).
+
+---
+
+### 5) Coefficient-by-coefficient mismatches (standardized betas + significance)
+
+Because your tables don’t label rows, I infer row-to-variable mapping by matching signs/magnitudes to the true table. Even allowing for that, there are multiple mismatches.
+
+#### Model 1 (minority-liked genres): key comparisons
+True standardized betas:
+
+- Racism **0.130** (**)  
+  Generated first row: **0.139** (*)  
+  **Mismatch:** significance is weaker in generated; beta slightly higher.  
+  **Fix:** once sample/coding matches, stars should align. Also ensure **two-tailed** p-values with Bryson thresholds (*<.05, **<.01, ***<.001).
+
+- Education **-0.175***  
+  Generated second row: **-0.261***  
+  **Mismatch:** too large in magnitude.  
+  **Fix:** likely due to different coding (e.g., years vs degree categories), different standardization, or restricted sample.
+
+- Income pc **-0.037 (ns)**  
+  Generated third row: **-0.034 (ns)**  
+  **Close match** (good sign).
+
+- Occ prestige **-0.020 (ns)**  
+  Generated fourth row: **+0.030 (ns)**  
+  **Mismatch in sign.**  
+  **Fix:** check the prestige variable coding (e.g., higher score = more prestige). You may be using an inverse scale or a different prestige measure.
+
+- Female **-0.057 (ns)**  
+  Generated fifth row: **-0.026 (ns)**  
+  **Mismatch in magnitude.**  
+  **Fix:** check female coding (0/1 vs 1/2) and standardization.
+
+- Age **0.163***  
+  Generated sixth row: **0.191***  
+  **Mismatch (too large).**  
+  **Fix:** sample/coding.
+
+- Black **-0.132***  
+  Generated seventh row: **-0.127 (*)** with p=.0256  
+  **Mismatch:** star level much weaker than ***.  
+  **Fix:** sample size/coding of race dummies; also check whether Bryson’s “Black” is compared to “White” with other categories included, and that you didn’t change the reference group.
+
+- Hispanic **-0.058 (ns)**  
+  Generated eighth row: **0.004 (ns)**  
+  **Mismatch in sign and magnitude.**  
+  **Fix:** Hispanic dummy coding and race/ethnicity construction (GSS has multiple race/ethnicity measures; ensure you match Bryson’s).
+
+- Other race **-0.017 (ns)**  
+  Generated ninth row: **0.079 (ns)**  
+  **Mismatch in sign.**  
+  **Fix:** same as above.
+
+- Conservative Protestant **0.063 (ns)**  
+  Generated tenth row: **NaN / 0 / NaN**  
+  **Mismatch:** the term is broken/missing.  
+  **Fix:** your Conservative Protestant variable is likely all missing/constant after filtering, or incorrectly created.
+
+- No religion **0.057 (ns)**  
+  Generated eleventh row: **0.022 (ns)**  
+  **Mismatch in magnitude.**  
+  **Fix:** religion coding (e.g., none vs other; handling of “don’t know”).
+
+- Southern **0.024 (ns)**  
+  Generated: not clearly present (may be missing or absorbed into NaN row).  
+  **Mismatch:** missing term.  
+  **Fix:** include Southern dummy per paper.
+
+- Constant **2.415***  
+  Generated last row: **2.6536***  
+  **Mismatch:** constant differs.  
+  **Fix:** different DV construction (count range), different sample, or different inclusion of weights.
+
+#### Model 2 (other 12 genres): key comparisons
+True standardized betas:
+
+- Racism **0.080 (ns)**  
+  Generated first row: **-0.005 (ns)**  
+  **Mismatch in sign and magnitude.**  
+  **Fix:** your racism scale is likely constructed differently (items reversed, different standardization, different missing handling). This is a major substantive discrepancy.
+
+- Education **-0.242***  
+  Generated second row: **-0.224***  
+  **Close-ish**, but still off.
+
+- Income pc **-0.065 (ns)**  
+  Generated third row: **-0.095 (p≈.106)**  
+  **Mismatch:** magnitude larger and closer to significance.
+
+- Occ prestige **0.005 (ns)**  
+  Generated fourth row: **-0.012 (ns)**  
+  **Mismatch in sign** (though small).
+
+- Female **-0.070 (ns)**  
+  Generated fifth row: **-0.091 (p≈.092)**  
+  **Mismatch:** stronger negative, near-significant.
+
+- Age **0.126** (**)  
+  Generated sixth row: **0.091 (p≈.110)**  
+  **Mismatch:** should be significant positive.
+
+- Black **0.042 (ns)**  
+  Generated seventh row: **0.112 (p≈.056)**  
+  **Mismatch:** too large and near-significant.
+
+- Hispanic **-0.029 (ns)**  
+  Generated eighth row: **0.132 (*)**  
+  **Mismatch in sign and significance.** Big discrepancy.
+
+- Other race **0.047 (ns)**  
+  Generated ninth row: **0.080 (ns)**  
+  **Mismatch in magnitude.
+
+- Conservative Protestant **0.048 (ns)**  
+  Generated tenth row: **NaN/0/NaN**  
+  **Mismatch:** broken/missing.
+
+- No religion **0.024 (ns)**  
+  Generated eleventh row: **0.142 (**)**  
+  **Mismatch:** should be small, non-sig; generated is sizable and significant.
+
+- Southern **0.069 (*)**  
+  Generated: not clearly present; likely missing.  
+  **Mismatch:** missing term and also true table shows it significant.
+
+- Constant **7.860 (no stars in paper)**  
+  Generated constant: **5.6737***  
+  **Mismatch:** both value and significance marker.  
+  **Fix:** In Bryson’s table, the constant is printed without stars; your code is adding stars based on p-value. To match the paper, suppress stars for the constant (or match exactly what the paper prints).
+
+---
+
+### 6) Interpretation mismatches (substantive direction)
+
+Given the true table:
+- Racism is **positively associated** with disliking minority-linked genres (Model 1) and **positive but not significant** for the other 12 (Model 2).
+
+Your generated Model B shows racism slightly **negative** (and essentially 0). That is a substantive reversal.
+
+**Fix:** rebuild the racism score exactly as Bryson did (item selection, reverse-coding, scaling, treatment of missing). This is the most likely source of the sign flip.
+
+---
+
+### 7) Concrete steps to make the generated analysis match Table 2
+
+1. **Use the correct dataset slice:** GSS **1993** only; confirm no extra filters.
+2. **Recreate variables exactly:**
+   - DV counts: ensure the exact set of genres in each DV and that the DV is a **count of “disliked” genres** with identical dislike definition.
+   - Racism score: same items, same direction, same aggregation, same missing rule.
+   - Income per capita: confirm formula and top/bottom coding.
+   - Occ prestige: match the prestige scale Bryson used and its direction.
+   - Religion categories: correctly define “Conservative Protestant” and “No religion”.
+   - Southern: include it.
+   - Race/ethnicity: replicate “Black”, “Hispanic”, “Other race” exactly with the same reference group.
+3. **Fix the broken predictor (NaN row):** check for zero-variance or collinearity after subsetting; ensure dummy variables have observations in each category.
+4. **Standardization:** Table 2 uses **standardized OLS coefficients**. Standardize variables the same way (typically z-scores) and ensure you are not mixing standardized and unstandardized outputs.
+5. **Match reporting:** output standardized betas with stars using Bryson’s thresholds; do not report SEs if claiming to reproduce the PDF table.
+6. **Match N:** after recodes, confirm listwise deletion yields **N=644 (Model 1)** and **N=605 (Model 2)**; if not, identify which variable is driving attrition.
+
+If you paste the row-to-variable mapping you intended (i.e., which row corresponds to which predictor) and how each predictor was coded, I can mark *every* mismatch deterministically (not inferentially) and tell you exactly which coding choice is causing each discrepancy.

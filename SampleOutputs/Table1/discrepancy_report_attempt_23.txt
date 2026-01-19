@@ -1,0 +1,211 @@
+Score: 10/100
+============================================================
+
+Below is a line-by-line audit of mismatches between the **Generated Results** and the **True Results (Table 1)**, plus what you must change so the generated analysis can match the paper’s table.
+
+---
+
+## 1) Core conceptual mismatch: you reported the wrong kind of coefficients
+
+### What the true table reports
+- The paper’s Table 1 reports **standardized OLS coefficients (β)** for predictors.
+- The **constant is unstandardized**.
+- **Standard errors are not reported** (only stars).
+
+### What the generated output mixes together
+- Your `model*_table1` “Value” column appears to show **standardized betas** (because they match the `beta` column in `model*_full`), but you also include:
+  - unstandardized `b` in `model*_full`
+  - p-values and stars derived from those models
+- This is already a mismatch with the paper’s reporting style, but it’s *fixable* if you compute standardized betas the same way the paper did and then **only report β + stars**, and show the unstandardized constant.
+
+### Fix
+To match Table 1:
+1. Fit OLS on the same analytic sample as the paper.
+2. Compute **standardized coefficients for predictors** (z-score X and Y, or post-hoc standardization).
+3. Report:
+   - Predictor rows = β
+   - Constant row = unstandardized intercept from the unstandardized model
+   - R², adj. R², N
+   - No SE column (or “—”)
+
+---
+
+## 2) Massive sample size / missing-data mismatch (driving most other discrepancies)
+
+### Mismatches in N (fit_stats)
+- **Model 1**
+  - Generated: **n = 747**
+  - True: **n = 787**
+- **Model 2**
+  - Generated: **n = 43** (catastrophically wrong)
+  - True: **n = 756**
+- **Model 3**
+  - Generated: **n = 23** (catastrophically wrong)
+  - True: **n = 503**
+
+### Why it happens (visible in your missingness table)
+- `hispanic` is **93% missing** in your data (!!), which would obliterate Models 2–3 if you do listwise deletion.
+- `pol_intol` is **47% missing**, which would reduce Model 3, but not to 23 if the variable were properly constructed/coded.
+- Your Models 2–3 Ns (43, 23) are consistent with **listwise deletion + a mostly-missing Hispanic variable and missing political intolerance**.
+
+### Fix
+To match the paper you need to replicate its GSS construction:
+- **Recode race/ethnicity dummies correctly** so `hispanic` is not “mostly NA”.
+  - In GSS, “Hispanic” often comes from a specific ethnicity/hispanic-origin variable, not from `race` alone, and should not be NA for most respondents.
+  - If your `hispanic` comes from a variable that is asked only of a subsample/year, you must use the correct 1993 variable or harmonized variable.
+- Construct `pol_intol` exactly as the paper did (likely a multi-item index). Your 47% missing suggests:
+  - you built it from items not asked of all respondents, or
+  - you required all items non-missing (too strict), or
+  - you used the wrong year/variable mapping.
+- Only after correct construction should you run **listwise deletion**. The paper’s N dropping from 756 to 503 in Model 3 is plausible; dropping to 23 is not.
+
+---
+
+## 3) Model fit statistics (R² / adj R²) do not match
+
+### Model 1
+- Generated R² = **0.088** vs True **0.107**
+- Generated adj R² = **0.085** vs True **0.104**
+
+### Model 2
+- Generated R² = **0.462** vs True **0.151** (wildly off)
+- Generated adj R² = **0.293** vs True **0.139**
+
+### Model 3
+- Generated R² = **0.657** vs True **0.169** (wildly off)
+- Generated adj R² = **0.372** vs True **0.148**
+
+### Why
+Primarily the **wrong analytic samples** (Ns of 43 and 23 will produce unstable and inflated fit), plus likely **variable construction differences**.
+
+### Fix
+Once you fix coding and recover the correct N, R² should come down toward the published values. If it still doesn’t:
+- verify the dependent variable construction for “number of music genres disliked” and ensure it matches the paper (range, included genres, missing rules).
+
+---
+
+## 4) Variable-by-variable coefficient mismatches (β) and sign errors
+
+Below I compare the **True β** to your generated `model*_table1` (which appears to be β). I flag **sign flips**, big magnitude differences, and missing variables.
+
+### Model 1 (SES)
+
+| Variable | Generated β | True β | Mismatch |
+|---|---:|---:|---|
+| Education | **-0.292*** | **-0.322*** | magnitude off |
+| Income pc | **-0.039** | **-0.037** | close (OK) |
+| Prestige | **0.020** | **0.016** | close (OK) |
+| Constant | **10.638** | **10.920** | mismatch |
+| R² | **0.088** | **0.107** | mismatch |
+| N | **747** | **787** | mismatch |
+
+**Fix**: Correct sample and DV construction; then re-estimate. Education and intercept differences are consistent with sample differences.
+
+---
+
+### Model 2 (Demographic)
+
+**Almost everything is wrong, including multiple sign flips.**
+
+| Variable | Generated β | True β | Mismatch |
+|---|---:|---:|---|
+| Education | **-0.730** | **-0.246** | huge magnitude mismatch |
+| Income pc | **0.109** | **-0.054** | **sign flip** |
+| Prestige | **0.406** | **-0.006** | **sign flip + huge** |
+| Female | **0.079** | **-0.083** | **sign flip** |
+| Age | **0.021** | **0.140** | magnitude mismatch |
+| Black | **-0.014** | **0.029** | **sign flip** |
+| Hispanic | **-0.020** | **-0.029** | close-ish, but your model has extreme missingness |
+| Other race | blank/NA | **0.005** | missing (you have NaN in full output) |
+| Cons Protestant | **0.422** | **0.059** | huge mismatch |
+| No religion | **0.151** | **-0.012** | **sign flip** |
+| Southern | **0.165** | **0.097** | magnitude mismatch |
+| Constant | **8.975** | **8.507** | mismatch |
+| R² | **0.462** | **0.151** | mismatch |
+| N | **43** | **756** | catastrophic mismatch |
+
+**Fix**:
+1. Fix `hispanic`/`otherrace` coding so they are not NA and so dummy categories match the paper.
+2. Ensure you’re using the correct year (GSS 1993) and correct weighting (if the paper uses weights, apply them).
+3. Recreate DV and all predictors identically (esp. age, sex coding, race/ethnicity scheme, religion groups).
+4. Re-run with listwise deletion on the corrected variables; N should be ~756.
+
+---
+
+### Model 3 (Political intolerance)
+
+Again, multiple sign flips and missing predictors.
+
+| Variable | Generated β | True β | Mismatch |
+|---|---:|---:|---|
+| Education | **-0.043** | **-0.151** | magnitude mismatch |
+| Income pc | **-0.132** | **-0.009** | huge mismatch |
+| Prestige | **0.332** | **-0.022** | **sign flip + huge** |
+| Female | **0.288** | **-0.095** | **sign flip** |
+| Age | **0.329** | **0.110** | magnitude mismatch |
+| Black | **-0.190** | **0.049** | **sign flip** |
+| Hispanic | blank/NA | **0.031** | missing due to NA |
+| Other race | blank/NA | **0.053** | missing due to NA |
+| Cons Protestant | **0.693** | **0.066** | huge mismatch |
+| No religion | **0.291** | **0.024** | huge mismatch |
+| Southern | **0.267** | **0.121** | magnitude mismatch |
+| Political intolerance | **0.221** | **0.164** | mismatch |
+| Constant | **-4.545** | **6.516** | **major mismatch** |
+| R² | **0.657** | **0.169** | mismatch |
+| N | **23** | **503** | catastrophic mismatch |
+
+**Fix**:
+- Same as Model 2 plus:
+  - Rebuild `pol_intol` index exactly as in the paper (items used, scoring, allowable missing, range 0–15).
+  - Don’t compute the index in a way that forces near-complete-case across many items unless that matches the paper; otherwise you’ll destroy N.
+
+---
+
+## 5) Variable-name / labeling mismatches
+
+### Predictor naming
+- Generated uses internal names: `educ_yrs`, `inc_pc`, `prestg80_v`, `age_v`, `cons_prot`, `norelig`, `pol_intol`.
+- True table uses human-readable labels (Education, Household income per capita, Occupational prestige, etc.).
+
+This is not inherently wrong, but your **table presentation must map names consistently**.
+
+### Missing “Other race” coefficient
+- Generated Model 2 and Model 3 show `otherrace` as **NaN**, but your pretty table leaves the cell blank.
+- True results include **Other race** with small nonzero β.
+
+**Fix**: Ensure `otherrace` is actually estimated:
+- Verify it varies (not all 0/1 or perfectly collinear).
+- Ensure you have a reference category (e.g., White) and include all needed dummies without the dummy-variable trap.
+
+---
+
+## 6) Significance stars and inference mismatch
+
+- The paper’s stars correspond to its model with correct N and correct variables.
+- Your stars are based on a completely different sample (especially Models 2–3), so they cannot match.
+
+**Fix**:
+- Once variables and sample match, compute p-values and apply the same thresholds (* <.05, ** <.01, *** <.001).
+- Also confirm whether the paper uses **two-tailed** tests (it says it does). Keep two-tailed.
+
+---
+
+## 7) How to make the generated analysis match the true table (checklist)
+
+1. **Filter to GSS 1993** cases used in the paper.
+2. **Reconstruct DV**: “Number of Music Genres Disliked” exactly (which genres, how dislike is defined, missing handling).
+3. **Recode predictors** to match the paper:
+   - education (years)
+   - household income per capita (same transformation)
+   - occupational prestige (same scale/year)
+   - female (0/1 coding)
+   - age (years)
+   - race/ethnicity dummies including a valid Hispanic indicator (not 93% missing)
+   - religion group dummies (esp. “Conservative Protestant” definition)
+   - Southern (region definition)
+   - political intolerance index (0–15) with paper’s missing-data rule
+4. Use **listwise deletion per model** (so N matches 787, 756, 503).
+5. Fit OLS; compute **standardized betas** for predictors; report **unstandardized constant**.
+6. Report **R²/adj R²/N** and stars using the same p-value cutoffs.
+
+If you share the code you used to create `hispanic`, `otherrace`, and `pol_intol` (and how you computed the DV), I can pinpoint exactly why they’re mostly missing and propose the exact recodes needed.

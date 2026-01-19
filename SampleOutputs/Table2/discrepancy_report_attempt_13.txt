@@ -1,0 +1,188 @@
+Score: 0/100
+============================================================
+
+### 0) Core structural problem: you’re not comparing the same estimand/table
+**True Table 2** reports **standardized coefficients + significance stars only** (and an unstandardized constant). It **does not report SEs or p-values**.
+
+**Generated tables** include:
+- `p_value` for every coefficient
+- a `NaN` coefficient row with `***` (apparently the constant)
+- model fit with **different N, R², adj R²**
+- only **10 coefficient rows + constant**, whereas the true table has **12 predictors + constant**
+
+So the generated output is not a faithful reproduction of Table 2.
+
+**Fix (high level):**
+- Remove SE/p-value claims unless you re-estimate the models from the microdata (GSS 1993) with the same construction rules.
+- Ensure the predictor list matches Table 2 exactly (12 predictors) and preserve the constant as **unstandardized** if you’re reproducing the paper’s table.
+- Match sample sizes and DV construction.
+
+---
+
+## 1) Variable list / naming mismatches (missing predictors)
+### True Model 1 and Model 2 include 12 predictors:
+1. Racism score  
+2. Education  
+3. Household income per capita  
+4. Occupational prestige  
+5. Female  
+6. Age  
+7. Black  
+8. Hispanic  
+9. Other race  
+10. Conservative Protestant  
+11. No religion  
+12. Southern  
++ Constant
+
+### Generated ModelA_table / ModelB_table show **10 coefficient rows + constant** (11 total rows)
+You are missing **two predictors** in *each* model (or you collapsed some categories).
+
+**Fix:**
+- Verify your design matrix includes **all 12 predictors**.
+- Common failure points:
+  - Dropping `Southern` due to all-missing after filtering.
+  - Dropping one religion dummy because of reference category confusion.
+  - Dropping `Other race` because of small N or recode issues.
+- Output should have 12 predictor rows (not counting the constant).
+
+---
+
+## 2) Coefficient mismatches (value + sign + significance)
+Below I align by the *likely intended order* (since your generated tables have no variable names). Many coefficients don’t match the true table.
+
+### Model 1 (Rap/Reggae/Blues/Jazz/Gospel/Latin dislike): true vs generated
+Assuming your rows correspond to the paper’s order:
+
+| Predictor | True coef | Generated coef | Mismatch |
+|---|---:|---:|---|
+| Racism score | **0.130** (**) | **0.139** (*) | value differs; star level differs |
+| Education | **-0.175** (***) | **-0.261** (***) | too negative (substantively off) |
+| HH income pc | -0.037 (ns) | -0.034 (ns) | close (ok) |
+| Occ prestige | -0.020 (ns) | 0.030 (ns) | **sign flip** |
+| Female | -0.057 (ns) | -0.026 (ns) | magnitude off |
+| Age | 0.163 (***) | 0.191 (***) | too large |
+| Black | -0.132 (***) | -0.127 (*) | star level wrong (*** → *) |
+| Hispanic | -0.058 (ns) | 0.004 (ns) | **sign flip + magnitude off** |
+| Other race | -0.017 (ns) | 0.079 (ns) | **sign flip** |
+| Cons Prot | 0.063 (ns) | 0.022 (ns) | magnitude off |
+| No religion | 0.057 (ns) | (missing?) | not clearly present; you have only 10 predictors |
+| Southern | 0.024 (ns) | (missing?) | not clearly present |
+| Constant | 2.415 (***) | NaN (***) | constant not reported correctly at all |
+
+**Fixes:**
+- Add **variable names** to your output so alignment is not ambiguous.
+- Ensure `Occupational prestige` is coded and included correctly (sign flip suggests miscoding or different measure).
+- Ensure race dummies match the paper’s definition (Hispanic/Other sign flips often come from:
+  - different reference group,
+  - mixing “race” vs “ethnicity” coding,
+  - or filtering that changes composition).
+- Fix significance-star logic: in the true table, stars are based on the authors’ model; in yours they are based on your computed p-values (from a different model). If you are reproducing Table 2 *without re-estimation*, you must **use the paper’s stars**, not recalculated ones.
+
+### Model 2 (12 remaining genres disliked): true vs generated
+Again assuming the paper’s order:
+
+| Predictor | True coef | Generated coef | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.080 (ns) | -0.005 (ns) | **sign + magnitude wrong** |
+| Education | -0.242 (***) | -0.224 (***) | somewhat closer, still off |
+| HH income pc | -0.065 (ns) | -0.095 (ns) | too negative |
+| Occ prestige | 0.005 (ns) | -0.012 (ns) | **sign flip** |
+| Female | -0.070 (ns) | -0.091 (ns) | magnitude off |
+| Age | 0.126 (**) | 0.091 (ns) | magnitude and significance wrong |
+| Black | 0.042 (ns) | 0.112 (~p=.056) | magnitude off |
+| Hispanic | -0.029 (ns) | 0.132 (*) | **sign flip + now significant** |
+| Other race | 0.047 (ns) | 0.080 (ns) | magnitude off |
+| Cons Prot | 0.048 (ns) | 0.142 (**) | **too large + becomes significant** |
+| No religion | 0.024 (ns) | (missing?) | not clearly present |
+| Southern | 0.069 (ns) | (missing?) | not clearly present |
+| Constant | 7.860 (no stars in paper) | NaN (***) | wrong and wrongly starred |
+
+**Fixes:**
+- The racism coefficient being negative in your generated model is a red flag that you’re not using the same DV, IV coding, or sample.
+- Religion and Hispanic effects becoming significant/large suggests you are (a) using a different outcome definition, (b) different year(s), (c) different weights, or (d) different sample restrictions.
+
+---
+
+## 3) Standard errors and p-values: entirely non-comparable to the true table
+**Mismatch:**
+- Generated output provides `p_value` and uses them for stars.
+- True Table 2 provides **no SEs/p-values**, only stars (implicitly from tests the authors ran).
+
+**Fix options:**
+1. **If your goal is to reproduce the printed Table 2 exactly:**  
+   - **Do not compute or show SEs/p-values.**  
+   - Hard-code coefficients + stars exactly as in the paper; present the constant and fit statistics as printed.
+2. **If your goal is to re-estimate the models from data:**  
+   - Then you must state that these are *replication estimates*, and you must use the same:
+     - dataset (GSS 1993),
+     - DV construction (two “count of genres disliked” variables with the same included genres),
+     - predictor coding,
+     - missing data handling,
+     - weighting (if used),
+     - and OLS settings.
+   - Only then are SEs/p-values meaningful; but they still may not match the paper if the paper used different weights or listwise deletion rules.
+
+---
+
+## 4) Fit statistics and sample size mismatches
+### Model 1
+- **True:** N=644, R²=.145, Adj R²=.129  
+- **Generated:** N=327, R²=0.1896, Adj R²=0.1639  
+
+### Model 2
+- **True:** N=605, R²=.147, Adj R²=.130  
+- **Generated:** N=308, R²=0.1658, Adj R²=0.1377  
+
+Your N is roughly **half** of the paper’s N in both models.
+
+**Likely causes:**
+- You restricted to complete cases on variables not in the paper (extra controls), or accidentally filtered the sample (e.g., only whites, only one gender, only respondents with full music module, etc.).
+- You used a different survey year or subset.
+- You accidentally dropped cases by merging datasets incorrectly.
+- You treated “don’t know/refused/not asked” as missing for many music items and then did listwise deletion across many genre indicators, collapsing N.
+
+**Fix:**
+- Recreate the sample selection exactly as the authors did:
+  - Use **GSS 1993** and the **music dislikes** items used in Table 2.
+  - Apply the same missing-data rule for the DV construction (often counts are built allowing some missing items; if you require all genre items non-missing, N can collapse).
+  - Use listwise deletion **only on the variables in the regression**, not on unused raw genre items (unless the paper did so).
+- After fixing sample/DV, your N and R² should move toward 644/605 and .145/.147.
+
+---
+
+## 5) Constant row is broken
+**Mismatch:**
+- True constants: **2.415*** (Model 1), **7.860** (Model 2)
+- Generated constants: coefficient is `NaN`, but stars/p-value show significance.
+
+**Fix:**
+- Ensure the constant is actually extracted from the model object.
+- Do not standardize the intercept; if you standardize variables, the intercept can change, but it should not be `NaN`.
+- If you are only reporting standardized coefficients (as the paper does), you can:
+  - omit the intercept, **or**
+  - report it separately as unstandardized like the paper, but then you must compute it correctly.
+
+---
+
+## 6) Interpretation mismatches driven by wrong signs/stars
+Because several key coefficients differ in sign and/or significance (notably **Racism score in Model 2, Hispanic, occupational prestige, age**), any substantive interpretation will diverge from the paper.
+
+**Fix:**
+- Do not interpret until:
+  1) DV definitions match,
+  2) predictor coding and reference categories match,
+  3) sample N matches closely,
+  4) you’re reporting the same statistic type (standardized betas only, or full regression output).
+
+---
+
+# Minimal checklist to make the generated analysis match Table 2
+1. **Use the correct DV constructions** (two “# of genres disliked” outcomes with the same genre groupings as Table 2).
+2. **Include all 12 predictors** exactly as listed; ensure correct dummy/reference coding.
+3. **Match sample/year (GSS 1993)** and replicate the paper’s missing-data handling so N≈644 and 605.
+4. **Report standardized coefficients** (and stars) only; **remove SEs/p-values** unless you are explicitly re-estimating from microdata and documenting differences.
+5. **Fix intercept extraction** (no NaN); report it as in the paper if you include it.
+6. **Add variable names to output rows** so mismatches can be verified unambiguously.
+
+If you paste the code (or at least the variable construction steps for the two DVs and the racism score), I can pinpoint exactly which recode/filter step is producing the sign flips and the ~50% N loss.

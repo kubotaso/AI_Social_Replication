@@ -1,0 +1,133 @@
+Score: 78/100
+============================================================
+
+## Discrepancy report (GT Figure 1 vs generated)
+
+### 1) Series-to-axis mapping is swapped
+- **GT:**  
+  - **Solid line** = *Coefficient for Musical Tolerance* (left y-axis; values around -0.25 to -0.45).  
+  - **Dash-dot line** = *Mean Education of Genre Audience* (right y-axis; values ~12.6 to ~14.8), **monotonically increasing** overall.
+- **Generated:**  
+  - **Solid line** is the monotone-increasing series (should be education), but it is drawn against the **left axis** styling/shape expectation.  
+  - **Dashed line** is the jagged up/down series (should be coefficient), but it is drawn with the education callout/association.
+- **Impact:** The plotted lines don’t correspond to the intended quantities.
+
+### 2) Linestyle mismatch for the education series
+- **GT:** Education series is **dash-dot** (`-.`).
+- **Generated:** Education series appears **dashed** (`--`) (and the coefficient series is not solid as in GT).
+
+### 3) Wrong data shape/order for the education series
+- **GT education (dash-dot):** rises steadily from left→right with small plateaus; it does **not** oscillate strongly by genre.
+- **Generated education (currently jagged dashed line):** oscillates substantially and includes a deep dip near **Bluegrass**, which matches GT’s *coefficient* behavior, not education.
+
+### 4) Wrong data shape/order for the coefficient series
+- **GT coefficient (solid):** jagged, includes a pronounced drop around **Bluegrass**, then remains more negative toward **Rap/Heavy Metal/Country/Gospel**.
+- **Generated coefficient (currently solid):** mostly monotone increasing—this is not plausible for the coefficient series and matches the *education* trend instead.
+
+### 5) Annotations/callouts attached to the wrong series
+- **GT:** “Mean Education of Genre Audience” callout arrow points to the **dash-dot** line; “Coefficient for Musical Tolerance” points to the **solid** line.
+- **Generated:** Callouts visually align with the opposite series (because the series mapping is swapped).
+
+### 6) Minor typography/styling differences (secondary)
+- **GT:** Education line is clearly **dash-dot** with thicker stroke; coefficient is solid with similar thickness; overall looks slightly heavier/older-style.  
+- **Generated:** stroke weights and dash pattern differ slightly; otherwise axes ranges/ticks look consistent (left: -0.5 to -0.1; right: 12 to 15; dotted reference at 13).
+
+---
+
+## Exact fixes (data processing + matplotlib) to match GT
+
+### A) Fix data/series mapping (most important)
+- Ensure you have **two distinct arrays** per genre:
+  - `coef_tol_by_genre` (left axis; negatives around -0.25…-0.45)
+  - `mean_edu_by_genre` (right axis; around 12…15)
+- **Do not reuse** one series for both axes; confirm you are not inadvertently sorting one series differently from the genre labels.
+
+**Code-level checks/fixes**
+- Create an explicit ordered categorical for genre (this prevents accidental re-sorting):
+  ```python
+  genre_order = ["Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical",
+                 "Reggae","Swing","New Age/Space","Opera","Bluegrass","Folk",
+                 "Easy Listening","Pop/Rock","Rap","Heavy Metal","Country","Gospel"]
+  df["genre"] = pd.Categorical(df["genre"], categories=genre_order, ordered=True)
+  df = df.sort_values("genre")
+  ```
+- Compute the two series separately and align them to `genre_order`:
+  ```python
+  coef = (df.groupby("genre", observed=False)["coef_tolerance"].mean()
+            .reindex(genre_order).to_numpy())
+  edu  = (df.groupby("genre", observed=False)["education_years"].mean()
+            .reindex(genre_order).to_numpy())
+  ```
+
+### B) Plot each series on the correct axis with correct linestyle
+- **Left axis (coeff):** solid black.
+- **Right axis (education):** black dash-dot.
+
+```python
+x = np.arange(len(genre_order))
+
+fig, ax = plt.subplots(figsize=(12,6))
+ax2 = ax.twinx()
+
+# Coefficient (LEFT)
+ax.plot(x, coef, color="black", linewidth=2.5, linestyle="-")
+
+# Education (RIGHT)
+ax2.plot(x, edu, color="black", linewidth=2.5, linestyle="-.")
+```
+
+### C) Match axis ranges/ticks and the reference line exactly
+```python
+ax.set_ylim(-0.5, -0.1)
+ax.set_yticks([-0.5,-0.4,-0.3,-0.2,-0.1])
+
+ax2.set_ylim(12, 15)
+ax2.set_yticks([12,13,14,15])
+
+# Dotted sample mean education line at 13 (on right-axis scale)
+ax2.axhline(13, color="black", linewidth=1.2, linestyle=":")
+```
+
+### D) Fix annotations so arrows point to the correct line/axis
+- “Mean Education…” annotation must target a point on the **education (ax2)** series.
+- “Coefficient…” annotation must target a point on the **coefficient (ax)** series.
+
+Example (pick x positions matching GT placement, e.g., near Blues/R&B and Jazz region):
+```python
+# Education label (on ax2 coordinates)
+ax2.annotate("Mean Education of Genre Audience",
+             xy=(2, edu[2]), xycoords=("data","data"),
+             xytext=(3.0, 14.2), textcoords=("data","data"),
+             arrowprops=dict(arrowstyle="-", color="black", lw=1.5),
+             fontsize=16, fontweight="bold")
+
+# Coefficient label (on ax coordinates)
+ax.annotate("Coefficient for Musical Tolerance",
+            xy=(2, coef[2]), xycoords=("data","data"),
+            xytext=(2.5, -0.47), textcoords=("data","data"),
+            arrowprops=dict(arrowstyle="-", color="black", lw=1.5),
+            fontsize=16, fontweight="bold")
+```
+
+### E) Ensure no unintended smoothing/aggregation
+- **GT coefficient line is jagged**: do **not** apply rolling means/interpolation/spline smoothing.
+- Use simple per-genre means (or the exact statistic used in the paper). If you currently smooth the series, remove code like:
+  - `rolling(...)`, `savgol_filter`, `interp1d`, `np.polyfit`, or `sort_values(by=value)`.
+
+### F) X tick label rotation/placement (to match look)
+- Keep ~45° rotation and the same labels/order:
+```python
+ax.set_xticks(x)
+ax.set_xticklabels(genre_order, rotation=45, ha="right")
+ax.set_xlabel("Type of Music", fontsize=18, fontweight="bold")
+```
+
+---
+
+### Quick validation checklist
+- Education line is **dash-dot** and climbs to near **15** at **Gospel**.
+- Coefficient line is **solid** and has the strong negative dip around **Bluegrass**.
+- Dotted horizontal reference line corresponds to **education=13** (right axis).
+- Callout arrows point to the correct respective lines.
+
+If you paste your current plotting code (and the column names you’re using for coefficient/education), I can mark the exact lines to change.

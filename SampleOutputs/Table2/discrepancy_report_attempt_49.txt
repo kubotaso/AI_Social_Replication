@@ -1,0 +1,160 @@
+Score: 10/100
+============================================================
+
+## 1) Table/variable-name mismatches
+
+### A. DV / model labeling mismatch
+- **Generated**: `ModelA_*` uses `dislike_minority6` with **N=203**; `ModelB_*` uses `dislike_other12` with **N=197**.
+- **True (Bryson Table 2)**: Model 1 and Model 2 use **N=644** and **N=605**, respectively, from **GSS 1993**.
+
+**Fix**
+- Recreate the analytic sample to match Bryson (1996): GSS 1993, correct age restrictions (if any), nonmissing on the DV and all covariates as done in the paper, and correct construction of both DVs (6 genres vs remaining 12).
+- Your N being ~200 indicates you’re either using a different dataset/year, a restricted subsample, or listwise deletion after variable construction that doesn’t match the paper.
+
+---
+
+### B. Predictor naming: mostly cosmetic but must align
+Generated names differ from the paper’s table labels (not fatal, but you were asked to match exactly):
+- `racism_score` vs **Racism score**
+- `education_years` vs **Education**
+- `hh_income_per_capita` vs **Household income per capita**
+- `occ_prestige` vs **Occupational prestige**
+- `female` vs **Female**
+- `age_years` vs **Age**
+- `black`, `hispanic`, `other_race` vs **Black/Hispanic/Other race**
+- `cons_protestant` vs **Conservative Protestant**
+- `no_religion` vs **No religion**
+- `south` vs **Southern**
+
+**Fix**
+- Rename variables in the output table to match the paper’s labels. This is presentation-level, but required for “matches.”
+
+---
+
+## 2) Coefficient/significance mismatches (standardized betas)
+
+Below I compare your **paper_style** standardized coefficients (`coef_table2`) to Bryson Table 2 coefficients.
+
+### Model 1 (true “Dislike of Rap…Latin”, N=644)
+
+| Variable | Generated beta | True beta | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.138 | 0.130** | **Stars wrong** (you show none) and value slightly off |
+| Education | -0.253 | -0.175*** | **Magnitude + stars wrong** |
+| HH income pc | 0.024 | -0.037 | **Sign wrong** |
+| Occ prestige | 0.005 | -0.020 | **Sign wrong** |
+| Female | -0.037 | -0.057 | Different magnitude (ok-ish) |
+| Age | 0.150* | 0.163*** | **Stars wrong** |
+| Black | -0.192 | -0.132*** | **Stars missing; magnitude off** |
+| Hispanic | 0.063 | -0.058 | **Sign wrong** |
+| Other race | -0.009 | -0.017 | Close (sign matches) |
+| Conservative Protestant | 0.073 | 0.063 | Close |
+| No religion | dropped (zero variance) | 0.057 | **Should not be dropped** |
+| Southern | -0.023 | 0.024 | **Sign wrong** |
+| Constant | 2.823*** | 2.415*** | Different |
+
+### Model 2 (true “Dislike of 12 remaining”, N=605)
+
+| Variable | Generated beta | True beta | Mismatch |
+|---|---:|---:|---|
+| Racism score | -0.013 | 0.080 | **Sign wrong** |
+| Education | -0.260** | -0.242*** | **Stars wrong** (should be ***) |
+| HH income pc | -0.068 | -0.065 | Close |
+| Occ prestige | -0.098 | 0.005 | **Sign + magnitude wrong** |
+| Female | -0.093 | -0.070 | Different |
+| Age | -0.006 | 0.126** | **Sign + magnitude wrong** |
+| Black | 0.012 | 0.042 | Different |
+| Hispanic | 0.071 | -0.029 | **Sign wrong** |
+| Other race | 0.154* | 0.047 | **Magnitude + stars wrong** |
+| Conservative Protestant | 0.114 | 0.048 | Different |
+| No religion | dropped | 0.024 | **Should not be dropped** |
+| Southern | 0.186** | 0.069 | **Magnitude + stars wrong** |
+| Constant | 7.077*** | 7.860 (no stars shown) | Different (also star handling differs) |
+
+**Core conclusion:** these are not “small rounding” differences. Many coefficients flip sign and several change substantially—strong evidence you are **not reproducing Bryson’s Table 2** (different sample, different coding, and/or different DV construction).
+
+---
+
+## 3) Standard error mismatches (and why they cannot “match” Table 2)
+
+- **Generated**: you report `std_err`, `t`, `p_value` in `ModelA_full` / `ModelB_full`.
+- **True**: Bryson Table 2 **does not report SEs at all**. So there is nothing to compare against; any SE comparison is necessarily a mismatch to the *reported* table.
+
+**Fix**
+- If the goal is to match the *paper’s Table 2*, remove SEs from the “paper_style” table and present only standardized coefficients with stars.
+- If the goal is replication beyond Table 2, you can compute SEs—but then you must state clearly they are **from your re-estimation**, not extracted from the published table.
+
+---
+
+## 4) “No religion” incorrectly dropped as zero variance
+
+- **Generated**: `no_religion` is flagged `zero_variance` and dropped in both models.
+- **True**: “No religion” is included with nonzero coefficients (0.057; 0.024).
+
+**Fix**
+- Diagnose coding:
+  - You likely created `no_religion` as a constant (all 0s or all 1s) due to a bad recode or filtering step.
+  - Or you subsetted to a group where it truly has no variance (which would again indicate the wrong sample).
+- Check frequency table of `no_religion` in the analytic sample; fix recode and/or sample definition until it varies and matches GSS 1993 distributions.
+
+---
+
+## 5) Fit statistics mismatch (R² / adj R²)
+
+- **Generated**:
+  - ModelA: R² = .165, adj R² = .117, N=203
+  - ModelB: R² = .194, adj R² = .146, N=197
+- **True**:
+  - Model 1: R² = .145, adj R² = .129, N=644
+  - Model 2: R² = .147, adj R² = .130, N=605
+
+**Fix**
+- These will only align after:
+  1) matching the sample and weights (if used),
+  2) matching DV construction,
+  3) matching covariate coding and reference categories,
+  4) matching whether Bryson uses listwise deletion and exactly which missing codes are treated as missing.
+
+---
+
+## 6) Interpretation mismatches implied by sign reversals
+
+Because many generated coefficients have the opposite sign from the true table (e.g., income, southern, Hispanic in Model 1; racism and age in Model 2), any narrative interpretation based on the generated output will contradict Bryson’s findings.
+
+**Fix**
+- Do **not** “edit the interpretation” to fit. You must fix the estimation inputs so the coefficients themselves align:
+  - Confirm you’re using the same dependent variables (counts of disliked genres) and the same genre groupings.
+  - Confirm the direction of the DV: “number of genres disliked” (higher = more dislikes). A reversed DV (likes instead of dislikes, or 0/1 swapped) would flip signs.
+  - Confirm the racism scale direction (higher = more racist). A reverse-coded racism scale would flip its coefficient sign.
+  - Confirm race/region dummies match the paper’s reference category.
+
+---
+
+## 7) Constants don’t match (and why)
+- **Generated constants**: 2.823 and 7.077 (both starred).
+- **True constants**: 2.415*** and 7.860 (no significance shown in your transcription for Model 2 constant; in many tables constants are shown without stars even if significant).
+
+**Fix**
+- Once the sample and DV coding match, constants will move closer.
+- Also match the paper’s reporting convention: if Table 2 doesn’t star the Model 2 constant, don’t star it in the “paper_style” output.
+
+---
+
+## What you need to change so the generated analysis matches Table 2
+
+1) **Use the correct data**: GSS 1993, not a restricted N≈200 subset unless the paper did so (it didn’t, per Table 2 N’s).
+2) **Rebuild the two DVs exactly**:
+   - Model 1 DV = number of disliked genres among (Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin).
+   - Model 2 DV = number of disliked genres among the other 12.
+   - Ensure “disliked” is coded consistently and summed as counts.
+3) **Recode predictors to match Bryson**:
+   - Racism score scale direction.
+   - Education measure (years vs categories) consistent with the paper.
+   - Income per capita construction and scaling.
+   - Occupational prestige measure consistent with GSS variable Bryson used.
+   - Region dummy for “Southern”.
+   - Religion dummies, ensuring “No religion” varies and is not accidentally constant.
+4) **Estimate standardized OLS coefficients** (beta weights) and report only those + stars in the Table 2-style output.
+5) **Stars must correspond to Bryson’s thresholds** (* <.05, ** <.01, *** <.001) and will only match once the sample/model matches.
+
+If you share your codebook/coding rules (especially DV construction, racism scale, and sample restrictions), I can pinpoint the specific step causing the biggest sign flips (DV reversal vs scale reversal vs wrong genre grouping).

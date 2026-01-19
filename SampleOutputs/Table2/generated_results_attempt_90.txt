@@ -1,0 +1,56 @@
+## ModelA_table
+            variable      beta stars  p_value_model                                                                note
+        racism_score  0.137075             0.070376                                                                    
+     education_years -0.252211    **       0.001597                                                                    
+hh_income_per_capita  0.021587             0.771277                                                                    
+        occ_prestige  0.005160             0.946373                                                                    
+              female -0.037425             0.580877                                                                    
+           age_years  0.150246     *       0.045701                                                                    
+               black -0.185950             0.124524                                                                    
+            hispanic  0.054958             0.642505                                                                    
+          other_race -0.012545             0.855855                                                                    
+     cons_protestant  0.072681             0.307696                                                                    
+         no_religion       NaN                  NaN omitted (constant/collinear or all-missing after listwise deletion)
+            southern -0.021900             0.746685                                                                    
+            constant       NaN   ***       0.000163                    unstandardized intercept on DV scale; b=2.824402
+
+## ModelB_table
+            variable      beta stars  p_value_model                                                                note
+        racism_score -0.016081         8.279326e-01                                                                    
+     education_years -0.261237    **   1.708032e-03                                                                    
+hh_income_per_capita -0.071203         3.368845e-01                                                                    
+        occ_prestige -0.101534         1.964242e-01                                                                    
+              female -0.096034         1.582809e-01                                                                    
+           age_years -0.004905         9.472772e-01                                                                    
+               black -0.020818         8.744524e-01                                                                    
+            hispanic  0.110983         3.755423e-01                                                                    
+          other_race  0.140811     *   4.628101e-02                                                                    
+     cons_protestant  0.111429         1.166833e-01                                                                    
+         no_religion       NaN                  NaN omitted (constant/collinear or all-missing after listwise deletion)
+            southern  0.190873    **   6.228939e-03                                                                    
+            constant       NaN   ***   2.912853e-09                    unstandardized intercept on DV scale; b=7.139903
+
+## ModelA_fit
+                                     model                      dv   n  k_including_const     r2   adj_r2 dropped_predictors
+Table2_ModelA_Dislike_Minority_Associated6 dislike_minority_genres 203                 12 0.1651 0.117017        no_religion
+
+## ModelB_fit
+                                  model                     dv   n  k_including_const       r2   adj_r2 dropped_predictors
+Table2_ModelB_Dislike_Other12_Remaining dislike_other12_genres 197                 12 0.196475 0.148698        no_religion
+
+## Diagnostics
+               variable  nonmissing_n         mean          std   min      max
+dislike_minority_genres          1134     2.057319     1.575628  0.00      6.0
+ dislike_other12_genres          1057     3.778619     2.514329  0.00     12.0
+           racism_score           841     2.382878     1.415354  0.00      5.0
+        education_years          1494    13.385542     2.883263  0.00     20.0
+   hh_income_per_capita          1464 14365.257411 13667.216529 98.25 103880.0
+           occ_prestige          1526    43.200524    13.213804 17.00     86.0
+                 female          1606     0.573474     0.494572  0.00      1.0
+              age_years          1601    46.048720    17.355420 18.00     89.0
+                  black          1606     0.111457     0.314697  0.00      1.0
+               hispanic          1076     0.124535     0.330191  0.00      1.0
+             other_race          1606     0.049813     0.217559  0.00      1.0
+        cons_protestant          1023     0.616813     0.486163  0.00      1.0
+            no_religion          1597     0.091421     0.288207  0.00      1.0
+               southern          1606     0.348070     0.476358  0.00      1.0

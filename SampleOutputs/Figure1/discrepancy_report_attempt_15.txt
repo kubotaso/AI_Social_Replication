@@ -1,0 +1,134 @@
+Score: 70/100
+============================================================
+
+## Discrepancy report (GT Figure 1 vs generated)
+
+### 1) Series are swapped between axes (wrong mapping)
+- **Ground truth (GT):**
+  - **Solid line** = **Mean Education of Genre Audience** (uses **right y-axis**, 12–15), monotonically increases toward Rap/Metal/Country/Gospel.
+  - **Dash-dot line** = **Coefficient for Musical Tolerance** (uses **left y-axis**, −0.5 to −0.1), jagged and trends downward near the right end.
+- **Generated:**
+  - **Solid line** is plotted on the **left axis** (−0.5..−0.1) and looks like the *tolerance coefficient* trajectory.
+  - **Dash-dot line** is plotted on the **right axis** (12..15) and looks like the *education* trajectory.
+- **Exact issue:** the two y-series are assigned to the wrong axes/linestyles (education and coefficient are swapped).
+
+### 2) Right-axis education curve shape differs (ordering/values mismatch)
+- **GT education (solid/right axis):** steady upward trajectory with distinct plateaus/steps, ending near ~14.7–14.9 at Gospel.
+- **Generated education (dash-dot/right axis):** much more oscillatory early/mid and drops sharply around Bluegrass then recovers—this matches GT’s *coefficient* behavior, confirming the swap.  
+- **Exact issue:** after fixing the swap, ensure the education values are plotted (not coefficient values) on the right axis.
+
+### 3) Left-axis tolerance curve shape differs (ordering/values mismatch)
+- **GT coefficient (dash-dot/left axis):** starts around ~−0.43 at Latin/Salsa, rises toward ~−0.35 by Blues/R&B, then varies, with notable drop near Bluegrass and ends ~−0.42 at Gospel.
+- **Generated coefficient (solid/left axis):** smooth monotonic increase from ~−0.43 to ~−0.13 by Gospel (does not match GT jagged pattern).
+- **Exact issue:** even beyond swapping, your “coefficient” line appears **sorted/monotonized** (likely by education or by x index) or otherwise transformed, not plotted in the GT genre order.
+
+### 4) Genre order mismatch / implicit sorting (data processing discrepancy)
+- **GT x-order:** `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
+- **Generated x-order text matches GT**, but the **solid line is monotonic**, which strongly suggests you **sorted the y-values** (or sorted the dataframe by a variable like education) while leaving x tick labels in the original order.
+- **Exact issue:** x labels are fixed, but y-series appears computed/ordered from a differently sorted table.
+
+### 5) Annotation leader lines attach to the wrong series
+- **GT:** “Mean Education…” leader points to **solid** line; “Coefficient…” leader points to **dash-dot** line.
+- **Generated:** leaders point to opposite series because the series themselves are swapped.
+- **Exact issue:** annotation target coordinates reference the wrong line/axis.
+
+(Other elements—axis ranges and tick values (left: −.5..−.1; right: 12..15), dotted sample-mean line around 13, no markers, black lines—are broadly consistent.)
+
+---
+
+## Code/data fixes to match GT exactly (actionable steps)
+
+### A) Fix dataframe ordering (prevent accidental sorting)
+- **Do not sort by education/coefficient.** Enforce the GT categorical order before plotting.
+```python
+genre_order = [
+    "Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical","Reggae",
+    "Swing","New Age/Space","Opera","Bluegrass","Folk","Easy Listening",
+    "Pop/Rock","Rap","Heavy Metal","Country","Gospel"
+]
+
+df["genre"] = pd.Categorical(df["genre"], categories=genre_order, ordered=True)
+df = df.sort_values("genre")  # ONLY by genre categorical order
+```
+- **Sanity check (recommended):**
+```python
+assert list(df["genre"]) == genre_order
+```
+
+### B) Ensure the correct transformations/aggregations (no unintended smoothing)
+- If you computed means/coefficients, ensure **no rolling mean, interpolation, or sorting by value** is applied.
+- Build two explicit series aligned to `genre_order`:
+```python
+x = np.arange(len(genre_order))
+coef = df.set_index("genre").loc[genre_order, "tolerance_coef"].to_numpy()
+edu  = df.set_index("genre").loc[genre_order, "mean_education"].to_numpy()
+```
+
+### C) Plot each series on the correct axis with correct linestyle
+- **Left axis:** coefficient (dash-dot)
+- **Right axis:** education (solid)
+```python
+fig, ax = plt.subplots(figsize=(12, 6), dpi=150)
+
+# Left y-axis: coefficient
+ax.plot(x, coef, color="black", lw=2.0, ls="-.")   # dash-dot
+ax.set_ylim(-0.5, -0.1)
+ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])
+ax.set_yticklabels(["-.5","-.4","-.3","-.2","-.1"])  # match GT formatting
+
+# Right y-axis: education
+ax2 = ax.twinx()
+ax2.plot(x, edu, color="black", lw=2.0, ls="-")     # solid
+ax2.set_ylim(12, 15)
+ax2.set_yticks([12, 13, 14, 15])
+```
+
+### D) Keep the horizontal “Sample Mean Education” reference line on the education (right) scale
+- In GT it’s a horizontal dotted line at ~13 (right axis). Draw it on `ax2`:
+```python
+ax2.axhline(13, color="black", lw=1.0, ls=(0, (2, 2)))  # dotted-like
+```
+
+### E) X ticks/labels and rotation
+```python
+ax.set_xticks(x)
+ax.set_xticklabels(genre_order, rotation=45, ha="right")
+ax.set_xlabel("Type of Music", fontweight="bold")
+```
+
+### F) Fix annotations so they point to the correct series/axis
+- After swapping, update annotation coordinates to use the correct axis (`ax2` for education; `ax` for coefficient). Example pattern:
+```python
+# "Mean Education..." pointing to education line (ax2)
+i = genre_order.index("Blues/R&B")  # pick the same anchor genre as GT placement
+ax2.annotate("Mean Education of Genre Audience",
+             xy=(x[i], edu[i]), xycoords="data",
+             xytext=(x[i]+1, 14.2), textcoords="data",
+             arrowprops=dict(arrowstyle="-", color="black", lw=1.2),
+             fontsize=12, fontweight="bold")
+
+# "Coefficient..." pointing to coefficient line (ax)
+j = genre_order.index("Blues/R&B")
+ax.annotate("Coefficient for Musical Tolerance",
+            xy=(x[j], coef[j]), xycoords="data",
+            xytext=(x[j]+1, -0.47), textcoords="data",
+            arrowprops=dict(arrowstyle="-", color="black", lw=1.2),
+            fontsize=12, fontweight="bold")
+```
+- And the “Sample Mean Education” label/arrow should reference `ax2` as well:
+```python
+ax2.annotate("Sample Mean Education",
+             xy=(x[6], 13), xycoords="data",
+             xytext=(x[4], 12.7), textcoords="data",
+             arrowprops=dict(arrowstyle="-|>", color="black", lw=1.0),
+             fontsize=12, fontweight="bold")
+```
+
+### G) If your coefficient line is still monotone after the swap, remove value-based sorting
+- Search for and delete/avoid lines like:
+  - `df.sort_values("mean_education")`
+  - `np.sort(coef)` / `sorted(coef)`
+  - `rank()`-based ordering
+  - any resampling/interpolation that reorders points.
+
+These changes (A–G) fix the *exact* issues: (1) series-to-axis mapping, (2) unintended monotonic/reshuffled coefficient values, and (3) annotation pointers tied to the wrong axis/series.

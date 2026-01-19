@@ -1,0 +1,247 @@
+Score: 17/100
+============================================================
+
+## 1) Structural problems (what’s being compared is not the same thing)
+
+### A. Wrong sample sizes (N)
+- **Generated Model A:** N = **327**
+- **True Model 1:** N = **644**
+- **Generated Model B:** N = **308**
+- **True Model 2:** N = **605**
+
+**Fix:** Use the same dataset and the same listwise-deletion rules as Bryson (GSS 1993; N≈644/605). Your Ns are roughly half, which strongly suggests you:
+- filtered to a subsample (e.g., only respondents with complete genre batteries, or only certain races), or
+- dropped many cases due to missingness handling, or
+- used the wrong year(s) or wrong GSS file.
+
+You must replicate Bryson’s inclusion criteria (GSS 1993, correct genre items, correct racism scale, same covariates, and comparable missing-data treatment).
+
+---
+
+### B. Wrong dependent variables (DV names indicate different constructions)
+- **Generated DV names:** `dislike_minority_genres` and `dislike_other12_genres`
+- **True DV definitions:** counts of disliked genres in two specific groupings:
+  1) **6 genres**: Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin
+  2) **12 remaining genres**
+
+Your DV labels suggest the same intent, but the **means/constant values and Ns** don’t line up, indicating the **count construction differs** (e.g., different coding of “dislike,” different handling of “don’t know,” different genre list, or using only respondents asked all items).
+
+**Fix:** Recreate the DV exactly as in the paper:
+- Ensure the exact **genre list** matches (especially the “remaining 12” list).
+- Ensure the **dislike indicator** matches the questionnaire coding (e.g., “dislike” vs “neutral,” handling of “not asked,” “DK,” “NA”).
+- Ensure the DV is the **count** across items with consistent missing handling.
+
+---
+
+### C. You are reporting standard errors / p-values, but the table you’re trying to match has none
+The true Table 2 provides **standardized coefficients and significance stars**, **not SEs**. Your “full” tables include **p-values** and thus implicitly SEs.
+
+**Mismatch:** Any comparison of SEs is impossible against Table 2.
+
+**Fix options:**
+1) **To match the paper:** report only **standardized coefficients + stars**, suppress SEs/p-values.
+2) If you insist on SEs: you must compute them from your replication model, but then you are **no longer matching Table 2’s reported content** (you can only match coefficients/stars approximately).
+
+---
+
+## 2) Variable-name / ordering mismatches
+
+### A. Intercept is being treated like a coefficient row in your “paper style” table, but variable names are missing
+Your `ModelA_table_paper_style` shows 12 coefficient rows but **no variable names**. The true table has **13 rows including the constant**.
+
+From your `ModelA_table_full`, the first row is the intercept (2.653629). Then you appear to have **11 more rows**, including a suspicious `0.000000 NaN` row.
+
+**Fix:**
+- Output a table with **explicit variable names** in the **same order** as Bryson’s Table 2:
+  Racism, Education, Income, Prestige, Female, Age, Black, Hispanic, Other race, Conservative Protestant, No religion, Southern, Constant.
+- Remove any spurious all-zero/NaN row (see below).
+
+### B. Spurious “0.000000 / NaN” row (both models)
+In both Model A and B full tables you have a row:
+- `b_unstd = 0.000000`, `p_value = NaN`, `beta_std = NaN`
+
+That indicates a broken term in the design matrix (e.g., a dummy with no variation, a perfectly collinear predictor, or a placeholder column).
+
+**Fix:**
+- Identify which predictor that row corresponds to (because you currently don’t print names).
+- Remove the collinear/constant predictor, or fix the dummy coding so all categories are represented correctly (e.g., religion dummies must omit a reference category; race dummies must omit White; region must omit non-South).
+
+---
+
+## 3) Coefficient mismatches (standardized betas and interpretation)
+
+Below I compare the **true standardized coefficients** to your **generated standardized coefficients (`beta_std`)**. (That is the only comparable quantity because the paper reports standardized coefficients.)
+
+### Model 1 (true) vs Generated Model A
+
+True Model 1 standardized coefficients (selected) vs your `ModelA_table_full beta_std`:
+
+- **Racism score:** true **0.130** (**)  
+  generated appears to be **0.139476** (*)  
+  **Mismatch:** significance level and exact value differ (small).  
+  **Likely cause:** different N/sample, different racism scale construction, or different DV coding.
+
+- **Education:** true **-0.175***  
+  generated **-0.260937*** (but note: your corresponding unstd is -0.140430; sign matches but magnitude is much larger)  
+  **Mismatch:** coefficient is too strong in your output.
+
+- **Household income per capita:** true **-0.037** (ns)  
+  generated **-0.034450** (ns)  
+  **Close**, could be acceptable once sample fixed.
+
+- **Occupational prestige:** true **-0.020** (ns)  
+  generated **0.030342** (ns)  
+  **Mismatch in sign.**
+
+- **Female:** true **-0.057** (ns)  
+  generated **-0.025797** (ns)  
+  **Mismatch in magnitude.**
+
+- **Age:** true **0.163***  
+  generated **0.191183***  
+  **Mismatch (somewhat higher).**
+
+- **Black:** true **-0.132***  
+  generated **-0.127196** (*)  
+  **Mismatch in significance (*** vs *).**
+
+- **Hispanic:** true **-0.058** (ns)  
+  generated **0.003663** (ns)  
+  **Mismatch in sign and magnitude.**
+
+- **Other race:** true **-0.017** (ns)  
+  generated **0.079136** (ns)  
+  **Mismatch in sign and magnitude.**
+
+- **Conservative Protestant:** true **0.063** (ns)  
+  generated: unclear which row corresponds; you have a NaN row and then **0.021948** at the end.  
+  **Mismatch/unclear mapping due to missing names and NaN row.**
+
+- **No religion:** true **0.057** (ns)  
+  same mapping problem as above.
+
+- **Southern:** true **0.024** (ns)  
+  same mapping problem.
+
+- **Constant:** true **2.415***  
+  generated intercept **2.653629***  
+  **Mismatch** (consistent with DV/sample differences).
+
+**Fix for Model 1 mismatches:**  
+1) Correct sample to N≈644 and variable coding.  
+2) Ensure dummy/reference categories exactly match the paper:
+   - Race: include Black/Hispanic/Other with **White as reference**
+   - Religion: Conservative Protestant and No religion with an appropriate omitted religious reference group
+   - Southern: South vs non-South
+3) Ensure “household income per capita” is actually per-capita (income/household size), not raw income.
+4) Ensure “racism score” matches Bryson’s scale construction (items, coding direction, standardization).
+5) Remove the collinear/NaN predictor row and re-run.
+
+---
+
+### Model 2 (true) vs Generated Model B
+
+True Model 2 standardized coefficients vs your `ModelB_table_full beta_std`:
+
+- **Racism score:** true **0.080** (ns)  
+  generated **-0.005081** (ns)  
+  **Mismatch in sign and magnitude.** This is not a minor deviation; it suggests the racism variable is not constructed the same way, or the DV isn’t the same “12 remaining genres” count.
+
+- **Education:** true **-0.242***  
+  generated **-0.223758***  
+  **Close-ish** (still affected by sample differences).
+
+- **Household income per capita:** true **-0.065** (ns)  
+  generated **-0.095374** (ns)  
+  **Mismatch in magnitude (stronger negative).**
+
+- **Occupational prestige:** true **0.005** (ns)  
+  generated **-0.012340** (ns)  
+  **Mismatch in sign (small).**
+
+- **Female:** true **-0.070** (ns)  
+  generated **-0.091211** (ns)  
+  **Mismatch in magnitude.
+
+- **Age:** true **0.126** (**)  
+  generated **0.091378** (ns)  
+  **Mismatch in significance and magnitude.**
+
+- **Black:** true **0.042** (ns)  
+  generated **0.112228** (p≈0.056; no star shown but near)  
+  **Mismatch in magnitude and near-significance.**
+
+- **Hispanic:** true **-0.029** (ns)  
+  generated **0.132050** (*)  
+  **Major mismatch** (sign flips and becomes significant). This is a strong indicator your “Hispanic” variable and/or the DV/sample is not what Bryson used (or you miscoded Hispanic vs non-Hispanic).
+
+- **Other race:** true **0.047** (ns)  
+  generated **0.080328** (ns)  
+  **Some mismatch but same sign.
+
+- **Conservative Protestant:** true **0.048** (ns)  
+  generated: unclear mapping; you have NaN row then **0.142424** (**) at the end.  
+  **If 0.142424 corresponds to Southern or a religion dummy, it’s a big mismatch.** True Southern is 0.069 (ns), not 0.142**.
+
+- **No religion:** true **0.024** (ns)  
+  mapping unclear.
+
+- **Southern:** true **0.069** (ns)  
+  mapping unclear.
+
+- **Constant:** true **7.860** (no stars shown in paper for constant)  
+  generated intercept **5.673737***  
+  **Large mismatch**.
+
+**Fix for Model 2 mismatches:**  
+- First, fix the **DV construction** and **sample** (N≈605). The constant being off by ~2.2 is consistent with a different DV definition.
+- Audit the **Hispanic** coding carefully (0/1 definition, missing handling, reference group). A sign flip + new significance is often from miscoding (e.g., coding “Hispanic=1” for non-Hispanic).
+- Rebuild the **racism score** to match Bryson; your racism effect essentially disappears (and reverses) in Model B, unlike the paper (small positive).
+
+---
+
+## 4) Model fit mismatches (R² / Adjusted R²)
+
+- **True Model 1:** R² = **.145**, Adj R² = **.129**
+- **Generated Model A:** R² = **.1896**, Adj R² = **.1639** (too high)
+
+- **True Model 2:** R² = **.147**, Adj R² = **.130**
+- **Generated Model B:** R² = **.1658**, Adj R² = **.1377** (a bit high)
+
+**Fix:** Once you correct N and variable constructions, R² should move toward the published values. Right now, higher R² can result from:
+- using a restricted sample with less noise,
+- using different DV coding (e.g., excluding neutral responses, rescaling counts),
+- including unintended predictors (that NaN row indicates something is wrong in the design matrix).
+
+---
+
+## 5) Interpretation mismatches (what your significance stars imply)
+
+Because your coefficients/stars differ, any narrative interpretation will diverge. The biggest interpretive landmines:
+
+- **Model 2 Hispanic effect:** Paper: small negative, ns. Generated: positive and *significant*.  
+  If you interpret that as “Hispanic respondents dislike more of the remaining genres,” that would directly contradict Bryson.
+
+- **Model 2 Racism effect:** Paper: +0.080 (ns). Generated: ~0 (slightly negative).  
+  Any claim about racism reducing dislike (or having no relationship) would not match.
+
+- **Model 1 Black effect:** Paper: strongly negative (***). Generated: weaker (*)  
+  Your write-up would understate the robustness.
+
+**Fix:** Do not interpret until:
+1) you can map each row to the correct variable name,
+2) the NaN/zero term is removed,
+3) DV and predictors match the original coding and sample.
+
+---
+
+## Minimal checklist to make the generated analysis match the paper
+
+1) **Use the correct sample:** GSS 1993; reproduce Bryson’s inclusion rules to reach **N=644** and **N=605**.
+2) **Recreate both DVs exactly** (6-genre minority-liked count; “12 remaining” count) with correct missing handling.
+3) **Recreate “racism score” exactly** (items, direction, scaling, then standardize).
+4) **Ensure per-capita income** (income / household size), not raw income.
+5) **Dummy coding:** match reference categories; remove collinear predictors; eliminate the `0.000000 / NaN` row.
+6) **Output standardized coefficients only** (and stars) if your goal is to match Table 2.
+
+If you paste the variable list/order used in your regression design matrix (the exact column names after dummy creation), I can map each generated row to a specific predictor and pinpoint exactly which coefficient corresponds to which true-table variable (and which one is the NaN row).

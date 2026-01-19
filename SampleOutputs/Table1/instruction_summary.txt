@@ -1,0 +1,143 @@
+## Mapping of Table 1 analysis variables to GSS 1993 data fields (per attached documentation)
+
+### Data source / sample restriction
+- **Survey year (GSS 1993)** → `YEAR`  
+  - Use **`YEAR == 1993`** to define the study year.
+- **Respondent identifier** (if needed for joins/merges) → `ID`
+
+---
+
+## Dependent variable (DV): “Musical exclusiveness” = count of genres disliked (0–18)
+
+### Underlying 18 music-genre rating items (5-point like/dislike + “don’t know” as missing)
+Create the DV from the following fields (all are coded: 1=like very much … 5=dislike very much; NA codes include “don’t know” etc.):
+
+1. Big band/swing → `BIGBAND`  
+2. Bluegrass → `BLUGRASS`  
+3. Country/Western → `COUNTRY`  
+4. Blues/R&B → `BLUES`  
+5. Broadway musicals/show tunes → `MUSICALS`  
+6. Classical → `CLASSICL`  
+7. Folk → `FOLK`  
+8. Gospel → `GOSPEL`  
+9. Jazz → `JAZZ`  
+10. Latin/Mariachi/Salsa → `LATIN`  
+11. Mood/easy listening → `MOODEASY`  
+12. New age/space music → `NEWAGE`  
+13. Opera → `OPERA`  
+14. Rap → `RAP`  
+15. Reggae → `REGGAE`  
+16. Contemporary pop/rock → `CONROCK`  
+17. Oldies rock → `OLDIES`  
+18. Heavy metal → `HVYMETAL`
+
+### DV construction rule (as described in analysis summary)
+- For each of the 18 items, define **“disliked” indicator**:
+  - `1` if response is **4 (“dislike it”)** or **5 (“dislike very much”)**
+  - `0` if response is **1, 2, or 3**
+  - **Missing** if item is any of the GSS NA codes (including “don’t know / not available / refused / etc.”)
+- **Musical exclusiveness (count)** = sum of the 18 “disliked” indicators.
+- **Listwise requirement for DV**: if respondent is missing on **any** of the 18 music items, set DV to missing / drop from analysis (this matches “respondents with any missing on the 18 items are dropped”).
+
+---
+
+## Independent variables (IVs) / covariates in Table 1
+
+### SES predictors (Model 1; also included in Models 2–3)
+
+1. **Education (years)** → `EDUC`  
+   - Use numeric years as coded in `EDUC`; treat GSS NA codes as missing.
+
+2. **Household income per capita** → derived from `INCOME` (or `REALINC`) and `HOMPOP`  
+   - **Household size** → `HOMPOP` (number of persons in household)
+   - **Family income** (categorical bands) → `INCOME`
+   - **Family income in constant dollars** → `REALINC` (available in file; constant-dollar income series)
+   - Construct the analysis variable as:
+     - **Per-capita income** = (family income measure) / `HOMPOP`
+     - In practice for replication, map “household income per capita” to **`REALINC / HOMPOP`** when `REALINC` is available; otherwise use an `INCOME`-based numeric conversion divided by `HOMPOP`.
+   - Treat NA codes in either component as missing (and therefore missing on the derived measure).
+
+3. **Occupational prestige** → `PRESTG80`  
+   - Use the 1980-based occupational prestige score; treat NA codes as missing.
+
+---
+
+### Demographic / group identity controls (added in Model 2; retained in Model 3)
+
+4. **Female (dummy)** → `SEX`  
+   - Recode: `female = 1` if `SEX == 2`; `female = 0` if `SEX == 1`; NA codes to missing.
+
+5. **Age (years)** → `AGE`  
+   - Use numeric `AGE`; treat NA codes as missing (note top-code label 89 = “89 or older” is retained as 89).
+
+6–8. **Race/ethnicity dummies**
+- **Black (dummy)** → `RACE`
+  - `black = 1` if `RACE == 2`, else `0` for other non-missing values.
+- **Other race (dummy)** → `RACE`
+  - `otherrace = 1` if `RACE == 3`, else `0`.
+- **Reference race category (implied)**: White → `RACE == 1` (and non-missing), with the other race dummies set to 0.
+
+- **Hispanic (dummy)** → **not present in the attached documentation excerpt**  
+  - The analysis summary requires a Hispanic indicator, but no field such as `HISPANIC`, `HISpanic origin`, or similar is included in the provided variable list. If your full codebook includes a Hispanic-origin variable, that is the field to map here.
+
+9–10. **Religion dummies**
+- **No religion (dummy)** → `RELIG`
+  - `norelig = 1` if `RELIG == 4` (“none”), else `0` for other non-missing values.
+- **Conservative Protestant (dummy)** → derived from `RELIG` and `DENOM`
+  - Base field for broad affiliation: `RELIG` (Protestant/Catholic/Jewish/None/Other)
+  - Denomination detail: `DENOM` (Baptist/Methodist/Lutheran/Presbyterian/Episcopal/Other/No denom)
+  - Construct `cons_prot` as an indicator for Protestant respondents (`RELIG == 1`) whose denomination category meets your study’s “conservative Protestant” definition using `DENOM`. (This is the variable documentation-supported way to operationalize that label given the provided fields.)
+
+11. **Southern (dummy)** → `REGION`
+  - `south = 1` if `REGION == 3` (“south”), else `0` for other non-missing values.
+
+---
+
+## Political attitude predictor (added in Model 3)
+
+12. **Political intolerance (0–15 count scale)** → derived from the 15 tolerance items in the documentation:
+
+### Item set: 5 target groups × 3 civil-liberty contexts
+For each item, code an “intolerant” response as 1, tolerant response as 0, NA as missing.
+
+**Anti-religionist**
+- Allow speech → `SPKATH` : intolerant = `2` (“not allowed”)
+- Allow teach → `COLATH` : intolerant = `5` (“not allowed”)
+- Allow book in library → `LIBATH` : intolerant = `1` (“remove”)
+
+**Racist**
+- Allow speech → `SPKRAC` : intolerant = `2`
+- Allow teach → `COLRAC` : intolerant = `5`
+- Allow book in library → `LIBRAC` : intolerant = `1`
+
+**Communist**
+- Allow speech → `SPKCOM` : intolerant = `2`
+- Teach at college (fired) → `COLCOM` : intolerant = `4` (“yes, fired”)
+- Allow book in library → `LIBCOM` : intolerant = `1`
+
+**Military-rule advocate**
+- Allow speech → `SPKMIL` : intolerant = `2`
+- Allow teach → `COLMIL` : intolerant = `5`
+- Allow book in library → `LIBMIL` : intolerant = `1`
+
+**Homosexual**
+- Allow speech → `SPKHOMO` : intolerant = `2`
+- Allow teach → `COLHOMO` : intolerant = `5`
+- Allow book in library → `LIBHOMO` : intolerant = `1`
+
+### Scale construction
+- **Political intolerance scale (0–15)** = sum of the 15 “intolerant” indicators above.
+- Treat GSS NA codes as missing at the item level; apply the analysis rule your replication uses for scale missingness (the analysis summary indicates the battery is asked of ~2/3 sample, producing smaller N in Model 3; operationally, respondents not asked will have missing on these fields and will drop from Model 3 via listwise deletion).
+
+---
+
+## Model membership (Table 1)
+- **Model 1 (SES Model)** uses:  
+  - DV = musical exclusiveness (constructed)  
+  - IVs = `EDUC`, per-capita income (`REALINC/HOMPOP`), `PRESTG80`
+- **Model 2 (Demographic Model)** adds:  
+  - `SEX` (female dummy), `AGE`, race dummies from `RACE`, Hispanic dummy (field not in excerpt), religion dummies from `RELIG`/`DENOM`, and `REGION` (South dummy)
+- **Model 3 (Political Intolerance Model)** adds:  
+  - Political intolerance scale from the 15 tolerance items (`SPK*`, `COL*`, `LIB*` as listed)
+
+This mapping links each analysis construct in Table 1 directly to the documented GSS fields (and specifies the required recodes/derived measures) so the dataset can be prepared and the three OLS models can be run.

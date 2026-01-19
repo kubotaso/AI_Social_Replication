@@ -1,0 +1,161 @@
+Score: 12/100
+============================================================
+
+## 1) Fit statistics: **n, R², adj. R² all mismatch**
+
+### Model 1 (SES)
+- **Generated:** n=747, R²=0.088, adj R²=0.085  
+- **True:** n=787, R²=0.107, adj R²=0.104  
+**Fix:** You are not reproducing the paper’s sample and/or construction of variables. To match Table 1 you must:
+1) Use the same GSS 1993 subset as the paper (including any restrictions).  
+2) Use the same missing-data handling (Table 1 almost certainly uses listwise deletion *within model*, but your n is even smaller than the paper’s).  
+3) Ensure the dependent variable is exactly **Number of Music Genres Disliked** (same coding, same item set, same range).
+
+### Model 2 (Demographic)
+- **Generated:** n=507, R²=0.139, adj R²=0.120  
+- **True:** n=756, R²=0.151, adj R²=0.139  
+**Fix:** Your Model 2 sample is collapsing dramatically (507 vs 756). That usually means you accidentally required non-missingness on variables that are **not** in Model 2 (e.g., political intolerance), or you merged/recoded a variable in a way that introduced extra missingness. Ensure Model 2 uses listwise deletion **only on Model 2 variables**.
+
+### Model 3 (Political intolerance)
+- **Generated:** n=286, R²=0.149, adj R²=0.111  
+- **True:** n=503, R²=0.169, adj R²=0.148  
+**Fix:** n is far too small. Your own missingness table shows `pol_intol` is ~47% missing, which could reduce n, but it should not drop all the way to 286 if the paper reports 503. Likely causes:
+- You coded political intolerance from different items / a different scale / required extra items to be present.
+- You treated “Don’t know/NA” differently from the paper.
+- You inadvertently filtered to complete cases across **more variables than Table 1 uses**.
+
+---
+
+## 2) Coefficients: you are mixing **unstandardized b** with **standardized β**, and several β’s still don’t match
+
+The paper’s Table 1 reports **standardized coefficients (β)** for predictors and **unstandardized constants**. Your “combined table” uses betas, which is the right target—but many β values differ.
+
+### Model 1 β mismatches
+- **Education**
+  - Generated β = **-0.292***  
+  - True β = **-0.322***  
+  **Fix:** Use the same sample (n=787) and compute β on that sample. If you standardized using the full dataset rather than the model sample, β will differ.
+- **Income per capita**
+  - Generated β = **-0.039**  
+  - True β = **-0.037** (close)
+- **Occupational prestige**
+  - Generated β = **0.020**  
+  - True β = **0.016** (close)
+- **Constant**
+  - Generated = **10.638**  
+  - True = **10.920**  
+  **Fix:** constants depend heavily on sample and on how the DV is coded. This again indicates your DV and/or sample differs.
+
+### Model 2 β mismatches (multiple important ones)
+- **Education:** Generated **-0.265*** vs True **-0.246*** (noticeable)
+- **Income:** Generated **-0.051** vs True **-0.054** (close)
+- **Prestige:** Generated **-0.011** vs True **-0.006** (small)
+- **Female:** Generated **-0.085*** vs True **-0.083*** (close; star matches)
+- **Age:** Generated **0.103*** vs True **0.140*** (**big mismatch**)
+- **Black:** Generated **0.100** vs True **0.029** (**big mismatch**)
+- **Hispanic:** Generated **0.074** vs True **-0.029** (**sign flips**)
+- **Other race:** Generated **-0.027** vs True **0.005** (sign flips)
+- **Cons. Protestant:** Generated **0.087** vs True **0.059** (moderate)
+- **No religion:** Generated **-0.015** vs True **-0.012** (close)
+- **Southern:** Generated **0.061** vs True **0.097** (**moderate**) and your generated p=0.161 (ns) contradicts the paper’s ** (p<.01).
+
+**Fixes (most likely):**
+1) **Race/ethnicity dummy coding is not the same.**  
+   - The sign flips for Hispanic and Other race strongly suggest different reference categories or overlapping dummies.
+   - In GSS, Hispanic is often treated as an ethnicity that can overlap with race; some replications code mutually exclusive categories (White non-Hispanic, Black non-Hispanic, Hispanic any race, Other). If you instead coded “Black”, “Hispanic”, “Other” as separate independent dummies without enforcing exclusivity, coefficients can change substantially.
+   - **Fix:** Recreate *exactly* the paper’s categories and reference group (almost certainly White non-Hispanic as reference), and ensure categories are mutually exclusive if that is what the paper used.
+
+2) **Age scaling / coding differs.**  
+   - A β difference from 0.103 to 0.140 is large.
+   - **Fix:** confirm age is in years (not centered, not top-coded differently, not filtered to a narrower range).
+
+3) **Sample mismatch is driving everything.**  
+   - With n=507 instead of 756, you are estimating on a different population; coefficients will move.
+
+### Model 3 β mismatches
+- **Education:** Generated **-0.155*** vs True **-0.151** (very close; but your star is * while true is **)
+- **Income:** Generated **-0.052** vs True **-0.009** (**major**)
+- **Prestige:** Generated **-0.015** vs True **-0.022** (moderate)
+- **Female:** Generated **-0.127*** vs True **-0.095*** (moderate)
+- **Age:** Generated **0.091 (ns)** vs True **0.110*** (should be significant)
+- **Black:** Generated **0.060** vs True **0.049** (close)
+- **Hispanic:** Generated **-0.030** vs True **0.031** (sign flip)
+- **Southern:** Generated **0.068** vs True **0.121** (big, and significance differs)
+- **Political intolerance:** Generated **0.184** with ** (p<.01) vs True **0.164*** (p<.001)
+- **Constant:** Generated **7.999** vs True **6.516** (large)
+
+**Fixes:**
+- Again, **sample mismatch (n=286 vs 503)** plus **race/ethnicity coding** issues explain sign flips and constant differences.
+- The **income β** mismatch (-0.052 vs -0.009) is so large it suggests you are not using the same income-per-capita transformation (e.g., logged vs raw; different equivalization; different scaling; or different handling of missing/zero).
+  - **Fix:** replicate the paper’s income-per-capita construction exactly (same numerator, denominator, any top-coding, and any rescaling).
+
+---
+
+## 3) Standard errors: generated output reports SE/p-values, but the “true” table doesn’t include SE
+
+- **Generated:** you provide p-values and imply standard errors exist (even if not printed in combined table).
+- **True:** Table 1 does **not** report SE (only stars), and explicitly notes SE are not reported.
+
+**Mismatch:** You cannot “match” SE because there are none in the true results. Also, your star thresholds appear consistent with conventional two-tailed tests, but because your n and coefficients differ, your significance will differ too.
+
+**Fix:** If your goal is to match Table 1, change your reporting to:
+- report **standardized β** only (plus stars),
+- report the **unstandardized constant**,  
+- do **not** present SE as if they are being compared to Table 1.
+(You can still compute SE internally, but don’t claim they match the published table.)
+
+---
+
+## 4) Variable name mismatches / labeling inconsistencies
+
+- **Generated variable names** in missingness: `pol_intol`, `num_genres_disliked`, `inc_pc`, `educ_yrs`, `prestg80_v`, etc.
+- **True table labels:** “Political intolerance”, “Household income per capita”, “Occupational prestige”, etc.
+
+That’s not inherently wrong, but your generated model tables use “Household income per capita” while missingness uses `inc_pc`; similarly “Occupational prestige” vs `prestg80_v`. That’s fine if you map cleanly—however the coefficient discrepancies suggest these may not be equivalent measures.
+
+**Fix:** Add a clear, audited mapping and verify the constructs:
+- `inc_pc` exactly equals “household income per capita” per paper definition.
+- `prestg80_v` exactly equals the prestige measure used (same prestige scale and year).
+- `pol_intol` exactly equals the 0–15 scale used by the paper.
+
+---
+
+## 5) Interpretation mismatch: what is being compared
+
+Your “model*_full” tables show both **b** (unstandardized) and **beta**. The paper’s Table 1 compares **β only** (predictors), not b. If you interpret b as if it should equal β-table values, that’s an interpretation error.
+
+**Fix:** When claiming a match to Table 1:
+- compare only your **beta** column to the paper’s β,
+- ensure β is computed correctly (see next section).
+
+---
+
+## 6) How to make the generated analysis match the true Table 1 (practical checklist)
+
+1) **Recreate the exact analytic samples**
+   - For each model, perform listwise deletion **only on that model’s variables**.
+   - Confirm your n matches: 787 (M1), 756 (M2), 503 (M3).
+
+2) **Compute standardized coefficients the same way**
+   - Standardize predictors (and outcome) **within the estimation sample** for that model, or use the software’s standardized beta that corresponds to the same.
+   - Do not standardize using the full dataset if the model uses a subset.
+
+3) **Replicate dummy coding exactly**
+   - Confirm reference groups:
+     - Gender: likely Male=0 reference.
+     - Region: non-South reference.
+     - Religion: reference category likely mainline/other (paper-specific).
+     - Race/ethnicity: ensure Hispanic is treated the same way as the paper (mutually exclusive vs overlapping).
+   - Rebuild race/ethnicity so coefficients don’t flip signs relative to Table 1.
+
+4) **Replicate variable construction**
+   - DV: same count of genres disliked, same handling of “don’t know”, same included genres.
+   - `pol_intol`: same items and summing rules to yield 0–15.
+   - Income per capita: same equivalization and scaling.
+
+5) **Report results in the same format**
+   - Standardized β for predictors; unstandardized constant.
+   - Stars using the same thresholds (*, **, ***).
+   - Do not claim SE “match” because Table 1 doesn’t report them.
+
+If you share the code (or at least the exact recode formulas for DV, `inc_pc`, and `pol_intol`, plus how race/ethnicity is coded), I can pinpoint which construction step is responsible for the big sign flips and the n-collapse in Models 2–3.

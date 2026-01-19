@@ -1,0 +1,101 @@
+Score: 62/100
+============================================================
+
+## Discrepancy report (Ground-truth Fig. 1 vs generated)
+
+### 1) Series mapping to axes is swapped (major)
+- **Ground truth:**  
+  - **Solid line** = *Coefficient for Musical Tolerance* (uses **left y-axis**, negative values ~ -0.1 to -0.5).  
+  - **Dash-dot line** = *Mean Education of Genre Audience* (uses **right y-axis**, ~12 to 15).
+- **Generated:**  
+  - **Solid line** is plotted on the **right-axis scale** (rises to ~15) → it is being treated as education.  
+  - **Dashed line** is on the **left-axis negative scale** → it is being treated as coefficient.
+- **Effect:** The two main series are assigned to the wrong y-axes (and line styles don’t match).
+
+### 2) Line styles do not match (major)
+- **Ground truth:** Education series is **dash-dot**; coefficient series is **solid**.
+- **Generated:** Coefficient-like series is **dashed** (not solid), and education-like series is **solid**.
+- **Also:** Ground truth dash-dot has a specific “.-” cadence; generated looks like a simple “--”.
+
+### 3) Genre order differs (major)
+- **Ground truth x-order (left→right):**  
+  Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, **Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel**
+- **Generated x-order:**  
+  ... Opera, **Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel** (this part matches)  
+  But earlier part differs because the *shape alignment indicates you likely sorted the categories by one of the series* (education or coefficient) rather than using the paper’s fixed order. The ground-truth solid line has a sharp drop around Bluegrass then rebounds; in the generated figure that sharp drop is on the dashed series, consistent with swapped mapping and likely reordered/sorted input.
+
+### 4) Sample mean education reference line placement slightly off (minor)
+- **Ground truth:** horizontal dotted line aligns at **~13** on the right axis.
+- **Generated:** dotted line appears at ~13 but may be drawn using the **left axis coordinates** (it visually sits near -0.36 which corresponds to 13 on the right only if axes are set a certain way). With swapped axes, this is very easy to get wrong.
+
+### 5) Annotations/leader lines differ (minor)
+- **Ground truth:**  
+  - “Mean Education of Genre Audience” label has a leader pointing to the **dash-dot** line.  
+  - “Coefficient for Musical Tolerance” leader points to the **solid** line.  
+  - “Sample Mean Education” has an upward arrow pointing to the dotted reference line.
+- **Generated:** Labels exist but point to the **wrong series** (consistent with the swap), and placement/angles differ (especially the “Coefficient…” leader line runs to a different x-position).
+
+### 6) Right/left axis tick labeling style (minor)
+- **Ground truth left y-ticks:** shown as **-.1, -.2, -.3, -.4, -.5** (no leading zero).
+- **Generated:** visually similar, but if your code uses default tick formatting it will show **-0.1** etc. (your rendering looks close, but to match exactly you need custom formatter).
+
+---
+
+## Exact fixes (data processing + matplotlib) to match the ground truth
+
+### A) Fix series-to-axis assignment (core fix)
+- **Ensure coefficient is plotted on `ax` (left) and education on `ax2` (right):**
+  - `ax.plot(x, coef, ...)`
+  - `ax2.plot(x, mean_educ, ...)`
+
+### B) Force the paper’s x-category order (do NOT sort by values)
+- Create an explicit ordered list and reindex your aggregated data to it:
+  - `order = ["Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical","Reggae","Swing","New Age/Space","Opera","Bluegrass","Folk","Easy Listening","Pop/Rock","Rap","Heavy Metal","Country","Gospel"]`
+- After computing per-genre metrics:
+  - `df = df.set_index("genre").reindex(order).reset_index()`
+- **Do not** call `sort_values()` on education or coefficient for plotting.
+
+### C) Match line styles exactly
+- Coefficient (left axis): **solid black**
+  - `ax.plot(x, coef, color="black", lw=2.0, ls="-")`
+- Mean education (right axis): **black dash-dot**
+  - `ax2.plot(x, educ, color="black", lw=2.0, ls="-.")`
+- Sample mean education line: **dotted**
+  - `ax2.axhline(sample_mean_educ, color="black", lw=1.0, ls=":")`
+
+### D) Lock axis ranges and ticks to match the figure
+- Left y-axis (coefficients):
+  - `ax.set_ylim(-0.5, -0.1)`
+  - `ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])`
+- Right y-axis (education):
+  - `ax2.set_ylim(12, 15)`
+  - `ax2.set_yticks([12, 13, 14, 15])`
+
+### E) Match left tick label formatting (no leading zero)
+- Apply a custom formatter on the left axis:
+```python
+from matplotlib.ticker import FuncFormatter
+ax.yaxis.set_major_formatter(FuncFormatter(lambda v, p: f"{v:.1f}".replace("-0.", "-.").replace("0.", ".")))
+```
+(Ensures `-0.1` → `-.1`.)
+
+### F) Ensure the dotted “sample mean education” uses the right axis coordinates
+- Compute sample mean education in the same units as the right axis (years):
+  - `sample_mean_educ = df_raw["education_years"].mean()` (or whatever the paper uses)
+- Plot it with `ax2.axhline(...)` (not `ax.axhline(...)`).
+
+### G) Re-point annotations to the correct lines (and use axis-specific coordinates)
+- When annotating the education label, reference a y-value from the **education series** and use `ax2` coordinates:
+  - `ax2.annotate("Mean Education of Genre Audience", xy=(x[i], educ[i]), xytext=(...), arrowprops=...)`
+- When annotating coefficient label, reference the **coefficient series** on `ax`:
+  - `ax.annotate("Coefficient for Musical Tolerance", xy=(x[j], coef[j]), ...)`
+- Keep “Sample Mean Education” annotation attached to the dotted line on `ax2`.
+
+### H) Prevent accidental smoothing/aggregation differences
+- If you currently smooth (rolling mean/interp), remove it:
+  - **No** `rolling()`, **no** spline/interpolation between categories.
+- Aggregation should be a simple mean per genre (as implied by the figure):
+  - `educ = df_raw.groupby("genre")["education_years"].mean()`
+  - `coef` should come from the model output per genre (do not re-average coefficients across respondents unless the paper did).
+
+If you paste your current plotting snippet (and how you compute `coef` and `educ`), I can mark the exact lines to change and provide a corrected minimal code block that reproduces the ground-truth styling and ordering.

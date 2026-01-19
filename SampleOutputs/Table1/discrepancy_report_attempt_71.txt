@@ -1,0 +1,220 @@
+Score: 49/100
+============================================================
+
+## A. Global/structural mismatches
+
+### 1) **Wrong sample sizes (n) in all three models**
+- **Generated:** n = 747 (M1), 507 (M2), 286 (M3)  
+- **True:** n = 787 (M1), 756 (M2), 503 (M3)
+- **Fix:** Your estimation dataset is not the paper’s estimation dataset. The drop in n across models is far too large and inconsistent with the paper (which has *more* cases in Models 2–3 than your generated models).
+  - Reproduce the paper’s inclusion rules: same GSS year (1993), same DV construction, same coding of race/religion/region, and same handling of missing data.
+  - Do **not** listwise-delete on variables that are not used in that model.
+  - Verify that your “pol_intol” is built from the same items and coding as the paper’s “Political intolerance”; your missingness table shows ~47% missing on `pol_intol`, which would indeed crush n—yet the paper’s Model 3 has n=503 (not 286). That implies your intolerance scale is misconstructed or you’re merging/filtering incorrectly.
+
+### 2) **Reporting the wrong quantities for Table 1**
+- **Generated “Table1style” columns:** you report **standardized betas** for *all terms including the constant* (you keep constants unstandardized but you label other terms as betas) and you also show p-values/SEs elsewhere.
+- **True Table 1:** reports **standardized coefficients (β)** for predictors, **unstandardized constants**, and **does not report SEs**.
+- **Fix:** To match the paper, your “Table1style” output should:
+  - show **β only** for predictors,
+  - show **unstandardized intercept**,
+  - omit SEs entirely (or mark as “—”),
+  - apply the paper’s star thresholds (*p*<.05, .01, .001).
+
+### 3) **Dropped predictor problem (“otherrace” becomes NaN)**
+- **Generated:** “Other race” is `NaN` in Models 2–3; fit stats say `dropped_predictors = otherrace`.
+- **True:** “Other race” is included with nonzero β (Model 2 β=0.005; Model 3 β=0.053).
+- **Fix:** This is almost certainly a **coding/collinearity/reference-category** error:
+  - If race is represented as three dummies (black, hispanic, otherrace) with **white omitted**, keep all three; do **not** also include a full set of race-category dummies plus an intercept.
+  - Ensure `otherrace` is not perfectly predicted (e.g., always 0 after filtering) and not identical to another variable.
+  - Confirm it’s numeric (0/1) with variation in the analysis sample.
+
+---
+
+## B. Model-by-model mismatches (βs, constants, R²/Adj R²)
+
+### Model 1 (SES)
+
+**Fit**
+- **Generated:** R² = 0.088, Adj R² = 0.085, n=747  
+- **True:** R² = 0.107, Adj R² = 0.104, n=787  
+- **Fix:** use correct sample + correct DV and predictor coding; R² will change once n/codings align.
+
+**Coefficients (standardized β)**
+- Education:
+  - **Generated:** β = **-0.292***  
+  - **True:** β = **-0.322***  
+  - **Fix:** mismatch likely from different sample/coding (years of education top-coding, missing handling, weighting).
+- Income per capita:
+  - **Generated:** β = **-0.039**  
+  - **True:** β = **-0.037**  
+  - Fix minor; will likely align after sample correction.
+- Occupational prestige:
+  - **Generated:** β = **0.020**  
+  - **True:** β = **0.016**  
+  - Fix minor; again sample/coding.
+
+**Constant**
+- **Generated:** 10.638  
+- **True:** 10.920  
+- **Fix:** intercept depends on unstandardized model and sample; once the estimation sample and variable scaling match, it should move toward 10.920.
+
+---
+
+### Model 2 (Demographic)
+
+**Fit**
+- **Generated:** R²=0.135, Adj R²=0.118, n=507  
+- **True:** R²=0.151, Adj R²=0.139, n=756  
+- **Fix:** major sample mismatch (listwise deletion / wrong construction of predictors) is the main issue.
+
+**Coefficients (standardized β) — every mismatch**
+- Education:
+  - **Generated:** -0.264***  
+  - **True:** -0.246***  
+- Income per capita:
+  - **Generated:** -0.053  
+  - **True:** -0.054  
+- Occupational prestige:
+  - **Generated:** -0.016  
+  - **True:** -0.006  
+- Female:
+  - **Generated:** -0.090*  
+  - **True:** -0.083*  
+- Age:
+  - **Generated:** +0.104*  
+  - **True:** +0.140***  (**both size and significance wrong**)  
+  - **Fix:** This is a red flag for sample/coding error. Age effect usually stabilizes; your reduced n and/or age coding (`age_v`) may differ (e.g., age restrictions, missing recode).
+- Black:
+  - **Generated:** +0.043  
+  - **True:** +0.029  
+- Hispanic:
+  - **Generated:** +0.030  
+  - **True:** **-0.029** (**sign mismatch**)  
+  - **Fix:** likely the “Hispanic” dummy is reversed/miscoded (1/0 flipped) or the reference group differs.
+- Other race:
+  - **Generated:** blank/NaN (dropped)  
+  - **True:** +0.005  
+  - **Fix:** see dropped-predictor section.
+- Conservative Protestant:
+  - **Generated:** +0.090  
+  - **True:** +0.059  
+- No religion:
+  - **Generated:** -0.019  
+  - **True:** -0.012  
+- Southern:
+  - **Generated:** +0.063  
+  - **True:** +0.097** (**magnitude + significance mismatch**)  
+  - **Fix:** likely `south` coding mismatch (e.g., region vs Census South; or includes border states differently), plus sample mismatch.
+
+**Constant**
+- **Generated:** 9.285  
+- **True:** 8.507  
+- **Fix:** again points to different sample and/or different unstandardized scaling of predictors.
+
+---
+
+### Model 3 (Political intolerance)
+
+**Fit**
+- **Generated:** R²=0.145, Adj R²=0.111, n=286  
+- **True:** R²=0.169, Adj R²=0.148, n=503  
+- **Fix:** your political intolerance variable construction or missing-data handling is severely shrinking the sample; also likely miscoded.
+
+**Coefficients (standardized β) — every mismatch**
+- Education:
+  - **Generated:** -0.157*  
+  - **True:** -0.151** (**star mismatch**)  
+  - **Fix:** star mismatch could be due to smaller n (less power) and/or different SEs.
+- Income per capita:
+  - **Generated:** -0.050  
+  - **True:** -0.009 (**large mismatch**)  
+  - **Fix:** suggests your `inc_pc` is not the same as the paper’s (could be wrong denominator, inflation, transformation, or treated as dollars vs thousands).
+- Occupational prestige:
+  - **Generated:** -0.011  
+  - **True:** -0.022  
+- Female:
+  - **Generated:** -0.122*  
+  - **True:** -0.095*  
+- Age:
+  - **Generated:** +0.083 (ns)  
+  - **True:** +0.110* (**magnitude + significance mismatch**)  
+- Black:
+  - **Generated:** +0.107  
+  - **True:** +0.049  
+- Hispanic:
+  - **Generated:** +0.028  
+  - **True:** +0.031 (close)
+- Other race:
+  - **Generated:** dropped/blank  
+  - **True:** +0.053  
+- Conservative Protestant:
+  - **Generated:** +0.037  
+  - **True:** +0.066  
+- No religion:
+  - **Generated:** +0.024  
+  - **True:** +0.024 (matches)
+- Southern:
+  - **Generated:** +0.065  
+  - **True:** +0.121** (**large mismatch**)  
+- Political intolerance:
+  - **Generated:** +0.190**  
+  - **True:** +0.164*** (**size + star mismatch**)  
+  - **Fix:** most likely your intolerance scale differs (range, items, reverse coding) and your n is much smaller, shifting both β and p.
+
+**Constant**
+- **Generated:** 7.360  
+- **True:** 6.516  
+- **Fix:** sample + coding.
+
+---
+
+## C. Standard errors and p-values: interpretation mismatch
+
+### 4) You report SEs and p-values as if they are part of “Table 1”
+- **True:** SEs are *not reported* in the paper’s table; stars are.
+- **Generated:** includes p-values everywhere and implies conventional OLS inference.
+- **Fix:** If the goal is to match Table 1, do not compare/print SEs and p-values as “true mismatches”—they’re not in the true output. Instead:
+  - compute stars from your p-values using the paper’s thresholds and compare stars only.
+  - If you want comparability, ensure you use the same design decisions (weights, clustering, robust vs classical SE). Any difference changes p-values/stars.
+
+---
+
+## D. Variable-name mismatches / labeling issues
+
+### 5) Variable label mismatches that can hide coding errors
+- **Generated uses:** `educ_yrs`, `inc_pc`, `prestg80_v`, `female`, `age_v`, `black`, `hispanic`, `otherrace`, `cons_prot`, `norelig`, `south`, `pol_intol`.
+- **True table labels:** Education, Household income per capita, Occupational prestige, Female, Age, Black, Hispanic, Other race, Conservative Protestant, No religion, Southern, Political intolerance.
+- **Fix:** Mapping is fine *if* coding matches. But given sign reversals (Hispanic in Model 2) and dropped otherrace, you should add a “codebook check” step:
+  - show category frequencies by model sample (e.g., mean of each dummy),
+  - confirm reference categories (White, non-South, etc.),
+  - confirm that `female=1` corresponds to women (not men).
+
+---
+
+## E. How to fix so the generated analysis matches the true table (action checklist)
+
+1) **Rebuild the analytic samples to match n**
+   - Filter to **GSS 1993** only and to the same respondent universe as the paper.
+   - Use **model-specific listwise deletion** (only variables in that model).
+   - Diagnose why `pol_intol` is missing for ~47%—that is inconsistent with Model 3 n=503.
+
+2) **Recode race correctly and prevent dummy trap**
+   - Create mutually exclusive dummies: `black`, `hispanic`, `otherrace`, with White omitted.
+   - Verify each has variation in the Model 2 and Model 3 sample; otherwise it will be dropped.
+
+3) **Fix Hispanic sign issue**
+   - Cross-tab `hispanic` with race/ethnicity source variable; verify 1 means Hispanic.
+   - Ensure you didn’t accidentally code `hispanic = 1 - hispanic_original`.
+
+4) **Reconstruct “household income per capita” exactly**
+   - Large Model 3 mismatch suggests `inc_pc` is not comparable.
+   - Confirm: is it household income divided by household size? Is it already in dollars? Did the paper rescale (e.g., thousands) or top-code?
+
+5) **Reconstruct political intolerance scale**
+   - Match the paper’s item set, scoring, and range (paper: “Political intolerance” in the model; your label says 0–15 but your data show many 15s and lots of missingness).
+   - Verify whether “don’t know/refused/not asked” are being coded as missing correctly (and not accidentally turned into missing for many items).
+
+6) **Match the table’s reporting style**
+   - Output: standardized β for predictors, unstandardized constant, stars with the paper’s cutoffs, and no SE column.
+
+If you provide the code you used to (a) build `inc_pc` and `pol_intol`, and (b) generate the model samples, I can point to the exact line(s) that cause the n collapse, the dropped `otherrace`, and the Hispanic sign flip.

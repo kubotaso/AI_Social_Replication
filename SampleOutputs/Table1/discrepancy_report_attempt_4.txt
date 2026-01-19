@@ -1,0 +1,182 @@
+Score: 12/100
+============================================================
+
+### 1) Model fit statistics mismatches (n, R², adj. R²)
+
+**Mismatch: sample sizes (`n`) are wildly wrong in Models 2–3**
+- **Generated**
+  - Model 1: **n=793**
+  - Model 2: **n=37**
+  - Model 3: **n=19**
+- **True**
+  - Model 1: **n=787**
+  - Model 2: **n=756**
+  - Model 3: **n=503**
+
+**What this implies**
+- Your Model 2–3 regressions were run on a tiny subset (likely due to listwise deletion + miscoded missing values, or an unintended filter/merge that dropped almost everyone).
+
+**How to fix**
+- Ensure all “missing” codes are converted to actual NA before running OLS (GSS often uses 8/9/98/99 etc.).
+- Avoid accidental filtering (e.g., `df = df.dropna()` too early on the full frame).
+- Recreate each model on the intended analytic sample:
+  - Model 1 uses SES vars only → should keep **~787**
+  - Model 2 adds demographics/religion/region → **~756**
+  - Model 3 adds political intolerance → **~503**
+- In code terms: do *model-specific* listwise deletion, e.g. `df_model2 = df[vars_model2].dropna()` not `df.dropna()` on all columns in the dataset.
+
+**Mismatch: R² and adjusted R² are wrong for Models 2–3**
+- **Generated**
+  - Model 1: R²=0.1076, adj R²=0.1042 (close to true)
+  - Model 2: R²=0.4892, adj R²=0.3433 (**not close**)
+  - Model 3: R²=0.5882, adj R²=0.1763 (**not close**)
+- **True**
+  - Model 1: R²=0.107, adj R²=0.104 (matches)
+  - Model 2: R²=0.151, adj R²=0.139
+  - Model 3: R²=0.169, adj R²=0.148
+
+**How to fix**
+- The incorrect n’s alone can produce distorted R².
+- Also verify:
+  - You’re using **OLS** (not logistic/GLM) and not reporting pseudo-R².
+  - You’re regressing the correct dependent variable (“number of music genres disliked”).
+  - You’re not accidentally standardizing the dependent variable or using a transformed outcome in some models but not others.
+
+---
+
+### 2) Variable name / inclusion mismatches
+
+**Mismatch: variable names mostly align, but missingness indicates coding problems**
+- Generated includes: `educ`, `inc_pc`, `prestg80`, `female`, `age`, `black`, `hispanic`, `otherrace`, `cons_prot`, `norelig`, `south`, `pol_intol`.
+- These correspond to the true table concepts.
+
+**Critical mismatch: several coefficients are `NaN` in generated output**
+- Generated has `NaN` for **hispanic, otherrace, norelig** (Models 2–3).
+
+**What this implies**
+- Those variables are either:
+  - perfectly collinear (e.g., you included all race dummies without a reference group), or
+  - constant/empty after filtering, or
+  - non-numeric/object and got dropped, or
+  - all missing after recoding.
+
+**How to fix**
+- For categorical sets (race, religion), ensure you use a reference category:
+  - Example: create race dummies with `drop_first=True` or omit one group (e.g., White as reference).
+- Confirm each dummy is coded 0/1 and has variation.
+- Check `df[['hispanic','otherrace','norelig']].value_counts(dropna=False)` before modeling.
+- Make sure you didn’t set whole columns to NA when recoding missing values.
+
+---
+
+### 3) Coefficient mismatches (direction, magnitude, and interpretation)
+
+A big conceptual mismatch: **the “true results” are standardized coefficients (β)**, while your generated output looks like **unstandardized OLS slopes** (and also appears to have been run on the wrong sample).
+
+That said, even allowing for standardization differences, **many signs differ**, which should *not* happen just because of standardization.
+
+#### Model 1 (SES)
+| Term | Generated β | True β | Match? |
+|---|---:|---:|---|
+| Constant | 10.833 | 10.920 | close-ish (but not exact) |
+| educ | -0.330 | -0.322 | close |
+| inc_pc | -0.034 | -0.037 | close |
+| prestg80 | 0.029 | 0.016 | somewhat off but same sign |
+| R² / adj R² | 0.108 / 0.104 | 0.107 / 0.104 | matches |
+
+**Fix (Model 1)**
+- Use the exact same sample definition as the paper (n should be **787**, not 793).
+- If you want to match the table, compute **standardized coefficients** (see fixes section below).
+
+#### Model 2 (Demographic) — major discrepancies
+| Variable | Generated | True | Mismatch type |
+|---|---:|---:|---|
+| Constant | 8.690 | 8.507 | off |
+| educ | **-0.796** | **-0.246** | magnitude way off (and likely wrong scaling/sample) |
+| inc_pc | **+0.182** | **-0.054** | **sign flip** |
+| prestg80 | **+0.425** | **-0.006** | **sign flip and huge** |
+| female | **+0.077** | **-0.083** | **sign flip** |
+| age | **-0.018** | **+0.140** | **sign flip** |
+| black | 0.025 | 0.029 | close |
+| hispanic | NaN | -0.029 | missing estimate |
+| otherrace | NaN | 0.005 | missing estimate |
+| cons_prot | 0.320 | 0.059 | huge mismatch |
+| norelig | NaN | -0.012 | missing estimate |
+| south | 0.224 | 0.097 | off |
+| R² | **0.489** | **0.151** | way off |
+| n | **37** | **756** | catastrophic |
+
+**Interpretation mismatch**
+- The generated Model 2 implies (for example) being female *increases* disliked genres and age *decreases* them—opposite the paper.
+
+**Fix (Model 2)**
+- First fix the analytic sample and missing-value recodes (this is the main cause).
+- Then ensure the model specification matches:
+  - Race: ensure reference category and no collinearity.
+  - Religion: same.
+- Then compute standardized β if you want to compare to the table.
+
+#### Model 3 (Political intolerance) — major discrepancies
+| Variable | Generated | True | Mismatch type |
+|---|---:|---:|---|
+| Constant | **-7.185** | **6.516** | completely inconsistent (often signals different scaling/centering or wrong DV) |
+| educ | -0.284 | -0.151 | off |
+| inc_pc | +0.207 | -0.009 | sign flip |
+| prestg80 | +0.511 | -0.022 | sign flip |
+| female | +0.206 | -0.095 | sign flip |
+| age | +0.148 | +0.110 | sign matches, magnitude off |
+| black | 0.079 | 0.049 | somewhat off |
+| hispanic | NaN | 0.031 | missing estimate |
+| otherrace | NaN | 0.053 | missing estimate |
+| cons_prot | 0.529 | 0.066 | huge mismatch |
+| norelig | NaN | 0.024 | missing estimate |
+| south | 0.218 | 0.121 | off |
+| pol_intol | 0.313 | 0.164 | off |
+| R² | 0.588 | 0.169 | way off |
+| n | 19 | 503 | catastrophic |
+
+**Fix (Model 3)**
+- Same as Model 2, plus:
+  - Verify `pol_intol` is coded in the same direction as the paper (sign should be positive in the true table). Your sign is positive, but everything else is broken, and n=19 indicates the model wasn’t actually estimated on the right data.
+
+---
+
+### 4) Standard errors & significance: reporting mismatches
+
+**Mismatch: the generated output reports p-values/stars as if from your regression, but the “true results” table does not report SE at all**
+- True table: **standardized β + stars only**, no SE/p-values shown.
+- Generated: p-values are computed from your (wrong) regression—so the stars won’t match the paper even if the coefficients did.
+
+**How to fix**
+- If your goal is to match the paper’s Table 1:
+  1) Report **standardized coefficients** for slopes (not the constant).
+  2) Do **not** report SE if you’re strictly reproducing the printed table; or, if you do report them, clearly label them as “from replication” and don’t claim they’re extracted from the paper.
+  3) Apply the **same significance thresholds** (* <.05, ** <.01, *** <.001) but only after fixing sample/specification.
+
+---
+
+### 5) Concrete steps to make the generated analysis match the true table
+
+1) **Use the correct sample for each model**
+   - Build `df_m1`, `df_m2`, `df_m3` by dropping missingness *only on variables used in that model*.
+   - Confirm n matches roughly: **787, 756, 503**.
+
+2) **Recode GSS missing values properly**
+   - Replace all “inapplicable/don’t know/no answer” codes with NA for every variable used.
+
+3) **Fix dummy-variable construction**
+   - Race: create mutually exclusive categories and omit one (White reference).
+   - Religion: same logic; avoid including all categories plus an intercept.
+
+4) **Compute standardized coefficients (β)**
+   - Paper reports standardized slopes. In practice:
+     - Standardize X’s and Y (or use a function that returns standardized betas) **for slopes only**.
+     - Keep the constant unstandardized if you want to mimic the table’s note (though many software packages don’t mix these automatically—so you may need to manually insert the paper-style constant).
+
+5) **Verify DV matches exactly**
+   - Ensure you’re modeling “Number of Music Genres Disliked” and not a subset/scale with different coding.
+   - The negative constant in your Model 3 is a red flag suggesting the DV or scaling is not what the paper used.
+
+---
+
+If you paste your modeling code (data prep + regression calls), I can pinpoint the exact source of the n collapse (37/19) and the NaN coefficients (collinearity vs. empty columns) and tell you exactly what to change line-by-line.

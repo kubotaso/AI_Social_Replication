@@ -1,0 +1,210 @@
+Score: 21/100
+============================================================
+
+## 1) Fundamental incompatibility (must fix first)
+
+### A. You are comparing **standardized coefficients from the paper** to **unstandardized OLS output**
+- **True Table 2** reports *standardized OLS coefficients* (betas) and significance stars only.
+- Your **ModelA_full/ModelB_full** report **unstandardized** coefficients (`b`), with **SEs, t, p-values**.
+- Your **paper_style betas** appear to be standardized betas, but they are being derived from your re-estimated models and then compared to Table 2—which is only valid if:
+  1) the **DV and all predictors are constructed identically**,  
+  2) the **same sample and weights** are used,  
+  3) the **same coding/omissions** are used,  
+  4) and the betas are computed the same way.
+
+**Fix:** To match Table 2, generate *standardized coefficients* from the exact GSS 1993 sample and identical variable construction/coding as Bryson (1996). Do **not** claim Table 2 SEs (they are not in the PDF). If you want SEs, you must re-run the model yourself and clearly label them as “replication estimates,” not “extracted from Table 2.”
+
+---
+
+## 2) Sample size / model fit mismatches (major)
+
+### Model 1 (paper) vs your ModelA_fit
+- **True N:** 644  
+- **Generated N:** 327  
+- **True R² / Adj R²:** .145 / .129  
+- **Generated R² / Adj R²:** .1896 / .1639  
+
+### Model 2 (paper) vs your ModelB_fit
+- **True N:** 605  
+- **Generated N:** 308  
+- **True R² / Adj R²:** .147 / .130  
+- **Generated R² / Adj R²:** .1658 / .1377  
+
+These N’s are almost exactly **about half** of the true N’s, strongly suggesting a filter/merge mistake (e.g., using only one split sample, restricting to complete cases incorrectly, dropping everyone missing any music item, wrong year, or accidentally using a subset such as those asked a module form).
+
+**Fix:**
+- Ensure you are using **GSS 1993** and the **same inclusion criteria** as Bryson.
+- Recreate the two DVs exactly (see §5).
+- Handle missingness the same way (Bryson likely uses listwise deletion on model variables, but your listwise deletion may be harsher if your DV construction requires nonmissing on many genre items).
+- Check survey weights (see §6); weights can also affect effective N reporting if you’re doing something unusual, but your N is literally half, which is more consistent with an unintended subset.
+
+---
+
+## 3) Dropped variables / variable-name mismatches (your code is not estimating the same model)
+
+Your fit tables say:
+- `dropped_zero_variance: hispanic, no_religion` (in both models)
+
+But in the **true table**, both are included with nonzero coefficients:
+- Model 1: Hispanic = -0.058, No religion = 0.057
+- Model 2: Hispanic = -0.029, No religion = 0.024
+
+So your “paper_style” output has `NaN` rows—those correspond to the dropped predictors.
+
+**Fix:**
+- You have a coding/data problem: in your estimation sample, `hispanic` and `no_religion` are constant (all 0 or all 1), which should not happen in a national GSS sample.
+- Likely causes:
+  - You accidentally subset to only non-Hispanic respondents (e.g., `race != hispanic` or `ethnic == 0`).
+  - You recoded “no religion” incorrectly (e.g., collapsed into another category, or set to missing then filled with 0, then subset).
+  - You are using only a subgroup (e.g., whites only) without realizing it.
+- Verify cross-tabs on the **analysis sample** (after all filters):  
+  - `tab hispanic`  
+  - `tab relig` / your `no_religion` indicator  
+  - `tab race` with black/hispanic/other indicators
+- Rebuild the dummies from raw GSS variables after subsetting to 1993, and avoid any filter that conditions on race/ethnicity/religion.
+
+---
+
+## 4) Coefficient-by-coefficient mismatches (standardized betas)
+
+Below I compare your **paper_style betas** to the **true standardized coefficients**. I’m assuming your row order is:
+`racism, education, income, prestige, female, age, black, hispanic, other_race, cons_protestant, no_religion, southern`
+(because it matches the Table 2 order and the two NaNs align with hispanic and no_religion in your “dropped” message). If your mapping differs, that itself is a mismatch that must be fixed by labeling rows.
+
+### Model 1 (Rap/Reggae/Blues…)
+True betas:
+- Racism 0.130**, Education -0.175***, Income -0.037, Prestige -0.020, Female -0.057, Age 0.163***, Black -0.132***, Hispanic -0.058, Other -0.017, Cons Prot 0.063, No religion 0.057, Southern 0.024
+
+Your ModelA_paper_style betas:
+1. **0.139476***? (you mark `*`, p=.0125) vs **0.130** → close but significance differs (** should be p<.01; yours is only <.05).
+2. **-0.260937*** vs **-0.175*** → much more negative (magnitude mismatch).
+3. **-0.034450** vs **-0.037** → close.
+4. **0.030342** vs **-0.020** → sign mismatch.
+5. **-0.025797** vs **-0.057** → too small.
+6. **0.191183*** vs **0.163*** → too large.
+7. **-0.127196***? (you mark `*`, p=.0256) vs **-0.132*** → magnitude close but significance way off (paper says ***).
+8. **NaN** vs **-0.058** (Hispanic dropped) → mismatch.
+9. **0.003663** vs **-0.017** → sign/magnitude mismatch.
+10. **0.079136** vs **0.063** → somewhat close, stars differ (paper none).
+11. **NaN** vs **0.057** (No religion dropped) → mismatch.
+12. **0.021948** vs **0.024** → close.
+
+**Likely fixes for these Model 1 discrepancies:**
+- The big differences (education, prestige sign flip, age too large, black significance wrong) are classic symptoms of:
+  - wrong sample (your N is half),
+  - different DV construction,
+  - different coding of prestige/income,
+  - not using weights or using different weights,
+  - or using different race dummy reference category (see §6).
+
+### Model 2 (12 remaining genres)
+True betas:
+- Racism 0.080, Education -0.242***, Income -0.065, Prestige 0.005, Female -0.070, Age 0.126**, Black 0.042, Hispanic -0.029, Other 0.047, Cons Prot 0.048, No religion 0.024, Southern 0.069
+
+Your ModelB_paper_style betas:
+1. **-0.005081** vs **+0.080** → sign and magnitude mismatch (very large conceptual mismatch).
+2. **-0.223758*** vs **-0.242*** → close.
+3. **-0.095374** vs **-0.065** → too negative.
+4. **-0.012340** vs **+0.005** → sign mismatch (small).
+5. **-0.091211** vs **-0.070** → too negative.
+6. **0.091378** vs **0.126** → too small and missing ** significance (yours p=.11).
+7. **0.112228** vs **0.042** → much larger (and borderline p=.056).
+8. **NaN** vs **-0.029** (Hispanic dropped) → mismatch.
+9. **0.132050*** vs **0.047** → much larger, and paper has no star.
+10. **0.080328** vs **0.048** → too large.
+11. **NaN** vs **0.024** (No religion dropped) → mismatch.
+12. **0.142424** ** vs **0.069** → much larger.
+
+**Fixes suggested by Model 2 pattern:**
+- Racism flipping from +0.080 to ~0 strongly suggests your **racism index is not the same variable** (or reverse-coded), or your DV is not “12 remaining genres” as Bryson defines it.
+- Your “Southern” effect is about double; again consistent with different DV or sample composition.
+
+---
+
+## 5) DV construction mismatches (very likely)
+
+Your DVs are named:
+- `dislike_minority_genres` (Model A) with model label “...minority6”
+- `dislike_other12_genres` (Model B)
+
+The paper defines:
+- Model 1 DV: number of genres disliked among **Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin**
+- Model 2 DV: number of genres disliked among the **other 12 genres** in the battery
+
+**Common replication trap:** “dislike” in GSS music items may have multiple categories (like/dislike/neutral/don’t know/not asked). If you coded “don’t know/not asked” as 0 (i.e., not disliked) instead of missing, you will:
+- change N,
+- change the DV variance,
+- distort relationships (often attenuating or inflating).
+
+**Fix:**
+- Recreate each dislike indicator exactly as Bryson: typically 1 if “dislike,” 0 if not, and **missing if item missing/not asked/DK** (unless the author states otherwise).
+- Sum across the correct set of 6 and 12 items.
+- Then apply listwise deletion on model variables (or match author’s missingness strategy if described).
+
+---
+
+## 6) Predictor coding mismatches (also likely)
+
+### A. Race/ethnicity dummy setup
+Paper includes **Black, Hispanic, Other race** with (implicitly) **White** as reference.
+
+Your models drop `hispanic` due to zero variance, meaning your estimation sample likely has no Hispanics. That also distorts coefficients for “black” and “other race.”
+
+**Fix:** Build mutually exclusive race/ethnicity categories consistent with Bryson:
+- White (reference)
+- Black
+- Hispanic
+- Other
+and do not condition the sample on race/ethnicity.
+
+### B. Religion variables
+Paper uses:
+- Conservative Protestant
+- No religion
+(reference group presumably everyone else)
+
+Your `no_religion` is constant in-sample (impossible in GSS unless filtered). Also, “conservative Protestant” requires a specific coding scheme (denomination + fundamentalism often).
+
+**Fix:** Recode religion to match Bryson’s definition; verify variation after subsetting.
+
+### C. Occupational prestige / income per capita
+Prestige measures in GSS can be `prestg80`, `prestg10`, etc. Income per capita requires household income divided by household size; coding differences can flip signs (your prestige beta sign mismatch in Model 1 is a warning).
+
+**Fix:** Use the same GSS variable versions and transformations (including any top-coding) as Bryson.
+
+---
+
+## 7) Interpretation/reporting mismatches
+
+### A. You report SEs “paper-style,” but the paper table has **no SEs**
+That is a reporting mismatch: you cannot say your SEs come from Table 2.
+
+**Fix:** Either:
+- remove SE claims entirely for the “true” Table 2 comparison, or
+- clearly label your SEs as “replication estimates from reanalysis,” not “from the paper table.”
+
+### B. Your stars are based on your p-values, but the paper’s stars correspond to the paper’s p-values from its model
+Since your model differs (sample, coding, dropped vars), your stars will not match.
+
+**Fix:** Once the model is correctly replicated (same N/coding/weights), stars should align closely. Until then, do not present star mismatches as mere formatting issues—they indicate substantive replication failure.
+
+---
+
+## 8) Concrete steps to make the generated analysis match Table 2
+
+1. **Label coefficients with variable names** in your output (currently missing). This prevents silent row-order mistakes.
+2. **Rebuild the analysis sample**: GSS 1993, respondents asked the full music battery, with correct missing handling.
+3. **Reconstruct the DVs** exactly:
+   - DV1 = count of dislikes among the specified 6 genres
+   - DV2 = count of dislikes among the other 12 genres
+4. **Recode predictors to match Bryson** (especially racism index, race/ethnicity dummies, conservative Protestant, no religion, income per capita, occupational prestige, southern).
+5. **Use standardized coefficients** for comparison to Table 2:
+   - Either standardize all variables before OLS, or compute beta = b * sd(x)/sd(y).
+6. **Apply the same weighting approach** as the paper (if Bryson uses weights; if unknown, test both weighted/unweighted and see which reproduces N/R²/coefficients).
+7. Re-run models; verify that:
+   - N ≈ 644 and 605
+   - R² ≈ .145 and .147
+   - hispanic and no_religion are not dropped
+   - betas closely match the table
+
+If you paste your variable dictionary / codebook mapping (which GSS variables you used for racism, prestige, income-per-capita, religion, and the 18 genre items), I can pinpoint which specific recode is producing the sign flips and the half-sample N.

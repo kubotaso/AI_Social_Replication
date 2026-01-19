@@ -1,0 +1,46 @@
+Dataset columns you need to reproduce **Figure 1** (Bryson 1996; **1993 GSS culture module**) are:
+
+## 1) Filter to the correct survey year
+- `YEAR` (keep `YEAR == 1993`)
+
+## 2) Education (only control in each logit)
+- `EDUC` (years of schooling; continuous)
+
+## 3) The 18 music-genre “taste” items (raw Likert responses)
+These are the source items you recode into **Dislike_g** and also use to compute **Tolerance_-g**:
+
+1. Latin/Salsa: `LATIN`
+2. Jazz: `JAZZ`
+3. Blues/R&B: `BLUES`
+4. Show tunes / musicals: `MUSICALS`
+5. Oldies: `OLDIES`
+6. Classical/chamber: `CLASSICL`
+7. Swing/Big Band: `BIGBAND`
+8. New Age/Space: `NEWAGE`
+9. Opera: `OPERA`
+10. Bluegrass: `BLUGRASS`
+11. Folk: `FOLK`
+12. Easy Listening: `MOODEASY`
+13. Pop/Contemporary Rock: `CONROCK`
+14. Reggae: `REGGAE`
+15. Rap: `RAP`
+16. Heavy Metal: `HVYMETAL`
+17. Country/Western: `COUNTRY`
+18. Gospel: `GOSPEL`
+
+These variables have the needed 1–5 scale where **4–5 = dislike/dislike very much**, and include “don’t know much about it” as special missing codes (in your extract represented as `NA(...)`).
+
+## 4) Optional identifiers (not required for Figure 1, but useful)
+- `ID` (respondent id; for debugging/merging)
+
+## Robust fallbacks if your extract uses different genre column names
+If any of the above are missing in your file/version, search for:
+- Prefix patterns like `MUSIC*`, `LIK*`, `TASTE*`, or labels containing the genre strings (“Latin/Mariachi/Salsa”, “New age/space”, “Mood/easy listening”, “Contemporary pop/rock”, etc.).
+- Common alternate spellings seen in some GSS harmonizations:
+  - classical: `CLASSICAL` instead of `CLASSICL`
+  - heavy metal: `HEAVYMETAL` instead of `HVYMETAL`
+  - easy listening: `EASYLIST` / `EASY` instead of `MOODEASY`
+  - contemporary rock: `POPROCK` / `ROCK` instead of `CONROCK`
+  - show tunes: `SHOWTUNES` instead of `MUSICALS`
+
+But given your documentation, the **exact columns** for Figure 1 are `EDUC` plus the 18 genre items listed above (and `YEAR` to select 1993).

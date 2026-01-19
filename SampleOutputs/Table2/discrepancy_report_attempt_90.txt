@@ -1,0 +1,173 @@
+Score: 18/100
+============================================================
+
+### 1) Table structure / reporting mismatches
+
+**A. Standard errors and p-values are reported in the Generated Results, but they do not exist in the True Results source (Table 2).**  
+- **Generated:** includes `p_value_model` and significance “stars” apparently derived from those p-values.  
+- **True:** Table 2 reports **standardized coefficients and stars only**; it **does not report standard errors or p-values**.  
+**Fix:**  
+- Remove SEs/p-values from the reproduction of Table 2.  
+- If you *must* show SEs/p-values, you need the underlying microdata + the exact estimation setup and then compute them yourself—but that would no longer be a pure “Table 2 replication from the PDF.”
+
+**B. “beta” label is inconsistent with the constant and with the claim of standardized coefficients.**  
+- True table says **standardized OLS coefficients**, yet it also reports a **constant** (which is necessarily **unstandardized**; a standardized regression typically would not have an interpretable constant like that).  
+- Generated output explicitly says the constant is “unstandardized intercept on DV scale,” but the column is still called `beta` and includes NaN for constant while placing the intercept in a note.  
+**Fix:**  
+- For a Table 2-style replication, store constants in a separate column (e.g., `intercept`) or allow `beta` to contain the intercept value (as the paper does), and clearly label coefficients as “standardized (except constant).”
+
+---
+
+### 2) Sample size / model fit mismatches (major)
+
+These alone imply the generated models are not estimating the same thing as Table 2.
+
+**Model 1 (Generated ModelA_fit vs True Model 1):**
+- **N mismatch:** Generated **n = 203** vs True **N = 644**.
+- **R² mismatch:** Generated **R² = .1651** vs True **R² = .145**.
+- **Adj R² mismatch:** Generated **.1170** vs True **.129**.
+
+**Model 2 (Generated ModelB_fit vs True Model 2):**
+- **N mismatch:** Generated **n = 197** vs True **N = 605**.
+- **R² mismatch:** Generated **.1965** vs True **.147**.
+- **Adj R² mismatch:** Generated **.1487** vs True **.130**.
+
+**Fix:**  
+To match Table 2 you must reproduce *its* analytic sample and specification:
+1. Use **GSS 1993** and the same inclusion criteria Bryson used.  
+2. Apply the same **listwise deletion** rules *on the same variables* (and not accidentally introduce extra missingness via recodes).  
+3. Ensure you are using the same **dependent-variable construction** (counts of disliked genres in the two sets).  
+4. Use the same **weights (if any were used)** and the same handling of “don’t know/refused/not asked.”  
+The enormous N drop in generated results is consistent with: wrong year, wrong subset, accidental filtering, or turning many values into missing (especially for religion/race variables).
+
+---
+
+### 3) Variable inclusion / omission mismatches
+
+**A. `no_religion` is omitted in both generated models, but it is included in the True table for both models.**
+- **Generated:** `no_religion` = NaN, “omitted (constant/collinear or all-missing after listwise deletion)”
+- **True:** “No religion” has coefficients (Model 1: 0.057; Model 2: 0.024)
+
+**Fix:**  
+- Diagnose why it is omitted:
+  - If you used **religion dummies** and also an intercept, you must omit **one** category as the reference. You should be omitting a reference category (e.g., “Mainline Protestant” or “Catholic”), not `no_religion` specifically unless that’s your chosen reference.
+  - If it’s “all-missing after listwise deletion,” you likely recoded religion incorrectly or filtered to a subsample where `no_religion` becomes constant.
+- Recode religion to match Bryson’s categories and ensure **variation** remains in the estimation sample.
+
+---
+
+### 4) Coefficient (direction/magnitude) mismatches by model
+
+Below I list every mismatch between generated coefficients and the True coefficients (Table 2). Even where signs match, the magnitudes often don’t; where signs differ, that indicates a definitional/specification error.
+
+#### Model 1: Dislike of minority-associated genres
+
+| Variable | True coef | Generated beta | Mismatch |
+|---|---:|---:|---|
+| Racism score | **0.130** (**) | 0.137 | stars differ (generated shows none / p=.070) |
+| Education | **-0.175** (***) | -0.252 | magnitude too large; stars differ (** vs ***) |
+| HH income pc | -0.037 | 0.022 | **sign flips** |
+| Occ prestige | -0.020 | 0.005 | **sign flips** |
+| Female | -0.057 | -0.037 | magnitude differs |
+| Age | 0.163 (***) | 0.150 (*) | stars too weak |
+| Black | -0.132 (***) | -0.186 | magnitude differs; stars missing in generated |
+| Hispanic | -0.058 | 0.055 | **sign flips** |
+| Other race | -0.017 | -0.013 | close-ish (ok direction) |
+| Conservative Protestant | 0.063 | 0.073 | close-ish |
+| No religion | 0.057 | omitted | **missing variable** |
+| Southern | 0.024 | -0.022 | **sign flips** |
+| Constant | 2.415 (***) | 2.824 (***) | intercept differs |
+
+**Interpretation consequences:** Generated Model 1 would (wrongly) imply income, prestige, Hispanic identity, and Southern residence are associated with *more* dislike (or less) in directions opposite the paper.
+
+**Likely causes to fix (Model 1):**
+- Dependent variable construction mismatch (wrong genre set; wrong coding of “dislike”; wrong count scale).
+- Income variable scaling/coding mismatch (e.g., not per-capita, logged, or reversed).
+- Southern dummy reversed (e.g., coding 1 = non-south).
+- Hispanic dummy reversed or coded as “non-Hispanic.”
+- Prestige measure not the same (or reversed rank).
+
+#### Model 2: Dislike of the 12 remaining genres
+
+| Variable | True coef | Generated beta | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.080 | -0.016 | **sign flips** |
+| Education | -0.242 (***) | -0.261 (**) | stars too weak |
+| HH income pc | -0.065 | -0.071 | close-ish |
+| Occ prestige | 0.005 | -0.102 | **sign flips + huge magnitude error** |
+| Female | -0.070 | -0.096 | magnitude differs |
+| Age | 0.126 (**) | -0.005 | **sign flips** |
+| Black | 0.042 | -0.021 | **sign flips** |
+| Hispanic | -0.029 | 0.111 | **sign flips + magnitude error** |
+| Other race | 0.047 | 0.141 (*) | magnitude too large; stars appear though true has none |
+| Conservative Protestant | 0.048 | 0.111 | magnitude too large |
+| No religion | 0.024 | omitted | **missing variable** |
+| Southern | 0.069 | 0.191 (**) | magnitude too large; stars differ |
+| Constant | 7.860 | 7.140 | intercept differs |
+
+**Interpretation consequences:** Generated Model 2 reverses several key relationships in the paper (racism, age, black, hispanic, prestige), so the substantive story would be materially wrong.
+
+**Likely causes to fix (Model 2):**
+- Wrong dependent variable (not “12 remaining genres” as defined by Bryson; possibly counting likes or excluding different items).
+- Prestige variable wrong (different scale, reversed, or not standardized).
+- Age variable miscoded (e.g., centered incorrectly won’t flip sign, but using a different age variable or filtering to odd subgroup could).
+- Race/ethnicity dummies miscoded or reference group confusion.
+
+---
+
+### 5) Significance-star logic mismatches (even ignoring the “no SEs” issue)
+
+Even if we pretend p-values are acceptable, the star assignments don’t match Table 2:
+- **Model 1 racism** should be ** (p<.01) but generated has no star (p=.070).
+- **Model 1 education** should be *** but generated shows **.
+- **Model 1 age** should be *** but generated shows *.
+- **Model 1 black** should be *** but generated shows none.
+- **Model 2 education** should be *** but generated shows **.
+- **Model 2 age** should be ** but generated shows none.
+- **Model 2 southern** is not starred in true table but is ** in generated.
+- **Model 2 other race** not starred in true table but is * in generated.
+
+**Fix:**  
+- If you’re replicating Table 2, copy stars exactly from Table 2 rather than recomputing.  
+- If you’re estimating from microdata, then the coefficients must match first (same sample/spec); stars will follow.
+
+---
+
+### 6) “Diagnostics” vs model N mismatch (internal inconsistency)
+
+Your diagnostics show very large nonmissing counts (e.g., DV nonmissing n=1134 and 1057), but your regression N is only 203/197. That means the regression sample is being reduced by something beyond simple missingness on the listed variables—likely:
+- an unintended filter (e.g., complete cases on additional variables not shown),
+- merging error (many unmatched rows),
+- restricting to a subgroup,
+- or creating missing values during standardization/transformation.
+
+**Fix:**  
+- Print the exact list of variables used in listwise deletion and count complete cases across *that exact set*.  
+- Verify no extra filters (year, survey form, oversamples, etc.).  
+- Confirm that the genre-dislike items used to build the DV exist for all respondents (GSS often has split ballots/forms).
+
+---
+
+### 7) What to change so the generated analysis matches Table 2 (action checklist)
+
+1. **Use the correct dataset and year:** GSS 1993, matching Bryson.  
+2. **Recreate the two DVs exactly:**
+   - DV1: count of dislikes among {Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin}.  
+   - DV2: count of dislikes among “the 12 remaining genres” (must match the exact item list in Bryson).
+   - Ensure “dislike” coding matches the GSS response options (and that DK/NA are handled as Bryson did).
+3. **Recode predictors to match:**
+   - `racism_score`: same item composition and direction.
+   - `education_years`: education measure used in paper (years or degree converted consistently).
+   - `hh_income_per_capita`: construct per-capita correctly and with the same treatment of missing/topcoding.
+   - `occ_prestige`: same prestige scale and direction.
+   - Race/ethnicity dummies: confirm 1/0 coding, and that the omitted reference is White, non-Hispanic.
+   - Religion: create `cons_protestant` and `no_religion` exactly and ensure the reference category is something else (not causing `no_religion` to be dropped).
+   - `southern`: ensure 1 = South (not reversed).
+4. **Estimate standardized OLS coefficients (as in Table 2):**
+   - Standardize predictors (and possibly DV) to reproduce standardized betas; keep intercept as reported in the paper.
+5. **Match the analytic sample (N):**
+   - Ensure all variables used are available on the same ballot/form; restrict appropriately so you land near **N=644** and **N=605**.
+6. **Do not report SEs if you claim to be reproducing Table 2 from the PDF.**  
+   - If estimating from microdata, you may report SEs, but then clearly label it as “re-estimated,” not “extracted from Table 2.”
+
+If you share the code (or at least the exact variable construction rules and any filters), I can pinpoint which step is causing the sign flips and the N collapse.

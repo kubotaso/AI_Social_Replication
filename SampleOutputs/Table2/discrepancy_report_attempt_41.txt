@@ -1,0 +1,160 @@
+Score: 15/100
+============================================================
+
+### 1) Variable-name / row-alignment mismatches (most serious)
+
+Your “paper_style” tables have **no variable names**, so we can only infer row identity by matching the order in `ModelA_full/ModelB_full`. That inferred order does **not** match the paper’s Table 2 ordering/content cleanly, and some rows are clearly “broken”:
+
+- **Race dummies are wrong / incomplete in generated output**
+  - **True table includes three race indicators:** Black, Hispanic, Other race (with White as reference).
+  - **Generated ModelA_full/ModelB_full appear to include only *one* race dummy** (the coefficient around `-0.542` in A and `0.816` in B), plus a near-zero “dummy-like” term (`3.4e-16`) that looks like a numerical artifact, not a real predictor.
+  - Meanwhile, the “paper_style” tables show **two NaN rows** where coefficients should be (e.g., Hispanic/Other race), consistent with missing columns or bad joins.
+
+**Fix**
+- Ensure race is coded into **three separate dummies** (Black, Hispanic, Other) with **White omitted** as the reference, and that all three are actually included in the model matrix.
+- When creating the “paper_style” output, keep an explicit `term` column and merge/join by `term`, not by row position.
+
+---
+
+### 2) Coefficient mismatches (standardized betas and constants)
+
+Below are the key mismatches between generated standardized coefficients (`beta_std` / “beta” in paper_style) and the **true standardized coefficients**.
+
+#### Model A (DV: dislike minority-liked genres)
+True vs generated (standardized):
+
+- **Racism score:** true `0.130**`; generated `0.139*`
+  - Magnitude close, but **significance marker differs**.
+- **Education:** true `-0.175***`; generated `-0.261***`
+  - Large mismatch in magnitude.
+- **Income per capita:** true `-0.037`; generated `-0.034` (close)
+- **Occupational prestige:** true `-0.020`; generated `0.030` (**sign mismatch**)
+- **Female:** true `-0.057`; generated `-0.026` (too small)
+- **Age:** true `0.163***`; generated `0.191***` (somewhat larger)
+- **Black:** true `-0.132***`; generated `-0.127*`
+  - Magnitude close, but **stars are wrong** (*** vs *).
+- **Hispanic:** true `-0.058`; **missing/NaN in generated**
+- **Other race:** true `-0.017`; appears missing/NaN (or mis-coded)
+- **Conservative Protestant:** true `0.063`; generated `0.004` (way off)
+- **No religion:** true `0.057`; generated `0.079` (somewhat high)
+- **Southern:** true `0.024`; generated `0.022` (close)
+- **Constant:** true `2.415***`; generated unstd constant `2.654***`
+  - Not directly comparable because the paper’s constant is not standardized, but your unstandardized intercept differs a lot.
+
+**Fix**
+- Use the **same sample and same variable construction as the paper**. Your N and R² don’t match (see Section 4), which guarantees coefficient drift.
+- Confirm you are actually computing **standardized coefficients the same way** (typically: standardize X’s and Y, then run OLS; or transform unstandardized b via SD ratios). Small differences can occur, but not the large ones (education, religion, prestige).
+- Ensure categorical variables match the paper coding (e.g., conservative Protestant definition; gender coding; southern definition).
+
+#### Model B (DV: dislike 12 remaining genres)
+True vs generated (standardized):
+
+- **Racism score:** true `0.080`; generated `-0.005` (**wrong sign and near zero**)
+- **Education:** true `-0.242***`; generated `-0.224***` (close-ish)
+- **Income per capita:** true `-0.065`; generated `-0.095` (too negative)
+- **Occupational prestige:** true `0.005`; generated `-0.012` (**sign mismatch**)
+- **Female:** true `-0.070`; generated `-0.091` (more negative)
+- **Age:** true `0.126**`; generated `0.091` (too small; also loses **)
+- **Black:** true `0.042`; generated `0.112` (too large)
+- **Hispanic:** true `-0.029`; missing/NaN or misaligned
+- **Other race:** true `0.047`; missing/NaN or misaligned
+- **Conservative Protestant:** true `0.048`; generated `0.132*` (too large)
+- **No religion:** true `0.024`; generated `0.080` (too large)
+- **Southern:** true `0.069`; generated `0.142**` (too large)
+- **Constant:** true `7.860` (no stars); generated unstd constant `5.674***` (big mismatch and stars differ)
+
+**Fix**
+- Again: align **DV construction**, **sample**, and **predictor coding**.
+- The racism coefficient being wrong-sign suggests either:
+  - the DV is reversed / constructed differently than in the paper, or
+  - the racism scale is reversed (higher = less racist), or
+  - you’re not using the same model (e.g., controls differ; missing race dummies; weights).
+- Verify scale direction explicitly (min/max and meaning) for racism and the “dislike” DV.
+
+---
+
+### 3) Standard errors: generated output conflicts with the “true results” description
+
+- **True Results statement:** Table 2 in the PDF **does not report standard errors**.
+- **Generated output includes standard errors and t-statistics** in `ModelA_full` and `ModelB_full`.
+
+This is not a mismatch with the paper per se (you *can* compute SEs if you have the microdata), but it **is a mismatch with what you claim you are reproducing from Table 2**. Also, your “paper_style” tables do not show SEs, which is consistent with the paper—but then your stars are being derived from your computed p-values, not from the paper’s reported significance.
+
+**Fix**
+- Decide the target:
+  1) **Reproduce Table 2 exactly**: report only standardized betas + stars (no SEs).
+  2) **Replicate using microdata**: you may report SEs, but then you must also match N/R² and explain differences from the printed table.
+- If targeting Table 2, **do not introduce SEs as if they were extracted**; label them clearly as “computed from replication data.”
+
+---
+
+### 4) Model fit and sample size mismatches (guarantees coefficient differences)
+
+Generated vs true:
+
+#### Model A
+- **Generated N = 327**, R² ≈ 0.190
+- **True N = 644**, R² = 0.145
+
+#### Model B
+- **Generated N = 308**, R² ≈ 0.166
+- **True N = 605**, R² = 0.147
+
+These are not small discrepancies: your sample is roughly **half** the size.
+
+**Fix**
+- Use the same GSS wave/year and the same inclusion rules as Bryson (1993 GSS; Table 2).
+- Apply the same missing-data handling (likely listwise deletion across all predictors and both DVs in that model).
+- If the paper used weights, apply the same weight variable and method.
+- Reconstruct the DVs exactly (counts of genres disliked in each set). A different set definition or missing genres will change N and coefficients.
+
+---
+
+### 5) Significance-star mismatches
+
+Even when betas are close, stars often differ:
+
+- Model A: Racism `0.139*` vs true `0.130**`; Black `-0.127*` vs true `-0.132***`.
+- Model B: Age loses **; many others gain stars incorrectly.
+
+This is expected if **N, coding, weights, or SE estimation** differ.
+
+**Fix**
+- Once N/coding/weights match, recompute p-values appropriately.
+- Also use the paper’s star cutoffs: * p<.05, ** p<.01, *** p<.001 (two-tailed).
+- In your “paper_style” output, ensure stars are attached to the correct coefficient row (another reason to avoid row-position joins).
+
+---
+
+### 6) Output formatting/interpretation errors in the generated “paper_style” tables
+
+- The “paper_style” tables show **rows with `NaN` beta but a p-value**, and the constant row shows `NaN` beta with `***` only. This indicates your pipeline is:
+  - dropping `beta_std` for the intercept (fine), **but**
+  - also dropping it for at least one non-intercept term (not fine), and/or
+  - mis-merging standardized betas back onto terms.
+
+**Fix**
+- Keep a tidy structure with columns: `term`, `b_unstd`, `se`, `p`, `beta_std`.
+- When computing `beta_std`, explicitly set intercept to NA but **never lose other terms**.
+- Ensure the constant is labeled “Constant” and shown with its **unstandardized** coefficient (as in the paper), not as an empty beta with stars floating alone.
+
+---
+
+## Minimal checklist to make the generated analysis match Table 2
+
+1. **Use the correct sample (GSS 1993) and reproduce N (644, 605)** via identical listwise deletion and weights (if used).
+2. **Rebuild both DVs exactly** (correct genre lists; correct “dislike” definition; correct counting).
+3. **Match predictor coding**:
+   - Racism score direction
+   - Education scale
+   - Income per capita transformation
+   - Occupational prestige scale
+   - Gender coding
+   - Race dummies (Black/Hispanic/Other; White reference)
+   - Religion categories (Conservative Protestant, No religion)
+   - Southern definition
+4. **Compute standardized betas consistently** (same standardization convention).
+5. **Generate stars using the paper’s thresholds**, but only after the model matches; otherwise label stars as “replication p-values.”
+6. **Fix table assembly** by merging on `term` names, not row order, and never output NaNs for real predictors.
+
+If you paste the variable list (term names) from your model matrix or regression summary (the exact `term` labels), I can map each generated row to the intended Table 2 variable and point out exactly which rows are mis-assigned (e.g., which coefficient you’re currently labeling as Black vs Hispanic vs Other).

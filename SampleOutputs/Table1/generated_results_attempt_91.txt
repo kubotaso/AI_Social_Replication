@@ -1,0 +1,126 @@
+## fit_stats
+                          model   n       r2   adj_r2 dropped_predictors
+                  Model 1 (SES) 747 0.088274 0.084592                   
+          Model 2 (Demographic) 507 0.135346 0.117914          otherrace
+Model 3 (Political intolerance) 334 0.137158 0.107682          otherrace
+
+## model1_full
+                       term         b      beta            p sig
+                   Constant 10.637845       NaN 8.659509e-52    
+          Education (years) -0.374451 -0.292447 3.458708e-12 ***
+Household income per capita -0.000009 -0.038625 3.095946e-01    
+      Occupational prestige  0.005155  0.020021 6.311403e-01    
+
+## model2_full
+                       term         b      beta            p sig
+                   Constant  9.285426       NaN 6.717163e-03    
+          Education (years) -0.339840 -0.264062 3.482808e-07 ***
+Household income per capita -0.000013 -0.053112 2.497486e-01    
+      Occupational prestige -0.004180 -0.015615 7.538998e-01    
+                     Female -0.621791 -0.089777 3.439994e-02   *
+                        Age  0.025127  0.104295 1.762531e-02   *
+                      Black  0.544603  0.042978 8.700094e-01    
+                   Hispanic  0.378982  0.030238 9.080113e-01    
+                 Other race       NaN       NaN          NaN    
+    Conservative Protestant  0.695618  0.089620 5.296006e-02    
+                No religion -0.225640 -0.019473 6.525593e-01    
+                   Southern  0.486785  0.062856 1.499976e-01    
+
+## model3_full
+                        term         b      beta        p sig
+                    Constant  6.986251       NaN 0.050418    
+           Education (years) -0.194360 -0.139711 0.035582   *
+ Household income per capita -0.000015 -0.066104 0.257923    
+       Occupational prestige  0.002479  0.009065 0.888119    
+                      Female -0.860519 -0.123794 0.018974   *
+                         Age  0.017341  0.072210 0.187857    
+                       Black  0.827542  0.063987 0.807747    
+                    Hispanic  0.174142  0.013699 0.958288    
+                  Other race       NaN       NaN      NaN    
+     Conservative Protestant  0.408272  0.051904 0.358392    
+                 No religion  0.309902  0.024379 0.653812    
+                    Southern  0.550757  0.071707 0.187308    
+Political intolerance (0–15)  0.165577  0.204621 0.000447 ***
+
+## model1_table1style
+                       term    Table1
+                   Constant    10.638
+          Education (years) -0.292***
+Household income per capita    -0.039
+      Occupational prestige     0.020
+
+## model2_table1style
+                       term    Table1
+                   Constant     9.285
+          Education (years) -0.264***
+Household income per capita    -0.053
+      Occupational prestige    -0.016
+                     Female   -0.090*
+                        Age    0.104*
+                      Black     0.043
+                   Hispanic     0.030
+                 Other race          
+    Conservative Protestant     0.090
+                No religion    -0.019
+                   Southern     0.063
+
+## model3_table1style
+                        term   Table1
+                    Constant    6.986
+           Education (years)  -0.140*
+ Household income per capita   -0.066
+       Occupational prestige    0.009
+                      Female  -0.124*
+                         Age    0.072
+                       Black    0.064
+                    Hispanic    0.014
+                  Other race         
+     Conservative Protestant    0.052
+                 No religion    0.024
+                    Southern    0.072
+Political intolerance (0–15) 0.205***
+
+## table1_combined
+                       term Model 1 (SES) Model 2 (Demographic) Model 3 (Political intolerance)
+                   Constant        10.638                 9.285                           6.986
+          Education (years)     -0.292***             -0.264***                         -0.140*
+Household income per capita        -0.039                -0.053                          -0.066
+      Occupational prestige         0.020                -0.016                           0.009
+
+## missingness
+           variable  nonmissing  missing  pct_missing
+num_genres_disliked         893      713    44.396015
+          pol_intol        1025      581    36.176837
+           hispanic        1044      562    34.993773
+             inc_pc        1459      147     9.153176
+           educ_yrs        1464      142     8.841843
+         prestg80_v        1526       80     4.981320
+          cons_prot        1597        9     0.560399
+            norelig        1597        9     0.560399
+              age_v        1601        5     0.311333
+             female        1606        0     0.000000
+              black        1606        0     0.000000
+          otherrace        1606        0     0.000000
+              south        1606        0     0.000000
+
+## dv_descriptives
+count    893.000000
+mean       5.776036
+std        3.756192
+min        0.000000
+25%        3.000000
+50%        5.000000
+75%        8.000000
+max       18.000000
+Name: num_genres_disliked, dtype: float64
+
+## pol_intol_descriptives
+count    1025.000000
+mean        5.090732
+std         4.603896
+min         0.000000
+25%         1.000000
+50%         4.000000
+75%         9.000000
+max        15.000000
+Name: pol_intol, dtype: float64

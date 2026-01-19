@@ -1,0 +1,146 @@
+Score: 45/100
+============================================================
+
+### 1) Table structure and labeling mismatches
+
+**Mismatch 1.1 — Missing/incorrect variable names (ModelA_table, ModelB_table).**  
+- **Generated:** tables have *no row labels* (just 11 numeric rows).  
+- **True:** each coefficient corresponds to a named predictor **plus a constant** (13 rows total in each model: 12 predictors + constant).
+
+**Fix:** Ensure the exported regression table preserves the index/row names (term names). If you used pandas, don’t drop the index when printing/exporting. Also verify you’re including **all predictors** listed in Table 2:
+- Racism score
+- Education
+- Household income per capita
+- Occupational prestige
+- Female
+- Age
+- Black
+- Hispanic
+- Other race
+- Conservative Protestant
+- No religion
+- Southern
+- Constant
+
+---
+
+### 2) Coefficients: value mismatches (and missing terms)
+
+#### 2.1 — Wrong number of coefficients (both models)
+- **Generated:** 11 coefficients shown.
+- **True:** **13 coefficients** (12 predictors + constant).
+
+**Fix:** You are missing **2 terms**. Most likely:
+- The **constant/intercept** is not included (or is being overwritten), and
+- One substantive predictor (often **Southern** or one religion dummy) is omitted due to reference-category coding or accidental exclusion.
+
+Make sure your model formula includes all listed predictors and that categorical variables are coded to match the paper (see §5).
+
+#### 2.2 — Intercept/constant is wrong (both models)
+- **Generated first row:** ~0 with p=1.000 in both models (looks like an intercept forced to 0 or centered-out).
+- **True constants:** **2.415*** (Model 1) and **7.860** (Model 2).
+
+**Fix:**  
+- Fit the model with an intercept (don’t use `-1` in formulas; don’t set `fit_intercept=False`).
+- Do **not** standardize the DV if you are trying to reproduce the **paper’s constant**. Note: even if the paper reports standardized coefficients, it still reports a nonzero constant because the DV is not necessarily standardized the way you did.
+
+---
+
+### 3) Standard errors and p-values: conceptually incompatible with the “true” table
+
+**Mismatch 3.1 — SEs are reported in generated output but not in the true table.**  
+- **Generated:** `std_err`, `t`, `p_value` shown.
+- **True:** Table 2 (per your note) **does not report SEs** at all—only standardized coefficients and significance markers.
+
+**Fix options (choose one depending on your goal):**
+1. **To match the paper exactly:** remove SE/t/p columns and add significance stars based on the paper’s markers.  
+2. **To compute SEs anyway:** you must re-run the regression on the original GSS 1993 microdata and then report your computed SEs—but they will not be “extractable” from Table 2 alone. Don’t claim they come from the PDF.
+
+---
+
+### 4) Model fit statistics and sample size mismatches
+
+#### 4.1 — N is wrong in both models
+- **Generated:** N=327 (Model A), N=308 (Model B)
+- **True:** N=644 (Model 1), N=605 (Model 2)
+
+**Fix:** Your analytic sample is about half the size. Common causes:
+- You restricted to complete cases on too many variables (e.g., listwise deletion after adding variables not used in the paper).
+- You filtered the data (e.g., only whites, only one region, only respondents with complete music batteries).
+- You used a subset or different year(s).
+
+To fix: replicate Bryson’s sample construction:
+- Use **GSS 1993**
+- Use the same DV construction (counts of disliked genres in the specified sets)
+- Apply the same missing-data handling as the author (likely listwise deletion on variables in the model, but you must ensure the same variables and coding).
+
+#### 4.2 — R² / Adjusted R² mismatch
+- **Generated Model A:** R²=0.1896, Adj=0.1639  
+- **True Model 1:** R²=0.145, Adj=0.129  
+- **Generated Model B:** R²=0.1658, Adj=0.1377  
+- **True Model 2:** R²=0.147, Adj=0.130
+
+**Fix:** Once N, DV construction, and coding match, R² should move toward the published values. Right now you are fitting on a different sample and possibly a different DV definition.
+
+---
+
+### 5) Predictor coding / reference-category issues (likely driving coefficient sign and magnitude errors)
+
+Even where some generated coefficients are numerically “near-ish” to the true ones (e.g., racism ~0.14 in Model A), many others differ in sign/magnitude. That usually comes from **coding differences**, not random noise.
+
+Key places where Bryson-style replication commonly fails:
+
+#### 5.1 — Standardized vs unstandardized coefficients
+- **True table:** “Standardized OLS coefficients” (betas).
+- **Generated:** labeled `coef_beta`, but unclear if truly standardized the same way.
+
+**Fix:** Compute standardized coefficients the same way:
+- Either standardize **all predictors** (and DV) before OLS (beta = slope in z-units), **or** use a function that converts unstandardized b to standardized beta using SD ratios.
+- But note: if you standardize the DV, the intercept will go to ~0, which contradicts the paper’s reported constants. So you need to replicate **exactly what the author means** by “standardized coefficients” while still reporting the constant (often: predictors standardized, DV not; or betas computed post-hoc while still estimating an intercept on original DV). The paper’s combination (standardized coefficients + nonzero constant) strongly suggests **betas computed separately**, not a fully standardized regression output.
+
+#### 5.2 — Dummy variables and omitted reference groups
+Race and religion are categorical. Your model must match Bryson’s reference categories:
+- Race: indicators for **Black**, **Hispanic**, **Other race**, with **White** as reference (implied).
+- Religion: indicators for **Conservative Protestant** and **No religion**, with some other category as reference (likely mainline Protestant/Catholic/other; depends on how she coded).
+
+**Fix:** Recreate the same dummy set with the same omitted category. If you accidentally used different baselines (e.g., included all dummies + intercept, or set “Black” as baseline), coefficients will shift and/or drop.
+
+#### 5.3 — DV construction mismatches (most important)
+- **True Model 1 DV:** “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music” (count of disliked among these 6).
+- **True Model 2 DV:** “Dislike of the 12 remaining genres” (count among the other 12).
+
+**Fix:** Verify you:
+- Use the same **18-genre battery**
+- Define “dislike” exactly as the author did (e.g., “dislike” vs “strongly dislike”; treatment of “neutral/don’t know”; whether “never heard” is missing)
+- Sum the correct genre sets (6 vs 12)
+
+If your DV is scaled differently (e.g., mean instead of count, or includes different genres), coefficients and intercepts will not match.
+
+---
+
+### 6) Interpretation mismatches in the generated analysis (implied by p-values)
+
+Your generated output implies inferential claims (p-values, t-stats), but the true table uses significance stars without SEs shown.
+
+Specific discrepancies likely to occur if you interpreted your generated p-values as if they were the paper’s:
+- **Model 2 racism:** True is **0.080 (ns)**; generated second row is **-0.005 (ns)**—wrong sign and near zero. Any interpretation about racism being unrelated would be directionally similar (ns), but the *magnitude and sign* mismatch.
+- **Age effects:** True is positive in both models (0.163***; 0.126**). Generated has one positive mid-table value in each model, but without term labels you cannot even guarantee which row is “Age.”
+
+**Fix:** Don’t interpret until:
+1) rows are correctly labeled,  
+2) coefficients align to the correct predictors, and  
+3) you are reporting the same estimand (standardized betas).
+
+---
+
+### 7) Concrete checklist to make the generated output match the paper
+
+1. **Rebuild the DVs** exactly as counts for the two genre sets (6 and 12) using the same “dislike” coding rules.  
+2. **Use the correct dataset/year** (GSS 1993) and reproduce the **paper’s sample restrictions** to get N≈644 and N≈605.  
+3. **Match dummy coding/reference categories** for race and religion (White reference; appropriate religion reference).  
+4. **Compute standardized coefficients (betas) the same way as Bryson** (likely post-estimation standardization of slopes, while still estimating the model on the original DV so the constant matches).  
+5. **Output formatting:** include **term names** and include **all 12 predictors + constant** (13 rows).  
+6. **Remove SE/t/p from the “paper replication” table** (or clearly separate: “computed SEs from my replication” vs “Table 2 reports only betas”).  
+7. **Confirm R²/Adj R²** against .145/.129 and .147/.130 once the above are aligned.
+
+If you paste your model formula (or code) and how you constructed both DVs and the racism score, I can point to exactly which two terms are missing and which generated row corresponds to which Table 2 variable.

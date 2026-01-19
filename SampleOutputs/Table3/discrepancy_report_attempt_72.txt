@@ -1,0 +1,131 @@
+Score: 89/100
+============================================================
+
+### 1) Row items/categories mismatched (names/number of items)
+
+**Mismatch: the “missing/other” rows are wrong in the Generated Results.**  
+In the true table, each genre has **7 response rows** before the mean:
+
+1. (1) Like very much  
+2. (2) Like it  
+3. (3) Mixed feelings  
+4. (4) Dislike it  
+5. (5) Dislike very much  
+6. **(M) Don’t know much about it** *(varies by genre)*  
+7. **(M) No answer** *(varies by genre)*  
+8. Mean
+
+In the Generated Results, after the first five rows, you have:
+- a row of **all 13’s** (clearly not a real response distribution row across all genres),
+- then a row of larger numbers (looks like it was intended to be “Don’t know much…”),
+- then the mean row.
+
+So: **the “No answer” row is incorrect (set to 13 everywhere), and the actual “No answer” counts are missing/merged/misplaced.**
+
+**How to fix**
+- Replace the “all 13” row with the **true “No answer” row per genre** (which differs by genre).
+- Ensure you include **both** missing rows: “Don’t know much about it” and “No answer” with their correct counts per genre.
+
+---
+
+### 2) Frequency count mismatches (by response category)
+
+The first five attitude rows **match perfectly** between Generated and True for all 18 genres:
+
+- (1) Like very much ✅  
+- (2) Like it ✅  
+- (3) Mixed feelings ✅  
+- (4) Dislike it ✅  
+- (5) Dislike very much ✅  
+
+All mismatches occur in the **two “M” rows**.
+
+#### A) “Don’t know much about it” row (Generated ≈ but not exact)
+
+Compare Generated row (the one with values like 220, 40, 55, 78, 38, 64, …) to True “Don’t know much about it”:
+
+**Latin/Salsa:** Gen 220 vs True 221 (off by -1)  
+**Jazz:** 40 vs 38 (off by +2)  
+**Blues/R&B:** 55 vs 56 (off by -1)  
+**Show Tunes:** 78 vs 77 (off by +1)  
+**Oldies:** 38 vs 41 (off by -3)  
+**Classical/Chamber:** 64 vs 66 (off by -2)  
+
+**Reggae:** 293 vs 295 (off by -2)  
+**Swing/Big Band:** 163 vs 164 (off by -1)  
+**New Age/Space:** 293 vs 292 (off by +1)  
+**Opera:** 83 vs 83 (match)  
+**Bluegrass:** 161 vs 163 (off by -2)  
+**Folk:** 77 vs 78 (off by -1)
+
+**Pop/Easy Listening:** 72 vs 72 (match)  
+**Contemporary Rock:** 49 vs 50 (off by -1)  
+**Rap:** 59 vs 61 (off by -2)  
+**Heavy Metal:** 67 vs 70 (off by -3)  
+**Country/Western:** 19 vs 22 (off by -3)  
+**Gospel:** 34 vs 35 (off by -1)
+
+**How to fix**
+- Replace that generated “DK” row with the exact true counts genre-by-genre shown in Table 3.
+
+#### B) “No answer” row (completely wrong)
+
+Generated has **13 for every genre**, but True “No answer” varies:
+
+- Latin/Salsa 12 (≠13)
+- Jazz 15 (≠13)
+- Blues/R&B 12 (≠13)
+- Show Tunes 14 (≠13)
+- Oldies 10 (≠13)
+- Classical/Chamber 11 (≠13)
+- Reggae 11 (≠13)
+- Swing/Big Band 12 (≠13)
+- New Age/Space 14 (≠13)
+- Opera 13 (=13)  ← only one that matches
+- Bluegrass 11 (≠13)
+- Folk 12 (≠13)
+- Pop/Easy Listening 13 (=13)
+- Contemporary Rock 12 (≠13)
+- Rap 11 (≠13)
+- Heavy Metal 10 (≠13)
+- Country/Western 10 (≠13)
+- Gospel 12 (≠13)
+
+**How to fix**
+- Add/restore the proper **No answer** row with these values (and do not reuse a constant 13).
+
+---
+
+### 3) Summary statistics mismatches (means, totals, etc.)
+
+#### Means
+The mean row in Generated matches the True means to the displayed precision (minor rounding only, e.g., 3.142753 vs 3.14). ✅
+
+#### Totals / internal consistency (implied issue)
+Because the two missing rows are wrong, the **per-genre total N** implied by Generated counts will not match the True total N for many genres.
+
+Example (Latin/Salsa):
+- True total = 85+325+416+403+144+221+12 = **1606**
+- Generated total = 85+325+416+403+144+220+13 = **1606** (coincidentally matches)
+But other genres won’t (because DK and NA errors don’t offset consistently).
+
+**How to fix**
+- After correcting DK and No answer rows, recompute totals (if you report them) and verify each genre column sums to the correct N.
+
+---
+
+### 4) Missing or extra column categories
+
+**Columns (genres) match exactly**: all 18 genres present, no extras, no missing. ✅  
+No column-name discrepancies detected (e.g., “Classical/Chamber”, “Pop/Easy Listening”, etc. match).
+
+---
+
+## Concrete correction to make Generated match True
+
+1. Keep rows 1–5 as-is (they already match).
+2. Replace the generated “Don’t know much about it” row with the True DK row values for each genre.
+3. Replace the “all 13” row with the True “No answer” row values for each genre.
+4. Retain the mean row (already consistent), optionally round to 2 decimals to match the true table formatting.
+
+If you want, I can rewrite the Generated table into the exact correct Table 3 layout (18 genres × 8 rows) using the True counts.

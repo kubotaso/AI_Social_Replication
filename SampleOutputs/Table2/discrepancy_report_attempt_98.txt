@@ -1,0 +1,175 @@
+Score: 27/100
+============================================================
+
+## 1) Table content mismatch: you reported SEs/p-values and unstandardized b’s, but the “true” table has only standardized betas (and stars)
+
+**Mismatch**
+- **Generated tables include**: `b_unstd`, `p_value`, and computed `stars`, plus `beta_std`.
+- **True Table 2 reports**: **standardized coefficients only** (plus significance markers). **No SEs and no p-values** are available from the table, and unstandardized coefficients are not shown.
+
+**Fix**
+- To match the paper’s Table 2, output **only standardized coefficients** and the star markers **as given** in the table.
+- If you want SEs/p-values, you must re-run the regression on the GSS 1993 microdata with the same sample restrictions and coding; you cannot “extract” SEs from Table 2.
+
+---
+
+## 2) Sample size and fit statistics do not match (major discrepancy)
+
+### Model 1
+**Mismatch**
+- Generated `n = 327`, `R² = 0.1896`, `Adj R² = 0.1639`
+- True `N = 644`, `R² = .145`, `Adj R² = .129`
+
+**Fix**
+- Your analytic sample is about **half** the size it should be. Common causes:
+  1. **Listwise deletion from extra variables** not in Bryson’s model (or additional missing recodes).
+  2. Wrong **year filter** (must be **GSS 1993**).
+  3. Different **age restrictions**, **race coding**, or **income construction** than Bryson.
+  4. Mishandled **missing values** coded as numeric (e.g., 8/9, 98/99, 998/999) rather than NA.
+- Replicate Bryson’s exact inclusion rules, recodes, and missing-data handling. Only then will N and R² align.
+
+### Model 2
+**Mismatch**
+- Generated `n = 308`, `R² = 0.1658`, `Adj R² = 0.1377`
+- True `N = 605`, `R² = .147`, `Adj R² = .130`
+
+**Fix**
+- Same issues as Model 1 (wrong filtering / missing handling / DV construction) plus likely **DV mismatch** (see next section).
+
+---
+
+## 3) Dependent variables are not aligned (your model names suggest different DVs)
+
+**Mismatch**
+- Generated names: `dislike_minority6` and `dislike_other12`
+- True Model 1 DV: **“Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music”**
+- True Model 2 DV: **“Dislike of the 12 remaining genres”**
+
+Even if your DV labels look similar, the *composition* often differs in replications because of:
+- different genre availability/coding in the dataset extract,
+- incorrect mapping of genre items to the “minority 6,”
+- reverse-coding errors (e.g., like vs dislike),
+- counting “neutral/don’t know” incorrectly.
+
+**Fix**
+- Verify the exact six genres used in Model 1 and confirm they match **exactly**: rap, reggae, blues/R&B, jazz, gospel, latin.
+- Ensure the DV is a **count of disliked genres** with the same dislike threshold as Bryson (and same treatment of DK/NA).
+- Ensure Model 2 uses the **other 12 genres** from the same battery, not “whatever remains in your dataset.”
+
+---
+
+## 4) Variable-name alignment: mostly OK, but you have missing categories (NaNs) that should have coefficients
+
+### Hispanic and No religion are missing in both models
+**Mismatch**
+- Generated: `hispanic = NaN` and `no_religion = NaN` (no coefficient/p-value)
+- True table: both **Hispanic** and **No religion** have coefficients in both models.
+
+**Likely causes**
+- Perfect collinearity from dummy coding (e.g., you included all religion dummies plus an intercept).
+- Category absent in your reduced sample due to filtering/missing.
+- Factor reference level confusion.
+
+**Fix**
+- Use **one reference category** per factor (omit one dummy) with an intercept.
+  - Race: include dummies for Black, Hispanic, Other race with **White as reference**.
+  - Religion: include Conservative Protestant and No religion with **other religions as reference** (or whatever Bryson used).
+- Check that Hispanic and no-religion categories exist after cleaning.
+
+---
+
+## 5) Standardized coefficients (betas) do not match the true coefficients (direction, magnitude, and significance)
+
+Below I compare **true standardized coefficients** to your **generated `beta_std`**. (I ignore your unstandardized b’s because the true table doesn’t report them.)
+
+### Model 1 (minority 6)
+
+| Variable | True beta | Generated beta_std | What’s wrong | Fix |
+|---|---:|---:|---|
+| Racism score | +0.130** | +0.139 | Close-ish but stars differ (you have `*`) | Once sample/DV match, the beta and p should align; don’t infer stars from table without re-estimation |
+| Education | -0.175*** | -0.261 | Too negative | sample/DV mismatch; education coding/scale may differ |
+| Income pc | -0.037 | -0.034 | Close | likely improves with correct N |
+| Occ prestige | -0.020 | +0.030 | **Sign flips** | likely wrong prestige measure/coding or wrong sample; check variable construction |
+| Female | -0.057 | -0.026 | Too small in magnitude | sample mismatch/coding of female |
+| Age | +0.163*** | +0.191 | Somewhat high | sample mismatch |
+| Black | -0.132*** | -0.127 | Close but your star is only `*` not `***` | star differences due to wrong N/model; also don’t compare your p-values to table stars unless same model |
+| Hispanic | -0.058 | NaN | missing | fix dummy coding / sample |
+| Other race | -0.017 | +0.004 | wrong sign / near zero | race coding/sample mismatch |
+| Cons Protestant | +0.063 | +0.079 | somewhat high | sample mismatch |
+| No religion | +0.057 | NaN | missing | fix religion coding / sample |
+| South | +0.024 | +0.022 | close | OK |
+
+**Interpretation mismatch (Model 1)**
+- In the true table, racism is **positively associated** with disliking “minority-liked” genres.
+- Your sign is also positive, but because the rest of the model isn’t matched (N, DV, other covariates), you **cannot claim replication**.
+
+### Model 2 (other 12)
+
+| Variable | True beta | Generated beta_std | What’s wrong | Fix |
+|---|---:|---:|---|
+| Racism score | +0.080 | -0.005 | **Sign flips and near zero** | DV/sample mismatch; potentially racism scale reversed or constructed differently |
+| Education | -0.242*** | -0.224 | Close-ish | would likely align with correct sample |
+| Income pc | -0.065 | -0.095 | too negative | income construction differs (per capita, log, trimming) |
+| Occ prestige | +0.005 | -0.012 | sign flips (small) | prestige variable mismatch |
+| Female | -0.070 | -0.091 | somewhat stronger | sample mismatch |
+| Age | +0.126** | +0.091 | too small | sample mismatch |
+| Black | +0.042 | +0.112 | much larger | race coding / sample mismatch |
+| Hispanic | -0.029 | NaN | missing | fix dummy coding/sample |
+| Other race | +0.047 | +0.132 | much larger | sample mismatch/coding |
+| Cons Protestant | +0.048 | +0.080 | higher | sample mismatch |
+| No religion | +0.024 | NaN | missing | fix religion coding/sample |
+| South | +0.069 | +0.142 | much larger | sample mismatch |
+
+**Interpretation mismatch (Model 2)**
+- True table: racism is **positive but not significant** (+0.080).
+- Your generated output: racism is ~0 and negative. This is not a “small discrepancy”; it indicates the model you estimated is not the same (or the racism scale is reversed / DV is different).
+
+---
+
+## 6) Constants do not match (and shouldn’t be compared if models/scales differ)
+
+**Mismatch**
+- Model 1 constant: Generated 2.654 vs True 2.415***
+- Model 2 constant: Generated 5.674 vs True 7.860
+
+**Fix**
+- Constants will only match if:
+  - DV is identically constructed (same count range and missing handling),
+  - covariates are identically coded,
+  - and the same sample is used.
+- Also note: the “true” table lists a constant of 7.860 without stars; your star logic is based on p-values you computed from a different model.
+
+---
+
+## 7) You are mixing “replication of Table 2” with a different reporting format
+
+**Mismatch**
+- You’re presenting a modern regression table (unstd b, standardized beta, p-values).
+- The paper’s table is standardized betas only.
+
+**Fix**
+- Decide on one target:
+  1. **To match Table 2 exactly**: report **only standardized betas** and use **the paper’s stars**.
+  2. **To produce your own full regression output**: re-estimate with microdata and then you may report unstandardized b, SE, p-values—but then you must **stop calling it identical to Table 2** unless the betas/N/R² match.
+
+---
+
+## Checklist to make the generated analysis match the true results
+
+1. **Data**: Use **GSS 1993** only, same weights (if any) as Bryson, and same exclusions.
+2. **Missing values**: Convert all GSS special codes to NA before modeling.
+3. **DV construction**:
+   - Model 1 count = exactly those 6 genres.
+   - Model 2 count = exactly the other 12 genres.
+   - Same dislike threshold and DK handling as Bryson.
+4. **Predictor coding**:
+   - Racism score: confirm direction (higher = more racist) and same scale construction.
+   - Income per capita: match Bryson’s construction (and whether it’s logged, standardized, etc.).
+   - Occ prestige: match the exact prestige variable and coding.
+   - Race and religion: dummy code with a clear reference group; avoid collinearity.
+5. **Estimation and output**:
+   - Standardize variables (or request standardized coefficients from the model) to reproduce betas.
+   - Report N, R², Adj R² and confirm they match (.145/.129; .147/.130).
+6. **Only after all above match**: compare significance; otherwise p-values/stars will diverge.
+
+If you share your codebook mappings for the 18 genre items and how you constructed “racism_score,” I can pinpoint which specific recode is most likely causing the sign flip for racism in Model 2 and the loss of all Hispanic/no-religion coefficients.

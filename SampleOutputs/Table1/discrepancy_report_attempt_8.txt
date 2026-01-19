@@ -1,0 +1,165 @@
+Score: 18/100
+============================================================
+
+## 1) Fit statistics: n, R², adjusted R² (major mismatches)
+
+### Model 1 (SES)
+- **n mismatch:** Generated **793** vs True **787**
+  - **Fix:** Use the same analytic sample as the paper (listwise deletion on exactly the variables in Model 1, and same GSS 1993 subset/weights if used). Your `model_frames` shows 793 rows—so you’re including cases the paper excluded (often due to different missing-value recodes, different year filter, or different income/prestige availability rules).
+
+- **R² / Adj R²:** Generated **0.107613 / 0.104220** vs True **0.107 / 0.104**
+  - This is essentially consistent (rounding differences), assuming you correct **n**.
+
+### Model 2 (Demographic)
+- **n mismatch (extreme):** Generated **37** vs True **756**
+- **R² mismatch:** Generated **0.489** vs True **0.151**
+- **Adj R² mismatch:** Generated **0.343** vs True **0.139**
+  - **Fix:** Your Model 2 is clearly being estimated on a tiny, highly selected subset. In your `model_frames`, Model 2 has **37 rows** and variables like `hispanic`, `otherrace`, `norelig` end up **NaN** in the coefficient table—classic symptoms of:
+    1) **incorrect missing-value handling** (e.g., treating many valid codes as missing or dropping most rows),
+    2) **bad merges/filters** (e.g., accidentally restricting to respondents with a rare pattern),
+    3) **perfect collinearity / no variance** in some dummies after filtering.
+  - Concretely: ensure you recode GSS missing codes (e.g., 8/9/98/99 etc.) to NA **correctly**, *but not over-aggressively*, and that you’re not filtering to only complete cases on variables that the paper did **not** require to be present (or requiring political intolerance already in Model 2 by mistake).
+
+### Model 3 (Political intolerance)
+- **n mismatch (extreme):** Generated **19** vs True **503**
+- **R² mismatch:** Generated **0.588** vs True **0.169**
+- **Adj R² mismatch:** Generated **0.176** vs True **0.148**
+  - **Fix:** Same root cause as Model 2, plus you’re likely constructing `pol_intol` in a way that makes almost everyone missing (your frame has only 19 complete cases).
+
+---
+
+## 2) Variable names: mismatches / likely coding problems
+
+### Education, income, prestige
+- Generated uses: `educ_yrs`, `inc_pc`, `prestg80`
+- True table labels: Education, Household income per capita, Occupational prestige
+  - **Not inherently wrong**, but you must confirm they correspond exactly to the paper’s operationalization:
+    - **Education**: years of schooling? (ok if paper uses that)
+    - **Income per capita**: must be *household income / household size* with consistent income coding and equivalence scale (paper likely uses a specific approach)
+    - **Prestige**: likely NORC prestige score (1980-based)
+  - **Fix:** Verify construction matches the paper. Even small differences in `inc_pc` construction can change coefficients materially.
+
+### Race/ethnicity dummies
+- Generated has `black`, `hispanic`, `otherrace`
+- In generated results, `hispanic` and `otherrace` are **NaN** coefficients (Models 2 & 3).
+  - **Interpretation mismatch:** In the true results, Hispanic and Other race have **actual coefficients** in both models.
+  - **Fix:** Your dummies likely have **no variation** in the tiny sample (n=37 / 19) or are being dropped due to collinearity. Once you fix the sample size issue, this should resolve. Also confirm coding:
+    - race categories must be mutually exclusive and based on the same GSS variables as the paper.
+    - avoid coding Hispanic as separate *and* also including as part of race categories unless that’s how paper does it.
+
+### Religion
+- Generated includes `cons_prot` and `norelig`, but `norelig` becomes **NaN** in Models 2 & 3.
+  - **Fix:** Same: sample restriction + possibly wrong recode. Make sure “no religion” is coded correctly and not accidentally all 0/NA after filtering.
+
+---
+
+## 3) Coefficients (direction and magnitude): pervasive mismatches
+
+Important: the paper reports **standardized β** (except constant). Your generated table looks like **unstandardized OLS slopes** (and you’re also showing p-values/SEs). Even if you standardized, the signs in your Models 2–3 are often wrong, indicating deeper issues than scaling.
+
+### Model 1
+Compare (Generated vs True):
+- **Education:** -0.3297 vs -0.322 (**close**)
+- **Income per capita:** -0.0336 vs -0.037 (**close**)
+- **Prestige:** +0.0291 vs +0.016 (difference, but same sign and small)
+- **Constant:** 10.833 vs 10.920 (close)
+  - **Main fixes for Model 1:** match n=787; ensure coefficients are **standardized** if you want to match the paper’s β exactly.
+
+### Model 2 (Generated is totally inconsistent with True)
+True signs (Model 2):  
+Education (-), income (-), prestige (-), female (-), age (+), black (+ small), hispanic (- small), otherrace (+ tiny), cons_prot (+), norelig (- tiny), south (+)
+
+Generated signs (Model 2):
+- **Education:** -0.7956 (huge negative; true is -0.246)
+- **Income:** +0.1823 (**wrong sign**; true is -0.054)
+- **Prestige:** +0.4255 (**wrong sign**; true is -0.006)
+- **Female:** +0.0766 (**wrong sign**; true is -0.083)
+- **Age:** -0.0183 (**wrong sign**; true is +0.140)
+- **South:** +0.224 (sign matches, magnitude too large)
+- `hispanic`, `otherrace`, `norelig` are NaN (should exist)
+
+**Fixes:**
+1) **Fix the sample construction** (this is the biggest issue; with n=37 you can get arbitrary sign flips).
+2) **Standardize predictors and outcome** (or at least predictors) to match standardized β reporting:
+   - Typically: `beta = b * (SD_x / SD_y)` if model is unstandardized.
+   - Or run regression on standardized variables (except constant).
+3) **Confirm age coding** (years; not categories reversed).
+4) **Confirm female coding** (1=female, 0=male as in paper; if reversed you’d flip sign).
+5) **Confirm prestige/income scaling** (log vs raw; per-capita computation).
+
+### Model 3 (Generated also inconsistent with True)
+True key patterns: education negative; political intolerance positive and significant; age positive; female negative.
+
+Generated:
+- **Political intolerance (`pol_intol`)**: +0.313 but **p=0.519** (true: +0.164***)
+- **Age:** +0.148 but NS (true: +0.110*)
+- **Female:** +0.206 (**wrong sign**; true: -0.095*)
+- **Income:** +0.207 (**wrong sign**; true: -0.009)
+- **Prestige:** +0.511 (**wrong sign**; true: -0.022)
+- **Constant:** -7.185 (wildly different from +6.516)
+
+**Fixes:**
+- Again: **sample size** (n=19 is unusable here).
+- **Make political intolerance measure match the paper** (same items, same scaling, same direction). Your `pol_intol` ranges up to at least 15 in the frame; the paper’s scale might differ. If your scale is different, standardized β can still match—but only if the *sample and items* match.
+- **Standardize** to compare to β table.
+- Check dummy codings (female, south, religion, race) for reversals.
+
+---
+
+## 4) Standard errors and p-values: interpretation mismatch with the paper
+
+- **Paper:** standardized β and **significance stars only**; **no SEs** in the table.
+- **Generated:** p-values and (implicitly) model-based SEs (though not printed).
+  - **Mismatch:** You can’t “match” SEs because the true table doesn’t report them.
+  - **Fix:** If your goal is to reproduce the paper’s table:
+    - report **standardized β** and stars using the same p-thresholds;
+    - omit SEs (or compute them but don’t claim they were “true SEs from Table 1”).
+
+Also, with your tiny n in Models 2–3, p-values are meaningless relative to the paper.
+
+---
+
+## 5) Missingness audit: indicates recoding/filter problems
+
+Your missingness audit shows some variables have **~1500 missing out of 1606**, implying you recoded most values to missing (or imported only a small fraction correctly). That aligns with Models 2 and 3 collapsing to n=37 and n=19.
+
+**Fix:**
+- Revisit every variable’s missing-value codes. In GSS, many variables use special codes (e.g., 0/8/9, 98/99) that differ by variable.
+- Ensure you are not:
+  - treating valid category codes as missing,
+  - applying the missing-code map from one variable to another,
+  - dropping rows globally before building model-specific frames.
+
+---
+
+## 6) What you should change to make the generated analysis match the true results
+
+1) **Recreate the exact analytic samples per model**
+   - Model 1 should yield **n=787**, Model 2 **n=756**, Model 3 **n=503**.
+   - Implement **model-specific listwise deletion**: for Model k, drop only cases missing on DV + variables in that model.
+   - Do *not* pre-drop using variables that appear only in later models.
+
+2) **Recode missing values correctly for each GSS item**
+   - Build a per-variable recode dictionary (do not reuse one blanket rule).
+   - Verify post-recode nonmissing counts look plausible (hundreds, not tens).
+
+3) **Compute standardized coefficients (β)**
+   - Either:
+     - standardize all predictors and outcome (z-scores) before OLS (then coefficients are standardized and constant becomes ~0, which would **not** match the paper’s constant), **or**
+     - run OLS on raw variables and convert slopes to standardized β via:  
+       \[
+       \beta_j = b_j \cdot \frac{\mathrm{SD}(x_j)}{\mathrm{SD}(y)}
+       \]
+     - Keep the **constant unstandardized** to match the paper.
+
+4) **Verify coding direction for key dummies**
+   - `female`: ensure 1=female.
+   - `south`: ensure 1=South.
+   - `cons_prot`, `norelig`: ensure 1=member of that group.
+   - Race/ethnicity: ensure consistent mutually exclusive categories.
+
+5) **Verify political intolerance scale construction**
+   - Same items, same inclusion rules, same coding direction, same index construction as the paper.
+   - After construction, check distribution and missingness—should retain ~503 cases when combined with other Model 3 variables, not 19.
+
+If you paste the code you used to (a) recode missing values and (b) build `inc_pc` and `pol_intol`, I can point to the exact line(s) that are causing the sample to collapse and the signs to flip.
