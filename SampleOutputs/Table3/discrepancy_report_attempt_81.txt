@@ -1,0 +1,185 @@
+Score: 60/100
+============================================================
+
+## 1) Row items/categories mismatches
+
+### A. Missing attitude rows in the Generated Results
+Your generated table **omits** two response categories that are present in the true table:
+
+- **(M) Don’t know much about it**
+- **(M) No answer**
+
+In the generated output, these rows exist but are incorrectly filled with **all zeros** across every genre.
+
+**How to fix**
+- Populate these two rows with the **true counts** for each genre (listed in the True Results panels).
+- Do **not** treat them as 0 unless you truly filtered them out earlier (and if you did, you must also recompute totals and means accordingly).
+
+### B. Column header/category mismatch: “New Age/Space Opera”
+In the generated header, you have a single column labeled:
+
+- **“New Age/Space Opera”**
+
+But the true table has **two separate genres/columns**:
+
+- **New Age/Space**
+- **Opera**
+
+In the true results, “Opera” is its own column with its own frequency distribution and mean.
+
+**How to fix**
+- Split the generated combined column into **two columns**:
+  - “New Age/Space”
+  - “Opera”
+- Then insert the correct counts for both columns (see Panel 2).
+
+### C. Column count mismatch
+Because of the mistaken merge of “New Age/Space” + “Opera”, the generated table has **17 genre columns** instead of the **18** in the true table.
+
+**How to fix**
+- Add the missing **Opera** column (and rename New Age appropriately), restoring 18 genre columns.
+
+---
+
+## 2) Frequency count mismatches
+
+### A. All “Don’t know much about it” counts are wrong (zeros vs true values)
+Generated: 0 for every genre  
+True: nonzero for every genre.
+
+**True “Don’t know much about it” counts** (must replace the 0s):
+
+**Panel 1**
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+
+**Panel 2**
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+
+**Panel 3**
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+**How to fix**
+- Fill these exact values into the “(M) Don’t know much about it” row.
+
+### B. All “No answer” counts are wrong (zeros vs true values)
+Generated: 0 for every genre  
+True: small nonzero values.
+
+**True “No answer” counts** (must replace the 0s):
+
+**Panel 1**
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+
+**Panel 2**
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+
+**Panel 3**
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+**How to fix**
+- Fill these exact values into the “(M) No answer” row.
+
+### C. Other attitude category counts (1–5) appear to match
+For the five substantive attitude rows:
+- (1) Like very much
+- (2) Like it
+- (3) Mixed feelings
+- (4) Dislike it
+- (5) Dislike very much
+
+…the generated counts match the true table **for every genre that exists in both tables**, including the values shown for New Age and Opera separately in the true table. The only problem is your **column naming/merging** (“New Age/Space Opera”) and the **missing M rows data**.
+
+---
+
+## 3) Summary statistics mismatches (Means, totals, etc.)
+
+### A. Means row: values match, but the column structure is wrong
+The **mean values shown** in the generated table match the true means for:
+- Latin/Salsa (3.14), Jazz (2.61), Blues/R&B (2.50), Show Tunes (2.59), Oldies (2.25), Classical/Chamber (2.67),
+- Reggae (3.15), Swing/Big Band (2.45),
+- New Age/Space (3.68), Opera (3.48),
+- Bluegrass (2.67), Folk (2.76),
+- Pop/Easy Listening (2.41), Contemporary Rock (2.67), Rap (3.92), Heavy Metal (4.12), Country/Western (2.32), Gospel (2.39).
+
+But because you **combined New Age/Space and Opera into one header**, the table is structurally inconsistent: it *looks* like there is one column, but you are actually presenting **two different mean values (3.68 and 3.48) that belong to two different true columns**.
+
+**How to fix**
+- Separate the “New Age/Space Opera” column into:
+  - “New Age/Space” with mean **3.68**
+  - “Opera” with mean **3.48**
+- Ensure each mean sits under the correct column.
+
+### B. Missing “percentages” in the generated output
+Your prompt asks to compare “frequency counts or percentages,” but:
+- The **true table provides counts only** (no percents shown).
+- The **generated table also provides counts only**.
+
+So there’s no percent mismatch per se—but if your generated analysis *claimed* percentages elsewhere, you’d need to compute them using the correct denominators (including or excluding missing categories consistently).
+
+**How to fix (if percentages are required)**
+- Decide denominator rule:
+  - **Include missing categories**: denominator = total N for that genre (including DK + NA)
+  - **Exclude missing categories**: denominator = N minus (DK + NA)
+- Then compute percentages consistently for every cell.
+
+---
+
+## 4) Missing/extra column categories
+
+### A. Missing “Opera” as its own genre column
+- True table includes **Opera** as a separate column.
+- Generated table does not (it is merged into “New Age/Space Opera”).
+
+**How to fix**
+- Add “Opera” as its own column with the true counts and mean.
+
+### B. Incorrect column label for “New Age/Space”
+Generated uses “New Age/Space Opera” (incorrect).  
+True uses “New Age/Space” (and separately “Opera”).
+
+**How to fix**
+- Rename to exactly match true categories:
+  - “New Age/Space”
+  - “Opera”
+
+---
+
+## Net: What to change so Generated matches True exactly
+
+1. **Split** the combined “New Age/Space Opera” into **two columns**: “New Age/Space” and “Opera”.
+2. Replace the all-zero **(M) Don’t know much about it** row with the true counts for each genre.
+3. Replace the all-zero **(M) No answer** row with the true counts for each genre.
+4. Keep the (1)–(5) rows as-is (they already match).
+5. Keep the means as-is **but** place them under the correctly separated “New Age/Space” and “Opera” columns.
+
+If you want, I can rewrite the full corrected generated table in the same single-panel format as your Generated Results (18 columns, all 7 rows + mean).

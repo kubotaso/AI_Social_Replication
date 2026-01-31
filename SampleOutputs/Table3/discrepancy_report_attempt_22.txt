@@ -1,0 +1,151 @@
+Score: 65/100
+============================================================
+
+## 1) Row items/categories: mismatches (missing rows)
+
+### Problem
+Your **Generated Results** table includes these attitude rows:
+
+- (1) Like very much  
+- (2) Like it  
+- (3) Mixed feelings  
+- (4) Dislike it  
+- (5) Dislike very much  
+- (M) Don’t know much about it → **all zeros**
+- (M) No answer → **all zeros**
+- Mean
+
+In the **True Results**, both **(M) Don’t know much about it** and **(M) No answer** are **nonzero for every genre**.
+
+So the generated table is **missing the correct “M” frequency distributions** (it has the rows, but they’re filled with incorrect values—zeros—effectively omitting those categories from the analysis).
+
+### Fix
+Populate the two “M” rows with the true counts for each genre (listed below in §2). Do **not** force them to 0, and do **not** drop them during tabulation.
+
+Common causes to correct:
+- Missing values were recoded to 0 or excluded before tabulation.
+- “Don’t know”/“No answer” were treated as NA and then counts were computed with `na.rm`/complete cases only.
+- Your frequency routine only tabulated levels 1–5 and ignored non-substantive codes.
+
+---
+
+## 2) Frequency count mismatches (by row/genre)
+
+All counts for response categories (1)–(5) **match perfectly** between generated and true tables for all genres.
+
+The **only frequency mismatches** are the two “M” rows, where the generated table reports **0 everywhere**, but the true table has the following values:
+
+### (M) Don’t know much about it — TRUE counts (should replace zeros)
+
+**Panel 1 genres**
+- Latin/Salsa: **221**
+- Jazz: **38**
+- Blues/R&B: **56**
+- Show Tunes: **77**
+- Oldies: **41**
+- Classical/Chamber: **66**
+
+**Panel 2 genres**
+- Reggae: **295**
+- Swing/Big Band: **164**
+- New Age/Space: **292**
+- Opera: **83**
+- Bluegrass: **163**
+- Folk: **78**
+
+**Panel 3 genres**
+- Pop/Easy Listening: **72**
+- Contemporary Rock: **50**
+- Rap: **61**
+- Heavy Metal: **70**
+- Country/Western: **22**
+- Gospel: **35**
+
+### (M) No answer — TRUE counts (should replace zeros)
+
+**Panel 1 genres**
+- Latin/Salsa: **12**
+- Jazz: **15**
+- Blues/R&B: **12**
+- Show Tunes: **14**
+- Oldies: **10**
+- Classical/Chamber: **11**
+
+**Panel 2 genres**
+- Reggae: **11**
+- Swing/Big Band: **12**
+- New Age/Space: **14**
+- Opera: **13**
+- Bluegrass: **11**
+- Folk: **12**
+
+**Panel 3 genres**
+- Pop/Easy Listening: **13**
+- Contemporary Rock: **12**
+- Rap: **11**
+- Heavy Metal: **10**
+- Country/Western: **10**
+- Gospel: **12**
+
+### Percentages
+Neither table shows percentages, so there are **no percentage mismatches to report**.  
+If you compute percentages later, make sure your denominator includes these “M” categories **if** the true table’s percentages do. (The published table is counts; many analyses compute percents excluding missing—be explicit.)
+
+---
+
+## 3) Column category mismatches (missing/extra/incorrect columns)
+
+### Problem: incorrect column name structure
+In the **Generated Results**, you have a single column labeled:
+
+- **“New Age/Space Opera”** (combined)
+
+But the **True Results (Panel 2)** has **two separate columns**:
+- **New Age/Space**
+- **Opera**
+
+So the generated output has a **column-category mismatch**: it merged two genres into one column label, even though the underlying numbers appear to be presented as if there are still two separate columns (48/73, 186/257, etc.).
+
+### How to see it clearly
+In your generated header you show “… New Age/Space Opera Bluegrass …”, but the body has **two adjacent sets of counts** that match the true table’s **New Age/Space** and **Opera** columns:
+
+Example (Like very much):
+- True: New Age/Space = 48, Opera = 73  
+- Generated row shows “… 48 73 …” (so the data are there), but the header labels them as one merged heading.
+
+### Fix
+Split/rename the columns correctly:
+- Create two distinct columns: **“New Age/Space”** and **“Opera”**
+- Ensure the header aligns with the two separate variables/genres.
+
+This is usually caused by:
+- A formatting/printing issue where two adjacent column names were concatenated.
+- A parsing step that joined headers with whitespace or removed a delimiter.
+
+---
+
+## 4) Summary statistics mismatches (means, totals, etc.)
+
+### Means
+All **Mean** values in the generated table match the true table **exactly** for every genre.
+
+### Totals / implied N
+Even though means match, the generated table’s zero “M” counts imply a smaller total N per genre than the true table. The generated output does **not** display totals, but it is still a discrepancy in the underlying frequency distribution.
+
+### Fix
+Once you add the correct “M” counts, your total N per genre will align with the true table’s total (which is the sum of all 7 attitude rows per genre: 1–5 + DK + NA).
+
+---
+
+## 5) What to change in the generated analysis so it matches the true table
+
+1. **Do not drop or recode “Don’t know much about it” and “No answer” to 0 or NA before counting.**  
+   - Keep them as explicit categories in the factor/labels.
+
+2. **Tabulate all response codes present in the source (1–5 plus the two missing categories).**  
+   - Ensure your frequency table includes those levels even if some genres have small counts.
+
+3. **Correct the column headings so “New Age/Space” and “Opera” are separate genres.**  
+   - Verify you are not concatenating adjacent headers during output formatting.
+
+If you tell me what software/code produced the “Generated Results” (R, Stata, SPSS, Python/pandas, etc.) and the original coding for the attitude items (e.g., 1–5 plus 8/9 or 0/9), I can give an exact recode/tabulation snippet that will reproduce the true table.

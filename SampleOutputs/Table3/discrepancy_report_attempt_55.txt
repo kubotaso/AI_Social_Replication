@@ -1,0 +1,148 @@
+Score: 62/100
+============================================================
+
+### 1) Row items/categories mismatches
+
+**A. “(M) No answer” row is wrong (all zeros)**
+- **Generated:** `(M) No answer` is `0` for every genre.
+- **True:** Nonzero “No answer” counts exist for **all** genres (10–15 depending on genre).
+- **Fix:** Replace the generated “(M) No answer” row with the true counts (listed under section 2).
+
+**B. Column/category structure error: “Opera” is incorrectly merged into “New Age/Space Opera”**
+- **Generated column header:** `New Age/Space Opera` (one combined column).
+- **True table:** **Two separate columns**: `New Age/Space` and `Opera`.
+- **Fix:** Split that generated column into **two distinct variables/columns**:
+  - `New Age/Space`
+  - `Opera`
+  and then assign each the correct frequency distribution.
+
+**C. Missing column due to the merge**
+- Because “New Age/Space” and “Opera” are merged, the generated output effectively has **17 distinct genre columns**, while the true table has **18**.
+- **Fix:** Add the missing separate `Opera` column (and rename the other one to `New Age/Space`).
+
+---
+
+### 2) Frequency count mismatches (cell-by-cell)
+
+All categories match **except** the two “missing-data” rows: **Don’t know much about it** and **No answer**. Everything else ((1)–(5)) matches the true table.
+
+Below are the exact mismatches and what they must be changed to.
+
+#### Panel 1 genres
+
+**Latin/Salsa**
+- Don’t know: **Generated 233** vs **True 221** → change to **221**
+- No answer: **Generated 0** vs **True 12** → change to **12**
+
+**Jazz**
+- Don’t know: **53** vs **38** → change to **38**
+- No answer: **0** vs **15** → change to **15**
+
+**Blues/R&B**
+- Don’t know: **68** vs **56** → change to **56**
+- No answer: **0** vs **12** → change to **12**
+
+**Show Tunes**
+- Don’t know: **91** vs **77** → change to **77**
+- No answer: **0** vs **14** → change to **14**
+
+**Oldies**
+- Don’t know: **51** vs **41** → change to **41**
+- No answer: **0** vs **10** → change to **10**
+
+**Classical/Chamber**
+- Don’t know: **77** vs **66** → change to **66**
+- No answer: **0** vs **11** → change to **11**
+
+#### Panel 2 genres
+
+**Reggae**
+- Don’t know: **306** vs **295** → change to **295**
+- No answer: **0** vs **11** → change to **11**
+
+**Swing/Big Band**
+- Don’t know: **176** vs **164** → change to **164**
+- No answer: **0** vs **12** → change to **12**
+
+**New Age/Space**
+- Don’t know: **306** vs **292** → change to **292**
+- No answer: **0** vs **14** → change to **14**
+
+**Opera**
+- This is currently *not a separate column* in the generated output.
+- True values that must appear under an **Opera** column:
+  - Don’t know: **83**
+  - No answer: **13**
+
+**Bluegrass**
+- Don’t know: **174** vs **163** → change to **163**
+- No answer: **0** vs **11** → change to **11**
+
+**Folk**
+- Don’t know: **90** vs **78** → change to **78**
+- No answer: **0** vs **12** → change to **12**
+
+#### Panel 3 genres
+
+**Pop/Easy Listening**
+- Don’t know: **85** vs **72** → change to **72**
+- No answer: **0** vs **13** → change to **13**
+
+**Contemporary Rock**
+- Don’t know: **62** vs **50** → change to **50**
+- No answer: **0** vs **12** → change to **12**
+
+**Rap**
+- Don’t know: **72** vs **61** → change to **61**
+- No answer: **0** vs **11** → change to **11**
+
+**Heavy Metal**
+- Don’t know: **80** vs **70** → change to **70**
+- No answer: **0** vs **10** → change to **10**
+
+**Country/Western**
+- Don’t know: **32** vs **22** → change to **22**
+- No answer: **0** vs **10** → change to **10**
+
+**Gospel**
+- Don’t know: **47** vs **35** → change to **35**
+- No answer: **0** vs **12** → change to **12**
+
+---
+
+### 3) Summary statistics mismatches (means, totals, etc.)
+
+**Means: appear correct for all shown genres.**
+- Every mean printed in the generated table matches the true table **for the corresponding genre**.
+
+**However, the “New Age/Space Opera” mean is structurally wrong**
+- In the true table, the means are:
+  - New Age/Space: **3.68**
+  - Opera: **3.48**
+- In generated, you list:
+  - `New Age/Space Opera` mean = **3.68**
+  - and there is **no separate Opera mean**
+- **Fix:** Split the column. Keep **3.68** under `New Age/Space` and add **3.48** under `Opera`.
+
+**Implicit totals / N consistency**
+- Because “Don’t know” and “No answer” are wrong, your **column totals (sample size per genre)** won’t match the true table’s implied N distribution.
+- **Fix:** Correct the two missing-data rows and ensure each genre’s column sums to the same total as the true table (typically 1600 in these panels when summed).
+
+---
+
+### 4) Missing or extra column categories
+
+- **Extra/incorrect:** `New Age/Space Opera` (combined label) — should not exist.
+- **Missing:** `Opera` as its own genre column.
+- **Fix:** Rename and split:
+  - `New Age/Space Opera` → `New Age/Space`
+  - Add separate `Opera` column with its true frequencies and mean.
+
+---
+
+### What to change so the generated matches the true table (checklist)
+
+1. **Replace all “(M) No answer” zeros** with the true nonzero values for each genre.
+2. **Correct all “(M) Don’t know much about it” counts** to match the true table for each genre.
+3. **Split “New Age/Space Opera” into two columns** (`New Age/Space` and `Opera`) and populate each with the true distributions and means.
+4. Recompute/verify **column totals (N)** after fixing missing-data rows; they should align with the true table’s implied totals.

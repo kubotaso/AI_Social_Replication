@@ -1,0 +1,14 @@
+[RuntimeError] The column label 'genre' is not unique.
+Traceback (most recent call last):
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Figure1.py", line 255, in try_run_generated_code
+    result = mod.run_analysis(str(data_path))  # type: ignore[attr-defined]
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260130_222138/Figure1/generated_analysis_retry_9.py", line 308, in run_analysis
+    res = res.sort_values("genre").reset_index(drop=True)
+          ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/frame.py", line 7211, in sort_values
+    k = self._get_label_or_level_values(by[0], axis=axis)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/generic.py", line 1928, in _get_label_or_level_values
+    raise ValueError(
+        f"The {label_axis_name} label '{key}' is not unique.{multi_message}"
+    )
+ValueError: The column label 'genre' is not unique.

@@ -1,129 +1,99 @@
-## Figure 1 — exact construction steps (from Bryson 1996)
+## Figure 1 — exact construction steps (what to compute)
 
-### Data source
-- **1993 General Social Survey (GSS)** culture module.
-- Musical taste items: **18 music genres**, each rated on a **5-point Likert** scale from *“like very much”* to *“dislike very much”*, plus “don’t know much about it”/no answer.
+### Data source / sample
+- **Source:** 1993 **General Social Survey (GSS)** culture module (NORC), noninstitutionalized U.S. adults.
+- **Music taste items:** ratings for **18 music genres** on a **5-point Likert scale** (“like very much” … “dislike very much”) plus “don’t know much about it” and “no answer”.
+- **Case handling for “dislike” measures:** For the *overall exclusiveness* scale earlier in the paper, “don’t know” is treated as missing and cases with any missing are dropped; for **Figure 1**, the author does not restate the exact N, but the figure’s regressions use the subset with nonmissing for:
+  - the dependent genre’s dislike indicator,
+  - education,
+  - and the tolerance count (which itself depends on observed like/dislike info for the other 17 genres).
 
-### Core variables used in Figure 1
-
-#### 1) Genre-specific dependent variable (18 separate outcomes)
+### Step A — Define “dislike” for each genre (binary DV per regression)
 For each genre \(g\):
-- Create a binary variable **Dislike\_g**:
-  - **1** if respondent answered **“dislike it”** or **“dislike very much”**
-  - **0** otherwise (i.e., like very much / like it / mixed feelings)
-- (The paper treats “don’t know” as missing in earlier analyses; for Figure 1, the logistic models are described without additional missing-data detail beyond standard GSS use. To reproduce exactly, you must mirror the author’s handling: respondents must have valid data for the dependent genre, education, and the tolerance index defined below.)
+- Create \(D_g = 1\) if respondent answered **“dislike” or “dislike very much”** for genre \(g\).
+- Create \(D_g = 0\) otherwise (i.e., “like very much”, “like it”, or “mixed feelings”).
+- Treat “don’t know much about it” and “no answer” as **missing** (excluded from that genre’s regression).
 
-#### 2) “Musical tolerance” regressor (varies by genre)
-For each genre \(g\), define a respondent’s **musical tolerance score excluding \(g\)** as:
+### Step B — Construct “musical tolerance” predictor used in Figure 1
+The paper’s global exclusiveness is a count of dislikes across 18 genres. Figure 1 uses its complement:
+
+For each regression where the dependent variable is genre \(g\), construct:
+- \(T_{-g} =\) **number of genres not disliked**, **excluding genre \(g\)**.
+  - Operationally, across the other 17 genres \(j \neq g\), count 1 when respondent is **not** in “dislike”/“dislike very much” for \(j\).
+  - This is described as: “**number of genres not disliked, excluding the dependent variable**.”
+- This makes \(T_{-g}\) the **reverse of the exclusiveness score minus the dependent variable**.
+
+### Step C — Control variable
+- **Education**: **years of education** (continuous), included as the only control in each regression.
+
+### Step D — Estimate 18 logistic regressions and extract the tolerance coefficient
+For each genre \(g\), estimate a logistic regression:
 
 \[
-Tolerance_{-g} = \#\{\text{genres not disliked}\} \text{ across the other 17 genres}
+\log \left(\frac{\Pr(D_g=1)}{1-\Pr(D_g=1)}\right) = \alpha_g + \beta_g \, T_{-g} + \gamma_g \, \text{Education}
 \]
 
-where “not disliked” means the respondent did **not** answer “dislike” or “dislike very much” on that genre.
+- Extract \(\beta_g\): “**coefficients represent the effects of being musically tolerant … from logistic regression equations where disliking each genre is the dependent variable and education is controlled**.”
+- The paper notes: **All \(\beta_g\) are significant at \(p < .0001\)**.
 
-The article describes this equivalently as:
-- “the number of genres **not disliked**, excluding the dependent variable”
-- and notes it is “the reverse of the exclusiveness score **minus the dependent variable**.”
-
-#### 3) Education control
-- **Years of education** (continuous), included as the **only control** in each genre-specific model.
-
-#### 4) Mean education of “genre audience” (for the second plotted series)
+### Step E — Compute “mean education of genre audience” (the second series)
 For each genre \(g\):
-- Identify **respondents who reported liking the genre** (wording: “reported liking that genre”).
-  - Operationalization consistent with the GSS item: *“like very much”* or *“like it”* (the paper does not explicitly state whether “mixed feelings” is included; the phrase “reported liking” implies categories 1–2 only).
+- Identify the **genre audience** = respondents who reported **liking** that genre (the paper says “reported liking that genre”; based on the Likert options, this most naturally corresponds to responses **(1) Like very much** or **(2) Like it**; “mixed feelings” is not “liking”).
 - Compute:
-\[
-MeanEduAudience_g = \text{mean(education in years among likers of genre } g)
-\]
+  - \(\overline{Edu}_g =\) **mean years of education among the genre’s audience**.
 
-### Statistical method used to generate the plotted coefficients (key element)
-For each genre \(g\), run a **logistic regression**:
+### Step F — Order genres on the x-axis
+- **Rank genres by \(\beta_g\)** (the tolerance coefficient) and place them left-to-right accordingly:
+  - Left = genres **least often disliked** by tolerant respondents (i.e., \(\beta_g\) closest to 0, least negative).
+  - Right = genres **most likely to be rejected** by tolerant respondents (i.e., \(\beta_g\) most negative).
 
-- Outcome: **Dislike\_g**
-- Predictors:
-  - **\(Tolerance_{-g}\)** (as defined above)
-  - **Education (years)**
+(As shown in the figure, the order is: **Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk, Reggae, Easy Listening, Pop/Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel**.)
 
-The figure plots, for each genre, the **log-odds coefficient** on \(Tolerance_{-g}\):
+---
 
-\[
-\beta_g = \text{coef}(Tolerance_{-g})
-\]
+## Plotting details needed to reproduce Figure 1
 
-Notes stated in the figure:
-- “Coefficients represent the effects of being musically tolerant … from logistic regression equations where disliking each genre is the dependent variable and education is controlled.”
-- “**All coefficients are significant at \(p < .0001\)**.”
+### Geometry / series
+- Two **connected line series** plotted against the same ordered genre x-axis:
+  1. **Tolerance coefficient series** (\(\beta_g\)) — plotted as a line (shown with a distinct line style; visually appears dotted/segmented in the scan).
+  2. **Mean education of genre audience** (\(\overline{Edu}_g\)) — plotted as a second line (visually a solid line).
 
-### Ordering/ranking of genres on the x-axis (crucial)
-- Genres are **ranked (sorted)** by the **size of the musical tolerance coefficient** \(\beta_g\).
-  - All \(\beta_g\) are negative, so “least often disliked by tolerant respondents” corresponds to coefficients **closest to 0** (least negative), appearing on the **left**.
-  - More excluded by tolerant respondents = **more negative** coefficients, appearing on the **right**.
+### Axes
+- **X-axis:** categorical genres in the ranked order above; labels are angled/diagonal.
+- **Left Y-axis (for coefficients):**
+  - Label (from figure): **“Coefficients for Musical Tolerance in Affecting Odds (Probability) of Disliking Each Individual Genre”**
+  - Values shown roughly from **-0.1 to -0.5** (negative coefficients).
+- **Right Y-axis (for mean education):**
+  - Label: **“Mean Educational Level of Respondents Who Reported Liking Each Audience”** (wording in the scan; intended meaning: mean education of those who like the genre)
+  - Scale shown about **12 to 15** years.
 
-The x-axis labels (in the displayed order in Figure 1) are:
-1. Latin/Salsa  
-2. Jazz  
-3. Blues/R&B  
-4. Show Tunes  
-5. Oldies  
-6. Classical/Chamber  
-7. Swing/Big Band  
-8. New Age/Space  
-9. Opera  
-10. Bluegrass  
-11. Folk  
-12. Easy Listening  
-13. Pop/Contemporary Rock  
-14. Reggae  
-15. Rap  
-16. Heavy Metal  
-17. Country/Western  
-18. Gospel  
+### Transformations / statistical scale
+- Logistic regression uses the **log-odds (logit)** link; the plotted coefficient \(\beta_g\) is the change in **log-odds** of disliking genre \(g\) per +1 unit of \(T_{-g}\).
+- The paper explicitly describes it as: regress the “**(log of the) odds** of disliking each genre” on tolerance and education.
 
-### Plotting details (what Figure 1 shows)
+### Annotations / reference lines
+- A **horizontal dotted line** labeled **“Sample Mean Education”** across the plot at the sample’s mean education (value not printed; line is around ~13 in the figure).
+- Text labels placed near the lines:
+  - “**Mean Education of Genre Audience**” with an arrow to the audience-education line.
+  - “**Coefficient for Musical Tolerance**” with an arrow to the coefficient line.
 
-#### Axes
-- **X-axis:** “Type of Music” (18 genres), ordered as above.
-- **Left Y-axis:** “Coefficients for Musical Tolerance … (Log Odds Probability of Disliking Each Musical Genre)”
-  - Scale shown roughly from **0** at top down to about **−0.5** at bottom (the printed ticks show 0, −.1, −.2, −.3, −.4, −.5).
-  - This axis corresponds to the **logit coefficients** \(\beta_g\) on tolerance.
-- **Right Y-axis:** “Mean Educational Level of Respondents Who Reported Liking Each Type of Music”
-  - Scale shown from **12 to 15** years.
+### Legend
+- No boxed legend; identification is via the on-plot text annotations/arrows.
 
-#### Transformations
-- Logistic regression implies the dependent variable is modeled as **log-odds**; the plotted coefficient is already in **log-odds units** (no further transformation).
-- The dependent is described in text as “(logistically) regress the **(log of the) odds** of disliking each genre…”
+### Title / caption
+- Caption/title (verbatim): **“Figure 1. The Effect of Being Musically Tolerant on Disliking Each Music Genre Compared to the Educational Composition of Genre Audiences”**
+- Note under figure: **“Coefficients represent the effects of being musically tolerant (number of genres not disliked, excluding the one involved in the dependent variable) from logistic regression equations where disliking each genre is the dependent variable and education is controlled. All coefficients are significant at p < .0001.”**
 
-#### Series, line/marker styles, and annotations (as printed)
-- Two overlaid lines:
-  1) **Coefficient for Musical Tolerance**: plotted against the **left y-axis**, shown as a **dotted line** (with dot markers not clearly indicated; appears dotted/segmented).
-  2) **Mean Education of Genre Audience**: plotted against the **right y-axis**, shown as a **solid line** (visually jagged across genres).
-- A **horizontal reference line** labeled **“Sample Mean Education”** drawn across the plot at about **13 years** on the right axis.
-- Text callouts within plot label the two series:
-  - “Mean Education of Genre Audience”
-  - “Coefficient for Musical Tolerance”
+---
 
-#### Legend
-- No boxed legend; instead, **inline text labels** point to the respective lines.
-
-### Minimal reproduction recipe (algorithmic)
-
-For each respondent \(i\) and genre \(g\):
-1. Recode each genre response into:
-   - \(Dislike_{ig}=1\) if response in {dislike, dislike very much}; \(0\) otherwise.
-2. For each genre \(g\), compute:
-   - \(Tolerance_{i,-g} = \sum_{h \neq g} (1 - Dislike_{ih})\), counting only valid non-missing responses consistent with the paper’s approach.
-3. Fit 18 logistic models:
-   - \(\text{logit}(P(Dislike_{ig}=1)) = \alpha_g + \beta_g \,Tolerance_{i,-g} + \gamma_g \,Education_i\)
-4. For each \(g\), store \(\beta_g\).
-5. For each \(g\), compute \(MeanEduAudience_g\) among respondents who “like” \(g\) (like/like very much).
-6. Sort genres by \(\beta_g\) (descending, i.e., closest to 0 at left; most negative at right).
-7. Plot:
-   - Dotted line of \(\beta_g\) vs genre order (left y-axis).
-   - Solid line of \(MeanEduAudience_g\) vs same order (right y-axis).
-   - Add horizontal line at overall sample mean education (label “Sample Mean Education”).
-   - Add axis titles exactly as shown and inline labels for the two series.
-   - Note in caption: all \(\beta_g\) significant at \(p<.0001\).
-
-Only the above elements are needed to reproduce **Figure 1**.
+## Minimal reproducibility checklist (inputs you must have)
+- Individual-level 1993 GSS responses for:
+  - the **18 music genre Likert items** (and “don’t know/no answer” flags),
+  - **education in years**.
+- Code to:
+  - binarize dislikes per genre,
+  - compute \(T_{-g}\) separately per genre (exclude that genre),
+  - run 18 logits and extract \(\beta_g\),
+  - compute \(\overline{Edu}_g\) among “like very much/like it” respondents,
+  - sort genres by \(\beta_g\),
+  - plot two y-scales with the stated labels and the sample-mean-education reference line.

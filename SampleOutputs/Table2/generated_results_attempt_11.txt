@@ -1,37 +1,89 @@
-## ModelA_table
-  b_unstd  beta_std      p_value sig
- 2.681795       NaN 6.428458e-09 ***
- 0.126037  0.124182 1.035968e-02   *
--0.132608 -0.259012 2.421460e-06 ***
--0.000006 -0.051312 2.994860e-01    
- 0.008507  0.078884 1.351263e-01    
--0.029245 -0.010194 8.202387e-01    
- 0.007985  0.095652 4.348649e-02   *
--0.582739 -0.148894 2.961420e-03  **
- 0.190714  0.026704 5.546428e-01    
- 0.223903  0.077038 1.017627e-01    
-      NaN       NaN          NaN    
- 0.074028  0.025611 5.718589e-01    
+## table2_betas
+ ModelA_Std_Beta ModelA_Sig  ModelB_Std_Beta ModelB_Sig
+             NaN         **              NaN           
+             NaN        ***              NaN         **
+             NaN                         NaN           
+             NaN                         NaN           
+             NaN                         NaN           
+             NaN        ***              NaN          *
+             NaN          *              NaN           
+             NaN                         NaN          *
+             NaN                         NaN           
+             NaN                         NaN          *
 
-## ModelB_table
-  b_unstd  beta_std      p_value sig
- 5.576787       NaN 1.935357e-13 ***
--0.024533 -0.015059 7.576008e-01    
--0.179659 -0.218618 7.781769e-05 ***
--0.000009 -0.050484 3.126102e-01    
--0.003886 -0.022448 6.736970e-01    
--0.321999 -0.069924 1.236060e-01    
- 0.007349  0.054838 2.514835e-01    
- 0.208044  0.033116 5.112465e-01    
- 0.776233  0.067712 1.387773e-01    
- 0.532400  0.114121 1.668012e-02   *
-      NaN       NaN          NaN    
- 0.565216  0.121822 8.052051e-03  **
+## fit
+  N       R2   Adj_R2  Constant Constant_Sig
+340 0.204919 0.180752  2.656845          ***
+326 0.167387 0.140955  5.205438          ***
 
-## ModelA_fit
-                          model   n  k_including_const       r2  adj_r2 dropped_zero_variance_predictors
-Table2_ModelA_dislike_minority6 456                 11 0.140299 0.12098                      no_religion
+## dv_descriptives
+ dv1_dislike_minority_linked_6  dv2_dislike_remaining_12
+                   1134.000000               1057.000000
+                      2.057319                  3.778619
+                      1.576324                  2.515519
+                      0.000000                  0.000000
+                      1.000000                  2.000000
+                      2.000000                  3.000000
+                      3.000000                  5.000000
+                      6.000000                 12.000000
 
-## ModelB_fit
-                        model   n  k_including_const       r2   adj_r2 dropped_zero_variance_predictors
-Table2_ModelB_dislike_other12 456                 11 0.121363 0.101618                      no_religion
+## missingness_modelA
+ share_missing
+      0.476339
+      0.363014
+      0.293898
+      0.086550
+      0.049813
+      0.005604
+      0.003113
+      0.002491
+      0.000000
+      0.000000
+      0.000000
+      0.000000
+      0.000000
+
+## missingness_modelB
+ share_missing
+      0.476339
+      0.363014
+      0.341843
+      0.086550
+      0.049813
+      0.005604
+      0.003113
+      0.002491
+      0.000000
+      0.000000
+      0.000000
+      0.000000
+      0.000000
+
+## item_missingness_music
+ missing_share_minority_genres  missing_share_remaining_genres
+                           NaN                        0.109589
+                      0.042341                             NaN
+                           NaN                        0.108344
+                           NaN                        0.047945
+                           NaN                        0.038605
+                           NaN                        0.019925
+                           NaN                        0.056040
+                      0.029265                             NaN
+                           NaN                        0.049813
+                      0.033001                             NaN
+                      0.145081                             NaN
+                           NaN                        0.052927
+                           NaN                        0.056663
+                           NaN                        0.190535
+                           NaN                        0.031756
+                           NaN                        0.059776
+                      0.044832                             NaN
+                      0.190535                             NaN
+
+## item_missingness_racism
+ missing_share
+      0.378580
+      0.383562
+      0.362391
+      0.357410
+      0.375467

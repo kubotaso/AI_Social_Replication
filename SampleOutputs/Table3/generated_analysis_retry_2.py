@@ -3,44 +3,44 @@ def run_analysis(data_source):
     import numpy as np
     import pandas as pd
 
-    os.makedirs("./output", exist_ok=True)
+    df = pd.read_csv(data_source)
 
-    # ----------------------------
-    # Load + filter
-    # ----------------------------
-    df = pd.read_csv(data_source, low_memory=False)
+    # --- Restrict to GSS 1993 ---
+    year_col = None
+    for c in ["year", "YEAR"]:
+        if c in df.columns:
+            year_col = c
+            break
+    if year_col is None:
+        raise KeyError("YEAR/year column not found in dataset.")
+    df = df.loc[df[year_col] == 1993].copy()
 
-    # Standardize column names (robust to provided lower-case CSV)
-    df.columns = [str(c).strip().upper() for c in df.columns]
-
-    if "YEAR" not in df.columns:
-        raise ValueError("YEAR column not found in data.")
-    df = df.loc[df["YEAR"] == 1993].copy()
-
-    # ----------------------------
-    # Variable mapping (Table 3)
-    # ----------------------------
-    genre_map = [
-        ("Latin/Salsa", "LATIN"),
-        ("Jazz", "JAZZ"),
-        ("Blues/R&B", "BLUES"),
-        ("Show Tunes", "MUSICALS"),
-        ("Oldies", "OLDIES"),
-        ("Classical/Chamber", "CLASSICL"),
-        ("Reggae", "REGGAE"),
-        ("Swing/Big Band", "BIGBAND"),
-        ("New Age/Space", "NEWAGE"),
-        ("Opera", "OPERA"),
-        ("Bluegrass", "BLUGRASS"),
-        ("Folk", "FOLK"),
-        ("Pop/Easy Listening", "MOODEASY"),
-        ("Contemporary Rock", "CONROCK"),
-        ("Rap", "RAP"),
-        ("Heavy Metal", "HVYMETAL"),
-        ("Country/Western", "COUNTRY"),
-        ("Gospel", "GOSPEL"),
+    # --- Music genre variables (Table 3 columns) ---
+    genres = [
+        ("Latin/Salsa", "latin"),
+        ("Jazz", "jazz"),
+        ("Blues/R&B", "blues"),
+        ("Show Tunes", "musicals"),
+        ("Oldies", "oldies"),
+        ("Classical/Chamber", "classicl"),
+        ("Reggae", "reggae"),
+        ("Swing/Big Band", "bigband"),
+        ("New Age/Space", "newage"),
+        ("Opera", "opera"),
+        ("Bluegrass", "blugrass"),
+        ("Folk", "folk"),
+        ("Pop/Easy Listening", "moodeasy"),
+        ("Contemporary Rock", "conrock"),
+        ("Rap", "rap"),
+        ("Heavy Metal", "hvymetal"),
+        ("Country/Western", "country"),
+        ("Gospel", "gospel"),
     ]
 
+    # Resolve column names case-insensitively (defensive)
+    colmap = {c.lower(): c for c in df.columns}
+
+    # --- Row labels (Table 3 rows) ---
     row_labels = [
         "(1) Like very much",
         "(2) Like it",
@@ -52,113 +52,147 @@ def run_analysis(data_source):
         "Mean",
     ]
 
-    # ----------------------------
-    # Helpers: missing classification
-    # ----------------------------
-    def _as_string(s):
-        # Keep true missing as <NA>, not "nan"
-        return s.astype("string")
+    # --- Missing code detection (compute, do not hardcode) ---
+    # Many GSS CSV extracts store special missing values as negative integers
+    # (e.g., -1/-2), or as large sentinels (8/9, 98/99), or as labeled strings.
+    DK_TOKENS = {
+        "d", "dk", "dont know", "don't know", "don’t know",
+        "dont know much", "don't know much", "don’t know much",
+        "dont know much about it", "don't know much about it", "don’t know much about it",
+        "dont know enough", "don't know enough", "don’t know enough",
+        "dont know enough about it", "don't know enough about it", "don’t know enough about it",
+    }
+    NA_TOKENS = {"n", "na", "no answer", "noanswer"}
 
-    def _classify_missing(raw_series):
+    # Candidate numeric codes; we will decide which are DK vs NA by inspecting labels (if any),
+    # otherwise fall back to a conservative numeric heuristic.
+    NUMERIC_MISSING_CANDIDATES = [-99, -98, -97, -2, -1, 0, 8, 9, 98, 99]
+
+    def _infer_missing_codes(series: pd.Series):
         """
-        Return masks for:
-          - DK: "Don't know much about it"  -> NA(d)
-          - NA: "No answer"                -> NA(n)
-
-        We first look for explicit NA(d)/NA(n) string encodings.
-        If not present (as in many released CSVs), we fall back to
-        GSS convention for these music items:
-          8 = Don't know much about it
-          9 = No answer
+        Infer DK and NA codes for this series using (in order):
+        1) pandas Categorical categories (rare in CSV), if present
+        2) string tokens in raw data
+        3) numeric sentinel candidates; try to infer DK vs NA by prevalence and common conventions
+        Returns: (dk_mask, na_mask, valid_mask_1to5)
         """
-        s = _as_string(raw_series)
-        s_upper = s.str.upper()
+        s = series
 
-        # Explicit string encodings (rare in plain CSVs but supported)
-        dk_mask = (
-            s_upper.str.contains(r"\[?\s*NA\s*\(\s*D\s*\)\s*\]?", regex=True, na=False)
-            | s_upper.str.contains(r"\bNA\s*\(\s*D\s*\)\b", regex=True, na=False)
-        )
-        na_mask = (
-            s_upper.str.contains(r"\[?\s*NA\s*\(\s*N\s*\)\s*\]?", regex=True, na=False)
-            | s_upper.str.contains(r"\bNA\s*\(\s*N\s*\)\b", regex=True, na=False)
-        )
+        # 1) If categorical with named categories, use category names
+        if isinstance(s.dtype, pd.CategoricalDtype):
+            cat = s.cat
+            cats = list(cat.categories)
+            # Build mapping from category label -> code
+            # Note: categories might already be numeric; if so, skip this.
+            if all(isinstance(x, str) for x in cats):
+                lowcats = [str(x).strip().lower() for x in cats]
+                dk_cats = {cats[i] for i, lc in enumerate(lowcats) if lc in DK_TOKENS}
+                na_cats = {cats[i] for i, lc in enumerate(lowcats) if lc in NA_TOKENS}
+                dk_mask = s.isin(list(dk_cats))
+                na_mask = s.isin(list(na_cats))
+                sn = pd.to_numeric(s.astype("string"), errors="coerce")
+                valid_mask = sn.isin([1, 2, 3, 4, 5])
+                return dk_mask.fillna(False), na_mask.fillna(False), valid_mask.fillna(False)
 
-        # Numeric fallback for typical GSS coding on these items
-        x = pd.to_numeric(raw_series, errors="coerce")
-        # Only apply numeric fallback where we did not already classify via strings
-        dk_mask = dk_mask | ((x == 8) & ~dk_mask & ~na_mask)
-        na_mask = na_mask | ((x == 9) & ~dk_mask & ~na_mask)
+        # 2) Strings in raw data
+        if s.dtype == "object" or str(s.dtype).startswith("string"):
+            ss = s.astype("string")
+            low = ss.str.strip().str.lower()
 
-        return dk_mask, na_mask
+            dk_mask = low.isin(DK_TOKENS)
+            na_mask = low.isin(NA_TOKENS)
 
-    # ----------------------------
-    # Build numeric table
-    # ----------------------------
-    table = pd.DataFrame(index=row_labels, columns=[g[0] for g in genre_map], dtype="float64")
+            # Numeric responses might also be stored as strings
+            sn = pd.to_numeric(low, errors="coerce")
+            valid_mask = sn.isin([1, 2, 3, 4, 5])
 
-    for genre_label, var in genre_map:
-        if var not in df.columns:
-            raise ValueError(f"Required genre variable not found in data: {var}")
+            return dk_mask.fillna(False), na_mask.fillna(False), valid_mask.fillna(False)
 
-        raw = df[var]
-        x = pd.to_numeric(raw, errors="coerce")
+        # 3) Numeric: infer from common sentinel sets
+        sn = pd.to_numeric(s, errors="coerce")
 
-        # Valid substantive responses for counts + mean
-        valid_mask = x.isin([1, 2, 3, 4, 5])
-        valid = x.where(valid_mask, np.nan)
+        valid_mask = sn.isin([1, 2, 3, 4, 5])
 
-        counts_1_5 = (
-            x.loc[valid_mask]
-            .value_counts(dropna=True)
-            .reindex([1, 2, 3, 4, 5], fill_value=0)
-            .astype(int)
-        )
+        # Check which candidate codes are present
+        present = [code for code in NUMERIC_MISSING_CANDIDATES if (sn == code).any()]
+        if not present:
+            # If there are NaNs, we cannot distinguish DK vs NA; treat both as 0.
+            dk_mask = pd.Series(False, index=sn.index)
+            na_mask = pd.Series(False, index=sn.index)
+            return dk_mask, na_mask, valid_mask
 
-        dk_mask, na_mask = _classify_missing(raw)
+        # Prefer negative GSS-style: -1 (DK), -2 (NA) if present
+        dk_codes = set()
+        na_codes = set()
+        if -1 in present:
+            dk_codes.add(-1)
+        if -2 in present:
+            na_codes.add(-2)
 
-        # Ensure DK/NA counts are only from non-valid responses (avoid double counting)
-        dk_count = int((dk_mask & ~valid_mask).sum())
-        na_count = int((na_mask & ~valid_mask).sum())
+        # If 8/9 or 98/99 present and not already assigned
+        if not dk_codes and 8 in present:
+            dk_codes.add(8)
+        if not na_codes and 9 in present:
+            na_codes.add(9)
+        if not dk_codes and 98 in present:
+            dk_codes.add(98)
+        if not na_codes and 99 in present:
+            na_codes.add(99)
 
-        mean_val = float(valid.mean(skipna=True)) if valid.notna().any() else np.nan
+        # If still unassigned, use a conservative fallback:
+        # assign the more frequent code among remaining candidates to DK and next to NA
+        remaining = [c for c in present if c not in dk_codes and c not in na_codes]
+        if remaining:
+            freqs = sorted([(c, int((sn == c).sum())) for c in remaining], key=lambda x: (-x[1], x[0]))
+            if not dk_codes and freqs:
+                dk_codes.add(freqs[0][0])
+            if not na_codes and len(freqs) > 1:
+                na_codes.add(freqs[1][0])
 
-        table.loc["(1) Like very much", genre_label] = counts_1_5.loc[1]
-        table.loc["(2) Like it", genre_label] = counts_1_5.loc[2]
-        table.loc["(3) Mixed feelings", genre_label] = counts_1_5.loc[3]
-        table.loc["(4) Dislike it", genre_label] = counts_1_5.loc[4]
-        table.loc["(5) Dislike very much", genre_label] = counts_1_5.loc[5]
-        table.loc["(M) Don’t know much about it", genre_label] = dk_count
-        table.loc["(M) No answer", genre_label] = na_count
-        table.loc["Mean", genre_label] = mean_val
+        dk_mask = sn.isin(list(dk_codes))
+        na_mask = sn.isin(list(na_codes))
+        return dk_mask.fillna(False), na_mask.fillna(False), valid_mask.fillna(False)
 
-    # ----------------------------
-    # Formatting (counts as integers; mean to 2 decimals)
-    # ----------------------------
-    formatted = table.copy()
+    # --- Build output table (counts + mean) ---
+    table = pd.DataFrame(index=row_labels, columns=[g[0] for g in genres], dtype="object")
 
-    for r in formatted.index:
-        if r == "Mean":
-            formatted.loc[r] = formatted.loc[r].map(lambda v: "" if pd.isna(v) else f"{float(v):.2f}")
-        else:
-            formatted.loc[r] = formatted.loc[r].map(lambda v: "" if pd.isna(v) else str(int(round(float(v)))))
+    # Pre-fill with empty strings to avoid "nan" in text output
+    table.loc[:, :] = ""
 
-    # ----------------------------
-    # Write output with 3-panel layout (6 + 6 + 6)
-    # ----------------------------
+    for genre_label, var_lower in genres:
+        if var_lower not in colmap:
+            raise KeyError(f"Expected variable '{var_lower}' not found in dataset.")
+        var = colmap[var_lower]
+
+        s = df[var]
+
+        # numeric version for substantive frequencies and mean
+        sn = pd.to_numeric(s, errors="coerce")
+
+        # counts for 1..5
+        for k, rlab in zip(
+            [1, 2, 3, 4, 5],
+            row_labels[:5]
+        ):
+            table.loc[rlab, genre_label] = str(int((sn == k).sum()))
+
+        # missing type counts (DK and NA)
+        dk_mask, na_mask, valid_mask = _infer_missing_codes(s)
+        table.loc["(M) Don’t know much about it", genre_label] = str(int(dk_mask.sum()))
+        table.loc["(M) No answer", genre_label] = str(int(na_mask.sum()))
+
+        # mean on valid 1..5 only (exclude DK/NA and any other codes)
+        mean_val = sn.where(valid_mask).mean()
+        table.loc["Mean", genre_label] = "" if pd.isna(mean_val) else f"{float(mean_val):.2f}"
+
+    # --- Save human-readable text file ---
+    os.makedirs("./output", exist_ok=True)
     out_path = "./output/table3_frequency_distributions_gss1993.txt"
-    cols = list(formatted.columns)
-
-    panels = [cols[0:6], cols[6:12], cols[12:18]]
+    title = "Table 3. Frequency Distributions for Attitude toward 18 Music Genres: General Social Survey, 1993"
 
     with open(out_path, "w", encoding="utf-8") as f:
-        f.write("Table 3. Frequency Distributions for Attitude toward 18 Music Genres: General Social Survey, 1993\n")
-        f.write("Counts shown for response categories; Mean computed on 1–5 excluding missing.\n\n")
-
-        for i, pcols in enumerate(panels, start=1):
-            block = formatted.loc[:, pcols]
-            f.write(f"Panel {i}\n")
-            f.write(block.to_string(index=True))
-            f.write("\n\n")
+        f.write(title + "\n\n")
+        f.write(table.to_string())
+        f.write("\n")
 
     return table

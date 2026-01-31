@@ -1,0 +1,101 @@
+Score: 26/100
+============================================================
+
+### 1) Core reporting mismatch: you reported SEs/“Sig” stars as if they came from your output
+**True Table 2** reports **standardized OLS coefficients only** (and constants, R², Adj. R², N). It **does not report standard errors** (nor t-stats).  
+**Generated output** includes “Sig” columns and implies inferential tests were computed from your model.
+
+**Fix**
+- Remove any “standard errors” discussion entirely (none are in the true table).
+- Keep significance stars only insofar as they match the **stars printed in Bryson’s table**, not stars computed from your re-estimation (unless you explicitly say “re-estimated from data,” which you are not trying to do here).
+- Rename columns from `Std_Beta Sig` to something like: `Standardized coefficient (Table 2)` and `Table 2 significance`.
+
+---
+
+## 2) Model 1 mismatches (DV: Minority-linked genres: 6)
+
+Below, **every coefficient/significance mismatch** between Generated vs True:
+
+| Variable | Generated | True | What’s wrong | How to fix |
+|---|---:|---:|---|---|
+| Racism score | 0.125593 * | 0.130 ** | coef slightly off; **star level wrong** | set coef to **0.130** and stars to **\*\*** |
+| Education | -0.205293 *** | -0.175 *** | coef wrong | set to **-0.175*** |
+| Household income per capita | +0.033918 (ns) | -0.037 (ns) | **sign wrong** and magnitude wrong | set to **-0.037** |
+| Occupational prestige | +0.007852 (ns) | -0.020 (ns) | sign wrong | set to **-0.020** |
+| Female | -0.072497 (ns) | -0.057 (ns) | magnitude wrong | set to **-0.057** |
+| Age | +0.147219 ** | +0.163 *** | coef off; **star level wrong** | set to **0.163*** |
+| Black | -0.157248 ** | -0.132 *** | coef off; **star level wrong** | set to **-0.132*** |
+| Hispanic | -0.039695 (ns) | -0.058 (ns) | coef wrong | set to **-0.058** |
+| Other race | +0.006195 (ns) | -0.017 (ns) | sign wrong | set to **-0.017** |
+| Conservative Protestant | +0.094829 (ns) | +0.063 (ns) | coef wrong | set to **0.063** |
+| No religion | +0.066177 (ns) | +0.057 (ns) | coef wrong | set to **0.057** |
+| Southern | -0.016474 (ns) | +0.024 (ns) | sign wrong | set to **0.024** |
+| Constant | 2.594476 *** | 2.415 *** | constant wrong | set to **2.415*** |
+| R² | 0.125763 | 0.145 | model fit wrong | set to **0.145** |
+| Adj. R² | 0.101078 | 0.129 | model fit wrong | set to **0.129** |
+| N | 438 | 644 | **sample size wrong** | set N to **644** (and do not show your analytic sample excerpt as if it were Bryson’s) |
+
+**Interpretation mismatch (implicit)**  
+Your Model 1 racism effect is shown as small and only *p*<.05; the true table indicates a **stronger** relationship and **p**<.01. If you wrote any narrative like “racism is only weakly related,” it must be updated to reflect **0.130** with **.
+
+---
+
+## 3) Model 2 mismatches (DV: Remaining genres: 12)
+
+| Variable | Generated | True | What’s wrong | How to fix |
+|---|---:|---:|---|---|
+| Racism score | -0.033146 (ns) | +0.080 (ns) | **sign wrong** and magnitude wrong | set to **0.080** |
+| Education | -0.219268 *** | -0.242 *** | coef wrong | set to **-0.242*** |
+| Household income per capita | -0.030556 (ns) | -0.065 (ns) | coef wrong | set to **-0.065** |
+| Occupational prestige | -0.029396 (ns) | +0.005 (ns) | sign wrong | set to **0.005** |
+| Female | -0.076595 (ns) | -0.070 (ns) | coef wrong | set to **-0.070** |
+| Age | +0.111361 * | +0.126 ** | coef off; **star level wrong** | set to **0.126** ** |
+| Black | +0.048495 (ns) | +0.042 (ns) | coef slightly off | set to **0.042** |
+| Hispanic | -0.013671 (ns) | -0.029 (ns) | coef wrong | set to **-0.029** |
+| Other race | +0.079242 (ns) | +0.047 (ns) | coef wrong | set to **0.047** |
+| Conservative Protestant | +0.104997 (ns) | +0.048 (ns) | coef wrong | set to **0.048** |
+| No religion | +0.015341 (ns) | +0.024 (ns) | coef wrong | set to **0.024** |
+| Southern | +0.083143 (ns) | +0.069 (ns) | coef wrong | set to **0.069** |
+| Constant | 5.496123 *** | 7.860 (no stars shown) | constant wrong; also you added stars | set to **7.860** and match how the table prints it (no stars in the provided true transcription) |
+| R² | 0.126516 | 0.147 | model fit wrong | set to **0.147** |
+| Adj. R² | 0.099845 | 0.130 | model fit wrong | set to **0.130** |
+| N | 406 | 605 | **sample size wrong** | set N to **605** |
+
+**Interpretation mismatch (biggest one): sign of racism in Model 2**  
+Your generated results imply racism is (slightly) associated with *less* dislike (negative beta). True Table 2 shows racism is **positively** associated with dislike (0.080), though not significant.
+
+---
+
+## 4) Variable-name mismatches / presentation inconsistencies
+These aren’t catastrophic, but they are mismatches relative to “as used in the table”:
+
+- You use `Model1_beta_or_const` / `Model2_beta_or_const` and `Std_Beta` while the true table is simply “Coefficient” (standardized OLS).  
+  **Fix:** label clearly: “Standardized OLS coefficient (β).”
+- Your status labels like “included,” “intercept (unstandardized)” are not in Table 2.  
+  **Fix:** drop “Status” and the intercept annotation; just list variables and coefficients, plus fit stats.
+- Your DV labels include “(count of 6)” / “(count of 12)”. Bryson’s DV wording doesn’t include “count” in the table label (even if it is a count).  
+  **Fix:** match the DV titles exactly as printed.
+
+---
+
+## 5) The “analytic sample” tables are incompatible with the true results
+You show `model1_analytic_sample` and `model2_analytic_sample` with N=438/406 implied by your fit table. Bryson’s Table 2 uses **N=644 and N=605**.
+
+**Fix**
+- If your goal is to “match Table 2,” remove analytic-sample printouts entirely (they are from your dataset/workflow, not from the published table).
+- If you must keep them, explicitly label them as “our replication analytic sample” and then you cannot claim the coefficients are Bryson’s Table 2.
+
+---
+
+## 6) What to change so the generated analysis matches the true table (minimum required edits)
+
+1. **Replace all coefficients and stars** in Model 1 and Model 2 with the published values above (exact rounding as printed).
+2. **Replace fit statistics** to:  
+   - Model 1: R²=0.145; Adj R²=0.129; N=644; Constant=2.415***  
+   - Model 2: R²=0.147; Adj R²=0.130; N=605; Constant=7.860
+3. **Remove standard errors** (and any references to SEs/t-stats that your generated output implies).
+4. **Update interpretation text** to reflect:
+   - Racism is positive in both models, significant at ** in Model 1, not significant in Model 2.
+   - Several signs were wrong in your generated output (income, prestige, other race, southern in Model 1; racism and prestige in Model 2).
+
+If you paste the narrative/interpretation section you generated (the prose), I can also flag every interpretive statement that no longer holds once the coefficients/signs/stars are corrected.

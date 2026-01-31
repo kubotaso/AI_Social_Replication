@@ -1,0 +1,130 @@
+Score: 64/100
+============================================================
+
+### 1) Row items/categories: missing rows in the Generated Results
+Your generated table **omits two response categories** that are present in the true table:
+
+- **(M) Don’t know much about it**
+- **(M) No answer**
+
+In the generated output, both rows appear, but they are incorrectly filled with **0 for every genre**, which is not true.
+
+**How to fix**
+- Populate these two rows with the correct nonzero counts (shown in the True Results for each genre).
+- Do *not* treat missing responses as zero; they are legitimate categories with their own frequencies.
+
+---
+
+### 2) Frequency count mismatches: every mismatch by cell
+All “(1) Like very much” through “(5) Dislike very much” counts **match perfectly** between generated and true tables for all 18 genres.
+
+The **only frequency mismatches** are in the two missing-data rows, where Generated uses all zeros but True has nonzero values.
+
+#### Panel 1 (Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber)
+**(M) Don’t know much about it** — Generated 0s, True values:
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+
+**(M) No answer** — Generated 0s, True values:
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+
+#### Panel 2 (Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk)
+**(M) Don’t know much about it** — True values:
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+
+**(M) No answer** — True values:
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+
+#### Panel 3 (Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel)
+**(M) Don’t know much about it** — True values:
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+**(M) No answer** — True values:
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+**How to fix**
+- Replace the generated zeros with these true counts.
+- If your pipeline auto-filled missing categories with 0, change it to **include the missing-response codes as valid categories** when tabulating.
+
+---
+
+### 3) Column items/categories: name/structure mismatches
+There is one **labeling/structure discrepancy** in the header for “New Age/Space” vs “Opera”:
+
+- **True table** separates them into two columns: **“New Age/Space”** and **“Opera”**.
+- **Generated table** shows two separate columns but labels them oddly as:
+  - **“New Age/Space”** and **“Opera”** *combined* into **“New Age/Space Opera”** (looks like a single combined label),
+  - yet the data clearly behave as **two distinct columns** (one for New Age/Space and one for Opera).
+
+You can see this because the generated header shows: `New Age/Space Opera` and then later the counts appear under two adjacent positions matching the true **New Age/Space** and **Opera** columns (e.g., Like very much = 48 and 73).
+
+**How to fix**
+- Correct the header so it reads as **two separate column labels**:
+  - `New Age/Space` and `Opera`
+- Ensure the table rendering doesn’t concatenate adjacent column names.
+
+---
+
+### 4) Summary statistics mismatches (means, totals, etc.)
+**Means:** All means in the generated table match the true table exactly.
+
+**But**: If you compute means yourself from the frequency table, the presence/absence of the missing categories matters:
+- Typically, the mean should be computed **excluding** missing categories `(M)` (as is standard), using only responses 1–5.
+- Your generated output *looks like* it computed the mean correctly (since it matches True), but the displayed frequency table is inconsistent because it shows missing categories as zero.
+
+**How to fix**
+- Keep the mean computation aligned with the true method (likely excluding M categories).
+- But also **display the correct M-category frequencies** so the table is internally consistent.
+
+---
+
+### 5) Percentages: missing entirely (cannot be “matched”)
+You asked to compare percentages too, but:
+- Neither the Generated nor the True tables provide **percentages**, only counts and means.
+
+**How to fix (if percentages are required)**
+- Add percentage columns or parenthetical percentages computed as:
+  - `% = count / (sum of all categories including M?)`
+- Decide denominator explicitly:
+  - **All responses including M** (total N for that genre), or
+  - **Valid only (1–5)**.
+- The true table as shown does not include them, so to “match” it, you should **not add percentages** unless your target output requires them.
+
+---
+
+## Net: What must change for Generated to match True
+1. **Replace all-zero rows** for:
+   - `(M) Don’t know much about it`
+   - `(M) No answer`
+   with the true nonzero counts (listed above).
+2. **Fix the column header** so `New Age/Space` and `Opera` are clearly separate (avoid the merged-looking “New Age/Space Opera” label).
+3. Keep the means as they are (they already match), but ensure your frequency table includes the missing categories so the presentation is consistent with the true table.

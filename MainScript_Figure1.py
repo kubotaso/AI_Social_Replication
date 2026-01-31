@@ -47,8 +47,6 @@ client = OpenAI()
 # ──────────────────────────────────────────────────
 
 ALIGNMENT_SCORE_THRESHOLD = 95  # Skip detailed check if score >= threshold (early exit)
-MAX_CONTEXT_CHARS = 12000  # Maximum characters for best code context in prompts
-MAX_FEEDBACK_CHARS = 60000  # Maximum accumulated feedback size
 MAX_OUTPUT_TOKENS = 20000  # Maximum output tokens for LLM responses
 
 
@@ -60,13 +58,23 @@ MAX_OUTPUT_TOKENS = 20000  # Maximum output tokens for LLM responses
 @dataclass
 class RunState:
     """Track state across retry attempts."""
+    # Best attempt tracking
     best_score: int = -1
     best_attempt: int = 0
     best_code_path: Optional[Path] = None
+    best_img_path: Optional[Path] = None
+    best_discrepancy: Optional[str] = None
+
+    # Previous attempt tracking
+    prev_attempt: int = 0
+    prev_code_path: Optional[Path] = None
+    prev_img_path: Optional[Path] = None
+    prev_discrepancy: Optional[str] = None
+    prev_error: Optional[str] = None
+
+    # Current attempt
     last_score: int = -1
-    accumulated_feedback: str = ""
     current_code_path: Optional[Path] = None
-    attempt_img: Optional[Path] = None
 
 
 # ──────────────────────────────────────────────────
@@ -226,17 +234,6 @@ def _normalize_result_to_text(result) -> str:
     return str(result)
 
 
-def _truncate_text(text: str, max_chars: int = MAX_CONTEXT_CHARS) -> str:
-    """Truncate text to prevent context window overflow."""
-    if len(text) <= max_chars:
-        return text
-    truncated = text[:max_chars]
-    last_newline = truncated.rfind('\n')
-    if last_newline > max_chars * 0.8:
-        truncated = truncated[:last_newline]
-    return truncated + "\n\n[... TRUNCATED ...]\n"
-
-
 def try_run_generated_code(
     module_path: Union[str, Path],
     data_path: Union[str, Path],
@@ -351,21 +348,27 @@ def ask_code_with_data(
     output_dir: Path,
     *,
     model: str,
-    error_feedback: Optional[str] = None,
-    best_score: Optional[int] = None,
+    is_retry: bool = False,
+    # Best attempt info
     best_code_text: Optional[str] = None,
+    best_discrepancy: Optional[str] = None,
+    best_score: Optional[int] = None,
+    # Previous attempt info
+    prev_code_text: Optional[str] = None,
+    prev_discrepancy: Optional[str] = None,
+    prev_error: Optional[str] = None,
     sample_rows: int = 5,
     jpeg_basename: str = "generated_results.jpg",
 ) -> str:
     """
     Ask the LLM to write the Python analysis code that *produces the Figure 1 replica*.
-    If error_feedback is provided, this is a retry with discrepancy/runtime feedback.
+    For retries, provides best attempt and previous attempt context.
     """
     sample_csv = df[data_columns[: min(len(data_columns), 18)]].head(sample_rows).to_csv(index=False)
     cols_str = ", ".join(data_columns[:80])
     out_dir_str = str(output_dir.resolve())
 
-    if error_feedback:
+    if is_retry:
         instructions = "You fix issues precisely and write simple, correct code."
     else:
         instructions = "Return code only (no backticks, no commentary)."
@@ -373,7 +376,7 @@ def ask_code_with_data(
     # Build the prompt
     prompt_parts = []
 
-    if error_feedback:
+    if is_retry:
         prompt_parts.append("We previously ran your analysis and found discrepancies or runtime errors. Use the feedback below to correct your code.\n")
 
     prompt_parts.append(f"[Figure‑1 Analysis Summary]\n{analysis_summary}\n")
@@ -382,16 +385,27 @@ def ask_code_with_data(
     prompt_parts.append(f"[All available columns]\n{cols_str}\n")
     prompt_parts.append(f"[Path to full dataset]\n{data_path}\n")
 
-    # Add best code context if available (for retries)
-    if best_code_text:
-        best_code_trim = _truncate_text(best_code_text, MAX_CONTEXT_CHARS)
-        if best_score is not None:
-            prompt_parts.append(f"[Best Code So Far (Score: {best_score}/100)]\n{best_code_trim}\n")
-        else:
-            prompt_parts.append(f"[Best Code So Far]\n{best_code_trim}\n")
+    # Add best attempt context (if exists and is_retry)
+    if is_retry and best_code_text and best_score is not None:
+        prompt_parts.append(
+            f"[Best Attempt So Far (Score: {best_score}/100)]\n"
+            f"Try to improve upon or maintain this quality.\n"
+        )
+        prompt_parts.append(f"[Best Code]\n{best_code_text}\n")
+        if best_discrepancy:
+            prompt_parts.append(f"[Best Attempt Discrepancy Report]\n{best_discrepancy}\n")
 
-    if error_feedback:
-        prompt_parts.append(f"[Feedback — MUST FIX]\n{error_feedback}\n")
+    # Add previous attempt context (if different from best)
+    if is_retry and prev_code_text:
+        # Check if prev is different from best (avoid duplicates)
+        is_same_as_best = (best_code_text and prev_code_text == best_code_text)
+        if not is_same_as_best:
+            prompt_parts.append("[Previous Attempt (most recent)]\n")
+            prompt_parts.append(f"[Previous Code]\n{prev_code_text}\n")
+            if prev_error:
+                prompt_parts.append(f"[Previous Runtime Error — MUST FIX]\n{prev_error}\n")
+            elif prev_discrepancy:
+                prompt_parts.append(f"[Previous Discrepancy Report — MUST FIX]\n{prev_discrepancy}\n")
 
     prompt_parts.append(
         "Generate a single Python function with the exact signature:\n"
@@ -525,37 +539,44 @@ def run_single_attempt(
         print(f"[Retry Loop] Attempt {attempt}/{max_attempts}")
         print(f"{'='*70}")
 
-        # Produce discrepancy report if we have an image
-        if state.attempt_img and state.attempt_img.exists():
-            disc = report_discrepancy_images(true_fig_path, state.attempt_img, model=model)
+        # Generate discrepancy report for previous attempt (if it had an image)
+        if state.prev_img_path and state.prev_img_path.exists():
+            state.prev_discrepancy = report_discrepancy_images(true_fig_path, state.prev_img_path, model=model)
             score_header = f"Score: {state.last_score}/100\n{'='*60}\n\n"
-            save_artifact(output_dir, f"discrepancy_report_attempt_{attempt-1}.txt", score_header + disc)
+            save_artifact(output_dir, f"discrepancy_report_attempt_{attempt-1}.txt", score_header + state.prev_discrepancy)
             print(f"[Mismatch] Saved discrepancy_report_attempt_{attempt-1}.txt")
-            state.accumulated_feedback = disc if not state.accumulated_feedback else f"{state.accumulated_feedback}\n---\n{disc}"
         else:
-            state.accumulated_feedback = f"{state.accumulated_feedback}\n(Note: previous run did not produce an image.)".strip()
-
-        # Limit accumulated feedback size
-        if len(state.accumulated_feedback) > MAX_FEEDBACK_CHARS:
-            state.accumulated_feedback = state.accumulated_feedback[-MAX_FEEDBACK_CHARS:]
-            print(f"[Info] Truncated accumulated feedback to last {MAX_FEEDBACK_CHARS} chars")
+            state.prev_discrepancy = None
+            print("[Info] Skipping discrepancy report due to previous runtime error or missing image.")
 
         # Read best code if available
         best_code_text = None
         best_code_file = output_dir / "best_generated_analysis.py"
-        try:
-            if best_code_file.exists():
+        if best_code_file.exists():
+            try:
                 best_code_text = best_code_file.read_text(encoding="utf-8")
-        except Exception:
-            best_code_text = None
+            except Exception:
+                pass
 
-        # Ask for revised code
+        # Read previous code if available
+        prev_code_text = None
+        if state.prev_code_path and state.prev_code_path.exists():
+            try:
+                prev_code_text = state.prev_code_path.read_text(encoding="utf-8")
+            except Exception:
+                pass
+
+        # Generate revised code with best + prev context
         revised = ask_code_with_data(
             fig1_summary, df, data_path, cols, inst_summary,
             output_dir, model=model,
-            error_feedback=state.accumulated_feedback,
-            best_score=state.best_score if state.best_score >= 0 else None,
+            is_retry=True,
             best_code_text=best_code_text,
+            best_discrepancy=state.best_discrepancy,
+            best_score=state.best_score if state.best_score >= 0 else None,
+            prev_code_text=prev_code_text,
+            prev_discrepancy=state.prev_discrepancy,
+            prev_error=state.prev_error,
             jpeg_basename="generated_results.jpg",
         )
         code_path = output_dir / f"generated_analysis_retry_{attempt}.py"
@@ -581,26 +602,44 @@ def run_single_attempt(
     if runtime_err:
         save_artifact(output_dir, f"runtime_error_attempt_{attempt}.txt", runtime_err)
         print(f"[Attempt {attempt}] Runtime error - saved to runtime_error_attempt_{attempt}.txt")
-        state.accumulated_feedback = f"{state.accumulated_feedback}\n\n--- RUNTIME ERROR ---\n{runtime_err}" if state.accumulated_feedback else runtime_err
-        state.attempt_img = None
+        # Store as previous attempt info for next iteration
+        state.prev_attempt = attempt
+        state.prev_code_path = code_path
+        state.prev_img_path = None
+        state.prev_error = runtime_err
         success = "0"
     else:
-        state.attempt_img = _materialize_attempt_image(output_dir, gen_text, attempt)
+        attempt_img = _materialize_attempt_image(output_dir, gen_text, attempt)
 
-        if state.attempt_img and state.attempt_img.exists():
-            print(f"[Attempt {attempt}] Generated figure: {state.attempt_img.name}")
-            state.last_score = score_alignment_images(true_fig_path, state.attempt_img, model=model)
+        if attempt_img and attempt_img.exists():
+            print(f"[Attempt {attempt}] Generated figure: {attempt_img.name}")
+            state.last_score = score_alignment_images(true_fig_path, attempt_img, model=model)
             is_aligned = state.last_score >= ALIGNMENT_SCORE_THRESHOLD
             success = "1" if is_aligned else "0"
             print(f"[Score {attempt}] {state.last_score}/100, Aligned: {is_aligned}")
 
+            # Store as previous attempt info for next iteration
+            state.prev_attempt = attempt
+            state.prev_code_path = code_path
+            state.prev_img_path = attempt_img
+            state.prev_error = None
+
+            # Update best if needed
             if state.last_score > state.best_score:
+                # Generate discrepancy for the new best (will be used in future retries)
+                state.best_discrepancy = report_discrepancy_images(true_fig_path, attempt_img, model=model)
                 state.best_score = state.last_score
                 state.best_attempt = attempt
                 state.best_code_path = code_path
-                save_best_result(output_dir, attempt, code_path, state.attempt_img, state.last_score)
+                state.best_img_path = attempt_img
+                save_best_result(output_dir, attempt, code_path, attempt_img, state.last_score)
         else:
             print(f"[Attempt {attempt}] No figure generated")
+            # Store as previous attempt info for next iteration
+            state.prev_attempt = attempt
+            state.prev_code_path = code_path
+            state.prev_img_path = None
+            state.prev_error = "No figure was generated by the code."
             success = "0"
 
     print(f"[Check {attempt}/{max_attempts}] Success: {success}")

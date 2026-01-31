@@ -1,11 +1,10 @@
-Score: 65/100
+Score: 67/100
 ============================================================
 
-## 1) Row items/categories: missing rows in the Generated Results
+## 1) Row items/categories: missing rows + missing labels
 
-### What the true table contains (8 rows per genre)
-For each genre, Table 3 has **these 8 rows**:
-
+### What the **true table** has (per genre)
+It has **8 rows**:
 1. (1) Like very much  
 2. (2) Like it  
 3. (3) Mixed feelings  
@@ -15,43 +14,88 @@ For each genre, Table 3 has **these 8 rows**:
 7. (M) No answer  
 8. Mean  
 
-### What the generated table contains
-Your generated output has **8 rows**, but rows 6 and 7 are:
+### What the **generated table** shows
+- It includes the first **5 attitude rows** and the **Mean** row.
+- It shows **two rows of all zeros** where the missing-data rows should be.
 
-- row 6: all zeros  
-- row 7: all zeros  
-
-So the generated table is **missing the two “M” categories** and incorrectly replaces them with zeros.
-
-#### How to fix
-- Add the two missing rows with the correct counts:
+### Mismatch
+- The generated table is **missing the two missing-data categories**:
   - **(M) Don’t know much about it**
   - **(M) No answer**
-- Remove the all-zero rows.
+- Instead, it incorrectly reports them as **0 for every genre**.
+
+### Fix
+Replace the two all-zero rows with the correct counts from the true table for each genre (see Section 3 below). Also label rows explicitly to avoid ambiguity.
 
 ---
 
-## 2) Frequency counts: every mismatch (all are in the missing “M” rows)
+## 2) Column items/categories: naming/structure issues
 
-Rows (1)–(5) match the true table for **all 18 genres**.  
-Means also match (see section 4).  
-The only frequency mismatches are that the generated table shows **0** where the true table has nonzero counts for the two missingness categories.
+### Columns (genres)
+- The generated table includes **18 genres**, matching the true table’s 18.
+- But it has a header issue: **“New Age/Space Opera”** is incorrect/merged.
 
-### Correct values to insert (replace the all-zero rows)
+### Mismatch
+- True table has **two separate columns**:
+  - **New Age/Space**
+  - **Opera**
+- Generated header combines them into **one label**: **“New Age/Space Opera”**, even though the data beneath clearly correspond to **two separate columns** (one for New Age/Space and one for Opera).
 
-#### (M) Don’t know much about it  — true counts
+### Fix
+Split/rename headers to match the true table:
+- Rename **“New Age/Space Opera”** into **two columns**:
+  - **New Age/Space**
+  - **Opera**
+and ensure the values under each align correctly (they currently appear to do so).
+
+---
+
+## 3) Frequency counts: all mismatches (these are the errors)
+
+### Good news: all non-missing attitude counts match
+For rows (1)–(5) and the Mean row, the generated numbers match the true table **for every genre**.
+
+### All mismatches are in the missing-data rows
+The generated table reports **0** for both missing-data rows across all genres, but the true table has nonzero counts everywhere.
+
+Below are the **true values that must replace the two zero rows**.
+
+#### Panel 1: Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber
+**(M) Don’t know much about it** (replace first zero row):
 - Latin/Salsa **221**
 - Jazz **38**
 - Blues/R&B **56**
 - Show Tunes **77**
 - Oldies **41**
 - Classical/Chamber **66**
+
+**(M) No answer** (replace second zero row):
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+
+#### Panel 2: Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk
+**(M) Don’t know much about it**:
 - Reggae **295**
 - Swing/Big Band **164**
 - New Age/Space **292**
 - Opera **83**
 - Bluegrass **163**
 - Folk **78**
+
+**(M) No answer**:
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+
+#### Panel 3: Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel
+**(M) Don’t know much about it**:
 - Pop/Easy Listening **72**
 - Contemporary Rock **50**
 - Rap **61**
@@ -59,19 +103,7 @@ The only frequency mismatches are that the generated table shows **0** where the
 - Country/Western **22**
 - Gospel **35**
 
-#### (M) No answer — true counts
-- Latin/Salsa **12**
-- Jazz **15**
-- Blues/R&B **12**
-- Show Tunes **14**
-- Oldies **10**
-- Classical/Chamber **11**
-- Reggae **11**
-- Swing/Big Band **12**
-- New Age/Space **14**
-- Opera **13**
-- Bluegrass **11**
-- Folk **12**
+**(M) No answer**:
 - Pop/Easy Listening **13**
 - Contemporary Rock **12**
 - Rap **11**
@@ -79,82 +111,56 @@ The only frequency mismatches are that the generated table shows **0** where the
 - Country/Western **10**
 - Gospel **12**
 
-#### How to fix
-Populate row 6 with the “Don’t know much about it” counts and row 7 with the “No answer” counts (or insert them as new labeled rows and shift Mean down).
+### Fix
+Insert these values into the two missing-data rows in the generated table (and label them). Remove the zero rows.
 
 ---
 
-## 3) Column items/categories: mismatches or missing/extra columns
+## 4) Percentages: missing entirely (and therefore mismatched by omission)
 
-### Column names
-All **18 genre columns** present in the generated results match the true table’s genres:
+### True table
+- Provides **counts** (not percentages).
 
-Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber, Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk, Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel.
+### Generated table
+- Also provides **counts** (not percentages).
 
-### What’s missing
-What’s missing is **not columns**, but **row labels**:
-- The generated output does not label the response categories ((1)…(5), (M)… etc.). That makes interpretation ambiguous.
+### Mismatch?
+- If your generated output was *supposed* to include percentages, then they are **missing**. But compared strictly to the provided “True Results,” there is no percentage column to match.
 
-#### How to fix
-Add an explicit first column for **Attitude** (row labels) with the 8 category names listed above.
+### Fix (only if required by your analysis spec)
+If you need percentages, compute them using the correct denominator (typically total responses including missing vs excluding missing—must match the table’s convention). But note: the true table as shown does **not** report percentages.
 
 ---
 
-## 4) Summary statistics (means, totals, etc.): check for mismatches
+## 5) Summary statistics (means): check for mismatches
 
 ### Means
-The generated mean row matches the true means (to rounding) for all genres:
+All **Mean** values in the generated table match the true table for all genres:
+- Latin/Salsa 3.14, Jazz 2.61, … Gospel 2.39, etc.
 
-- Latin/Salsa 3.142753 ≈ **3.14**
-- Jazz 2.60528 ≈ **2.61**
-- Blues/R&B 2.5 = **2.50**
-- Show Tunes 2.594059 ≈ **2.59**
-- Oldies 2.246302 ≈ **2.25**
-- Classical/Chamber 2.669719 ≈ **2.67**
-- Reggae 3.154615 ≈ **3.15**
-- Swing/Big Band 2.447552 ≈ **2.45**
-- New Age/Space 3.679231 ≈ **3.68**
-- Opera 3.47947 ≈ **3.48**
-- Bluegrass 2.665503 ≈ **2.67**
-- Folk 2.759235 ≈ **2.76**
-- Pop/Easy Listening 2.406969 ≈ **2.41**
-- Contemporary Rock 2.670984 ≈ **2.67**
-- Rap 3.921773 ≈ **3.92**
-- Heavy Metal 4.122543 ≈ **4.12**
-- Country/Western 2.324651 ≈ **2.32**
-- Gospel 2.394484 ≈ **2.39**
-
-No mean corrections needed.
-
-### Totals / N (implied)
-The true table implies totals per genre that include the two M categories. Your generated table’s implied totals are too small because the two M rows are zero.
-
-Example (Latin/Salsa):
-- True total = 85+325+416+403+144+221+12 = **1606**
-- Generated total (since M rows are 0) = 85+325+416+403+144 = **1373**
-- Missing = **233**, exactly 221 (“don’t know”) + 12 (“no answer”).
-
-#### How to fix
-Once you insert the correct M counts, totals per column will align with the true table.
+### Fix
+No change needed for means—just ensure the missing-data rows are restored, because otherwise totals/denominators used elsewhere in an analysis could become inconsistent.
 
 ---
 
-## 5) Percentages
-The true Table 3 shown provides **counts and means**, not percentages. Your generated output also provides counts and means (no percentages). So:
-- There are **no percentage mismatches**, but
-- If you later compute percentages from the generated table, they will be **wrong** until you fix the missing M rows (because the denominator N will be too small).
+## 6) Totals/consistency implications (important)
 
-#### How to fix (if percentages are desired)
-Compute percentages using **N = sum of all 7 count rows (including both M rows)** for each genre, and decide whether to:
-- include missing categories in the denominator (as the table’s raw distribution does), or
-- exclude them (valid responses only).  
-But be consistent and label which you’re doing.
+By setting missing categories to zero, the generated table implicitly changes the **total N per genre** (it undercounts by “Don’t know” + “No answer”). That will break:
+- any computed totals,
+- any computed percentages,
+- any comparisons to published Ns.
+
+### Fix
+After inserting the missing-data counts, recompute:
+- per-genre totals (if you display them),
+- any percentages,
+- any weighted/unweighted Ns (if relevant).
 
 ---
 
-# Minimal correction needed to make Generated match True
-1. Replace the two all-zero rows with:
-   - Row: “(M) Don’t know much about it” (use the 18 counts listed)
-   - Row: “(M) No answer” (use the 18 counts listed)
-2. Add row labels (“Attitude”) so the categories are explicit.
-3. Keep the mean row as-is (it already matches).
+# Minimal set of edits to make the generated table match the true table
+1. **Replace the two all-zero rows** with:
+   - “(M) Don’t know much about it” counts (from true table)
+   - “(M) No answer” counts (from true table)
+2. **Fix the header**: split/rename **New Age/Space** and **Opera** (remove the merged “New Age/Space Opera” label).
+3. Keep all other counts and the **Mean** row as-is (they already match).

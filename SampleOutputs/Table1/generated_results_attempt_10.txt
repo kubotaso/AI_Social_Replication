@@ -1,43 +1,53 @@
 ## fit_stats
-                          model   n       r2   adj_r2
-                  Model 1 (SES) 793 0.107613 0.104220
-          Model 2 (Demographic)  48 0.474051 0.331903
-Model 3 (Political intolerance)  26 0.524212 0.207020
+                          model   N       R2   Adj_R2     const dropped_no_variance
+                  Model 1 (SES) 758 0.108770 0.105224 11.085710                    
+          Model 2 (Demographic) 306 0.182998 0.155303  9.859296         no_religion
+Model 3 (Political intolerance) 171 0.170758 0.113389  4.638904         no_religion
 
-## tables
-{'Model 1 (SES)':        term       beta             p  sig
-0  Constant  10.832928  2.000622e-64  ***
-1  educ_yrs  -0.329748  1.533161e-15  ***
-2    inc_pc  -0.033565  3.637382e-01     
-3  prestg80   0.029083  4.759880e-01     , 'Model 2 (Demographic)':          term      beta         p sig
-0    Constant  7.398981  0.138420    
-1    educ_yrs -0.739400  0.001078  **
-2      inc_pc  0.092167  0.660644    
-3    prestg80  0.447898  0.012693   *
-4      female  0.011249  0.939254    
-5         age  0.060112  0.675672    
-6       black  0.004607  0.982548    
-7    hispanic -0.019153  0.922609    
-8   otherrace       NaN       NaN    
-9   cons_prot  0.440254  0.005055  **
-10    norelig  0.056214  0.701479    
-11      south  0.162831  0.214174    , 'Model 3 (Political intolerance)':          term      beta         p sig
-0    Constant -0.204419  0.980857    
-1    educ_yrs -0.194006  0.598984    
-2      inc_pc -0.054157  0.872823    
-3    prestg80  0.269648  0.435317    
-4      female  0.120599  0.599409    
-5         age  0.274388  0.323495    
-6       black -0.067794  0.793276    
-7    hispanic       NaN       NaN    
-8   otherrace       NaN       NaN    
-9   cons_prot  0.540246  0.034535   *
-10    norelig  0.056697  0.811084    
-11      south  0.234969  0.321346    
-12  pol_intol  0.057794  0.841059    }
+## table1_style_betas
+Model 1 (SES) Model 2 (Demographic) Model 3 (Political intolerance)
+    -0.332***             -0.326***                          -0.070
+       -0.034                -0.027                          -0.065
+        0.029                 0.010                           0.008
+          NaN                -0.066                          -0.090
+          NaN                 0.107                           0.141
+          NaN                -0.008                          -0.043
+          NaN                 0.060                          0.173*
+          NaN                 0.007                           0.085
+          NaN                 0.078                           0.004
+          NaN                                                      
+          NaN               0.142**                          0.151*
+          NaN                   NaN                         0.214**
+
+## coefficients_long
+                          model         term  included  beta_std        p_raw sig
+                  Model 1 (SES)         educ      True -0.331721 1.770045e-15 ***
+                  Model 1 (SES)       inc_pc      True -0.033879 3.650009e-01    
+                  Model 1 (SES)     prestg80      True  0.029360 4.755042e-01    
+          Model 2 (Demographic)         educ      True -0.326499 1.451933e-06 ***
+          Model 2 (Demographic)       inc_pc      True -0.027422 6.439502e-01    
+          Model 2 (Demographic)     prestg80      True  0.009838 8.746741e-01    
+          Model 2 (Demographic)       female      True -0.066217 2.228558e-01    
+          Model 2 (Demographic)          age      True  0.107221 5.913135e-02    
+          Model 2 (Demographic)        black      True -0.007610 8.871330e-01    
+          Model 2 (Demographic)     hispanic      True  0.059876 2.789597e-01    
+          Model 2 (Demographic)   other_race      True  0.006574 9.035366e-01    
+          Model 2 (Demographic) conserv_prot      True  0.078430 1.629049e-01    
+          Model 2 (Demographic)  no_religion     False       NaN          NaN    
+          Model 2 (Demographic)        south      True  0.141993 8.411858e-03  **
+Model 3 (Political intolerance)         educ      True -0.070022 4.476140e-01    
+Model 3 (Political intolerance)       inc_pc      True -0.065238 4.308319e-01    
+Model 3 (Political intolerance)     prestg80      True  0.007878 9.275500e-01    
+Model 3 (Political intolerance)       female      True -0.090166 2.374193e-01    
+Model 3 (Political intolerance)          age      True  0.141106 7.256551e-02    
+Model 3 (Political intolerance)        black      True -0.043463 5.665929e-01    
+Model 3 (Political intolerance)     hispanic      True  0.172646 2.425007e-02   *
+Model 3 (Political intolerance)   other_race      True  0.085371 2.642161e-01    
+Model 3 (Political intolerance) conserv_prot      True  0.003874 9.606437e-01    
+Model 3 (Political intolerance)  no_religion     False       NaN          NaN    
+Model 3 (Political intolerance)        south      True  0.151112 4.716859e-02   *
+Model 3 (Political intolerance)     polintol      True  0.214398 6.789612e-03  **
 
 ## diagnostics
-                          model  n_after_listwise  dv_mean    dv_sd
-                  Model 1 (SES)               793 5.655738 3.566874
-          Model 2 (Demographic)                48 6.333333 4.104537
-Model 3 (Political intolerance)                26 7.115385 4.172501
+ base_N_complete_music_DV  N_complete_M1_vars  N_complete_M2_vars  N_complete_M3_vars  N_polintol_complete15  N_hispanic_nonmissing  N_conserv_prot_nonmissing
+                      893                 758                 306                 171                    491                    612                        560

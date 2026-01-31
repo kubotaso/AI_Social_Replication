@@ -1,0 +1,175 @@
+Score: 52/100
+============================================================
+
+## 1) Variable name / model labeling mismatches
+
+### 1.1 DV / model titles (mostly OK, but sample sizes and constants imply wrong model setup)
+- **Generated** DV labels match the paper’s wording closely.
+- **But** the generated models clearly were not fit on the same analytic samples (N differs) and likely not with the same DV scaling (see constants), so the model titles are misleading: they claim to reproduce Bryson’s Table 2 but the estimation does not.
+
+**Fix**
+- Recreate the DVs exactly as Bryson defines them (count of disliked genres in each set) **with the same item inclusion rules and missing-data handling** as the paper.
+- Then run OLS on the same sample restrictions (listwise deletion across *all* variables used in each model, matching Bryson).
+
+---
+
+## 2) Coefficient mismatches (Model 1)
+
+Bryson (true) vs Generated (std coefficients shown by you):
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.130** | 0.132100** | slight numeric diff |
+| Education | -0.175*** | -0.180520*** | diff |
+| Household income per capita | -0.037 | **+0.008959** | **sign wrong** |
+| Occupational prestige | -0.020 | -0.019044 | tiny diff |
+| Female | -0.057 | -0.071580 | diff |
+| Age | 0.163*** | 0.156779*** | diff |
+| Black | -0.132*** | **-0.144987*** (but sig shown as *) | **size + significance mismatch** |
+| Hispanic | -0.058 | **+0.005833** | **sign wrong** |
+| Other race | -0.017 | **+0.010904** | **sign wrong** |
+| Conservative Protestant | 0.063 | 0.083125 | diff |
+| No religion | 0.057 | 0.068296 | diff |
+| Southern | 0.024 | 0.027012 | tiny diff |
+| Constant | 2.415*** | 2.463298*** | diff |
+
+### Interpretation errors implied by mismatches
+- Your generated Model 1 implies **higher income predicts more dislike** (positive β), while Bryson shows **higher income predicts less dislike** (negative β).
+- Your generated Model 1 implies Hispanics/Other race have ~0 or slightly positive associations, while Bryson shows **negative** coefficients for both.
+
+**Fix**
+- The pattern (income/hispanic/other_race signs flipped) strongly suggests **coding/reference-category or variable-construction differences**, not rounding.
+  - Verify that *Household income per capita* is coded and transformed the same way (paper likely uses per-capita income; you must replicate equivalization and any transformations).
+  - Verify race dummies and omitted category. Bryson’s table uses: Black, Hispanic, Other race with **White as reference**. Ensure that is exactly what you did.
+  - Confirm “dislike” coding direction (e.g., 1=dislike). If you accidentally reversed the DV for some genres or used “like” instead of “dislike,” signs can flip.
+
+---
+
+## 3) Coefficient mismatches (Model 2)
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.080 | **-0.005172** | **sign & magnitude wrong** |
+| Education | -0.242*** | -0.189323*** | wrong magnitude |
+| Household income per capita | -0.065 | -0.038334 | magnitude diff |
+| Occupational prestige | 0.005 | **-0.012600** | **sign wrong** |
+| Female | -0.070 | -0.067817 | close |
+| Age | 0.126** | 0.122638** | close |
+| Black | 0.042 | **0.138292*** (sig shown as *) | **much too large + significance mismatch** |
+| Hispanic | -0.029 | -0.097166 | too negative |
+| Other race | 0.047 | 0.075722 | diff |
+| Conservative Protestant | 0.048 | **0.111038*** (sig shown as *) | too large + sig mismatch |
+| No religion | 0.024 | 0.018473 | close |
+| Southern | 0.069 | 0.066530 | close |
+| Constant | 7.860 (no stars shown) | **4.908186*** | **wrong scale + wrong inference** |
+
+### Interpretation errors implied by mismatches
+- Bryson’s Model 2: racism is **positive (0.080)** though not significant; your output makes it ~0 and slightly negative.
+- You substantially overstate effects for Black and Conservative Protestant.
+- The constant is wildly different, which strongly indicates the **DV is not the same metric** (or the model is not estimated on the same scale/sample).
+
+**Fix**
+- Rebuild DV2 exactly (“count of 12 remaining genres disliked”), including:
+  - exact list of the 12 genres,
+  - same response-to-dislike threshold,
+  - same missing handling across the 12 items.
+- Ensure you are reporting **standardized betas** (Bryson) for slopes, but recognize: **the intercept should be unstandardized** (Bryson reports a constant; yours is unstandardized too, but it differs because DV construction/sample differs).
+- Ensure any weighting (if Bryson used survey weights) is handled the same way. Different weighting can shift coefficients and especially significance.
+
+---
+
+## 4) Significance / stars mismatches (both models)
+
+### 4.1 Model 1: Black significance
+- **True:** Black = **-0.132***  
+- **Generated:** Black = -0.144987 but marked only “*”
+
+That’s a direct mismatch in inferential labeling.
+
+**Fix**
+- If you’re recreating Bryson, don’t compute stars from your regression unless your p-values match the paper’s design (sample, weights, df, etc.).
+- If you want to match Table 2 exactly, **hard-code the stars exactly as printed** once coefficients are matched, or replicate the exact testing approach (including any weighting/design corrections).
+
+### 4.2 Model 2: multiple star mismatches
+- **True:** Racism has **no stars**; Black has **no stars**; Conservative Protestant has **no stars**; Constant has **no stars shown**.
+- **Generated:** Black and Conservative Protestant have stars; Constant has ***.
+
+**Fix**
+- Same as above: correct the estimation first (to match coefficients), then ensure significance markers follow Bryson’s printed table. Otherwise you are reporting *a different analysis*.
+
+---
+
+## 5) Standard errors: generated output includes none (and shouldn’t)
+
+- **True results:** explicitly: *Table 2 does not report standard errors*.  
+- **Generated results:** you also do not show SEs in the coefficient tables, which is consistent.
+
+**But there is still a “standard error / inference mismatch” problem**: you are *adding or changing significance* relative to the paper (stars differ), implying different SEs/p-values.
+
+**Fix**
+- Either:
+  1) Remove stars entirely (since Bryson’s table is being “reproduced” but you cannot validate p-values without exact replication), **or**
+  2) Replicate the paper’s sample/weights/tests so stars align.
+
+---
+
+## 6) Model fit + N mismatches (major)
+
+### Model 1
+- **True:** N = 644; R² = 0.145; Adj R² = 0.129
+- **Generated:** N = 549; R² = 0.133045; Adj R² = 0.113635
+
+### Model 2
+- **True:** N = 605; R² = 0.147; Adj R² = 0.130
+- **Generated:** N = 507; R² = 0.123734; Adj R² = 0.102448
+
+**Fix**
+- Your preprocessing is dropping far more cases than Bryson.
+  - Apply the same missing-data rules. Bryson likely uses listwise deletion *per model* but with fewer missing items than your construction, or uses different recodes that reduce missingness.
+  - Confirm you didn’t inadvertently drop cases due to “Dropped_no_variation” logic, merging errors, or NA generation during per-capita income computation.
+  - Confirm you’re using the same survey year/sample and the same universe restrictions as Bryson.
+
+---
+
+## 7) Constant / scaling mismatches (major)
+
+- **Model 1 constant:** 2.415 vs 2.463 (moderate mismatch)
+- **Model 2 constant:** 7.860 vs 4.908 (huge mismatch)
+
+The Model 2 intercept difference is too large to be “rounding”—it indicates the DV isn’t the same (different genre set, different dislike threshold, or different coding range), or the model sample differs substantially.
+
+**Fix**
+- Verify DV2 maximum is 12 and that each genre contributes 0/1 to the count exactly as Bryson defines.
+- Check whether Bryson’s DV is a **count of “dislikes”** vs your possible count of “not likes,” “strong dislikes only,” or inclusion of DK/refused as dislike/missing.
+
+---
+
+## 8) What to change so the generated analysis matches Bryson exactly (practical checklist)
+
+1. **Reconstruct both DVs from raw genre items**
+   - Use the exact 6 “minority-linked” genres for Model 1 and the exact remaining 12 for Model 2.
+   - Apply the exact “dislike” definition (response category threshold) used in Bryson.
+   - Handle DK/NA exactly as in Bryson (most likely set to missing and then listwise delete).
+
+2. **Match variable coding**
+   - Race dummies: Black/Hispanic/Other with White omitted.
+   - Female: confirm 1=female.
+   - Religion: Conservative Protestant and No religion coded as dummies with the same reference group as Bryson.
+   - Southern: confirm definition.
+
+3. **Match income and prestige construction**
+   - Confirm “income per capita” is truly per-capita (household income divided by household size) and in the same units; check any trimming/logging.
+   - Confirm occupational prestige scale matches Bryson’s source.
+
+4. **Match sample + missing data**
+   - Replicate Bryson’s N (644 and 605). If you cannot, document exactly why (different dataset version, missing items, different universe).
+   - Ensure you are not accidentally restricting to complete cases across *both* models simultaneously.
+
+5. **Report the same estimand**
+   - Bryson reports **standardized OLS coefficients** for slopes. Ensure you compute standardized betas the same way (standardizing X and Y within the model’s analytic sample).
+   - Keep intercept unstandardized.
+
+6. **Only then address stars**
+   - After coefficients match, apply the same star thresholds *as printed*. If your p-values still differ, that’s evidence you still haven’t matched the design/sample.
+
+If you want, paste your code (or at least your DV construction and recodes), and I can pinpoint which step is causing the sign flips (income/hispanic/other_race in Model 1; racism and prestige in Model 2 are the biggest red flags).

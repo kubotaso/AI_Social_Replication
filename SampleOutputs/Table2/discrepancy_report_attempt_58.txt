@@ -1,0 +1,170 @@
+Score: 25/100
+============================================================
+
+### 1) Model/DV labeling mostly matches, but the *model numbers and samples do not*
+**Mismatch**
+- Generated calls them **Model A / Model B** (fine), but the *true table* is **Model 1 / Model 2** with **N=644** and **N=605**.
+- Generated reports **N=340** (Model A) and **N=326** (Model B), which is not just a rounding issue—it’s a different analytic sample (about half the size).
+- Generated DV descriptives show “All 1993” with N=1134 / 1057, which is not what Table 2 is reporting. Table 2’s N’s are 644 and 605 (already restricted/complete-case for that model).
+
+**How to fix**
+- Reproduce Bryson’s **exact case selection** for each model. Concretely:
+  - Use the same survey/year and the same inclusion criteria as the paper.
+  - Apply the same missing-data rule as the paper (Table 2 is effectively *model-wise complete cases* on the variables in that model).
+  - Ensure you are constructing the same DV counts from the same set of genre items and coding “dislike” identically.
+- Your pipeline should output N close to **644** and **605** if you match Table 2.
+
+---
+
+### 2) Variable-name mismatches and coding/proxy problems
+
+#### 2.1 Racism scale name and construction
+**Mismatch**
+- Generated: “Racism score (0–5; strict 5 items, sum)”  
+- True: “Racism score” (no “strict 5 items” language; the key issue is whether you built the *same* racism scale the author used).
+
+**How to fix**
+- Verify the racism scale construction exactly (items, coding direction, handling DK/NA, and whether it’s summed/averaged then standardized). Even small construction differences change standardized betas.
+
+#### 2.2 Hispanic variable is missing in the generated model but exists in Table 2
+**Mismatch**
+- Generated: “Hispanic indicator … dropped (unavailable)” (NaN)
+- True: Hispanic is included in both models with coefficients **-0.058** (Model 1) and **-0.029** (Model 2)
+
+**How to fix**
+- Use the dataset’s actual **Hispanic/Latino** measure (often a distinct variable, not derivable safely from a generic “ethnic” field).
+- If you only have RACE, do **not** treat “Hispanic” as unavailable—Table 2 clearly had it.
+- Add Hispanic to the design matrix and re-run OLS.
+
+#### 2.3 Conservative Protestant is incorrectly handled as a proxy
+**Mismatch**
+- Generated: “Conservative Protestant (proxy: RELIG==1 & DENOM==1…)”
+- True: “Conservative Protestant” (not described as a proxy; Bryson likely used a standard denomination classification)
+
+**How to fix**
+- Replicate the paper’s **religious tradition coding** (typically derived from denomination codes into conservative Protestant vs mainline vs Catholic, etc.).
+- Do not use a simplistic RELIG & DENOM conjunction unless you can prove it matches Bryson’s classification.
+
+#### 2.4 “No religion” wrongly dropped for “no variation”
+**Mismatch**
+- Generated drops “No religion (RELIG==4)” for “no variation”
+- True includes “No religion” with coefficients **0.057** (Model 1) and **0.024** (Model 2)
+
+**How to fix**
+- Your “no religion” coding is wrong (or you subsetted to a group where it becomes constant).
+- Recode “no religion” exactly as in the survey (often “none” vs “some religion”), and confirm variation *after* filtering and before modeling.
+- Ensure you aren’t mistakenly setting all missing religion to a single category.
+
+---
+
+### 3) Coefficient mismatches (every variable differs; some signs differ)
+
+Below are the **true** betas vs **generated** betas. Any difference here means your analysis is not reproducing Table 2.
+
+#### Model 1 / Generated Model A (Minority-linked genres)
+| Variable | True β | Generated β | Mismatch type |
+|---|---:|---:|---|
+| Racism score | 0.130** | 0.146** | value differs |
+| Education | -0.175*** | -0.266*** | value differs (too negative) |
+| Income pc | -0.037 | -0.048 | value differs |
+| Occ prestige | -0.020 | +0.025 | **sign error** |
+| Female | -0.057 | -0.027 | value differs |
+| Age | 0.163*** | 0.210*** | value differs |
+| Black | -0.132*** | -0.133* | **sig mismatch** (and SE/p differs) |
+| Hispanic | -0.058 | dropped | **variable missing** |
+| Other race | -0.017 | +0.010 | **sign error** |
+| Cons Protestant | 0.063 | 0.071 | value differs |
+| No religion | 0.057 | dropped | **variable missing** |
+| Southern | 0.024 | 0.0167 | value differs |
+| Constant | 2.415*** | 2.656*** | value differs |
+| R² | 0.145 | 0.205 | value differs |
+| Adj R² | 0.129 | 0.181 | value differs |
+| N | 644 | 340 | **major mismatch** |
+
+#### Model 2 / Generated Model B (Remaining genres)
+| Variable | True β | Generated β | Mismatch type |
+|---|---:|---:|---|
+| Racism score | 0.080 | 0.008 | large value mismatch |
+| Education | -0.242*** | -0.205** | value & **sig mismatch** |
+| Income pc | -0.065 | -0.098 | value differs |
+| Occ prestige | 0.005 | -0.026 | sign error |
+| Female | -0.070 | -0.079 | close-ish but not equal |
+| Age | 0.126** | 0.132* | sig mismatch (true **, generated *) |
+| Black | 0.042 | 0.092 | value differs |
+| Hispanic | -0.029 | dropped | variable missing |
+| Other race | 0.047 | 0.116* | value differs & sig mismatch |
+| Cons Protestant | 0.048 | 0.097 | value differs |
+| No religion | 0.024 | dropped | variable missing |
+| Southern | 0.069 | 0.121* | value differs & sig mismatch |
+| Constant | 7.860 | 5.205*** | **completely different** (and significance differs; Table 2 doesn’t even mark it significant) |
+| R² | 0.147 | 0.167 | value differs |
+| Adj R² | 0.130 | 0.141 | value differs |
+| N | 605 | 326 | major mismatch |
+
+**How to fix coefficients**
+- Once you fix (a) the analytic sample (N), (b) Hispanic and no religion inclusion, (c) correct religion and race coding, and (d) DV construction, the betas should move toward the published ones.
+- Standardized betas are sensitive to:
+  - whether you standardized using analytic-sample SDs (you should),
+  - whether you standardized dummy variables (Bryson’s “standardized OLS coefficients” implies all regressors were standardized in the regression output, including 0/1 dummies, or computed as y- and x-standardized prior to estimation—match the method),
+  - whether weights were used (many sociology survey analyses use weights; unweighted vs weighted can change betas and N).
+
+---
+
+### 4) Standard errors: generated output implies significance from SE/p-values, but Table 2 has no SEs
+**Mismatch**
+- You were asked to check “standard errors,” but:
+  - Generated results show significance stars (implying p-values/SEs were computed).
+  - True Table 2 reports **no SEs**; it only prints stars for coefficients.
+- So you cannot “match standard errors” to Table 2 because there are none to match.
+
+**How to fix**
+- Do **not** report SEs as “matching Table 2.” If you compute SEs, label them as *your computed SEs*, and be prepared that stars may not match unless you replicate:
+  - weighting,
+  - exact sample,
+  - exact DF handling,
+  - possibly robust vs conventional SEs.
+- If your goal is to match Table 2, focus on matching the **standardized coefficients and star pattern**, not SEs.
+
+---
+
+### 5) Interpretation/status text mismatches (dropped variables are incorrectly justified)
+**Mismatch**
+- “Dropped (unavailable)” for Hispanic is not a property of the data in Table 2; it’s a pipeline failure.
+- “Dropped (no variation)” for no religion is almost certainly a coding/subsetting error.
+
+**How to fix**
+- Add validation checks before estimation:
+  1. Frequency table for each categorical/dummy in the analytic sample.
+  2. Assert variance > 0 for each regressor.
+  3. Assert all Table-2 regressors exist and are populated before running models.
+  4. Compare N after listwise deletion to the target N (644/605); stop if far off.
+
+---
+
+### 6) Constants and model fit (R²) do not match; in Model 2 the constant is wildly different
+**Mismatch**
+- Model 1 constant: 2.415*** (true) vs 2.656*** (generated)
+- Model 2 constant: 7.860 (true) vs 5.205*** (generated)
+- R²/Adj R² also off in both models.
+
+**How to fix**
+- Constants will differ if:
+  - DV construction differs (very likely for Model 2 given the huge constant discrepancy),
+  - standardization procedure differs (sometimes intercepts are from unstandardized regression while betas are standardized),
+  - weights differ,
+  - sample differs.
+- To match Table 2: run the model exactly as Bryson did (OLS on the count DV) and then compute/report **standardized coefficients** the same way the software/paper did.
+
+---
+
+## Minimal “repair checklist” to make the generated analysis match Table 2
+1. **Recreate the two DVs** from the exact genre items and “dislike” coding used in the paper.
+2. **Use the same year/data subset** and any restrictions Bryson applied.
+3. **Include all Table 2 predictors**: racism, education, income pc, prestige, female, age, black, hispanic, other race, conservative Protestant, no religion, southern.
+4. **Fix Hispanic**: use the actual Hispanic variable; don’t infer it from a generic “ethnic” field.
+5. **Fix religion variables**: replicate Bryson’s conservative Protestant and no-religion coding; stop using ad hoc proxies unless validated.
+6. **Match missing-data handling**: model-wise listwise deletion to reach N≈644 and N≈605.
+7. **Confirm standardization method** for betas (and whether weights were used); replicate it exactly.
+8. Only then compare coefficients and significance stars; do not claim to match SEs because Table 2 provides none.
+
+If you paste your codebook/variable list (especially the race/ethnicity and religion variables) and how you constructed the two DV counts, I can point to the *specific* recodes that would most likely move each coefficient toward the published values.

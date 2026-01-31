@@ -1,0 +1,99 @@
+Score: 65/100
+============================================================
+
+### 1) Row items/categories mismatches (missing/extra rows)
+
+**Mismatch:** In the *Generated Results*, the last two response categories are present but all zeros:
+
+- **(M) Don’t know much about it** → generated: all **0**
+- **(M) No answer** → generated: all **0**
+
+**True table:** These two rows have **nonzero** counts for *every* genre (with varying values by genre).
+
+**How to fix:** Populate these two rows with the correct counts from the true table (listed below under section 2). Do **not** leave them as zeros.
+
+---
+
+### 2) Frequency count mismatches (by row/category and genre)
+
+All counts for response categories **(1)–(5)** match the true table across all 18 genres.
+
+The **only frequency-count errors** are the two “missing-data” rows: **(M) Don’t know much about it** and **(M) No answer**. They are incorrectly **0 for all genres** in the generated output.
+
+#### Correct values that must replace the zeros
+
+**Panel 1 genres**
+- **Latin/Salsa:** DK=221, NA=12  
+- **Jazz:** DK=38, NA=15  
+- **Blues/R&B:** DK=56, NA=12  
+- **Show Tunes:** DK=77, NA=14  
+- **Oldies:** DK=41, NA=10  
+- **Classical/Chamber:** DK=66, NA=11  
+
+**Panel 2 genres**
+- **Reggae:** DK=295, NA=11  
+- **Swing/Big Band:** DK=164, NA=12  
+- **New Age/Space:** DK=292, NA=14  
+- **Opera:** DK=83, NA=13  
+- **Bluegrass:** DK=163, NA=11  
+- **Folk:** DK=78, NA=12  
+
+**Panel 3 genres**
+- **Pop/Easy Listening:** DK=72, NA=13  
+- **Contemporary Rock:** DK=50, NA=12  
+- **Rap:** DK=61, NA=11  
+- **Heavy Metal:** DK=70, NA=10  
+- **Country/Western:** DK=22, NA=10  
+- **Gospel:** DK=35, NA=12  
+
+**How to fix:** Copy these counts into the generated table’s two “(M)” rows.
+
+---
+
+### 3) Percentages
+
+**Mismatch type:** The generated table provides **no percentages at all**, while your instructions ask to compare “frequency counts or percentages.”
+
+**True table:** Also shows counts only (no percentages). So there is **no count-vs-percent discrepancy**, but if your “generated analysis” was expected to include percentages, then the generated output is **missing a column/row of percentages** (or a separate percentage table).
+
+**How to fix (if percentages are required):**
+- Add percentages computed as `count / column total * 100` for each genre.
+- Important: the **column totals must include the DK and No answer rows** (otherwise percentages won’t match any “true” percent computed from full N).
+
+---
+
+### 4) Summary statistics mismatches (means, totals, etc.)
+
+**Means:** All **Mean** values in the generated table match the true table exactly.
+
+**But** there is an implied summary-stat issue:
+
+- If the means were computed **ignoring** DK/NA but the generated table sets DK/NA to zero, then the table is internally inconsistent as a “full distribution” table. Even though the displayed means match, the **distribution presented** is wrong because it omits missing-data counts.
+
+**How to fix:**
+- Keep the means as shown (they match the true table).
+- Correct the DK/NA counts so the frequency distribution aligns with the means and the true N’s.
+
+---
+
+### 5) Missing or extra column categories / naming issues
+
+**Column/category labeling mismatch (minor):**
+- Generated header appears to combine **“New Age/Space Opera”** into one column label.
+- True table has **two separate columns**: **“New Age/Space”** and **“Opera.”**
+
+However, the generated table *does* show two separate columns’ worth of numbers (New Age/Space values and Opera values), but the header text is merged/misaligned.
+
+**How to fix:**
+- Split/rename the column headers to match the true table:
+  - **New Age/Space**
+  - **Opera**
+- Ensure each numeric column is under the correct header.
+
+---
+
+## Net: Every mismatch to correct
+1) Replace the all-zero **DK** row with the correct DK counts for each genre.  
+2) Replace the all-zero **No answer** row with the correct NA counts for each genre.  
+3) Fix the merged/misaligned header: separate **New Age/Space** and **Opera** into distinct column labels.  
+4) If percentages are expected in the “generated analysis,” compute them using totals that **include DK and NA**.

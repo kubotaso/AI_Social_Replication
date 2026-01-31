@@ -1,17 +1,40 @@
 Traceback (most recent call last):
-  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Table1.py", line 293, in try_run_generated_code
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Table1.py", line 286, in try_run_generated_code
     result = mod.run_analysis(str(data_path))  # type: ignore[attr-defined]
-  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260119_074740/Table1/generated_analysis.py", line 116, in run_analysis
-    df.loc[df["relig"].notna() & df["denom"].notna(), "cons_prot"] = np.where(is_prot & denom_cons, 1, 0)
-    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/indexing.py", line 912, in __setitem__
-    iloc._setitem_with_indexer(indexer, value, self.name)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/indexing.py", line 1943, in _setitem_with_indexer
-    self._setitem_with_indexer_split_path(indexer, value, name)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/indexing.py", line 1999, in _setitem_with_indexer_split_path
-    raise ValueError(
-    ...<2 lines>...
-    )
-ValueError: Must have equal len keys and value when setting with an iterable
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_table1/generated_analysis.py", line 178, in run_analysis
+    m2, n2 = fit_std_ols(df_music, y, x_m2)
+             ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_table1/generated_analysis.py", line 32, in fit_std_ols
+    model = sm.OLS(y_std, X).fit()
+            ~~~~~~^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/regression/linear_model.py", line 921, in __init__
+    super().__init__(endog, exog, missing=missing,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                              hasconst=hasconst, **kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/regression/linear_model.py", line 746, in __init__
+    super().__init__(endog, exog, missing=missing,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                              weights=weights, hasconst=hasconst, **kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/regression/linear_model.py", line 200, in __init__
+    super().__init__(endog, exog, **kwargs)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/base/model.py", line 270, in __init__
+    super().__init__(endog, exog, **kwargs)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/base/model.py", line 95, in __init__
+    self.data = self._handle_data(endog, exog, missing, hasconst,
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                  **kwargs)
+                                  ^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/base/model.py", line 135, in _handle_data
+    data = handle_data(endog, exog, missing, hasconst, **kwargs)
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/base/data.py", line 694, in handle_data
+    return klass(endog, exog=exog, missing=missing, hasconst=hasconst, **kwargs)
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/base/data.py", line 90, in __init__
+    self._handle_constant(hasconst)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/.venv/lib/python3.13/site-packages/statsmodels/base/data.py", line 139, in _handle_constant
+    raise MissingDataError("exog contains inf or nans")
+statsmodels.tools.sm_exceptions.MissingDataError: exog contains inf or nans

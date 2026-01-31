@@ -1,0 +1,99 @@
+## table1_style
+Model 1 (SES) Model 2 (Demographic) Model 3 (Political intolerance)
+    -0.332***             -0.302***                         -0.157*
+       -0.034                -0.057                          -0.067
+        0.029                -0.007                          -0.008
+          NaN                -0.078                         -0.118*
+          NaN                0.109*                           0.092
+          NaN                 0.053                           0.004
+          NaN                -0.017                           0.091
+          NaN                -0.016                           0.053
+          NaN                 0.040                          -0.011
+          NaN                -0.016                           0.018
+          NaN                 0.079                           0.073
+          NaN                   NaN                         0.196**
+       11.086                10.089                           7.583
+        0.109                 0.157                           0.152
+        0.105                 0.139                           0.115
+          758                   523                             293
+
+## fit_stats
+                          model   N       R2   Adj_R2     const dropped_no_variance
+                  Model 1 (SES) 758 0.108770 0.105224 11.085710                    
+          Model 2 (Demographic) 523 0.157249 0.139108 10.088708                    
+Model 3 (Political intolerance) 293 0.151507 0.115143  7.583088                    
+
+## coefficients_long
+                          model         term  included  coef_raw  beta_std        p_raw sig
+                  Model 1 (SES)         educ      True -0.414328 -0.331721 1.770045e-15 ***
+                  Model 1 (SES)       inc_pc      True -0.000008 -0.033879 3.650009e-01    
+                  Model 1 (SES)     prestg80      True  0.007698  0.029360 4.755042e-01    
+          Model 2 (Demographic)         educ      True -0.379435 -0.301951 4.455592e-09 ***
+          Model 2 (Demographic)       inc_pc      True -0.000014 -0.056601 2.085878e-01    
+          Model 2 (Demographic)     prestg80      True -0.002021 -0.007465 8.787998e-01    
+          Model 2 (Demographic)       female      True -0.544751 -0.077553 6.129741e-02    
+          Model 2 (Demographic)          age      True  0.026309  0.108869 1.173121e-02   *
+          Model 2 (Demographic)        black      True  0.598957  0.052850 5.033149e-01    
+          Model 2 (Demographic)     hispanic      True -0.216962 -0.017186 8.261752e-01    
+          Model 2 (Demographic)   other_race      True -0.236347 -0.015926 6.994779e-01    
+          Model 2 (Demographic) conserv_prot      True  0.299448  0.040025 3.702401e-01    
+          Model 2 (Demographic)  no_religion      True -0.186814 -0.016222 7.029326e-01    
+          Model 2 (Demographic)        south      True  0.617424  0.078870 6.137637e-02    
+Model 3 (Political intolerance)         educ      True -0.223469 -0.157065 2.441827e-02   *
+Model 3 (Political intolerance)       inc_pc      True -0.000015 -0.066990 2.844876e-01    
+Model 3 (Political intolerance)     prestg80      True -0.002364 -0.008358 9.013496e-01    
+Model 3 (Political intolerance)       female      True -0.832743 -0.118333 3.723606e-02   *
+Model 3 (Political intolerance)          age      True  0.023007  0.091830 1.189737e-01    
+Model 3 (Political intolerance)        black      True  0.049475  0.004331 9.655318e-01    
+Model 3 (Political intolerance)     hispanic      True  1.169661  0.091279 3.578560e-01    
+Model 3 (Political intolerance)   other_race      True  0.841406  0.052772 3.530923e-01    
+Model 3 (Political intolerance) conserv_prot      True -0.081461 -0.010694 8.569663e-01    
+Model 3 (Political intolerance)  no_religion      True  0.213496  0.017862 7.600321e-01    
+Model 3 (Political intolerance)        south      True  0.569776  0.073324 2.052576e-01    
+Model 3 (Political intolerance)     polintol      True  0.159782  0.195556 1.627311e-03  **
+
+## diagnostics
+ N_year_1993  N_complete_music_items  N_M1_completecases  N_M2_completecases  N_M3_completecases  N_hispanic_nonmissing  N_polintol_complete15  N_conserv_prot_nonmissing
+        1606                     893                 758                 523                 293                    612                    491                        890
+
+## estimation_samples
+{'m1':       exclusiveness  educ        inc_pc  prestg80
+0              10.0  11.0  17685.000000      42.0
+1               2.0  16.0  17685.000000      42.0
+2               4.0  16.0  35370.000000      52.0
+6               3.0  12.0  21615.000000      46.0
+8               0.0  18.0  34626.666667      49.0
+...             ...   ...           ...       ...
+1598            4.0  13.0  25970.000000      72.0
+1599           13.0  12.0   9825.000000      46.0
+1600           10.0  17.0  51940.000000      65.0
+1604            3.0  16.0  21615.000000      49.0
+1605            7.0  18.0  14285.324250      44.0
+
+[758 rows x 4 columns], 'm2':       exclusiveness  educ        inc_pc  prestg80  ...  other_race  conserv_prot  no_religion  south
+0              10.0  11.0  17685.000000      42.0  ...         0.0           0.0          0.0    0.0
+1               2.0  16.0  17685.000000      42.0  ...         0.0           0.0          1.0    0.0
+2               4.0  16.0  35370.000000      52.0  ...         0.0           0.0          0.0    0.0
+6               3.0  12.0  21615.000000      46.0  ...         0.0           0.0          0.0    0.0
+8               0.0  18.0  34626.666667      49.0  ...         0.0           0.0          0.0    0.0
+...             ...   ...           ...       ...  ...         ...           ...          ...    ...
+1598            4.0  13.0  25970.000000      72.0  ...         0.0           0.0          0.0    1.0
+1599           13.0  12.0   9825.000000      46.0  ...         0.0           0.0          0.0    1.0
+1600           10.0  17.0  51940.000000      65.0  ...         0.0           1.0          0.0    1.0
+1604            3.0  16.0  21615.000000      49.0  ...         0.0           0.0          0.0    0.0
+1605            7.0  18.0  14285.324250      44.0  ...         0.0           0.0          0.0    0.0
+
+[523 rows x 12 columns], 'm3':       exclusiveness  educ        inc_pc  prestg80  ...  conserv_prot  no_religion  south  polintol
+0              10.0  11.0  17685.000000      42.0  ...           0.0          0.0    0.0       1.0
+1               2.0  16.0  17685.000000      42.0  ...           0.0          1.0    0.0       0.0
+2               4.0  16.0  35370.000000      52.0  ...           0.0          0.0    0.0       0.0
+6               3.0  12.0  21615.000000      46.0  ...           0.0          0.0    0.0       5.0
+8               0.0  18.0  34626.666667      49.0  ...           0.0          0.0    0.0       0.0
+...             ...   ...           ...       ...  ...           ...          ...    ...       ...
+1579           10.0  11.0  14738.000000      42.0  ...           1.0          0.0    0.0      11.0
+1584            8.0  17.0  14285.324250      39.0  ...           0.0          0.0    0.0       3.0
+1596           11.0  17.0  25970.000000      64.0  ...           1.0          0.0    1.0       7.0
+1600           10.0  17.0  51940.000000      65.0  ...           1.0          0.0    1.0       0.0
+1604            3.0  16.0  21615.000000      49.0  ...           0.0          0.0    0.0       5.0
+
+[293 rows x 13 columns]}

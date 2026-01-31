@@ -1,262 +1,228 @@
-Score: 31/100
+Score: 54/100
 ============================================================
 
-Below is an item-by-item comparison of the **Generated Results** vs the **True Results (Table 1)**. I flag **every mismatch** in (a) variable names/presence, (b) coefficients (β), (c) constants, (d) fit statistics (R²/Adj R²/N), and (e) interpretation implied by signs/significance. Then I explain **how to fix** the generated analysis so it reproduces Table 1.
+Below is a line-by-line audit of **every mismatch** between the *Generated Results* and the *True Results* (PDF Table 1), grouped into (A) variable-name/inclusion problems, (B) coefficient/significance mismatches, (C) sample size + fit-stat mismatches, (D) standard error/reporting problems, and (E) interpretation/measurement mismatches. For each, I state **how to fix the analysis so the generated output matches the printed table**.
 
 ---
 
-## 1) Fit statistics mismatches (R², adjusted R², N)
+## A) Variable names and variable inclusion mismatches
+
+### A1) **Hispanic is missing entirely in the generated models**
+- **True Results:** Hispanic appears in Model 2 and Model 3 (coefficients shown).
+- **Generated Results:** Hispanic is omitted and a note says: *“Hispanic omitted: no usable Hispanic/ethnicity flag…”*
+
+**Fix**
+1. Identify the correct Hispanic/ethnicity variable in the dataset (common GSS-style names: `hispanic`, `hisp`, `ethnic`, `latino`, `ethnicity`, etc.).
+2. Recode to match the PDF’s dummy:
+   - `Hispanic = 1` if respondent is Hispanic/Latino, else `0`.
+3. Include it in Model 2 and Model 3 exactly as in Table 1.
+
+---
+
+### A2) **Occupational prestige term name differs (prestg80 vs Occupational prestige)**
+- **True Results:** “Occupational prestige”
+- **Generated Results:** `prestg80`
+
+This may be only a label mismatch, but it can also hide a **measurement mismatch** if the PDF used a different prestige scale/variable than `prestg80`.
+
+**Fix**
+- Confirm the PDF’s prestige variable definition. If it truly corresponds to `prestg80`, just relabel it in the table output as **Occupational prestige**.
+- If the PDF used another prestige measure (e.g., `prestige`, `prestg10`, `sei`, etc.), swap in the correct variable and rerun.
+
+---
+
+### A3) Income variable naming/definition ambiguity
+- **True Results:** “Household income per capita”
+- **Generated Results:** `income_pc`
+
+Label difference is fine **only if** the construction matches the article.
+
+**Fix**
+- Verify construction: `income_pc = household_income / household_size` (and any logged/standardized form).
+- Ensure it is the same year-specific income measure and equivalence assumption used in the PDF.
+
+---
+
+## B) Coefficient and significance mismatches (by model)
+
+All coefficients in the PDF are **standardized betas**. Your generated coefficients are also labeled `beta_std`, so we compare directly.
 
 ### Model 1 (SES)
-**Generated fit_stats:** N=1347, R²=0.0876, Adj R²=0.0856  
-**True:** N=787, R²=0.107, Adj R²=0.104
 
-**Mismatches**
-- N is far larger (1347 vs 787).
-- R² and Adj R² are too low.
+| Term | True | Generated | Mismatch |
+|---|---:|---:|---|
+| Education | -0.322*** | -0.332*** | coefficient differs |
+| HH income pc | -0.037 | -0.034 | coefficient differs (small) |
+| Occ prestige | 0.016 | 0.029 | coefficient differs |
+| Constant | 10.920 | 11.086 | constant differs |
+| R² | 0.107 | 0.10877 | differs |
+| Adj R² | 0.104 | 0.105224 | differs |
+| N | 787 | 758 | **major mismatch** |
 
 **Fix**
-- Use the **same analytic sample as the paper**. Table 1’s N implies substantial listwise deletion and/or additional sample restrictions beyond what your missingness table suggests.
-- Ensure you are using **GSS 1993 only** and the same universe/filters (e.g., valid responses for DV and IVs, and any age/music-module restrictions).
-- Apply **listwise deletion per model** exactly as the paper did (likely: drop DK/NA/INAP codes, restrict to asked subsample for genre dislikes, etc.). Your N_model_frames suggests you are listwise-deleting, but on a *different* cleaned dataset than the authors’.
+- The coefficient drift is very plausibly driven by the **wrong estimation sample** (see Section C). Get N to match first (787), then coefficients will move toward the printed ones.
+- After fixing N, check standardization method (see Section E).
+
+---
 
 ### Model 2 (Demographic)
-**Generated:** N=895, R²=0.0909, Adj R²=0.0807  
-**True:** N=756, R²=0.151, Adj R²=0.139
 
-**Mismatches**
-- N too high (895 vs 756).
-- R²/Adj R² much too low.
+| Term | True | Generated | Mismatch |
+|---|---:|---:|---|
+| Education | -0.246*** | -0.259*** | coefficient differs |
+| HH income pc | -0.054 | -0.050 | coefficient differs |
+| Occ prestige | -0.006 | 0.006 | **sign differs** |
+| Female | -0.083* | -0.089** | coefficient & **sig** differ |
+| Age | 0.140*** | 0.129*** | coefficient differs |
+| Black | 0.029 | 0.030 | close |
+| Hispanic | -0.029 | — | **omitted** |
+| Other race | 0.005 | 0.001 | differs |
+| Cons Prot | 0.059 | 0.067 | differs |
+| No religion | -0.012 | -0.004 | differs |
+| Southern | 0.097** | 0.084* | coefficient & **sig** differ |
+| Constant | 8.507 | 8.788 | differs |
+| R² | 0.151 | 0.1452 | differs |
+| Adj R² | 0.139 | 0.1337 | differs |
+| N | 756 | 756 | matches |
 
 **Fix**
-- Same as Model 1, plus ensure **race/ethnicity and religion variables are coded exactly** like the paper (miscoding can reduce explanatory power and change N if INAP handling differs).
+1. Add **Hispanic** (A1). Omitting a covariate can change other coefficients and significance (notably prestige, female, southern).
+2. Ensure **identical reference categories**:
+   - Race dummies: if the PDF uses White as reference, you must include `black`, `hispanic`, `other_race` with White omitted.
+   - Religion dummies: ensure “Conservative Protestant” and “No religion” are coded vs the same omitted category as the paper.
+3. Ensure standardization approach matches the paper (E1). A sign flip on prestige (true: -0.006 vs generated: +0.006) is small, but it signals the model is not identical (often sample/coding).
+
+---
 
 ### Model 3 (Political intolerance)
-**Generated:** N=588, R²=0.1006, Adj R²=0.0834  
-**True:** N=503, R²=0.169, Adj R²=0.148
 
-**Mismatches**
-- N too high (588 vs 503).
-- R²/Adj R² far too low.
-
-**Fix**
-- Align the **political intolerance** measure construction and missing-value handling to the paper.
-- Make sure you’re using the same intolerance item(s)/scale and same coding direction.
-
----
-
-## 2) Variable-name / variable-inclusion mismatches
-
-### “Other race” appears as NaN in Generated Models 2 & 3
-**Generated (model2_full/model3_full):** `Other race = NaN` (no estimate)  
-**True:** Other race is included with nonzero β (Model 2: 0.005; Model 3: 0.053)
-
-**What this indicates**
-- Perfect collinearity / empty category / dropped reference category issue.
-- Or you accidentally created “Other race” in a way that is *always 0*, *always 1*, or redundant with other race dummies.
-
-**Fix**
-- Rebuild race dummies with a clear reference group.
-  - Example: create indicators for **Black**, **Hispanic**, **Other race**, with **White** as reference (all three = 0).
-- Confirm “Other race” actually has cases in the analytic sample after cleaning.
-- Ensure you did **not** include a full set of race dummies plus an intercept in a way that causes dummy-variable trap.
-
-### DV naming mismatch (minor, but relevant)
-Generated uses `num_genres_disliked`; True calls it “Number of Music Genres Disliked” (same concept).  
-**Potential issue:** your DV construction might not match the paper’s (see section 6 on interpretation/construct validity).
-
-**Fix**
-- Verify the DV exactly matches the paper’s coding (which genres included, how “disliked” is defined, how missing/INAP handled, any rescaling).
-
----
-
-## 3) Coefficient (β) mismatches by model (sign, magnitude, significance)
-
-Important: Table 1 reports **standardized coefficients (β)**; your “Table1style” uses **beta**, which is appropriate to compare. Below I compare the **generated standardized β** to the **true β**.
-
-### Model 1: SES
-
-| Variable | Generated β | True β | Mismatch |
+| Term | True | Generated | Mismatch |
 |---|---:|---:|---|
-| Education | -0.297*** | -0.322*** | too small in magnitude |
-| Income pc | -0.035 | -0.037 | close (small mismatch) |
-| Prestige | 0.030 | 0.016 | too large |
-| Constant | 9.676 | 10.920 | too low |
-| R² | 0.0876 | 0.107 | too low |
-| N | 1347 | 787 | too high |
+| Education | -0.151** | -0.161** | differs |
+| HH income pc | -0.009 | -0.012 | differs |
+| Occ prestige | -0.022 | -0.008 | differs (and magnitude) |
+| Female | -0.095* | -0.114* | differs |
+| Age | 0.110* | 0.060 | **coef & sig differ strongly** |
+| Black | 0.049 | 0.062 | differs |
+| Hispanic | 0.031 | — | **omitted** |
+| Other race | 0.053 | 0.051 | close |
+| Cons Prot | 0.066 | 0.053 | differs |
+| No religion | 0.024 | 0.020 | close |
+| Southern | 0.121** | 0.087 | **coef & sig differ** |
+| Political intolerance | 0.164*** | 0.166** | **sig differs** (*** vs **) |
+| Constant | 6.516 | 7.355 | differs |
+| R² | 0.169 | 0.1394 | **big mismatch** |
+| Adj R² | 0.148 | 0.1165 | **big mismatch** |
+| N | 503 | 426 | **major mismatch** |
 
 **Fix**
-- Main culprit is **sample + variable construction** (DV/IV coding). Prestige and constant especially suggest non-matching scaling/coding and/or different sample.
-- Make sure prestige uses the same prestige scale/version (your variable is `prestg80_v`; confirm it matches what paper used).
-- Confirm education is measured identically (years vs degree recode). The paper labels “Education” without “years”; you assume years—could be correct, but verify.
+- The **N mismatch (503 vs 426)** is the biggest red flag; it will distort coefficients, R², and p-values.
+- Add Hispanic (A1).
+- Recreate the political intolerance index exactly as in the paper (E2). If your `political_intolerance` coding differs (different items, scaling, missing handling), you can easily lose ~80 cases and change effect sizes and R².
 
-### Model 2: Demographic
+---
 
-| Variable | Generated β | True β | Mismatch |
-|---|---:|---:|---|
-| Education | -0.217*** | -0.246*** | too small in magnitude |
-| Income pc | -0.021 | -0.054 | **substantially too small** |
-| Prestige | -0.008 | -0.006 | close |
-| Female | -0.071* | -0.083* | somewhat smaller |
-| Age | 0.058 (ns) | 0.140*** | **major mismatch** (size + significance) |
-| Black | -0.069 (ns) | 0.029 (ns) | **sign mismatch** |
-| Hispanic | 0.010 (ns) | -0.029 (ns) | **sign mismatch** |
-| Other race | blank/NA | 0.005 | **missing estimate** |
-| Cons. Protestant | 0.112** | 0.059 | **too large and wrong sig** (true is not starred) |
-| No religion | 0.003 | -0.012 | sign mismatch (small) |
-| Southern | 0.069* | 0.097** | too small; weaker significance |
-| Constant | 8.205 | 8.507 | too low |
-| R² | 0.0909 | 0.151 | too low |
-| N | 895 | 756 | too high |
+## C) Sample size (N) mismatches and why they matter
 
-**Fix (high priority issues)**
-1. **Age effect is completely off**:  
-   - Likely age is mis-coded (e.g., top-coded, missing recodes, wrong scale, centered incorrectly shouldn’t affect β though, but wrong inclusion set will).
-   - Or you are using a different DV construction (age correlates differently with your DV than with the paper’s).
-   - Verify `age_v` equals the paper’s age variable and that you’re excluding INAP/DK properly.
-
-2. **Race coefficients’ signs disagree**:  
-   - This usually comes from **different reference category** or incorrect dummy coding.
-   - Ensure the reference group is **White** (likely in the paper), and that “Black/Hispanic/Other” are mutually exclusive and correctly derived.
-
-3. **Income per capita effect far smaller than true**:  
-   - Potentially you computed **income per capita differently** than the authors (e.g., household income / household size vs something else).
-   - Or used a non-comparable income variable (e.g., already-adjusted/real dollars vs categories).
-   - Align the income-per-capita construction to the paper (including any transformations like log, trimming, or dealing with zero/negative).
-
-4. **Conservative Protestant too large and over-significant**:  
-   - Strong sign that your religious tradition coding doesn’t match. “Conservative Protestant” in GSS often requires **denomination + fundamentalism** or a tradition scheme (Steensland et al.).
-   - If you used a simpler indicator (e.g., literalist, or any Protestant), you will not reproduce the paper.
-
-### Model 3: Political intolerance
-
-| Variable | Generated β | True β | Mismatch |
-|---|---:|---:|---|
-| Education | -0.162** | -0.151** | close (slightly larger magnitude) |
-| Income pc | -0.026 | -0.009 | too negative |
-| Prestige | 0.014 | -0.022 | **sign mismatch** |
-| Female | -0.094* | -0.095* | essentially matches |
-| Age | 0.026 (ns) | 0.110* | **major mismatch** |
-| Black | -0.051 | 0.049 | **sign mismatch** |
-| Hispanic | -0.007 | 0.031 | **sign mismatch** |
-| Other race | blank/NA | 0.053 | **missing estimate** |
-| Cons. Protestant | 0.091* | 0.066 | too big; wrong sig (true has no star) |
-| No religion | 0.032 | 0.024 | close |
-| Southern | 0.104* | 0.121** | smaller; weaker sig |
-| Political intolerance | 0.146*** | 0.164*** | too small |
-| Constant | 7.217 | 6.516 | too high |
-| R² | 0.1006 | 0.169 | too low |
-| N | 588 | 503 | too high |
+### C1) Model 1 N mismatch: **True N=787 vs Generated N=758**
+Generated output shows listwise deletion driven by missingness in `educ`, `income_pc`, `prestg80`.
 
 **Fix**
-- Same core problems as Model 2 persist (age, race coding, religion coding, sample restrictions).
-- Additionally, **prestige sign flips** from true negative to generated positive—this is a strong red flag for either:
-  - wrong prestige variable/version,
-  - wrong DV construction,
-  - or different sample selection producing suppression effects (but a sign flip across a published replication is usually coding/sample mismatch first).
+- Determine whether the paper used:
+  1) **pairwise deletion** for standardized coefficients, or  
+  2) **imputation**, or  
+  3) **a different operationalization** with fewer missing values, or  
+  4) **a different survey subsample filter** (e.g., only those asked all music items, only certain year, etc.)
+
+Your diagnostics show `N_complete_music_18 = 893`, so DV complete-case isn’t the issue; it’s covariate missingness. To match 787, you need **only 106 missing from 893**, not 135 missing (893-758).
+
+Concretely:
+- Check whether the paper used a different income variable with less missingness, or treated some “DK/refused” codes differently (e.g., recoded to median/mean rather than missing).
+- Check whether prestige was missing due to employment status coding—papers sometimes assign prestige from last job or spouse, etc.
 
 ---
 
-## 4) Standard errors: mismatch in what you report vs what “true” provides
-
-**Generated:** You report p-values and have implied SEs (even if not shown everywhere).  
-**True:** Table 1 **does not report SEs**, only β and stars.
-
-**Mismatch**
-- Not an error to compute SEs, but it **won’t match Table 1** if your goal is to “match the paper” *as printed*. Also your “Table1style” shows β with stars but your stars are driven by *your* p-values, which differ from the paper’s in several places (e.g., Age, Conservative Protestant, Southern).
+### C2) Model 3 N mismatch: **True N=503 vs Generated N=426**
+Your missingness table shows `political_intolerance` nonmissing = 491 among DV-complete, which already prevents reaching 503. That implies your political intolerance variable is not constructed the same way and/or you are filtering too aggressively.
 
 **Fix**
-- If the target is *Table 1 exactly*, format output to:
-  - show **standardized β**, with stars based on your p-values **only after you replicate the same data/coding**,
-  - and either omit SE entirely or mark as not reported.
-- If the target is *substantive replication*, keep SEs but acknowledge Table 1 omitted them.
+- Rebuild the political intolerance measure to achieve nonmissing N consistent with the paper.
+Typical causes:
+1. You used a **single item** with lots of missing; the paper used an **index** averaging multiple items with partial nonresponse rules.
+2. You required **complete responses to all intolerance items**; the paper allowed computation if at least k items present.
+3. You restricted to year 1993 differently than the paper, or combined years.
+
+Until `political_intolerance` nonmissing is at least ~503 (and then listwise with other covariates), you cannot match the printed model.
 
 ---
 
-## 5) Interpretation mismatches implied by sign/significance
+## D) Standard errors and table formatting/reporting mismatches
 
-Even without narrative text, your generated table implies several interpretations that conflict with the paper:
+### D1) You are printing SE-looking rows, but the PDF table prints **no standard errors**
+- **True Results:** explicitly: “Table 1 … does not print standard errors.”
+- **Generated Results:** table shows lines that look like additional rows under each coefficient (e.g., `-0.034`, then another number under it), implying SEs or extra coefficient rows, but they are not labeled and don’t correspond to the PDF.
 
-- **Age**: Generated suggests age is weak/non-significant (Models 2–3). True table shows age is **strongly positive** (0.140*** in Model 2; 0.110* in Model 3).  
-  **Fix:** correct age coding + sample + DV coding.
-
-- **Race effects**: Generated suggests Black is negative; True suggests small positive (ns) in both models. Hispanic sign also flips across models.  
-  **Fix:** race dummy construction/reference group.
-
-- **Prestige (Model 3)**: Generated positive; True negative.  
-  **Fix:** prestige variable alignment and/or sample/DV.
-
-- **Conservative Protestant**: Generated statistically significant positive; True is positive but **not significant** in both models.  
-  **Fix:** religious tradition measure must match paper’s definition.
+**Fix**
+- Remove standard errors from the table entirely to match the PDF presentation.
+- Present only standardized coefficients and stars.
+- If you must compute SEs for p-values, do so internally but don’t print them.
 
 ---
 
-## 6) Why your N’s and coefficients are systematically off (likely root causes)
+### D2) Star thresholds mismatch in Model 3 political intolerance term
+- **True:** 0.164*** (p<.001)
+- **Generated:** 0.166** with p_raw = 0.00147 (which is **not < .001**)
 
-Your missingness table shows, for example:
-- DV missing only ~4.3%,
-- political intolerance missing ~36%,
-- Hispanic missing ~34% (!!)
+This is not just formatting—your p-value is different because the model/sample differs.
 
-That “Hispanic” missingness rate is suspiciously high for a simple ethnicity indicator—often it should be near-complete if it’s a recode from race/ethnic items. This alone can inflate listwise deletion differences and distort estimates.
-
-**Most likely root causes**
-1. **Different construction of key covariates** (especially Hispanic, Conservative Protestant, income per capita, political intolerance).
-2. **Different handling of GSS missing codes** (DK/NA/INAP coded as numeric values rather than set to missing).
-3. **Different sample restrictions** than the paper (module subsamples; only respondents asked the music questions; etc.).
-4. **Weighting**: your fit_stats has a “weight” column but empty—if the paper used weights and you didn’t (or vice versa), coefficients and N/R² can differ.
+**Fix**
+- Fix N and variable construction first (Section C/E). Once model matches, p should align and stars will follow.
 
 ---
 
-## 7) Concrete fixes to make the generated analysis match Table 1
+## E) Interpretation / operationalization mismatches
 
-### A. Replicate the paper’s sample exactly
-- Filter to **GSS 1993** and the same respondent universe used for the music module.
-- Recode all special codes (e.g., 8/9/98/99) to missing for every variable used.
-- Apply **listwise deletion per model** after recoding.
-- Verify N matches: 787, 756, 503.
+### E1) “Standardized coefficients” must be computed the same way
+Even with the same variables, standardized betas can differ if:
+- you standardized using the estimation sample vs full sample,
+- you standardized y and x vs using post-hoc beta conversion,
+- you used weights (paper may use weights; you appear unweighted),
+- you handled missingness differently before standardization.
 
-### B. Ensure standardized coefficients are computed the same way
-- Table 1 reports standardized β for predictors. Replicate with:
-  - OLS on raw variables, then compute standardized coefficients, **or**
-  - pre-standardize predictors and DV (except constant will differ if you standardize DV; the paper’s constant is unstandardized, implying DV not standardized for intercept reporting).
-- Best approach to match: run model on raw DV, compute **β = b * (sd(x)/sd(y))**.
-
-### C. Rebuild problematic variables to match the paper’s definitions
-1. **Hispanic / race dummies**
-   - Create mutually exclusive categories and set **White** as reference.
-   - Ensure “Hispanic” isn’t missing for a third of the sample; if it is, you’re pulling from the wrong source variable.
-
-2. **Conservative Protestant**
-   - Use the same classification scheme as the paper (often based on denomination + tradition). A simple “is Protestant” dummy will not match.
-
-3. **Income per capita**
-   - Confirm it is exactly *household income / household size* with the same income measure and same treatment of brackets, top-codes, and missing.
-
-4. **Political intolerance**
-   - Confirm the scale/items and direction match the paper’s measure.
-   - Align missing-data handling to yield N=503 in Model 3.
-
-5. **Occupational prestige**
-   - Confirm the prestige score variable matches the year and coding used in the paper (your `prestg80_v` may not be the same operationalization).
-
-### D. Fix factor coding so “Other race” is estimated
-- Ensure “Other race” is not the reference category and not collinear.
-- Confirm nonzero variance in the estimation sample.
-
-### E. Only after A–D: re-check stars/significance
-- Once coefficients match closely, your p-values/stars should line up better. If not, check:
-  - weights and robust vs classical SEs,
-  - clustering,
-  - two-tailed thresholds (paper uses two-tailed).
+**Fix**
+- Replicate the paper’s standardization procedure:
+  - If the paper standardized using **listwise sample**, do that.
+  - If it standardized using **full available sample**, do that.
+- Check whether survey weights were used in the article; if yes, you need weighted OLS and weighted standardization.
 
 ---
 
-## Summary of the biggest mismatches to correct first
-1. **Ns and R²** are wrong in all models → sample restrictions + missing-code recodes are not matching the paper.
-2. **Age** effect is dramatically underestimated → age coding and/or DV construction mismatch.
-3. **Race/ethnicity** signs differ and “Other race” is dropped → dummy coding/reference and Hispanic construction are wrong.
-4. **Conservative Protestant** is too large/too significant → religion tradition coding doesn’t match paper.
-5. **Prestige (Model 3)** sign flip → prestige variable mismatch and/or sample/DV mismatch.
+### E2) Political intolerance measure likely not matching the paper
+Your `political_intolerance` ranges like 0–7 in the sample printout. That could be correct, but the missingness is huge (402 missing of 893), and the resulting N is far below the paper.
 
-If you share your exact codebook choices (which GSS variables you used for Hispanic, conservative Protestant, income, intolerance, and how you treated missing codes/INAP), I can pinpoint precisely which recodes are causing each discrepancy and propose one-to-one replacements.
+**Fix**
+- Locate the exact items used in the intolerance scale in the paper and rebuild:
+  - same items,
+  - same coding direction,
+  - same summation/averaging,
+  - same missing-data rule (e.g., allow up to 1 missing item),
+  - same rescaling if any.
+
+---
+
+## What to change so the generated analysis matches the PDF (action checklist)
+
+1. **Add Hispanic** to Models 2 and 3 using the correct dataset variable and correct reference group.
+2. **Reconstruct political_intolerance** exactly as the paper defines it; loosen overly strict complete-case requirements if the paper did.
+3. **Match N**:
+   - Model 1 must be 787 (currently 758): revisit missing handling for income/prestige/education and any filters.
+   - Model 3 must be 503 (currently 426): driven mostly by intolerance variable construction/missing rules.
+4. **Match model specification and reference categories** for race/religion/region; confirm dummy coding.
+5. **Use the same standardization and weighting** approach as the paper.
+6. **Remove SEs from the printed table** (PDF doesn’t report them); output only standardized betas + stars + fit stats.
+7. After (1)–(5), re-check:
+   - coefficients (especially prestige sign in Model 2; age and southern in Model 3),
+   - R² / Adj R²,
+   - significance stars (notably political intolerance should be ***).
+
+If you paste the code (or at least the exact variable list and how `political_intolerance` and `income_pc` were constructed), I can point to the precise lines causing the N loss and coefficient shifts and specify the corrected recodes/model formula.

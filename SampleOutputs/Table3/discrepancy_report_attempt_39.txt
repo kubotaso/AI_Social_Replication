@@ -1,0 +1,137 @@
+Score: 65/100
+============================================================
+
+## 1) Row items/categories mismatches
+
+### A. Missing attitude rows in the Generated Results
+In the **Generated Results**, the following rows are present but incorrectly filled with zeros across all genres:
+
+- **(M) Don’t know much about it**
+- **(M) No answer**
+
+In the **True Results**, these rows have **nonzero counts for every genre**.
+
+**Fix:** Populate these two “M” rows with the correct counts from the True table (listed below in section 2). Do *not* set them to 0.
+
+### B. Column/category naming mismatch: “New Age/Space Opera”
+The Generated column header is **“New Age/Space Opera”**, which incorrectly merges two separate genre labels.
+
+In the True Results (Panel 2), these are two distinct columns:
+- **New Age/Space**
+- **Opera**
+
+**Fix:** Split “New Age/Space Opera” into **two columns**: “New Age/Space” and “Opera”, and use the correct counts/means for each.
+
+### C. Incorrect number of genre columns
+Because the Generated table merges “New Age/Space” and “Opera” into one, it has **17 genre columns** instead of the **18** in the True table.
+
+**Fix:** Add the missing separate **Opera** column (or split the merged one), restoring **18** total genres.
+
+---
+
+## 2) Frequency count mismatches (by row/category)
+
+All non-missing response categories **(1)–(5)** match the True Results **for every genre** (the numbers shown are identical).  
+The mismatches are entirely in the **(M)** rows (and the merged column issue).
+
+### A. (M) Don’t know much about it — Generated shows 0, True has counts
+
+Replace the Generated zeros with these True counts:
+
+**Panel 1**
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+
+**Panel 2**
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+
+**Panel 3**
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+### B. (M) No answer — Generated shows 0, True has counts
+
+Replace the Generated zeros with these True counts:
+
+**Panel 1**
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+
+**Panel 2**
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+
+**Panel 3**
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+---
+
+## 3) Summary statistics mismatches (means, totals, etc.)
+
+### Means
+All **Mean** values shown in the Generated Results match the True Results **for the columns that exist**.
+
+However, because the Generated table **merged “New Age/Space” and “Opera”**, it improperly implies a single mean for a combined category (and in practice you cannot have one mean for two different variables without recomputing from raw data).
+
+**Fix:** After splitting the column, use:
+- Mean(New Age/Space) = **3.68**
+- Mean(Opera) = **3.48**
+
+### Totals / N (implicit problem)
+Even though no total N row is shown, setting the (M) categories to zero makes the implied sample size per genre incorrectly smaller than in the True table.
+
+**Fix:** Once you restore the correct (M) counts, the per-genre totals will align with the True distribution.
+
+---
+
+## 4) Missing/extra column categories
+
+### Missing column: Opera (as a separate genre)
+Opera is **missing as its own column** and incorrectly embedded in “New Age/Space Opera”.
+
+**Fix:** Add **Opera** as its own column and rename the other to **New Age/Space**.
+
+No other genre columns are missing or extra; the remaining genre labels match the True table.
+
+---
+
+## 5) Percentages
+Neither table displays percentages—only counts and means. So:
+- There are **no percentage mismatches to check**
+- If your generated analysis was supposed to include percentages, they are **missing entirely**
+
+**Fix (if needed):** Compute percentages within each genre using the correct totals (including both M categories), then display them consistently.
+
+---
+
+### Minimal set of corrections to make Generated match True
+1. **Split** “New Age/Space Opera” into **New Age/Space** and **Opera**.
+2. Replace the all-zero **(M) Don’t know much about it** row with the correct counts for each genre.
+3. Replace the all-zero **(M) No answer** row with the correct counts for each genre.
+4. Ensure the **means** are reported for the two separate columns (3.68 and 3.48).

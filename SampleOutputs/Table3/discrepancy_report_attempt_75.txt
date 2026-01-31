@@ -1,0 +1,110 @@
+Score: 77/100
+============================================================
+
+### 1) Row items/categories mismatches (missing rows)
+
+**Generated table is missing two response categories entirely (set to all zeros):**
+- **(M) Don’t know much about it**
+- **(M) No answer**
+
+In the **true table**, both rows have **nonzero counts for every genre**.
+
+**How to fix**
+- Add the two “M” rows and populate them with the correct counts from the true table (see section 2 below).
+- Do **not** treat them as 0 or as absent; they are part of the frequency distribution.
+
+---
+
+### 2) Frequency-count mismatches (by row/genre)
+
+All counts for rows **(1)–(5)** and **Mean** match the true table.  
+**The only count mismatches are in the two “M” rows**, where the generated results incorrectly show **0 for all genres**.
+
+#### Correct values that must replace the generated zeros
+
+**(M) Don’t know much about it** (replace the entire row of zeros with these):
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+**(M) No answer** (replace the entire row of zeros with these):
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+---
+
+### 3) Row/column naming issues (category labels)
+
+There is a **column label mismatch** for the New Age / Space Opera split:
+
+- **Generated column:** `New Age/Space`
+- **True table has two columns:** `New Age/Space` **and** `Opera` (shown as “New Age/Space” and “Opera” in Panel 2)
+
+In your generated header it appears as **“New Age/Space Opera”** (merged/ambiguous), but the body clearly contains **two separate columns** (one for New Age/Space and one for Opera), with values matching the true table.
+
+**How to fix**
+- Ensure the headers are split into **two distinct columns**:
+  - `New Age/Space`
+  - `Opera`
+- Remove the merged label “New Age/Space Opera” (or replace it with two separate headers).
+
+---
+
+### 4) Missing/extra column categories
+
+- **Number of genres:** Generated includes 18 genres (correct).
+- **No extra genres** appear.
+- The only column problem is the **header formatting/merging** for **New Age/Space vs Opera** (see #3).
+
+---
+
+### 5) Percentages / summary-statistics mismatches
+
+- **Means:** All generated means match the true means.
+- **Percentages:** Neither table shows percentages, only counts and mean. So there are **no percentage mismatches to check**. (If you intended percentages, they are missing from *both* outputs and would need to be computed from totals.)
+
+**However, the generated table is internally incomplete as a frequency distribution** because it omits nonresponse categories (sets them to 0). That means any totals computed from the generated table would be wrong.
+
+**How to fix totals/derived stats**
+- After inserting the correct “Don’t know” and “No answer” counts, recompute:
+  - **Column totals (N) per genre**
+  - Any **valid-percent** calculations (excluding missing) or **overall percent** (including missing), depending on your definition.
+
+---
+
+## Bottom line fixes to make generated match true
+1. Replace the all-zero **(M) Don’t know much about it** row with the true nonzero counts.
+2. Replace the all-zero **(M) No answer** row with the true nonzero counts.
+3. Correct the column header so **New Age/Space** and **Opera** are clearly separated (not merged into “New Age/Space Opera”).
+4. If producing any totals/percents, recompute them after restoring the missing rows.

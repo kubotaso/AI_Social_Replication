@@ -1,67 +1,166 @@
-## ModelA_table_paper_style
- beta_std sig beta_with_sig
- 0.110874             0.111
--0.226047  **      -0.226**
--0.007318            -0.007
- 0.078826             0.079
--0.017426            -0.017
- 0.071864             0.072
--0.179910            -0.180
--0.004611            -0.005
- 0.004318             0.004
- 0.075950             0.076
- 0.016855             0.017
-      NaN ***           ***
+## combined_table2_betas
+       Independent Variable  ModelA_Std_Beta ModelA_Sig  ModelB_Std_Beta ModelB_Sig
+               Racism score         0.168057         **         0.039790           
+                  Education        -0.280732        ***        -0.234194        ***
+Household income per capita        -0.029530                   -0.053330           
+      Occupational prestige         0.076720                   -0.018862           
+                     Female        -0.025509                   -0.074900           
+                        Age         0.169390         **         0.078634           
+                      Black        -0.155382                   -0.038428           
+                   Hispanic         0.024140                    0.137743           
+                 Other race        -0.002945                    0.093388           
+    Conservative Protestant         0.067867                    0.125538          *
+                No religion              NaN                         NaN           
+                   Southern        -0.046789                    0.098554           
 
-## ModelB_table_paper_style
- beta_std sig beta_with_sig
--0.036742            -0.037
--0.241442 ***     -0.241***
--0.044092            -0.044
--0.046275            -0.046
--0.062965            -0.063
- 0.024914             0.025
- 0.062759             0.063
--0.106370            -0.106
- 0.064947             0.065
- 0.171771  **       0.172**
- 0.114509   *        0.115*
-      NaN ***           ***
+## combined_fit
+  Model                                                               DV   N       R2   Adj_R2  Constant Constant_Sig Dropped_no_variation
+Model 1 Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music 309 0.189045 0.159009  2.590695          ***          no_religion
+Model 2                               Dislike of the 12 Remaining Genres 305 0.156358 0.124686  5.549442          ***          no_religion
 
-## ModelA_table_full
-      b_unstd  std_err         t  p_value  beta_std
- 1.187463e-01 0.068256  1.739729 0.083042  0.110874
--1.165672e-01 0.035187 -3.312835 0.001049 -0.226047
--8.458532e-07 0.000007 -0.116851 0.907064 -0.007318
- 9.283764e-03 0.007764  1.195748 0.232840  0.078826
--5.169620e-02 0.171661 -0.301153 0.763528 -0.017426
- 6.151501e-03 0.005315  1.157423 0.248119  0.071864
--6.818149e-01 0.471418 -1.446305 0.149247 -0.179910
--1.903622e-02 0.497857 -0.038236 0.969527 -0.004611
- 2.667049e-02 0.368820  0.072313 0.942406  0.004318
- 2.258155e-01 0.182315  1.238604 0.216564  0.075950
- 5.110960e-02 0.176444  0.289664 0.772295  0.016855
- 2.527285e+00 0.594327  4.252347 0.000029       NaN
+## dv_descriptives
+                     Sample                                                               DV    N     Mean       SD  Min  P25  Median  P75  Max
+        1993 (DV available) Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music 1134 2.057319 1.575628  0.0  1.0     2.0  3.0  6.0
+        1993 (DV available)                               Dislike of the 12 Remaining Genres 1057 3.778619 2.514329  0.0  2.0     3.0  5.0 12.0
+Model 1 analytic (listwise) Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music  309 2.016181 1.490986  0.0  1.0     2.0  3.0  6.0
+Model 2 analytic (listwise)                               Dislike of the 12 Remaining Genres  305 3.767213 2.323418  0.0  2.0     3.0  5.0 12.0
 
-## ModelB_table_full
-  b_unstd  std_err         t      p_value  beta_std
--0.061118 0.105289 -0.580479 5.620743e-01 -0.036742
--0.193377 0.054278 -3.562720 4.335134e-04 -0.241442
--0.000008 0.000011 -0.708910 4.789897e-01 -0.044092
--0.008465 0.011977 -0.706773 4.803146e-01 -0.046275
--0.290124 0.264799 -1.095637 2.742105e-01 -0.062965
- 0.003312 0.008199  0.404007 6.865260e-01  0.024914
- 0.369402 0.727198  0.507980 6.118806e-01  0.062759
--0.682056 0.767982 -0.888115 3.752665e-01 -0.106370
- 0.623060 0.568932  1.095141 2.744274e-01  0.064947
- 0.793210 0.281234  2.820464 5.149772e-03  0.171771
- 0.539303 0.272179  1.981432 4.855334e-02  0.114509
- 6.066451 0.916794  6.617028 1.951998e-10       NaN
+## missingness_1993
+                     variable  share_missing_1993                                                            label
+                 racism_score            0.372976                                                     Racism score
+                    cons_prot            0.363014                                          Conservative Protestant
+     dv2_dislike_remaining_12            0.341843                               Dislike of the 12 Remaining Genres
+dv1_dislike_minority_linked_6            0.293898 Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music
+                     hispanic            0.222914                                                         Hispanic
+                    income_pc            0.086550                                      Household income per capita
+                 occ_prestige            0.049813                                            Occupational prestige
+                  no_religion            0.005604                                                      No religion
+                    age_years            0.003113                                                              Age
+                    education            0.002491                                                        Education
+                       female            0.000000                                                           Female
+                        black            0.000000                                                            Black
+                   other_race            0.000000                                                       Other race
+                     southern            0.000000                                                         Southern
 
-## ModelA_fit
-                          model   n  k_predictors       r2   adj_r2 dropped_zero_variance_predictors
-Table2_ModelA_dislike_minority6 283            11 0.121296 0.085629                      no_religion
+## item_missingness_music
+      item  share_missing
+     d_rap       0.044832
+  d_reggae       0.190535
+   d_blues       0.042341
+    d_jazz       0.033001
+  d_gospel       0.029265
+   d_latin       0.145081
+ d_bigband       0.109589
+d_blugrass       0.108344
+ d_country       0.019925
+d_musicals       0.056663
+d_classicl       0.047945
+    d_folk       0.056040
+d_moodeasy       0.052927
+  d_newage       0.190535
+   d_opera       0.059776
+ d_conrock       0.038605
+  d_oldies       0.031756
+d_hvymetal       0.049813
 
-## ModelB_fit
-                        model   n  k_predictors       r2   adj_r2 dropped_zero_variance_predictors
-Table2_ModelB_dislike_other12 283            11 0.133222 0.098039                      no_religion
+## item_missingness_racism
+        item  share_missing
+    r_rachaf       0.378580
+    r_busing       0.383562
+   r_racdif1       0.362391
+   r_racdif3       0.357410
+   r_racdif4       0.375467
+racism_score       0.372976
+
+## quickcheck_distributions
+   variable value  count
+     ethnic   nan    358
+     ethnic  11.0    230
+     ethnic  14.0    168
+     ethnic   8.0    167
+     ethnic   1.0    104
+     ethnic  30.0     71
+     ethnic  15.0     59
+     ethnic  24.0     50
+     ethnic  21.0     39
+     ethnic  18.0     34
+     ethnic  17.0     28
+     ethnic  23.0     25
+     ethnic  26.0     24
+     ethnic  97.0     23
+     ethnic  10.0     23
+     ethnic  19.0     21
+     ethnic  29.0     19
+     ethnic  25.0     17
+     ethnic   3.0     13
+     ethnic  38.0     12
+     ethnic  39.0     11
+     ethnic  20.0     11
+     ethnic  22.0     11
+     ethnic  13.0     10
+     ethnic   6.0     10
+     ethnic   7.0      9
+     ethnic   4.0      7
+     ethnic  12.0      6
+     ethnic   5.0      6
+     ethnic  27.0      6
+     ethnic  31.0      6
+     ethnic   9.0      5
+     ethnic   2.0      4
+     ethnic  33.0      3
+     ethnic  32.0      3
+     ethnic  16.0      3
+     ethnic  34.0      3
+     ethnic  28.0      2
+     ethnic  37.0      2
+     ethnic  35.0      2
+     ethnic  36.0      1
+   hispanic   0.0   1120
+   hispanic   nan    358
+   hispanic   1.0    128
+no_religion   0.0   1451
+no_religion   1.0    146
+no_religion   nan      9
+  cons_prot   0.0    711
+  cons_prot   nan    583
+  cons_prot   1.0    312
+   southern   0.0   1047
+   southern   1.0    559
+
+## modelA_table
+       Independent Variable  Std_Beta Sig
+               Racism score  0.168057  **
+                  Education -0.280732 ***
+Household income per capita -0.029530    
+      Occupational prestige  0.076720    
+                     Female -0.025509    
+                        Age  0.169390  **
+                      Black -0.155382    
+                   Hispanic  0.024140    
+                 Other race -0.002945    
+    Conservative Protestant  0.067867    
+                No religion       NaN    
+                   Southern -0.046789    
+
+## modelB_table
+       Independent Variable  Std_Beta Sig
+               Racism score  0.039790    
+                  Education -0.234194 ***
+Household income per capita -0.053330    
+      Occupational prestige -0.018862    
+                     Female -0.074900    
+                        Age  0.078634    
+                      Black -0.038428    
+                   Hispanic  0.137743    
+                 Other race  0.093388    
+    Conservative Protestant  0.125538   *
+                No religion       NaN    
+                   Southern  0.098554    
+
+## modelA_fit
+  Model                                                               DV   N       R2   Adj_R2  Constant Constant_Sig Dropped_no_variation
+Model 1 Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music 309 0.189045 0.159009  2.590695          ***          no_religion
+
+## modelB_fit
+  Model                                 DV   N       R2   Adj_R2  Constant Constant_Sig Dropped_no_variation
+Model 2 Dislike of the 12 Remaining Genres 305 0.156358 0.124686  5.549442          ***          no_religion

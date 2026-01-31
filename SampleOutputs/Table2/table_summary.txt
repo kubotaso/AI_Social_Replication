@@ -1,120 +1,112 @@
-## Data source(s) relevant to Table 2
-- **1993 General Social Survey (GSS)**, NORC; nationally representative sample of noninstitutionalized U.S. adults.
-- Musical taste items are part of the **1993 GSS culture module**: 18 genres rated on a 5-point like/dislike Likert scale (used elsewhere to create dislike counts).
+## Table 2 (Bryson 1996): what it is
+**Table 2. “Standardized OLS Coefficients from the Regression of the Number of Music Genres Disliked on Racism and Demographic Variables: General Social Survey, 1993.”**
 
-## Table 2: What it is
-**Table 2 title:** *Standardized OLS Coefficients from the Regression of the Number of Music Genres Disliked on Racism and Demographic Variables: General Social Survey, 1993*
-
-**Unit of analysis:** respondent (GSS adult).
-
-**Estimation method:** **OLS regression** with **standardized coefficients (beta)**; **two-tailed significance tests**.
-
----
-
-## Dependent variables (two OLS models in Table 2)
-Table 2 reports **two separate regressions**, each with a different dependent variable:
-
-### DV1 (Model A): Dislike of “minority-associated” genres (count)
-A count of the number of genres the respondent **dislikes** among the genres “disproportionately liked by Hispanic or Black respondents” (footnote a):
-- **Rap**
-- **Reggae**
-- **Blues/R&B**
-- **Jazz**
-- **Gospel**
-- **Latin music**
-
-*(Operationalization described earlier: “dislike” + “dislike very much” counted; don’t know treated as missing in the construction of dislike counts.)*
-
-### DV2 (Model B): Dislike of the “12 remaining” genres (count)
-A count of dislikes across the **other 12** genres (i.e., the remaining genres from the 18-item battery, excluding the six above).
+- **Data source:** **1993 General Social Survey (GSS)**, NORC (U.S. noninstitutionalized adults; stratified random sample).
+- **Estimation/statistical method:** **OLS regression** with **standardized coefficients (beta weights)**; two-tailed significance tests.
+- **Unit of analysis:** individual respondent.
+- **Samples (listwise due to scale construction/availability):**
+  - Model for minority-linked genres: **N = 644**
+  - Model for remaining genres: **N = 605**
 
 ---
 
-## Independent variables in Table 2 (same RHS in both models)
-All variables included on the right-hand side (predictors/controls):
+## Dependent variables in Table 2 (two OLS models)
+Table 2 splits “musical exclusiveness” (a *count of disliked genres*) into two dependent variables:
 
-### Key focal predictor
-- **Racism score** (scale 0–5)
+### DV1: Dislike of minority-linked genres (count)
+**“Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music”**  
+- Construction: count of genres (from this set of 6) rated **“dislike”** or **“dislike very much.”**
+- Footnote: these are the **genres disproportionately liked by Hispanic or Black respondents** (author notes p < .001 used to identify them).
 
-**Racism scale construction (all dichotomous; summed):**
-1) Objection to sending children to a school where > half the children are Black  
-2) Favor/oppose busing for school integration  
-3) Belief that Black–White socioeconomic differences are due mainly to discrimination (coded toward racism when rejecting discrimination)  
-4) …due to lack of educational chance (coded toward racism when rejecting this)  
-5) …due to lack of motivation/will power (coded toward racism when endorsing this)  
-(Author notes: built from 1993 GSS racial attitude items; factor analysis used to drop one item; alpha reported elsewhere as .54.)
+### DV2: Dislike of remaining genres (count)
+**“Dislike of the 12 Remaining Genres”**  
+- Construction: count of **“dislike”** or **“dislike very much”** among the other 12 genres (i.e., all genres not in DV1).
 
-### Socioeconomic status controls
+---
+
+## Independent variables in Table 2 (all predictors used in both models)
+
+### Key predictor
+- **Racism score** (scale range **0–5**)
+  - Built from 1993 GSS racial-attitude items (dichotomous), direction-coded consistently; one item removed after factor analysis.
+  - Items used (as described in text):
+    1) objection to sending children to a school where > half Black  
+    2) favor/oppose busing  
+    3) attribute Black–White inequality mainly to discrimination?  
+    4) … mainly to lack of educational opportunity?  
+    5) … mainly to lack of motivation/will power?
+  - Reported reliability in text: **alpha ≈ .54**
+
+### Socioeconomic-status controls
 - **Education** (years)
 - **Household income per capita**
 - **Occupational prestige**
 
-### Demographic and identity controls
-- **Female**
-- **Age**
+### Demographic / group-identity controls
+- **Female** (indicator)
+- **Age** (years)
 - **Black** (indicator)
 - **Hispanic** (indicator)
-- **Other race** (indicator)
+- **Other race** (indicator; reference category is non-Hispanic White)
 - **Conservative Protestant** (indicator)
-- **No religion** (indicator)
+- **No religion** (indicator; implies omitted reference includes other religious categories)
 - **Southern** (indicator)
 
 ---
 
-## The regression models in Table 2 (explicit specification)
-Let \(Y_{i}\) be a respondent’s dislike count.
+## Regression models in Table 2 (explicit specification)
+Let \(Y_1\) be the count of disliked minority-linked genres (6), and \(Y_2\) the count of disliked remaining genres (12).
 
-### Model A (minority-associated genres)
+### Model 2A (DV1)
 \[
-Y^{(A)}_i = \beta_0 + \beta_1(\text{Racism}) + \beta_2(\text{Education}) + \beta_3(\text{Income pc}) + \beta_4(\text{Occ prestige})
-+ \beta_5(\text{Female}) + \beta_6(\text{Age})
-+ \beta_7(\text{Black}) + \beta_8(\text{Hispanic}) + \beta_9(\text{Other race})
-+ \beta_{10}(\text{Cons Protestant}) + \beta_{11}(\text{No religion}) + \beta_{12}(\text{Southern})
-+ \varepsilon_i
+Y_1 = \beta_0 + \beta_1(\text{racism})+\beta_2(\text{education})+\beta_3(\text{inc pc})+\beta_4(\text{occ prestige})+\beta_5(\text{female})+\beta_6(\text{age})+\beta_7(\text{black})+\beta_8(\text{hispanic})+\beta_9(\text{other race})+\beta_{10}(\text{cons prot})+\beta_{11}(\text{no religion})+\beta_{12}(\text{southern})+\epsilon
 \]
 
-### Model B (12 remaining genres)
-Same RHS, but with dependent variable \(Y^{(B)}_i\) = dislike count for the 12 remaining genres.
+### Model 2B (DV2)
+Same RHS predictors as above, but with \(Y_2\) as DV.
 
 ---
 
-## Table 2 coefficients and fit (as reported)
-### Model A DV: Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin
-- Racism score: **.130** **(p < .01)**
-- Education: **−.175*** (p < .001)
-- Household income per capita: −.037 (n.s.)
-- Occupational prestige: −.020 (n.s.)
-- Female: −.057 (n.s.)
-- Age: **.163*** (p < .001)
-- Black: **−.132*** (p < .001)
-- Hispanic: −.058 (n.s.)
-- Other race: −.017 (n.s.)
-- Conservative Protestant: .063 (n.s.)
-- No religion: .057 (n.s.)
-- Southern: .024 (n.s.)
+## Table 2 reported results (standardized OLS betas)
+(Stars as printed: * p<.05, ** p<.01, *** p<.001)
+
+### DV1: Dislike of rap/reggae/blues-R&B/jazz/gospel/Latin (N=644)
+- Racism score: **.130** **  
+- Education: **−.175***  
+- Household income per capita: −.037  
+- Occupational prestige: −.020  
+- Female: −.057  
+- Age: **.163***  
+- Black: **−.132***  
+- Hispanic: −.058  
+- Other race: −.017  
+- Conservative Protestant: .063  
+- No religion: .057  
+- Southern: .024  
 - Constant: **2.415***  
-- \(R^2 = .145\), Adjusted \(R^2 = .129\), **N = 644**
+- \(R^2 = .145\); Adjusted \(R^2 = .129\)
 
-### Model B DV: Dislike of the 12 remaining genres
+### DV2: Dislike of the 12 remaining genres (N=605)
 - Racism score: .080 (n.s.)
-- Education: **−.242*** (p < .001)
-- Household income per capita: −.065 (n.s.)
-- Occupational prestige: .005 (n.s.)
-- Female: −.070 (n.s.)
-- Age: **.126** (p < .01)
-- Black: .042 (n.s.)
-- Hispanic: −.029 (n.s.)
-- Other race: .047 (n.s.)
-- Conservative Protestant: .048 (n.s.)
-- No religion: .024 (n.s.)
-- Southern: .069 (n.s.)
+- Education: **−.242***  
+- Household income per capita: −.065  
+- Occupational prestige: .005  
+- Female: −.070  
+- Age: **.126** **  
+- Black: .042  
+- Hispanic: −.029  
+- Other race: .047  
+- Conservative Protestant: .048  
+- No religion: .024  
+- Southern: .069  
 - Constant: 7.860  
-- \(R^2 = .147\), Adjusted \(R^2 = .130\), **N = 605**
+- \(R^2 = .147\); Adjusted \(R^2 = .130\)
 
 ---
 
-## “Related” statistical methods tied directly to Table 2 (context)
-- **Construction of dependent variables:** counts of “dislike”/“dislike very much” across genre subsets; “don’t know” treated as missing when building the overall exclusiveness measure (and cases with missing excluded).
-- **Racism scale construction:** item selection plus **factor analysis** (mentioned as used to drop one item), then additive index.
+## “Related” (Table-2-adjacent) measurement details you may need for replication
+- **Musical dislike inputs:** 1993 GSS asked ratings for **18 genres** on a 5-point Likert scale from “like very much” to “dislike very much.”
+- **Coding into counts:** the author counts only **“dislike”** and **“dislike very much”** as dislikes.
+- **Handling DK:** “don’t know” treated as missing (in main exclusiveness scale construction, cases with DK were dropped; for Table 2 the usable N differs due to racism-scale availability and/or module splits).
 
-If you want, I can also list (from the paper) which of the 18 genres fall into the “12 remaining” set by name, but Table 2 itself only labels the 6 “minority-associated” genres explicitly.
+If you want, I can also list **exactly which 12 genres** are in the “remaining genres” set by subtracting the Table-2 six from the full Table-3 list of 18.

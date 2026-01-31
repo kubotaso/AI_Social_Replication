@@ -1,113 +1,116 @@
+## table1_style
+                      Model 1 (SES)               Model 2 (Demographic)     Model 3 (Political intolerance)
+DV: Number of music genres disliked DV: Number of music genres disliked DV: Number of music genres disliked
+                          -0.332***                                   —                                   —
+                             -0.034                                   —                                   —
+                              0.029                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                                  —                                   —                                   —
+                             11.086                                                                        
+                              0.109                                                                        
+                              0.105                                                                        
+                                758                                   0                                   0
+
 ## fit_stats
-                          model   n       r2   adj_r2   dropped
-                  Model 1 (SES) 747 0.088274 0.084592          
-          Model 2 (Demographic) 507 0.135346 0.117914 otherrace
-Model 3 (Political intolerance) 286 0.145491 0.111186 otherrace
+                          model   N      R2   Adj_R2  const_raw
+                  Model 1 (SES) 758 0.10877 0.105224   11.08571
+          Model 2 (Demographic)   0     NaN      NaN        NaN
+Model 3 (Political intolerance)   0     NaN      NaN        NaN
 
-## model1_full
-                       term         b      beta            p sig
-                   Constant 10.637845       NaN 8.659509e-52    
-          Education (years) -0.374451 -0.292447 3.458708e-12 ***
-Household income per capita -0.000009 -0.038625 3.095946e-01    
-      Occupational prestige  0.005155  0.020021 6.311403e-01    
+## coefficients_long
+                          model                    term  beta_std        p_raw      cell
+                  Model 1 (SES)                    educ -0.331721 1.770045e-15 -0.332***
+                  Model 1 (SES)               income_pc -0.033879 3.650009e-01    -0.034
+                  Model 1 (SES)                prestg80  0.029360 4.755042e-01     0.029
+          Model 2 (Demographic)                    educ       NaN          NaN         —
+          Model 2 (Demographic)               income_pc       NaN          NaN         —
+          Model 2 (Demographic)                prestg80       NaN          NaN         —
+          Model 2 (Demographic)                  female       NaN          NaN         —
+          Model 2 (Demographic)                     age       NaN          NaN         —
+          Model 2 (Demographic)                   black       NaN          NaN         —
+          Model 2 (Demographic)                hispanic       NaN          NaN         —
+          Model 2 (Demographic)              other_race       NaN          NaN         —
+          Model 2 (Demographic) conservative_protestant       NaN          NaN         —
+          Model 2 (Demographic)             no_religion       NaN          NaN         —
+          Model 2 (Demographic)                southern       NaN          NaN         —
+Model 3 (Political intolerance)                    educ       NaN          NaN         —
+Model 3 (Political intolerance)               income_pc       NaN          NaN         —
+Model 3 (Political intolerance)                prestg80       NaN          NaN         —
+Model 3 (Political intolerance)                  female       NaN          NaN         —
+Model 3 (Political intolerance)                     age       NaN          NaN         —
+Model 3 (Political intolerance)                   black       NaN          NaN         —
+Model 3 (Political intolerance)                hispanic       NaN          NaN         —
+Model 3 (Political intolerance)              other_race       NaN          NaN         —
+Model 3 (Political intolerance) conservative_protestant       NaN          NaN         —
+Model 3 (Political intolerance)             no_religion       NaN          NaN         —
+Model 3 (Political intolerance)                southern       NaN          NaN         —
+Model 3 (Political intolerance)   political_intolerance       NaN          NaN         —
 
-## model2_full
-                       term         b      beta            p sig
-                   Constant  9.285426       NaN 6.717163e-03    
-          Education (years) -0.339840 -0.264062 3.482808e-07 ***
-Household income per capita -0.000013 -0.053112 2.497486e-01    
-      Occupational prestige -0.004180 -0.015615 7.538998e-01    
-                     Female -0.621791 -0.089777 3.439994e-02   *
-                        Age  0.025127  0.104295 1.762531e-02   *
-                      Black  0.544603  0.042978 8.700094e-01    
-                   Hispanic  0.378982  0.030238 9.080113e-01    
-                 Other race       NaN       NaN          NaN    
-    Conservative Protestant  0.695618  0.089620 5.296006e-02    
-                No religion -0.225640 -0.019473 6.525593e-01    
-                   Southern  0.486785  0.062856 1.499976e-01    
+## diagnostics_overall
+ N_year_1993  N_complete_music_18  N_model1  N_model2  N_model3                                                                                                                                                                                                                                                               hispanic_note  hispanic_nonmissing_in_dv_complete  hispanic_yes_in_dv_complete  polintol_nonmissing_in_dv_complete  polintol_items_required
+        1606                  893       758         0         0 Hispanic: ETHNIC has non-binary codes [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 36.0, 37.0, 38.0, 39.0, 97.0]; left missing                                   0                            0                                 491                       15
 
-## model3_full
-                       term         b      beta        p sig
-                   Constant  7.360497       NaN 0.045578    
-          Education (years) -0.226811 -0.157424 0.025004   *
-Household income per capita -0.000011 -0.049508 0.435268    
-      Occupational prestige -0.003185 -0.011123 0.869323    
-                     Female -0.861029 -0.122143 0.032004   *
-                        Age  0.020869  0.082686 0.162256    
-                      Black  1.408770  0.106672 0.684378    
-                   Hispanic  0.355989  0.027509 0.916155    
-                 Other race       NaN       NaN      NaN    
-    Conservative Protestant  0.300066  0.037176 0.540506    
-                No religion  0.288547  0.023974 0.684140    
-                   Southern  0.508206  0.065066 0.270612    
-      Political intolerance  0.154450  0.190034 0.002650  **
+## missingness_m1
+                var  nonmissing  missing
+          income_pc         822       71
+               educ         846       47
+           prestg80         860       33
+num_genres_disliked         893        0
 
-## model1_table1style
-                       term    Table1
-                   Constant    10.638
-          Education (years) -0.292***
-Household income per capita    -0.039
-      Occupational prestige     0.020
+## missingness_m2
+                    var  nonmissing  missing
+               hispanic           0      893
+              income_pc         822       71
+                   educ         846       47
+               prestg80         860       33
+conservative_protestant         890        3
+            no_religion         890        3
+                    age         892        1
+                  black         893        0
+                 female         893        0
+    num_genres_disliked         893        0
+             other_race         893        0
+               southern         893        0
 
-## model2_table1style
-                       term    Table1
-                   Constant     9.285
-          Education (years) -0.264***
-Household income per capita    -0.053
-      Occupational prestige    -0.016
-                     Female   -0.090*
-                        Age    0.104*
-                      Black     0.043
-                   Hispanic     0.030
-                 Other race          
-    Conservative Protestant     0.090
-                No religion    -0.019
-                   Southern     0.063
+## missingness_m3
+                    var  nonmissing  missing
+               hispanic           0      893
+  political_intolerance         491      402
+              income_pc         822       71
+                   educ         846       47
+               prestg80         860       33
+conservative_protestant         890        3
+            no_religion         890        3
+                    age         892        1
+                  black         893        0
+                 female         893        0
+    num_genres_disliked         893        0
+             other_race         893        0
+               southern         893        0
 
-## model3_table1style
-                       term  Table1
-                   Constant   7.360
-          Education (years) -0.157*
-Household income per capita  -0.050
-      Occupational prestige  -0.011
-                     Female -0.122*
-                        Age   0.083
-                      Black   0.107
-                   Hispanic   0.028
-                 Other race        
-    Conservative Protestant   0.037
-                No religion   0.024
-                   Southern   0.065
-      Political intolerance 0.190**
+## estimation_samples
+{'m1':       num_genres_disliked  educ     income_pc  prestg80
+0                    10.0  11.0  17685.000000      42.0
+1                     2.0  16.0  17685.000000      42.0
+2                     4.0  16.0  35370.000000      52.0
+6                     3.0  12.0  21615.000000      46.0
+8                     0.0  18.0  34626.666667      49.0
+...                   ...   ...           ...       ...
+1598                  4.0  13.0  25970.000000      72.0
+1599                 13.0  12.0   9825.000000      46.0
+1600                 10.0  17.0  51940.000000      65.0
+1604                  3.0  16.0  21615.000000      49.0
+1605                  7.0  18.0  14285.324250      44.0
 
-## table1_combined_table1style
-                       term Model 1 (SES) Model 2 (Demographic) Model 3 (Political intolerance)
-                   Constant        10.638                 9.285                           7.360
-          Education (years)     -0.292***             -0.264***                         -0.157*
-Household income per capita        -0.039                -0.053                          -0.050
-      Occupational prestige         0.020                -0.016                          -0.011
-                     Female           NaN               -0.090*                         -0.122*
-                        Age           NaN                0.104*                           0.083
-                      Black           NaN                 0.043                           0.107
-                   Hispanic           NaN                 0.030                           0.028
-                 Other race           NaN                                                      
-    Conservative Protestant           NaN                 0.090                           0.037
-                No religion           NaN                -0.019                           0.024
-                   Southern           NaN                 0.063                           0.065
-      Political intolerance           NaN                   NaN                         0.190**
-
-## missingness
-           variable  nonmissing  missing  pct_missing
-          pol_intol         850      756    47.073474
-num_genres_disliked         893      713    44.396015
-              black        1044      562    34.993773
-           hispanic        1044      562    34.993773
-          otherrace        1044      562    34.993773
-             inc_pc        1459      147     9.153176
-           educ_yrs        1464      142     8.841843
-         prestg80_v        1526       80     4.981320
-          cons_prot        1597        9     0.560399
-            norelig        1597        9     0.560399
-              age_v        1601        5     0.311333
-             female        1606        0     0.000000
-              south        1606        0     0.000000
+[758 rows x 4 columns], 'm2': Empty DataFrame
+Columns: [num_genres_disliked, educ, income_pc, prestg80, female, age, black, hispanic, other_race, conservative_protestant, no_religion, southern]
+Index: [], 'm3': Empty DataFrame
+Columns: [num_genres_disliked, educ, income_pc, prestg80, female, age, black, hispanic, other_race, conservative_protestant, no_religion, southern, political_intolerance]
+Index: []}

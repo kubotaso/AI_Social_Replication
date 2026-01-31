@@ -1,79 +1,62 @@
-## ModelA_replication_table
- beta_std   b_unstd stars  p_value_replication
-      NaN  2.748975               2.951854e-08
- 0.153440  0.163166    **         2.038988e-03
--0.260328 -0.137472   ***         4.624805e-06
--0.033325 -0.000004               5.098691e-01
- 0.058517  0.006645               2.830943e-01
--0.008709 -0.026196               8.502841e-01
- 0.117854  0.010555     *         1.629163e-02
--0.161934 -0.669788    **         1.604644e-03
- 0.041176  0.304082               3.760225e-01
- 0.080158  0.244221               9.779067e-02
- 0.010398  0.031547               8.227849e-01
+## table2_betas
+                                   Independent Variable  ModelA_Std_Beta ModelA_Sig  ModelB_Std_Beta ModelB_Sig
+        Racism score (0–5; strict sum of 5 dichotomies)         0.150577          *         0.013515           
+                                      Education (years)        -0.300774        ***        -0.231758         **
+           Household income per capita (REALINC/HOMPOP)        -0.008021                   -0.033681           
+                       Occupational prestige (PRESTG80)         0.094967                   -0.080764           
+                                      Female (1=female)        -0.035388                   -0.070087           
+                                            Age (years)         0.159045         **         0.118058           
+                                        Black (1=Black)        -0.129363                    0.076758           
+Hispanic (constructed; source=ethnic(proxy_codes_8_15))         0.097924                    0.012587           
+                                   Other race (1=other)         0.070973                    0.100948           
+  Conservative Protestant (proxy; source=relig+denom16)         0.111837                    0.065367           
+                                 No religion (RELIG==4)         0.077589                    0.067609           
+                                   Southern (REGION==3)        -0.049999                    0.116407           
 
-## ModelB_replication_table
- beta_std   b_unstd stars  p_value_replication
-      NaN  6.058535               2.658134e-14
- 0.015329  0.025798               7.596738e-01
--0.235107 -0.196283   ***         3.125642e-05
--0.061108 -0.000011               2.302817e-01
--0.041421 -0.007512               4.472492e-01
--0.075207 -0.358422               1.029325e-01
- 0.040690  0.005700               4.060747e-01
- 0.108420  0.774992     *         3.261119e-02
- 0.101885  1.291253     *         2.868953e-02
- 0.112945  0.542808     *         1.972597e-02
- 0.141554  0.683151    **         2.745419e-03
+## fit
+                                            DV   N      R2   Adj_R2  Constant Constant_Sig Dropped_predictors_no_variation
+Dislike of minority-linked genres (count of 6) 274 0.19433 0.157288  2.454479          ***                                
+     Dislike of remaining genres (count of 12) 266 0.15027 0.109967  5.655019          ***                                
 
-## ModelA_paper_style
-beta_with_stars
-        0.153**
-      -0.260***
-         -0.033
-          0.059
-         -0.009
-         0.118*
-       -0.162**
-          0.041
-          0.080
-          0.010
-          2.749
+## dv_descriptives
+  stat  DV1_Minority6  DV2_Remaining12
+     N    1134.000000      1057.000000
+  Mean       2.057319         3.778619
+    SD       1.575628         2.514329
+   Min       0.000000         0.000000
+   P25       1.000000         2.000000
+Median       2.000000         3.000000
+   P75       3.000000         5.000000
+   Max       6.000000        12.000000
 
-## ModelB_paper_style
-beta_with_stars
-          0.015
-      -0.235***
-         -0.061
-         -0.041
-         -0.075
-          0.041
-         0.108*
-         0.102*
-         0.113*
-        0.142**
-          6.059
+## missingness_modelA
+              variable                                                   label  share_missing
+          racism_score         Racism score (0–5; strict sum of 5 dichotomies)       0.476339
+             cons_prot   Conservative Protestant (proxy; source=relig+denom16)       0.356787
+dv1_minority6_dislikes          Dislike of minority-linked genres (count of 6)       0.293898
+              hispanic Hispanic (constructed; source=ethnic(proxy_codes_8_15))       0.222914
+             income_pc            Household income per capita (REALINC/HOMPOP)       0.086550
+              prestg80                        Occupational prestige (PRESTG80)       0.049813
+           no_religion                                  No religion (RELIG==4)       0.005604
+                   age                                             Age (years)       0.003113
+                  educ                                       Education (years)       0.002491
+                female                                       Female (1=female)       0.000000
+                 black                                         Black (1=Black)       0.000000
+            other_race                                    Other race (1=other)       0.000000
+              southern                                    Southern (REGION==3)       0.000000
 
-## ModelA_fit
-                  model                      dv   n  k_predictors       r2   adj_r2 dropped_zero_variance_predictors
-Table2_ModelA_Minority6 dislike_minority_genres 419            10 0.167977 0.147585                      no_religion
-
-## ModelB_fit
-                model                     dv   n  k_predictors       r2  adj_r2 dropped_zero_variance_predictors
-Table2_ModelB_Other12 dislike_other12_genres 412            10 0.172086 0.15144                      no_religion
-
-## missingness_audit
- missing_n  nonmissing_n
-       765           841
-       583          1023
-       166          1440
-       165          1441
-       142          1464
-       112          1494
-        80          1526
-         9          1597
-         5          1601
-         0          1606
-         0          1606
-         0          1606
-         0          1606
+## missingness_modelB
+                variable                                                   label  share_missing
+            racism_score         Racism score (0–5; strict sum of 5 dichotomies)       0.476339
+               cons_prot   Conservative Protestant (proxy; source=relig+denom16)       0.356787
+dv2_remaining12_dislikes               Dislike of remaining genres (count of 12)       0.341843
+                hispanic Hispanic (constructed; source=ethnic(proxy_codes_8_15))       0.222914
+               income_pc            Household income per capita (REALINC/HOMPOP)       0.086550
+                prestg80                        Occupational prestige (PRESTG80)       0.049813
+             no_religion                                  No religion (RELIG==4)       0.005604
+                     age                                             Age (years)       0.003113
+                    educ                                       Education (years)       0.002491
+                  female                                       Female (1=female)       0.000000
+                   black                                         Black (1=Black)       0.000000
+              other_race                                    Other race (1=other)       0.000000
+                southern                                    Southern (REGION==3)       0.000000

@@ -1,0 +1,124 @@
+Score: 65/100
+============================================================
+
+### 1) Row items/categories: missing rows in the generated table
+The generated table **omits two attitude categories entirely** by setting them to zeros across all genres:
+
+- **(M) Don’t know much about it**  
+- **(M) No answer**
+
+In the true table, these rows have **nonzero counts for every genre**.
+
+**How to fix:**  
+Populate these two rows with the true counts (see section 3 below). Do not treat missing codes as 0; they are valid response categories with frequencies.
+
+---
+
+### 2) Column items/categories: mismatch in a column name/category
+The generated header includes:
+
+- **“New Age/Space Opera”** (single combined column label)
+
+But the true table has:
+
+- **“New Age/Space”** and **“Opera”** as **two separate columns** (in Panel 2)
+
+In the generated table, “New Age/Space Opera” appears to be **only one column**, yet the cells under it match the **New Age/Space** counts (e.g., Like very much = 48; Like it = 186; etc.), and there is **no separate Opera column**.
+
+**How to fix:**
+- Split this into **two columns**: **New Age/Space** and **Opera**.
+- Keep the existing counts under “New Age/Space” (they already match).
+- Add the missing **Opera** column with its true counts and mean:
+  - Like very much 73; Like it 257; Mixed 359; Dislike 515; Dislike very much 306; Don’t know 83; No answer 13; Mean 3.48.
+
+---
+
+### 3) Frequency count mismatches: all errors are in the missing-response rows
+For the 5 substantive categories (1)–(5), **all counts match perfectly** across all genres.
+
+The only frequency/count mismatches are that the generated table shows **0** for all genres in the two “M” rows, while the true table has the following nonzero values.
+
+#### (M) Don’t know much about it — should be:
+**Panel 1**
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+
+**Panel 2**
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+
+**Panel 3**
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+#### (M) No answer — should be:
+**Panel 1**
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+
+**Panel 2**
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+
+**Panel 3**
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+**How to fix:**  
+Insert these exact values into the generated table for the two missing-response rows, and ensure the “Opera” column exists.
+
+---
+
+### 4) Summary statistics (means): mostly correct, but one mean is misassigned due to the missing Opera column
+- All displayed means in the generated table **match the true means** for the columns that exist (Latin/Salsa through Gospel), **including New Age/Space = 3.68**.
+
+But because the generated table lacks a separate **Opera** column, the generated output is **missing the Opera mean (3.48)** and incorrectly *labels* the “New Age/Space” column as “New Age/Space Opera,” which implies the mean might refer to some combined variable (it does not).
+
+**How to fix:**
+- Rename the existing “New Age/Space Opera” column to **New Age/Space** and keep mean **3.68**.
+- Add a separate **Opera** column with mean **3.48**.
+
+---
+
+### 5) Percentages: not shown (but would be wrong if computed from the generated table)
+The true table gives **counts only** (and means). The generated table also provides counts only.  
+However, if you compute percentages from the generated table, they will be **wrong** because the denominators would exclude the nonzero “Don’t know” and “No answer” counts (since they were set to 0).
+
+**How to fix:**
+- After restoring the two missing-response rows (and adding Opera), compute percentages using:
+  - denominator = sum of **all 7 response categories** (1–5 + Don’t know + No answer) **for each genre**.
+
+---
+
+## Net changes required to make generated match true
+1. **Add the missing response-category counts** for:
+   - (M) Don’t know much about it
+   - (M) No answer
+2. **Split “New Age/Space Opera” into two columns**:
+   - New Age/Space (keep existing counts/mean)
+   - Opera (add missing counts/mean 3.48)
+3. If producing percentages, **recompute using the full denominators** including the M categories.

@@ -1,0 +1,120 @@
+Score: 70/100
+============================================================
+
+### 1) Row items/categories: mismatches
+
+**Mismatch A — Missing response categories (rows) in Generated Results**
+- In the **Generated Results**, the rows
+  - **(M) Don’t know much about it**
+  - **(M) No answer**
+  are present but set to **0 for every genre**.
+- In the **True Results**, these two rows have **nonzero counts for every genre**.
+
+**How to fix**
+- Populate those two rows with the **correct counts** from the True table (listed in section 2 below). Do **not** leave them as all zeros.
+
+---
+
+### 2) Frequency count mismatches (cell-by-cell)
+
+All counts for response categories **(1)–(5)** match the True table across all genres.
+
+The *only* frequency-count mismatches are the two “missing-data” categories that were incorrectly set to zero in the Generated Results.
+
+#### A) Panel 1 genres — counts that must replace the zeros
+
+**(M) Don’t know much about it** should be:
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+
+**(M) No answer** should be:
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+
+#### B) Panel 2 genres — counts that must replace the zeros
+
+**(M) Don’t know much about it** should be:
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+
+**(M) No answer** should be:
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+
+#### C) Panel 3 genres — counts that must replace the zeros
+
+**(M) Don’t know much about it** should be:
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+**(M) No answer** should be:
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+---
+
+### 3) Summary statistics mismatches (means, totals, etc.)
+
+**Means:** All means in the Generated Results **match** the True table.
+
+**However:** If the Generated analysis later computes percentages or any “valid N”/total N using the generated table, it will be wrong because the **missing-data rows are zeroed out**, which **changes the denominator**.
+
+**How to fix**
+- After inserting correct missing-data counts, ensure any computed:
+  - **Total N per genre** = sum of (1)–(5) + (M) Don’t know + (M) No answer
+  - **Valid N** (if used) = sum of (1)–(5) only
+  - **Percentages**: clarify whether they are based on total N or valid N, and recompute accordingly.
+
+---
+
+### 4) Missing or extra column categories (variables)
+
+**Mismatch B — Column naming/structure issue for “New Age/Space” and “Opera”**
+- The Generated Results has a single combined column labeled **“New Age/Space Opera”**.
+- The True Results show this as **two separate columns**:
+  - **New Age/Space**
+  - **Opera**
+
+**Important note:** Despite the label issue, the Generated table’s values under “New Age/Space Opera” actually correspond to **New Age/Space** *and* there is also a separate **Opera** column present (with its own counts: 73, 257, 359, 515, 306, mean 3.48). So the problem is primarily a **header/labeling discrepancy**, not a numeric one.
+
+**How to fix**
+- Rename headers to match the True table exactly:
+  - One column = **New Age/Space**
+  - Another column = **Opera**
+- Do **not** merge them into one label (“New Age/Space Opera”). If your output format forces single-line headers, use something like:
+  - `New Age/Space` and `Opera`
+  or
+  - `New Age/Space` and `Opera (genre)`.
+
+---
+
+## Complete list of mismatches (everything that differs)
+1. **All cells in “(M) Don’t know much about it” are wrong** (Generated = 0; True = nonzero for every genre).
+2. **All cells in “(M) No answer” are wrong** (Generated = 0; True = nonzero for every genre).
+3. **Column header mismatch**: “New Age/Space Opera” should not be a merged label; True table has **New Age/Space** and **Opera** as distinct columns (your data appear to already be distinct—just mislabeled).
+
+Everything else (the (1)–(5) counts and the means) matches the True table.

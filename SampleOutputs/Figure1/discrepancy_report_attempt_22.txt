@@ -1,0 +1,136 @@
+Score: 78/100
+============================================================
+
+## Discrepancy report (GT Figure 1 vs generated)
+
+### 1) Series are swapped (wrong y-axis mapping)
+- **GT:**  
+  - **Dash-dot line** = *Mean Education of Genre Audience* (uses **right y-axis**, 12–15).  
+  - **Solid line** = *Coefficient for Musical Tolerance* (uses **left y-axis**, −0.5 to −0.1).
+- **Generated:**  
+  - **Solid line** is increasing 13→15 and clearly plotted against the **right axis** values, but it is visually acting like the education series; meanwhile **dash-dot** sits around −0.25 to −0.45, acting like the coefficient series.
+- **Exact discrepancy:** the **linestyle-to-variable mapping is reversed**, and thus each line is effectively plotted on the wrong axis.
+
+### 2) Left y-axis label text differs
+- **GT left y-label:** “**Coefficients for Musical Tolerance as It Affects One’s Probability of Disliking Each Music Genre**”
+- **Generated left y-label:** “**Coefficients for Musical Tolerance in Affecting Odds (Probability) of Disliking Each Individual Genre**”
+- **Exact discrepancy:** wording and meaning differ; GT references “as It Affects One’s Probability…”, not “Odds (Probability)” nor “Each Individual Genre”.
+
+### 3) Line endpoint/shape mismatch due to incorrect series assignment
+- **GT education (dash-dot, right axis):** steadily rises across genres, ending near **~14.7–14.9** at Gospel.  
+- **Generated dash-dot:** does *not* show that rising right-axis pattern; instead it drops to around **−0.43** at the end (coefficient-like).
+- **GT coefficient (solid, left axis):** fluctuates around −0.27 to −0.45 and ends near **~−0.42** at Gospel.  
+- **Generated solid:** rises to **~14.8** (education-like).
+- **Exact discrepancy:** beyond aesthetics, the plotted values per series are wrong (caused by the swap).
+
+### 4) Annotation leader lines point to the wrong series
+- **GT:** “Mean Education of Genre Audience” leader points to the **dash-dot** line; “Coefficient for Musical Tolerance” leader points to the **solid** line.
+- **Generated:** the text is present but leader lines visually align with the swapped series (because the series are swapped).
+
+### 5) Minor typography/layout differences (still visible)
+- **GT:** heavier/older-style typography; label capitalization “as It Affects”; y-tick labels shown as **−.1, −.2, …** (no leading zero).  
+- **Generated:** appears to use standard Matplotlib font; tick formatting may not exactly match the **“−.1”** style (depends on your formatter).  
+- **Exact discrepancy:** tick label formatting and font weight do not exactly match GT.
+
+(Everything else—x-order of genres, dual y-axis ranges of −0.5..−0.1 and 12..15, dotted horizontal line at 13 with arrow “Sample Mean Education”, and black-only styling—looks broadly consistent.)
+
+---
+
+## Code/data fixes to match GT exactly (actionable steps)
+
+### A) Fix the data-to-axis + linestyle mapping (root cause)
+- **Ensure coefficient values are plotted on the LEFT axis and with a SOLID line**
+  - Data: `coef_musical_tolerance` (values around −0.25..−0.45)
+  - Plot call:
+    ```python
+    ln_coef, = ax.plot(x, coef, color='black', lw=2.5, ls='-')
+    ```
+- **Ensure mean education is plotted on the RIGHT axis and with a DASH-DOT line**
+  - Data: `mean_education` (values around 12..15)
+  - Plot call:
+    ```python
+    ax2 = ax.twinx()
+    ln_edu, = ax2.plot(x, edu, color='black', lw=2.5, ls='-.')
+    ```
+- **Sanity check (recommended):** assert ranges before plotting:
+  ```python
+  assert np.nanmin(coef) < -0.2 and np.nanmax(coef) < -0.1
+  assert np.nanmin(edu) >= 12 and np.nanmax(edu) <= 15
+  ```
+
+### B) Force axis ranges/ticks to match GT
+- **Left axis (coefficients):**
+  ```python
+  ax.set_ylim(-0.5, -0.1)
+  ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])
+  ```
+- **Right axis (education):**
+  ```python
+  ax2.set_ylim(12, 15)
+  ax2.set_yticks([12, 13, 14, 15])
+  ```
+- **Format left ticks like GT (“−.1” not “−0.1”):**
+  ```python
+  from matplotlib.ticker import FuncFormatter
+  ax.yaxis.set_major_formatter(FuncFormatter(lambda v, p: f"{v:.1f}".replace("-0.", "-.").replace("0.", ".")))
+  ```
+
+### C) Match labels exactly (verbatim)
+- **Left y-label (GT text):**
+  ```python
+  ax.set_ylabel("Coefficients for Musical Tolerance as It Affects\nOne’s Probability of Disliking Each Music Genre",
+                fontweight='bold')
+  ```
+- **Right y-label (already close; keep verbatim GT):**
+  ```python
+  ax2.set_ylabel("Mean Educational Level of Respondents Who\nReported Liking Each Music Genre",
+                 rotation=270, labelpad=30, fontweight='bold')
+  ```
+- **X label:**
+  ```python
+  ax.set_xlabel("Type of Music", fontweight='bold')
+  ```
+
+### D) Re-anchor annotations to the correct lines (after swapping)
+- Place annotation arrows to the correct series coordinates:
+  ```python
+  ax2.annotate("Mean Education of Genre Audience",
+               xy=(x[idx_edu], edu[idx_edu]), xycoords='data',
+               xytext=(x[idx_edu]-1.5, 14.1), textcoords='data',
+               arrowprops=dict(arrowstyle='-', lw=1.5, color='black'),
+               fontsize=16, fontweight='bold')
+
+  ax.annotate("Coefficient for Musical Tolerance",
+              xy=(x[idx_coef], coef[idx_coef]), xycoords='data',
+              xytext=(x[idx_coef]+1.0, -0.47), textcoords='data',
+              arrowprops=dict(arrowstyle='-', lw=1.5, color='black'),
+              fontsize=16, fontweight='bold')
+  ```
+
+### E) Sample mean education reference line at 13 (right axis)
+- Draw it on the **right-axis scale** but spanning the full plot:
+  ```python
+  ax2.axhline(13, color='black', lw=1.2, ls=(0, (2, 2)))  # dotted
+  ax.annotate("Sample Mean Education",
+              xy=(x[mid], ax.get_ylim()[0] + 0.14),  # position text on left-axis coords
+              ha='center', va='center', fontweight='bold', fontsize=16)
+  ax2.annotate("", xy=(x[mid], 13), xytext=(x[mid], 12.8),
+               arrowprops=dict(arrowstyle='-|>', lw=1.5, color='black'))
+  ```
+  (Key point: the horizontal line must be at **13 on ax2**, not a left-axis value.)
+
+### F) Styling to closer match GT
+- Use thicker spines and ticks:
+  ```python
+  for a in (ax, ax2):
+      a.tick_params(axis='both', width=2.5, length=12, labelsize=14)
+  for s in ax.spines.values(): s.set_linewidth(2.5)
+  for s in ax2.spines.values(): s.set_linewidth(2.5)
+  ```
+- Rotate x tick labels to ~55° and right-align:
+  ```python
+  ax.set_xticks(x)
+  ax.set_xticklabels(genres, rotation=55, ha='right')
+  ```
+
+If you share the snippet that constructs `coef` and `edu` (groupby/merge steps), I can point to the exact line where the columns get swapped and provide a precise patch.

@@ -3,200 +3,200 @@ def run_analysis(data_source):
     import numpy as np
     import pandas as pd
 
-    os.makedirs("./output", exist_ok=True)
+    df = pd.read_csv(data_source)
 
-    # ---- Load ----
-    df = pd.read_csv(data_source, low_memory=False)
-    df.columns = [str(c).strip().upper() for c in df.columns]
+    # ---- Resolve columns case-insensitively ----
+    colmap = {str(c).strip().lower(): c for c in df.columns}
 
-    if "YEAR" not in df.columns:
-        raise ValueError("YEAR column not found in data.")
+    # ---- Restrict to GSS 1993 ----
+    if "year" not in colmap:
+        raise KeyError("Expected column 'year' not found in dataset.")
+    year_col = colmap["year"]
+    df = df.loc[pd.to_numeric(df[year_col], errors="coerce") == 1993].copy()
 
-    # Filter to 1993
-    df = df.loc[df["YEAR"].eq(1993)].copy()
-
-    # ---- Variables (Table 3) ----
-    genre_map = [
-        ("Latin/Salsa", "LATIN"),
-        ("Jazz", "JAZZ"),
-        ("Blues/R&B", "BLUES"),
-        ("Show Tunes", "MUSICALS"),
-        ("Oldies", "OLDIES"),
-        ("Classical/Chamber", "CLASSICL"),
-        ("Reggae", "REGGAE"),
-        ("Swing/Big Band", "BIGBAND"),
-        ("New Age/Space", "NEWAGE"),
-        ("Opera", "OPERA"),
-        ("Bluegrass", "BLUGRASS"),
-        ("Folk", "FOLK"),
-        ("Pop/Easy Listening", "MOODEASY"),
-        ("Contemporary Rock", "CONROCK"),
-        ("Rap", "RAP"),
-        ("Heavy Metal", "HVYMETAL"),
-        ("Country/Western", "COUNTRY"),
-        ("Gospel", "GOSPEL"),
+    # ---- Table 3 genre variables (exact set/order) ----
+    genres = [
+        ("Latin/Salsa", "latin"),
+        ("Jazz", "jazz"),
+        ("Blues/R&B", "blues"),
+        ("Show Tunes", "musicals"),
+        ("Oldies", "oldies"),
+        ("Classical/Chamber", "classicl"),
+        ("Reggae", "reggae"),
+        ("Swing/Big Band", "bigband"),
+        ("New Age/Space", "newage"),
+        ("Opera", "opera"),
+        ("Bluegrass", "blugrass"),
+        ("Folk", "folk"),
+        ("Pop/Easy Listening", "moodeasy"),
+        ("Contemporary Rock", "conrock"),
+        ("Rap", "rap"),
+        ("Heavy Metal", "hvymetal"),
+        ("Country/Western", "country"),
+        ("Gospel", "gospel"),
     ]
 
+    missing_vars = [v for _, v in genres if v not in colmap]
+    if missing_vars:
+        raise KeyError(f"Expected genre variable(s) not found in dataset: {missing_vars}")
+
+    # ---- Row labels (exact order) ----
     row_labels = [
         "(1) Like very much",
         "(2) Like it",
         "(3) Mixed feelings",
         "(4) Dislike it",
         "(5) Dislike very much",
-        "(M) Don't know much about it",
+        "(M) Don’t know much about it",
         "(M) No answer",
         "Mean",
     ]
 
-    # ---- Helpers ----
-    def _norm_str_series(s):
-        return s.astype("string").str.strip().str.upper()
+    # ---- Missing-code handling (fix: do not guess; correctly detect NA(d)/NA(n)) ----
+    # For this GSS battery, codes are commonly:
+    #   8 = don't know much about it (NA(d))
+    #   9 = no answer (NA(n))
+    # Some extracts use 98/99 or other special codes; handle those too.
+    DK_NUM_CODES = {8, 98}
+    NA_NUM_CODES = {9, 99}
 
-    def _extract_categories(raw):
+    DK_STR_TOKENS = {
+        "d", "dk",
+        "dont know", "don't know", "don’t know",
+        "dont know much", "don't know much", "don’t know much",
+        "dont know much about it", "don't know much about it", "don’t know much about it",
+        "dont know enough", "don't know enough", "don’t know enough",
+        "dont know enough about it", "don't know enough about it", "don’t know enough about it",
+    }
+    NA_STR_TOKENS = {"n", "na", "no answer", "noanswer"}
+
+    def _series_str(series: pd.Series) -> pd.Series:
+        # Always return a string dtype Series (nullable), safe for .str ops
+        try:
+            return series.astype("string")
+        except Exception:
+            return series.astype(str)
+
+    def _compute_item_counts(series: pd.Series):
         """
-        Returns:
-          valid_num: float Series with only 1..5 else NaN
-          dk_mask: bool mask for "don't know much about it"
-          na_mask: bool mask for "no answer"
-          other_missing_mask: bool mask for other missings (kept out of mean; not shown separately)
-        Notes:
-          - If explicit NA(d)/NA(n) exist as strings, use them.
-          - Otherwise, if missing is unsplittable (just NaN), split deterministically by column using
-            a year-wide estimate of NA(n) count (small), remainder goes to DK.
-            This avoids runtime errors while still producing two rows.
+        Compute counts for 1..5, DK, NA, and mean over 1..5.
+        DK/NA counted only when explicitly coded (numeric DK/NA codes or recognized string tokens).
+        Any other special codes/blanks/NaN are excluded from the mean but not displayed in DK/NA rows,
+        matching Table 3 which displays only those two missing categories.
         """
-        # Preserve original raw for string detection
-        s = raw
+        s = series
+        sn = pd.to_numeric(s, errors="coerce")
 
-        # Numeric parse
-        x = pd.to_numeric(s, errors="coerce")
-        valid_num = x.where(x.isin([1, 2, 3, 4, 5]), np.nan)
+        valid_mask = sn.isin([1, 2, 3, 4, 5]).fillna(False)
 
-        # Detect explicit bracketed missing codes if present in raw strings
-        s_up = _norm_str_series(s)
-        dk_mask_exp = s_up.str.contains(r"\[NA\(D\)\]|\bNA\(D\)\b", regex=True, na=False)
-        na_mask_exp = s_up.str.contains(r"\[NA\(N\)\]|\bNA\(N\)\b", regex=True, na=False)
+        c1 = int((sn == 1).sum())
+        c2 = int((sn == 2).sum())
+        c3 = int((sn == 3).sum())
+        c4 = int((sn == 4).sum())
+        c5 = int((sn == 5).sum())
 
-        # Other explicit NA(*) markers (treated as missing but not reported separately)
-        other_mask_exp = s_up.str.contains(r"\[NA\([A-Z]\)\]|\bNA\([A-Z]\)\b", regex=True, na=False) & (
-            ~dk_mask_exp & ~na_mask_exp
-        )
+        # numeric DK/NA
+        dk_num = sn.isin(list(DK_NUM_CODES)).fillna(False)
+        na_num = sn.isin(list(NA_NUM_CODES)).fillna(False)
 
-        # If explicit DK/NA exist, use them; also treat any non-1..5 numeric codes / NaN as other missing
-        if (dk_mask_exp | na_mask_exp | other_mask_exp).any():
-            other_missing_mask = (x.isna() | (~x.isin([1, 2, 3, 4, 5]) & x.notna())) | other_mask_exp
-            # ensure disjoint categories
-            dk_mask = dk_mask_exp
-            na_mask = na_mask_exp & ~dk_mask
-            other_missing_mask = other_missing_mask & ~(dk_mask | na_mask)
-            return valid_num, dk_mask, na_mask, other_missing_mask
+        # string DK/NA (only matters if non-numeric tokens exist)
+        st = _series_str(s).str.strip().str.lower()
+        dk_str = st.isin(DK_STR_TOKENS).fillna(False)
+        na_str = st.isin(NA_STR_TOKENS).fillna(False)
 
-        # No explicit missing codes: everything missing is NaN (or non-1..5 numeric codes)
-        # We'll allocate a small, stable NA(n) count per column using year-wide calibration.
-        missing_pool = x.isna() | (x.notna() & ~x.isin([1, 2, 3, 4, 5]))
-        other_missing_mask = pd.Series(False, index=x.index)  # none separate in this scenario
+        # ensure disjoint and exclude substantive
+        dk_mask = (dk_num | dk_str) & ~valid_mask
+        na_mask = (na_num | na_str) & ~valid_mask & ~dk_mask
 
-        if not missing_pool.any():
-            dk_mask = pd.Series(False, index=x.index)
-            na_mask = pd.Series(False, index=x.index)
-            return valid_num, dk_mask, na_mask, other_missing_mask
+        dk_cnt = int(dk_mask.sum())
+        na_cnt = int(na_mask.sum())
 
-        # Determine NA size:
-        # Use the minimum nonzero missing count across the 18 items as a proxy for NA(n) level,
-        # capped by this variable's missing count. This is deterministic and avoids raising errors.
-        # If min_missing is 0 (shouldn't happen with missing_pool.any()), fallback to 0.
-        miss_counts = []
-        for _, v in genre_map:
-            if v in df.columns:
-                xx = pd.to_numeric(df[v], errors="coerce")
-                miss_counts.append(int((xx.isna() | (xx.notna() & ~xx.isin([1, 2, 3, 4, 5]))).sum()))
-        min_missing = min([m for m in miss_counts if m > 0], default=0)
+        mean_val = sn.where(valid_mask).mean()
 
-        n_miss = int(missing_pool.sum())
-        n_na = int(min_missing)
-        if n_na < 0:
-            n_na = 0
-        if n_na > n_miss:
-            n_na = n_miss
+        return c1, c2, c3, c4, c5, dk_cnt, na_cnt, mean_val
 
-        # Deterministic assignment by index order within the missing pool
-        miss_idx = x.index[missing_pool]
-        na_idx = miss_idx[:n_na]
-        dk_idx = miss_idx[n_na:]
+    # ---- Build table with Attitude as first column ----
+    out_cols = ["Attitude"] + [g[0] for g in genres]
+    table = pd.DataFrame(index=row_labels, columns=out_cols, dtype=object)
+    table["Attitude"] = row_labels
 
-        na_mask = pd.Series(False, index=x.index)
-        dk_mask = pd.Series(False, index=x.index)
-        na_mask.loc[na_idx] = True
-        dk_mask.loc[dk_idx] = True
+    for genre_label, var_lower in genres:
+        s = df[colmap[var_lower]]
+        c1, c2, c3, c4, c5, dk_cnt, na_cnt, mean_val = _compute_item_counts(s)
 
-        return valid_num, dk_mask, na_mask, other_missing_mask
-
-    # ---- Build table (numeric) ----
-    table = pd.DataFrame(index=row_labels, columns=[g[0] for g in genre_map], dtype="float64")
-
-    for genre_label, var in genre_map:
-        if var not in df.columns:
-            raise ValueError(f"Required genre variable not found in data: {var}")
-
-        raw = df[var]
-        valid_num, dk_mask, na_mask, other_missing_mask = _extract_categories(raw)
-
-        counts_1_5 = (
-            valid_num.value_counts(dropna=True)
-            .reindex([1, 2, 3, 4, 5], fill_value=0)
-            .astype(int)
-        )
-
-        dk_count = int(dk_mask.sum())
-        na_count = int(na_mask.sum())
-
-        # Note: other missing types (if any) are excluded from mean and not shown in Table 3.
-        # If they exist, they are effectively omitted from the displayed missing rows, matching the paper layout.
-        mean_val = float(valid_num.mean(skipna=True)) if valid_num.notna().any() else np.nan
-
-        table.loc["(1) Like very much", genre_label] = counts_1_5.loc[1]
-        table.loc["(2) Like it", genre_label] = counts_1_5.loc[2]
-        table.loc["(3) Mixed feelings", genre_label] = counts_1_5.loc[3]
-        table.loc["(4) Dislike it", genre_label] = counts_1_5.loc[4]
-        table.loc["(5) Dislike very much", genre_label] = counts_1_5.loc[5]
-        table.loc["(M) Don't know much about it", genre_label] = dk_count
-        table.loc["(M) No answer", genre_label] = na_count
+        table.loc["(1) Like very much", genre_label] = c1
+        table.loc["(2) Like it", genre_label] = c2
+        table.loc["(3) Mixed feelings", genre_label] = c3
+        table.loc["(4) Dislike it", genre_label] = c4
+        table.loc["(5) Dislike very much", genre_label] = c5
+        table.loc["(M) Don’t know much about it", genre_label] = dk_cnt
+        table.loc["(M) No answer", genre_label] = na_cnt
         table.loc["Mean", genre_label] = mean_val
 
-    # ---- Format for output (counts as int; mean to 2 decimals) ----
+    # ---- Format for output (counts as integers; mean to 2 decimals) ----
     formatted = table.copy()
-    for r in formatted.index:
+    for r in row_labels:
         if r == "Mean":
-            formatted.loc[r] = formatted.loc[r].map(lambda v: "" if pd.isna(v) else f"{float(v):.2f}")
+            for c in formatted.columns:
+                if c == "Attitude":
+                    continue
+                v = formatted.loc[r, c]
+                formatted.loc[r, c] = "" if pd.isna(v) else f"{float(v):.2f}"
         else:
-            formatted.loc[r] = formatted.loc[r].map(lambda v: "" if pd.isna(v) else str(int(round(float(v)))))
+            for c in formatted.columns:
+                if c == "Attitude":
+                    continue
+                v = formatted.loc[r, c]
+                formatted.loc[r, c] = "" if pd.isna(v) else str(int(v))
 
-    # Add stub column
-    display = formatted.copy()
-    display.insert(0, "Attitude", list(display.index))
-    display = display.reset_index(drop=True)
-
-    # ---- Save as three 6-column blocks ----
+    # ---- Save as human-readable text file with 3 panels (6 genres each) ----
+    os.makedirs("./output", exist_ok=True)
     out_path = "./output/table3_frequency_distributions_gss1993.txt"
-    genre_labels = [g[0] for g in genre_map]
-    blocks = [genre_labels[i : i + 6] for i in range(0, len(genre_labels), 6)]
+    title = "Table 3. Frequency Distributions for Attitude toward 18 Music Genres: General Social Survey, 1993"
+
+    panels = [
+        [g[0] for g in genres[0:6]],
+        [g[0] for g in genres[6:12]],
+        [g[0] for g in genres[12:18]],
+    ]
+
+    def _pad(text, width, align="left"):
+        text = "" if text is None else str(text)
+        if len(text) >= width:
+            return text
+        if align == "right":
+            return " " * (width - len(text)) + text
+        if align == "center":
+            left = (width - len(text)) // 2
+            right = width - len(text) - left
+            return " " * left + text + " " * right
+        return text + " " * (width - len(text))
+
+    att_col = "Attitude"
+    row_w = max(len(att_col), max(len(str(x)) for x in formatted[att_col].tolist())) + 2
 
     with open(out_path, "w", encoding="utf-8") as f:
-        f.write(
-            "Table 3. Frequency Distributions for Attitude toward 18 Music Genres: General Social Survey, 1993\n"
-        )
-        f.write("Counts shown for response categories; Mean computed on 1–5 excluding missing.\n\n")
+        f.write(title + "\n")
+        f.write("Counts shown for 1–5 plus (M) DK and (M) No answer. Mean computed over 1–5 only.\n")
+        f.write("DK counted when coded as 8/98 (or DK string token); No answer counted when coded as 9/99 (or NA string token).\n")
 
-        for bi, cols in enumerate(blocks, start=1):
-            f.write(f"Block {bi}:\n")
-            cols_with_stub = ["Attitude"] + cols
-            block_df = display.loc[:, cols_with_stub]
-            f.write(block_df.to_string(index=False))
-            f.write("\n\n")
+        for p_idx, panel_cols in enumerate(panels, start=1):
+            f.write("\n")
+            f.write(f"Panel {p_idx}\n")
 
-        # Optional internal consistency notes (no paper numbers; computed from data)
-        f.write("Notes:\n")
-        f.write("- 'Don't know much about it' and 'No answer' are separated using explicit NA(d)/NA(n) if present;\n")
-        f.write("  otherwise they are split deterministically from the missing pool to avoid runtime errors.\n")
+            widths = {}
+            for c in panel_cols:
+                max_cell_len = int(formatted[c].astype(str).map(len).max())
+                widths[c] = max(len(str(c)), max_cell_len) + 4
 
-    return table
+            header = _pad(att_col, row_w, "left") + "".join(_pad(c, widths[c], "center") for c in panel_cols)
+            f.write(header + "\n")
+
+            for r in row_labels:
+                line = _pad(formatted.loc[r, att_col], row_w, "left")
+                for c in panel_cols:
+                    val = formatted.loc[r, c]
+                    line += _pad(val, widths[c], "center" if r == "Mean" else "right")
+                f.write(line + "\n")
+
+    return formatted

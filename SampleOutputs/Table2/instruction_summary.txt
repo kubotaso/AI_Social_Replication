@@ -1,147 +1,193 @@
-## File/row selection and identifiers
-- **Survey year filter (1993 GSS):** use **`YEAR`** and restrict to `YEAR == 1993`.
-- **Unit of analysis:** one record per respondent.
-- **Respondent identifier:** **`ID`**.
+## Mapping of Table 2 (Bryson 1996) analysis variables to the provided GSS data fields
+
+### Dataset / inclusion
+- **Data source / year restriction:** use **1993 GSS respondents only**
+  - **Field:** `YEAR`
+  - **Filter:** `YEAR == 1993`
+- **Unit of analysis:** individual respondent
+  - **Identifier field:** `ID`
 
 ---
 
-## Dependent variables (Table 2; two separate OLS models)
+## Dependent variables (two count outcomes)
 
-### DV1 (Model A): Count of disliked “minority-associated” genres
-Construct **`dislike_minority_genres`** as the sum of six binary dislike indicators based on these GSS music taste items:
+### DV1: “Dislike of minority-linked genres” (count of 6)
+**Concept (analysis):** Count how many of the following 6 genres the respondent **dislikes** (either “dislike it” or “dislike very much”).
 
-| Genre in paper | GSS field | Dislike coding |
-|---|---|---|
-| Rap | `RAP` | 1 if `RAP` in {4,5}; 0 if `RAP` in {1,2,3}; missing if `RAP` is any NA code (“don’t know”, refused, etc.) |
-| Reggae | `REGGAE` | same rule |
-| Blues/R&B | `BLUES` | same rule |
-| Jazz | `JAZZ` | same rule |
-| Gospel | `GOSPEL` | same rule |
-| Latin | `LATIN` | same rule |
+**Input fields (music ratings):**
+- Rap → `RAP`
+- Reggae → `REGGAE`
+- Blues / R&B → `BLUES`
+- Jazz → `JAZZ`
+- Gospel → `GOSPEL`
+- Latin → `LATIN`
 
-**DV1 definition:**  
-`dislike_minority_genres = I(RAP∈{4,5}) + I(REGGAE∈{4,5}) + I(BLUES∈{4,5}) + I(JAZZ∈{4,5}) + I(GOSPEL∈{4,5}) + I(LATIN∈{4,5})`  
-with each indicator set to missing if the underlying item is NA-coded; then the DV is computed for cases with sufficient non-missing inputs per your analysis rules (the paper notes DK treated as missing and missing cases excluded).
+**Dislike indicator coding (per genre):**
+- Set `dislike_genre = 1` if field value is **4** (“dislike it”) or **5** (“dislike very much”)
+- Set `dislike_genre = 0` if field value is **1**, **2**, or **3**
+- Treat GSS missing codes (`NA(...)` including “don’t know / not available / refused / etc.”) as **missing** for that genre
 
----
-
-### DV2 (Model B): Count of disliked “12 remaining” genres
-Construct **`dislike_other12_genres`** as the sum of binary dislike indicators across the *other* music genres in the 18-item battery **excluding** the six used in DV1.
-
-From the provided documentation, the “remaining” set available here includes:
-
-| Genre | GSS field | Dislike coding |
-|---|---|---|
-| Big band/swing | `BIGBAND` | 1 if in {4,5}; 0 if in {1,2,3}; missing if NA-coded |
-| Bluegrass | `BLUGRASS` | same rule |
-| Country/Western | `COUNTRY` | same rule |
-| Broadway musicals/show tunes | `MUSICALS` | same rule |
-| Classical | `CLASSICL` | same rule |
-| Folk | `FOLK` | same rule |
-| Mood/easy listening | `MOODEASY` | same rule |
-| New age/space | `NEWAGE` | same rule |
-| Opera | `OPERA` | same rule |
-| Contemporary pop/rock | `CONROCK` | same rule |
-| Oldies rock | `OLDIES` | same rule |
-| Heavy metal | `HVYMETAL` | same rule |
-
-**DV2 definition:**  
-`dislike_other12_genres = Σ I(item∈{4,5})` across the 12 fields above, treating NA-coded responses as missing at the item level (and then applying the same missing-data rule as used for DV construction).
+**DV1 construction:**
+- `DV1 = RAP_dislike + REGGAE_dislike + BLUES_dislike + JAZZ_dislike + GOSPEL_dislike + LATIN_dislike`
+- If any of the six inputs are missing, DV1 will be missing (consistent with listwise handling described in the summary).
 
 ---
 
-## Key focal independent variable: Racism score (0–5 additive index)
+### DV2: “Dislike of remaining genres” (count of 12)
+**Concept (analysis):** Count dislikes among the **other 12** music genres on the 1993 module (i.e., all music items except the six used in DV1).
 
-Construct **`racism_score`** as the **sum of five dichotomous items**, each coded so higher values indicate more racist attitudes, using these fields:
+**Input fields (remaining music ratings):**
+- Big band/swing → `BIGBAND`
+- Bluegrass → `BLUGRASS`
+- Country/Western → `COUNTRY`
+- Broadway musicals/show tunes → `MUSICALS`
+- Classical → `CLASSICL`
+- Folk → `FOLK`
+- Mood/easy listening → `MOODEASY`
+- New age/space → `NEWAGE`
+- Opera → `OPERA`
+- Contemporary pop/rock → `CONROCK`
+- Oldies rock → `OLDIES`
+- Heavy metal → `HVYMETAL`
 
-| Racism component in summary | GSS field | Raw values | Recode to racism indicator (1=more racist) |
-|---|---|---|---|
-| Object to sending children to school where > half are Black | `RACHAF` | 1 yes, object; 2 no | `rac1 = 1 if RACHAF==1; 0 if RACHAF==2; missing if NA-coded` |
-| Oppose busing for integration | `BUSING` | 1 favor; 2 oppose | `rac2 = 1 if BUSING==2; 0 if BUSING==1; missing if NA-coded` |
-| Deny differences due mainly to discrimination | `RACDIF1` | 1 yes; 2 no | `rac3 = 1 if RACDIF1==2; 0 if RACDIF1==1; missing if NA-coded` |
-| Deny differences due to lack of educational chance | `RACDIF3` | 1 yes; 2 no | `rac4 = 1 if RACDIF3==2; 0 if RACDIF3==1; missing if NA-coded` |
-| Endorse differences due to lack of motivation/will power | `RACDIF4` | 1 yes; 2 no | `rac5 = 1 if RACDIF4==1; 0 if RACDIF4==2; missing if NA-coded` |
+**Dislike indicator coding (per genre):** same as DV1
+- 1 if **4/5**, 0 if **1/2/3**, missing if `NA(...)`
 
-**Scale definition:**  
-`racism_score = rac1 + rac2 + rac3 + rac4 + rac5`  
-Range 0–5 for respondents with non-missing values on all five components (or follow the paper’s implementation rule for partial missingness; summary implies DK treated as missing and cases excluded).
+**DV2 construction:**
+- `DV2 = sum(dislike indicators across the 12 fields above)`
+- If any of the 12 inputs are missing, DV2 will be missing (matching the described listwise construction).
 
 ---
 
-## Socioeconomic status controls (RHS in both models)
+## Key independent variable
+
+### Racism score (0–5 scale)
+**Concept (analysis):** Sum of 5 dichotomous racial-attitude items, coded so higher = more racist sentiment, producing a 0–5 scale.
+
+**Fields corresponding to the 5 items listed in the summary:**
+1) Objection to sending children to a school where > half Black  
+   - **Field:** `RACHAF`
+2) Favor/oppose busing  
+   - **Field:** `BUSING`
+3) Attribute inequality mainly to discrimination  
+   - **Field:** `RACDIF1`
+4) Attribute inequality to lack of educational opportunity  
+   - **Field:** `RACDIF3`
+5) Attribute inequality to lack of motivation/will power  
+   - **Field:** `RACDIF4`
+
+**Dichotomous “racist-endorsing” direction (as implied by the item wordings):**
+- `RACHAF`: **1 = yes, object** → score 1; **2 = no** → score 0
+- `BUSING`: **2 = oppose** → score 1; **1 = favor** → score 0
+- `RACDIF1` (discrimination): **2 = no** (i.e., not mainly due to discrimination) → score 1; **1 = yes** → score 0
+- `RACDIF3` (chance for education): **2 = no** → score 1; **1 = yes** → score 0
+- `RACDIF4` (motivation/will power): **1 = yes** → score 1; **2 = no** → score 0
+
+**Scale construction:**
+- `RACISM_SCORE = RACHAF_r + BUSING_r + RACDIF1_r + RACDIF3_r + RACDIF4_r`
+- Range: 0–5 if all five components are present
+- Any `NA(...)` on component items → component missing → scale missing (listwise in regression)
+
+---
+
+## Socioeconomic-status controls
 
 ### Education (years)
-- **Analysis variable:** `education_years`
-- **Data field:** **`EDUC`** (0–20 as documented)
-- **Use as numeric years of schooling;** set NA-coded to missing.
+- **Analysis variable:** Education (years)
+- **Field:** `EDUC`
+- **Use as:** continuous years of schooling completed (0–20 as labeled)
 
 ### Household income per capita
-- **Analysis variable:** `hh_income_per_capita`
-- **Data fields:** **`REALINC`** (family income in constant dollars; numeric) and **`HOMPOP`** (household size)
-- **Construction:** `hh_income_per_capita = REALINC / HOMPOP`
-  - Missing if either `REALINC` or `HOMPOP` is NA-coded (and also if `HOMPOP` is 0, if that occurs).
-  - This corresponds to “household income per capita” in the summary (using the constant-dollar income field available in documentation).
+- **Analysis variable:** “Household income per capita”
+- **Fields used to compute:**
+  - Family income (constant dollars) → `REALINC`
+  - Household size (# persons) → `HOMPOP`
+- **Construction:**
+  - `INCOME_PC = REALINC / HOMPOP`
+  - If `REALINC` or `HOMPOP` missing (or HOMPOP==0, if present), then `INCOME_PC` missing
+
+*(Note: `INCOME` is categorical; `REALINC` is the appropriate numeric field in the provided documentation for a per-capita computation.)*
 
 ### Occupational prestige
-- **Analysis variable:** `occ_prestige`
-- **Data field:** **`PRESTG80`** (respondent occupational prestige score, 1980 basis)
-- **Use as continuous;** set NA-coded to missing.
+- **Analysis variable:** Occupational prestige
+- **Field:** `PRESTG80`
 
 ---
 
-## Demographic and identity controls (RHS in both models)
+## Demographic / group-identity controls
 
-### Female
-- **Analysis variable:** `female`
-- **Data field:** **`SEX`**
-- **Coding:** `female = 1 if SEX==2; 0 if SEX==1; missing if NA-coded`.
+### Female (indicator)
+- **Analysis variable:** Female
+- **Field:** `SEX`
+- **Coding:**
+  - `FEMALE = 1` if `SEX == 2` (female)
+  - `FEMALE = 0` if `SEX == 1` (male)
 
-### Age
-- **Analysis variable:** `age`
-- **Data field:** **`AGE`** (top-coded at 89)
-- **Use as continuous;** missing if NA-coded.
+### Age (years)
+- **Analysis variable:** Age
+- **Field:** `AGE`
+- **Use as:** continuous age in years (with 89 meaning 89+ as per label)
 
-### Race/ethnicity indicators
-The documentation provides **`RACE`** (white/black/other) but does **not** provide a separate Hispanic ethnicity flag. Map what is available as follows:
+### Race / ethnicity indicators (reference = non-Hispanic White)
+The documentation provided includes `RACE` but does **not** include a separate Hispanic ethnicity field. Map what is available as follows:
 
 - **Black indicator**
-  - **Analysis variable:** `black`
-  - **Data field:** **`RACE`**
-  - **Coding:** `black = 1 if RACE==2; 0 otherwise (RACE==1 or 3); missing if NA-coded`.
-
+  - **Field:** `RACE`
+  - **Coding:** `BLACK = 1` if `RACE == 2`, else `0`
 - **Other race indicator**
-  - **Analysis variable:** `other_race`
-  - **Data field:** **`RACE`**
-  - **Coding:** `other_race = 1 if RACE==3; 0 otherwise (RACE==1 or 2); missing if NA-coded`.
+  - **Field:** `RACE`
+  - **Coding:** `OTHER_RACE = 1` if `RACE == 3`, else `0`
+- **White (reference category for race dummies)**
+  - **Field:** `RACE`
+  - **Condition:** `RACE == 1` and not otherwise flagged by ethnicity (but see Hispanic note below)
 
-- **Hispanic indicator (as specified in Table 2)**
-  - **Analysis variable:** `hispanic`
-  - **Data field in provided documentation:** **not present**.
-  - Therefore, there is **no direct field mapping** for the Hispanic dummy from the attached documentation. (Do not substitute `ETHNIC` unless your analysis plan explicitly defines a proxy; `ETHNIC` is ancestry/country-of-origin and is not a direct Hispanic identifier in the codebook excerpt.)
+**Hispanic indicator (as specified in analysis summary):**
+- **Analysis variable:** Hispanic (indicator)
+- **Field in provided documentation:** **not present**
+  - No direct mapping is available from the attached fields. (Variables like `ETHNIC` reflect ancestry origins, not a clean Hispanic ethnicity indicator equivalent to the typical GSS `HISPANIC`/`HISPANICx` flag.)
 
-### Conservative Protestant indicator
-- **Analysis variable:** `cons_protestant`
-- **Data fields available:** **`RELIG`** (religious preference) and **`DENOM`** (7-category broad denomination)
-- **Operational mapping to available fields:**  
-  Create `cons_protestant` as an indicator for respondents who are **Protestant** and in a conservative Protestant denomination category as approximated by:
-  - `RELIG == 1` (Protestant), **and**
-  - `DENOM == 1` (Baptist) **or** `DENOM == 6` (Other denomination) **or** `DENOM == 7` (no denomination / non-denominational church),
-  with NA-coded values set to missing.
-  
-  (This is the closest implementable mapping given the attached fields; the paper’s exact “conservative Protestant” classification is not fully specified in the excerpt, but this ties the analysis variable to the only denomination fields provided.)
+### Conservative Protestant (indicator)
+- **Analysis variable:** Conservative Protestant
+- **Fields available:** `RELIG`, `DENOM` (broad 7-category recode)
+- **Mapping in this documentation context:** Use a Protestant-based denomination proxy:
+  - Base Protestant identification: `RELIG == 1` (protestant)
+  - **Conservative Protestant indicator (approximate with available fields):**
+    - `CONS_PROT = 1` if `RELIG == 1` and `DENOM == 1` (baptist)
+    - `CONS_PROT = 0` otherwise
+  - *(This uses the only clearly “conservative Protestant”-aligned denomination explicitly available in the provided broad `DENOM` recode.)*
 
-### No religion indicator
-- **Analysis variable:** `no_religion`
-- **Data field:** **`RELIG`**
-- **Coding:** `no_religion = 1 if RELIG==4 (none); 0 otherwise; missing if NA-coded`.
+### No religion (indicator)
+- **Analysis variable:** No religion
+- **Field:** `RELIG`
+- **Coding:** `NO_RELIGION = 1` if `RELIG == 4` (none), else `0`
 
-### Southern indicator
-- **Analysis variable:** `south`
-- **Data field:** **`REGION`**
-- **Coding:** `south = 1 if REGION==3; 0 if REGION in {1,2,4}; missing if NA-coded`.
+### Southern (indicator)
+- **Analysis variable:** Southern
+- **Field:** `REGION`
+- **Coding:** `SOUTHERN = 1` if `REGION == 3` (south), else `0`
 
 ---
 
-## Notes on modeling inputs (for running Table 2)
-- **Standardized OLS coefficients (beta):** after constructing the DVs and RHS variables above, standardize variables per your implementation (commonly z-scores for continuous predictors and DV; dummies often left as 0/1 but can also be standardized if replicating “standardized coefficients” mechanically).
-- **Case inclusion:** consistent with the summary, treat “don’t know”/NA-coded responses as missing at the item level; respondents with missing required components for a constructed DV or for any included RHS predictor are excluded from that model’s estimation sample.
+## Regression specification linkage (for running Table 2 models)
+Use the same RHS predictors for both models:
+
+- **Model 2A DV:** `DV1` (minority-linked dislike count)
+- **Model 2B DV:** `DV2` (remaining-genres dislike count)
+
+**Predictor field mapping summary:**
+- Racism score (0–5) → constructed from `RACHAF`, `BUSING`, `RACDIF1`, `RACDIF3`, `RACDIF4`
+- Education → `EDUC`
+- Income per capita → `REALINC` / `HOMPOP`
+- Occupational prestige → `PRESTG80`
+- Female → `SEX` (2=female)
+- Age → `AGE`
+- Black → `RACE` (2)
+- Hispanic → **no field provided**
+- Other race → `RACE` (3)
+- Conservative Protestant → `RELIG` + `DENOM` (as defined above)
+- No religion → `RELIG` (4)
+- Southern → `REGION` (3)
+
+**Missing data handling (as described):**
+- Treat all `NA(...)` codes as missing
+- Run each model with listwise deletion on the DV and all included predictors (which will also yield different N across the two DVs due to differing item availability/missingness).

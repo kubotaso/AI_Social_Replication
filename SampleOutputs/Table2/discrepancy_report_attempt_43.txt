@@ -1,0 +1,205 @@
+Score: 20/100
+============================================================
+
+Below is a full audit of **every place the generated output fails to match Bryson (1996) Table 2**, grouped by (A) variable naming/specification, (B) coefficients + significance, (C) fit statistics/sample size/constants, and (D) interpretation/what to change so the generated analysis reproduces the table.
+
+---
+
+## A) Variable names / coding / specification mismatches
+
+### A1. “No religion” is incorrectly *dropped*
+- **Generated:** `No religion (RELIG==4)` is **NaN / dropped (no variation)** in both models.
+- **True Table 2:** “No religion” is included with coefficients **0.057 (Model 1)** and **0.024 (Model 2)**.
+
+**Fix**
+- Your analytic sample is accidentally restricting to a subset where `RELIG==4` never occurs (or you coded `no_religion` wrong so it’s always 0/NA).
+- Do **not** subset in a way that conditions on religion, and recode carefully:
+  - Create a set of mutually exclusive religion dummies with a clear reference category, e.g.:
+    - `cons_prot` (Conservative Protestant)
+    - `no_religion`
+    - reference = “all other religions”
+- Verify variation **after** all sample restrictions used for the model:
+  - `table(no_religion, useNA="ifany")` (R) / `value_counts()` (Python)
+- If it’s still constant, your sample construction is not the paper’s.
+
+---
+
+### A2. Conservative Protestant definition is a “proxy” (likely not Bryson’s)
+- **Generated:** `Conservative Protestant (proxy: RELIG==1 & DENOM in {1,6})`
+- **True:** “Conservative Protestant” as used by Bryson is typically derived from denomination/fundamentalist classification used in GSS recodes, not a simple `RELIG==1` filter (and RELIG==1 is usually just “Protestant”, not “Conservative Protestant”).
+
+**Fix**
+- Reconstruct **exactly** the paper’s Conservative Protestant measure (often based on GSS `DENOM` + sometimes `FUND`/`BORNAGAIN`/`RELTRAD` style recodes depending on year).
+- If you can’t reproduce the exact Bryson coding, you should not expect coefficient agreement.
+
+---
+
+### A3. “Hispanic (proxy from ETHNIC)” is not guaranteed to match Bryson
+- **Generated:** “Hispanic proxy from ETHNIC”
+- **True:** “Hispanic” is an explicit independent variable in Table 2.
+
+**Fix**
+- Use the same variable Bryson used (likely a direct Hispanic identifier, or a specific GSS race/ethnicity variable available that year).
+- Ensure race categories are mutually exclusive:
+  - White is the reference, and “Black”, “Hispanic”, “Other race” are dummies.
+
+---
+
+### A4. Income definition mismatch risk
+- **Generated:** `income_pc = REALINC/HOMPOP`
+- **True:** “Household income per capita” is reported, but Bryson’s precise construction may differ (e.g., equivalence scale, handling of top-codes, inflation adjustment year, missing treatment).
+
+**Fix**
+- Confirm:
+  - exactly which income variable (REALINC vs. nominal)
+  - exactly which household size variable
+  - treatment of zeros/missing
+  - any transformations (log, etc.—Table 2 says standardized coefficients, but standardization can be applied to raw or transformed variables)
+
+---
+
+### A5. Dependent variables appear re-created from microdata but don’t match paper’s DV construction/sample
+- **Generated:** DV labels match conceptually, but the model N’s are tiny (261/259), and the descriptive N’s are ~1100.
+- **True:** N is **644** and **605** in the regressions.
+
+**Fix**
+- Your DV creation or listwise deletion is not aligned with Bryson’s:
+  - Make sure each DV is the **count** of disliked genres (0–6, 0–12), using the same “dislike” threshold and the same genre list.
+  - Then apply the same missing-data rules as the paper (likely listwise deletion across all predictors + DV, but not collapsing N to 261).
+
+---
+
+## B) Coefficients and significance mismatches (variable-by-variable)
+
+Important: Table 2 reports **standardized betas** only (no SEs). Your generated table also reports standardized betas, so direct comparison is valid.
+
+### Model 1 mismatches (DV = minority-linked 6)
+
+| Variable | Generated β (sig) | True β (sig) | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.129* | 0.130** | **significance wrong** (should be ** not *) |
+| Education | -0.266*** | -0.175*** | **coefficient too large in magnitude** |
+| Income pc | -0.008 | -0.037 | **too close to 0** |
+| Occ prestige | 0.053 | -0.020 | **wrong sign** |
+| Female | -0.036 | -0.057 | magnitude differs (sign matches) |
+| Age | 0.171** | 0.163*** | **significance wrong** (*** expected) |
+| Black | -0.160* | -0.132*** | **significance wrong** and magnitude differs |
+| Hispanic | -0.041 | -0.058 | differs |
+| Other race | -0.015 | -0.017 | close (ok-ish) |
+| Cons Protestant | 0.116 | 0.063 | differs a lot |
+| No religion | dropped | 0.057 | **missing** |
+| Southern | -0.039 | 0.024 | **wrong sign** |
+
+**How to fix Model 1 coefficient mismatches**
+These are not rounding errors; they indicate **different model/data**. To match:
+1. Use Bryson’s **exact sample** (GSS years used, inclusion criteria).
+2. Use **exact DV coding** and genre set.
+3. Use **exact predictor coding** (especially religion and region).
+4. Use standardized betas computed the same way (OLS on raw variables, then standardize; or pre-standardize all variables excluding dummies—confirm your approach).
+
+---
+
+### Model 2 mismatches (DV = remaining 12)
+
+| Variable | Generated β (sig) | True β (sig) | Mismatch |
+|---|---:|---:|---|
+| Racism score | -0.019 | 0.080 | **wrong sign and magnitude** |
+| Education | -0.177* | -0.242*** | **too small** and **significance wrong** |
+| Income pc | -0.079 | -0.065 | somewhat close (but your N is wrong so still not matching) |
+| Occ prestige | -0.080 | 0.005 | **wrong sign** |
+| Female | -0.086 | -0.070 | differs |
+| Age | 0.118 | 0.126** | **missing significance** |
+| Black | 0.068 | 0.042 | differs |
+| Hispanic | -0.058 | -0.029 | differs |
+| Other race | 0.112 | 0.047 | too large |
+| Cons Protestant | 0.116 | 0.048 | too large |
+| No religion | dropped | 0.024 | **missing** |
+| Southern | 0.134* | 0.069 | too large (and significance likely wrong) |
+
+**How to fix Model 2 coefficient mismatches**
+Same root causes, plus a strong hint: **your racism effect flips sign**, which almost certainly means you are not using the same DV, not using the same sample, or have reverse-coded either racism or “dislike” for Model 2.
+
+Concrete checks:
+- Confirm higher DV = *more dislikes* (count of disliked genres), not “likes”.
+- Confirm racism scale direction matches Bryson (higher = more racist).
+- Confirm you did not reverse-code some genre items only in the 12-genre index.
+
+---
+
+## C) Fit statistics, constants, and sample size mismatches
+
+### C1. Regression N (big mismatch)
+- **Generated:** Model 1 N=261; Model 2 N=259 (but descriptives show N>1000).
+- **True:** Model 1 N=644; Model 2 N=605.
+
+**Fix**
+- Your regression is using a **much smaller listwise-complete subset** than Bryson’s.
+- Align missing-data handling with the paper:
+  - If Bryson used listwise deletion, you should still end up near 644/605, not ~260.
+  - So likely you introduced additional variables/constraints (or mistakenly filtered) that the paper did not.
+
+---
+
+### C2. R² and Adjusted R² (do not match)
+- **Generated:** R² 0.182 / Adj 0.145 (Model 1); R² 0.152 / Adj 0.114 (Model 2)
+- **True:** R² 0.145 / Adj 0.129 (Model 1); R² 0.147 / Adj 0.130 (Model 2)
+
+**Fix**
+- Once you match the sample and covariate coding, R² should move toward the paper’s values.
+- Also ensure you’re running **OLS with the same weighting** (if Bryson used survey weights and you didn’t—or vice versa—R² and betas will differ).
+
+---
+
+### C3. Constant/intercept mismatch
+- **Generated:** Constant 2.647 (Model 1), 5.328 (Model 2)
+- **True:** Constant 2.415 (Model 1), 7.860 (Model 2)
+
+**Fix**
+- Intercepts depend on the **unstandardized** DV scale and covariate coding/reference categories.
+- If you match:
+  - DV construction,
+  - dummy reference categories,
+  - sample,
+then intercepts should align much more closely. Your Model 2 intercept being far lower than 7.860 is consistent with “not the same DV” or “not the same reference coding”.
+
+---
+
+## D) Interpretation/reporting mismatches
+
+### D1. Significance stars do not match the paper’s stars
+- **Generated:** uses `*`, `**`, `***`, but many variables have different stars than Table 2 (racism M1; age M1; black M1; education M2; age M2, etc.).
+- **True:** stars are from Bryson’s reported tests on her sample/model.
+
+**Fix**
+- Don’t try to “force” stars; they will match only if the **model and sample match**.
+- Also ensure you use **two-tailed tests** as noted in the table.
+
+---
+
+### D2. The generated output implicitly suggests standard errors exist/are relevant—but Table 2 has none
+- **Generated request:** “mismatch in … standard errors”
+- **True:** Table 2 does **not** report SEs.
+
+**Fix**
+- If your goal is to match the table, do not present SEs as something to compare against Table 2.
+- If you still want SEs for transparency, label them as “computed from replication data; not reported in Bryson (1996)”.
+
+---
+
+## Summary: what you must change to make the generated analysis match Bryson Table 2
+
+1. **Use the correct dataset and years** Bryson used (GSS waves) and reproduce her **case selection**.
+2. Rebuild both DVs to match the paper exactly:
+   - exact genre lists (6 vs 12),
+   - exact “dislike” coding threshold,
+   - exact handling of missing responses.
+3. Recode key predictors to match the paper:
+   - correct racism scale direction and item set,
+   - correct “Conservative Protestant” classification,
+   - correct “No religion” (and ensure it varies),
+   - correct race/ethnicity dummies and reference category,
+   - correct region coding for “Southern”.
+4. Apply the same **missing-data strategy** so regression N becomes **644** and **605**.
+5. Confirm whether Bryson used **weights**; match that choice.
+
+If you share the code you used to construct (i) the DVs, (ii) racism score, (iii) the religion dummies, and (iv) the filters that lead to N≈261, I can pinpoint exactly which step is causing the massive N drop and the sign flips.

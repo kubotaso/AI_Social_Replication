@@ -1,0 +1,204 @@
+Score: 10/100
+============================================================
+
+### 1) Sample size / model fit mismatches (major)
+
+**Mismatch: N**
+- **Generated**: Model A **N=261**, Model B **N=259**
+- **True (Bryson 1996 Table 2)**: Model 1 **N=644**, Model 2 **N=605**
+
+**How to fix**
+- Use the same dataset and inclusion rules as Bryson (1996) Table 2.
+- Ensure you are using the full analytic sample (not a restricted subset caused by missingness, filtering, or merging).
+- Apply the same listwise deletion rules Bryson used (or replicate his missing-data handling) so N matches **644** and **605**.
+
+**Mismatch: R² and Adjusted R²**
+- **Generated**: Model A **R²=0.178**, Adj **0.142**; Model B **R²=0.151**, Adj **0.113**
+- **True**: Model 1 **R²=0.145**, Adj **0.129**; Model 2 **R²=0.147**, Adj **0.130**
+
+**How to fix**
+- Once N and the exact variable coding match the paper, R² should move toward the published values.
+- Also confirm you are running **OLS** with the same DV construction (see DV section below) and the same set of predictors (including “No religion,” which you dropped).
+
+**Mismatch: Constant**
+- **Generated**: Model A constant **2.599***; Model B constant **5.198***  
+- **True**: Model 1 constant **2.415***; Model 2 constant **7.860** (no stars shown in your transcription; Table 2 sometimes omits stars for constants)
+
+**How to fix**
+- Constants won’t match until the **DV scaling**, **sample**, and **coding** match. In particular, a big shift (Model 2 constant 5.2 vs 7.86) strongly suggests the DV was constructed/scaled differently.
+
+---
+
+### 2) DV definition / scaling mismatches (very likely)
+
+**Mismatch: DV levels implied by constants**
+- Model 2’s constant is dramatically different (5.2 vs 7.86). That typically indicates:
+  - different number of items in the “dislike” index,
+  - different response scale direction (like vs dislike),
+  - rescaling/standardizing the DV,
+  - or using means vs sums.
+
+**How to fix**
+- Recreate both DVs *exactly* as in Bryson (1996):
+  - Model 1 DV: “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music”
+  - Model 2 DV: “Dislike of the 12 remaining genres”
+- Verify whether Bryson used **sum indices** or **mean indices**, and whether any items were reverse-coded.
+- Do **not standardize the DV** if Bryson didn’t (Table reports standardized *coefficients* but constants imply the DV itself is not standardized).
+
+---
+
+### 3) Predictor set / “No religion” handling (clear discrepancy)
+
+**Mismatch: “No religion” dropped**
+- **Generated**: “No religion” = **NaN**, and `Dropped_no_variation = no_religion`
+- **True**: “No religion” is included with coefficients:
+  - Model 1: **0.057**
+  - Model 2: **0.024**
+
+**How to fix**
+- “Dropped_no_variation” means your model matrix treated “No religion” as having no variation—this is almost certainly a **coding error** or a **sample restriction** problem.
+  - Check frequency: `table(no_religion)` in the analytic sample.
+  - Ensure it’s coded 0/1 and not all 0 or all missing after filtering.
+  - If using religion dummies, ensure you didn’t accidentally make “No religion” the reference category *and* also include it as a predictor (dummy-variable trap handling differs by software). Bryson’s table clearly treats “No religion” as a separate indicator relative to an omitted category.
+
+---
+
+### 4) Variable-name/meaning mismatches (sign reversals suggest coding problems)
+
+Several coefficients have **opposite signs** compared to the published table—this is not random noise; it usually indicates **reverse coding**, **different reference categories**, or **different DV direction**.
+
+#### Racism score
+- **Generated**: Model A **0.144***; Model B **−0.009**  
+- **True**: Model 1 **0.130** (**) ; Model 2 **0.080** (ns)
+
+**What’s wrong**
+- Model B sign flips from positive (true) to slightly negative (generated). That suggests either:
+  - DV2 is reversed (dislike vs like),
+  - or “racism score” is reverse-coded in Model B pipeline,
+  - or a mismatch in which DV was paired to which model.
+
+**Fix**
+- Verify DV2 direction and the racism scale direction are consistent across both models.
+- Confirm Model A corresponds to Table 2 Model 1 and Model B to Model 2 (no swapping).
+
+#### Southern
+- **Generated**: Model A **−0.059**; Model B **+0.101**
+- **True**: Model 1 **+0.024**; Model 2 **+0.069**
+
+**What’s wrong**
+- Model A sign is wrong (negative vs positive).
+
+**Fix**
+- Check coding of “Southern” (1=south vs 1=not south).
+- Check whether “southern” got flipped by a recode step.
+
+#### Occupational prestige
+- **Generated**: Model A **+0.057**; Model B **−0.083**
+- **True**: Model 1 **−0.020**; Model 2 **+0.005**
+
+**What’s wrong**
+- Both models diverge in sign and magnitude.
+
+**Fix**
+- Confirm you used the same prestige measure (and same scaling) as Bryson (e.g., Duncan SEI or NORC prestige score). A different prestige index (or reverse-coded prestige) would do this.
+
+#### Hispanic
+- **Generated**: Model A **+0.040**; Model B **+0.018**
+- **True**: Model 1 **−0.058**; Model 2 **−0.029**
+
+**What’s wrong**
+- Both signs are wrong.
+
+**Fix**
+- Check race/ethnicity dummy coding and reference group.
+- Ensure “Hispanic” is coded 1=Hispanic, 0=non-Hispanic, and that “Black/Hispanic/Other race” are mutually exclusive as in the paper.
+
+---
+
+### 5) Coefficient mismatches (systematic, not just rounding)
+
+Below are variable-by-variable differences. (Generated → True)
+
+#### Model 1 (Generated “ModelA” vs True “Model 1”)
+- Racism score: **0.144*** → **0.130** (**) (magnitude + sig mismatch)
+- Education: **−0.260*** → **−0.175*** (too large in magnitude)
+- Income: **−0.013** → **−0.037** (too close to 0)
+- Occ prestige: **+0.057** → **−0.020** (sign mismatch)
+- Female: **−0.036** → **−0.057** (magnitude mismatch)
+- Age: **+0.174** (**) → **+0.163*** (sig mismatch)
+- Black: **−0.207** → **−0.132*** (too large in magnitude; sig mismatch—your table shows none)
+- Hispanic: **+0.040** → **−0.058** (sign mismatch)
+- Other race: **−0.005** → **−0.017** (mismatch)
+- Cons. Protestant: **+0.117** → **+0.063** (too large)
+- No religion: **dropped** → **+0.057** (should be included)
+- Southern: **−0.059** → **+0.024** (sign mismatch)
+
+#### Model 2 (Generated “ModelB” vs True “Model 2”)
+- Racism score: **−0.009** → **+0.080** (sign mismatch)
+- Education: **−0.165** (*) → **−0.242*** (too small; sig mismatch)
+- Income: **−0.079** → **−0.065** (close-ish but not equal)
+- Occ prestige: **−0.083** → **+0.005** (sign mismatch)
+- Female: **−0.084** → **−0.070** (close-ish)
+- Age: **+0.125** (no sig) → **+0.126** (**) (sig mismatch)
+- Black: **+0.025** → **+0.042** (mismatch)
+- Hispanic: **+0.018** → **−0.029** (sign mismatch)
+- Other race: **+0.124** (*) → **+0.047** (too large; sig mismatch)
+- Cons. Protestant: **+0.141** (*) → **+0.048** (far too large)
+- No religion: **dropped** → **+0.024** (should be included)
+- Southern: **+0.101** → **+0.069** (mismatch)
+
+**How to fix (general)**
+- These are too widespread to be mere sampling variability. To match Bryson, you need:
+  1) exact DV construction,
+  2) exact predictor construction/coding (especially race/ethnicity and region),
+  3) exact sample and weights (if any were used),
+  4) standardized betas computed the same way.
+
+---
+
+### 6) Significance/interpretation mismatches (and a conceptual error)
+
+**Mismatch: significance stars differ**
+Examples:
+- True Model 1: Racism **0.130** has ** (p<.01); Generated gives only *
+- True Model 1: Age is ***; Generated is **
+- True Model 1: Black is ***; Generated shows no star
+- True Model 2: Education is ***; Generated is only *
+- True Model 2: Age is **; Generated has none
+
+**How to fix**
+- Once coefficients, N, and standard errors (implicitly) align, significance will align.
+- But also: ensure you’re using **two-tailed tests** as noted in the paper and the same p-value thresholds.
+
+**Conceptual discrepancy: “standard errors”**
+- You asked to compare standard errors, but **the true table does not report SEs**.
+- Your generated output also does not show SEs—only standardized betas and stars—so SE comparison is impossible.
+
+**How to fix**
+- If you want your generated analysis to “match Table 2,” don’t invent or compare SEs.
+- If you want SEs anyway, compute and report them from your replication—but then you must **not** claim they come from Bryson’s Table 2.
+
+---
+
+### 7) Standardized beta computation mismatch (likely)
+
+Even if you run the “right” OLS, standardized betas can differ if:
+- you standardized using the wrong SD (sample vs population),
+- you standardized after listwise deletion differently per model,
+- you standardized categorical dummies incorrectly (some software reports “standardized” effects differently when variables are binary).
+
+**How to fix**
+- Replicate Bryson’s approach: Table 2 reports “standardized OLS coefficients” (typically meaning: run OLS on original variables and then compute beta = b * SD(X)/SD(Y) using the model sample).
+- Ensure standardization uses the **same analytic sample per model**.
+
+---
+
+## Minimal checklist to make the generated analysis match Bryson (1996) Table 2
+
+1) Rebuild DV1 and DV2 exactly (items, reverse-coding, sum/mean, scale direction).
+2) Use the correct analytic samples (target **N=644** and **N=605**).
+3) Fix “No religion” so it varies and is included (and set the correct religion reference category).
+4) Verify coding directions for: **Southern**, **Hispanic**, **Occupational prestige**, **Racism score**.
+5) Re-run OLS and compute standardized betas in the same way; then apply two-tailed p-values for stars.
+
+If you paste your variable coding rules (especially for the DVs, race/ethnicity, religion, and southern) and how you computed standardized betas, I can point to the exact step causing each sign flip.

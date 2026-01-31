@@ -1,139 +1,128 @@
-Score: 62/100
+Score: 72/100
 ============================================================
 
 ## Discrepancy report (ground-truth Fig. 1 vs generated)
 
-### 1) **Series mapping is swapped (wrong y-axis assignment)**
+### 1) Series are swapped between axes (wrong y-data bound to wrong line)
 - **Ground-truth:**  
-  - **Solid line** = *Coefficient for Musical Tolerance* (uses **left y-axis**, negative values around -0.25 to -0.45).  
-  - **Dash-dot line** = *Mean Education of Genre Audience* (uses **right y-axis**, values ~12–15).
+  - **Dashed/dash-dot line** = *Mean Education of Genre Audience* (**right y-axis**, values ~12–15, generally increasing left→right).  
+  - **Solid line** = *Coefficient for Musical Tolerance* (**left y-axis**, values ~ −0.5 to −0.1, fluctuating).
 - **Generated:**  
-  - **Solid line** is increasing to ~15 (so it’s plotted on the **right axis**) and represents education.  
-  - **Dash-dot line** is around -0.25 to -0.45 (so it’s plotted on the **left axis**) and represents tolerance coefficient.
-- **Impact:** Visually flips the story (education trend vs coefficient trend).
+  - **Solid line** is plotted on the **right-axis scale** (12–15) and is monotonically increasing.  
+  - **Dash-dot line** is plotted on the **left-axis scale** (−0.5 to −0.1) and fluctuates.
+- **Exact discrepancy:** The two datasets/series have been assigned to the wrong axis/linestyle.
 
-### 2) **X-axis category set/order differs**
-- **Ground-truth order and labels (19 categories):**  
-  `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
-- **Generated uses different categories/labels and order (not matching):**
-  - `Classical/Chamber` appears (GT has **Classical** only)
-  - `Swing/Big Band` appears (GT has **Swing**)
-  - `Pop/Contemporary Rock` appears (GT has **Pop/Rock**)
-  - `Country/Western` appears (GT has **Country**)
-  - **Order differs**: e.g., GT places **Reggae** early (after Classical), but generated places **Reggae** later (near the right side).
+### 2) Incorrect line styles mapped to series
+- **Ground-truth:** education series uses **dash-dot** (–·–·), tolerance coefficient uses **solid**.
+- **Generated:** the visual mapping suggests the same styles, but because the **data are swapped**, the **style-to-variable mapping is wrong**.
 
-### 3) **Annotation leader lines point to the wrong series**
+### 3) Left y-axis label text differs
+- **Ground-truth left y-label:**  
+  “**Coefficients for Musical Tolerance as It Affects One’s Probability of Disliking Each Music Genre**”
+- **Generated left y-label:**  
+  “**Coefficients for Musical Tolerance in Affecting Odds (Probability of Disliking Each Individual Genre**” (different wording and meaning; also appears to have a missing parenthesis).
+- **Exact discrepancy:** label text is not identical (should match verbatim).
+
+### 4) Annotation leader targets point to wrong series (because series swapped)
 - **Ground-truth:** “Mean Education of Genre Audience” leader points to the **dash-dot** line; “Coefficient for Musical Tolerance” leader points to the **solid** line.
-- **Generated:** Both text blocks exist, but because the **series are swapped**, each leader effectively refers to the wrong variable.
+- **Generated:** the leaders visually point to the opposite series given the swapped data binding.
 
-### 4) **Right-axis education trajectory does not match GT (data/order mismatch)**
-- **Ground-truth education (dash-dot, right axis):** generally **increases** left→right, ending near the top (~15) at **Gospel**.
-- **Generated education (solid, right axis):** increases overall, but because **genres are mis-ordered/mismatched**, the shape and where inflections happen do not align with GT.
+### 5) Line widths differ
+- **Ground-truth:** both lines appear **medium** weight, not extremely thick.
+- **Generated:** the **solid** line is noticeably **thicker** than ground-truth.
+- **Exact discrepancy:** linewidth for at least the solid series is too large.
 
-### 5) **Left-axis coefficient trajectory does not match GT (data/order mismatch)**
-- **Ground-truth coefficient (solid, left axis):** fluctuates; notable dip around the later-middle (near **Bluegrass**), then ends more negative around **Country/Gospel** region.
-- **Generated coefficient (dash-dot, left axis):** different peaks/troughs timing (again consistent with wrong genre order + swapped mapping).
-
-(Other visual elements like axis ranges and presence of the sample mean dotted line appear broadly consistent; the major failures are mapping + categories/order.)
+(Other elements—x-category order, tick rotation, axis ranges (−0.5…−0.1 and 12…15), and the horizontal “Sample Mean Education” reference line at ~13—look broadly consistent.)
 
 ---
 
-## Specific code/data fixes to match exactly (actionable steps)
+## Code/data fixes to match exactly (matplotlib + processing)
 
-### A) Fix the **genre list** (names + order) and reindex both series to it
-- Define the canonical x order exactly as in the ground-truth and force your dataframe to that order.
+### A) Fix the data-to-axis/series mapping (primary issue)
+- **Ensure tolerance coefficients are plotted on the left axis (ax) as a solid line**
+  - **Data:** `coef_tolerance` should be around `[-0.5, -0.1]`
+  - **Plot call:**
+    ```python
+    ax.plot(x, coef_tolerance, color='black', linestyle='-', linewidth=2.0)
+    ```
+- **Ensure mean education is plotted on the right axis (ax2) as dash-dot**
+  - **Data:** `mean_edu` should be around `[12, 15]`
+  - **Plot call:**
+    ```python
+    ax2 = ax.twinx()
+    ax2.plot(x, mean_edu, color='black', linestyle='-.', linewidth=2.0)
+    ```
+
+**Sanity checks (add before plotting):**
 ```python
-genres = [
-  "Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical","Reggae",
-  "Swing","New Age/Space","Opera","Bluegrass","Folk","Easy Listening",
-  "Pop/Rock","Rap","Heavy Metal","Country","Gospel"
-]
-
-# If your source uses alternate names, normalize them first:
-name_map = {
-  "Classical/Chamber": "Classical",
-  "Swing/Big Band": "Swing",
-  "Pop/Contemporary Rock": "Pop/Rock",
-  "Country/Western": "Country",
-}
-df["genre"] = df["genre"].replace(name_map)
-
-# Then enforce order
-df = df.set_index("genre").reindex(genres).reset_index()
+assert np.nanmin(coef_tolerance) < 0 and np.nanmax(coef_tolerance) < 0
+assert 10 < np.nanmin(mean_edu) and np.nanmax(mean_edu) < 20
 ```
-- Ensure you are **not** sorting by value (education/coefficient). GT is a fixed genre order, not rank-ordered.
+If those assertions fail, your upstream columns/transformations are wrong (e.g., accidentally plotting predicted probabilities instead of coefficients).
 
-### B) Fix the **axis assignment** (swap which series is plotted on which axis)
-- Plot **coefficient** on the **left axis** as **solid**.
-- Plot **mean education** on the **right axis** as **dash-dot**.
+### B) Match axis labels verbatim
+- **Left y-axis label (exact text):**
+  ```python
+  ax.set_ylabel(
+      "Coefficients for Musical Tolerance as It Affects\n"
+      "One’s Probability of Disliking Each Music Genre",
+      fontweight='bold'
+  )
+  ```
+- **Right y-axis label (already close; keep verbatim formatting):**
+  ```python
+  ax2.set_ylabel(
+      "Mean Educational Level of Respondents Who\n"
+      "Reported Liking Each Music Genre",
+      fontweight='bold', rotation=270, labelpad=30
+  )
+  ```
+
+### C) Match line weights and styling
+- Reduce the solid line thickness to match the original (generated is too thick):
+  ```python
+  lw = 2.0  # or 1.8 depending on rendering
+  ax.plot(..., linewidth=lw)
+  ax2.plot(..., linewidth=lw)
+  ```
+- Keep everything **black**, no markers:
+  ```python
+  marker=None
+  ```
+
+### D) Ensure the “Sample Mean Education” reference line is on the RIGHT-axis scale
+- Ground-truth is a horizontal line at **education ≈ 13**, so draw it using `ax2`:
+  ```python
+  ax2.axhline(13.0, color='black', linestyle=(0, (2, 2)), linewidth=1.2)
+  ```
+- If you drew it on `ax` (left axis), it will land at the wrong vertical position even if it “looks” plausible.
+
+### E) Fix annotation targets after swapping series
+- After correcting series mapping, update annotation arrow `xy` points to reference the correct line’s coordinates:
+  ```python
+  ax2.annotate("Mean Education of Genre Audience",
+               xy=(x[idx1], mean_edu[idx1]), xycoords='data',
+               xytext=(...), textcoords='data',
+               arrowprops=dict(arrowstyle='-', color='black'),
+               fontweight='bold')
+  ax.annotate("Coefficient for Musical Tolerance",
+              xy=(x[idx2], coef_tolerance[idx2]), xycoords='data',
+              xytext=(...), textcoords='data',
+              arrowprops=dict(arrowstyle='-', color='black'),
+              fontweight='bold')
+  ```
+- Also ensure “Sample Mean Education” arrow points to the **ax2** horizontal line, not ax.
+
+### F) Lock scales/ticks to match
+(These look mostly correct, but set explicitly to avoid drift.)
 ```python
-x = np.arange(len(genres))
-
-fig, ax = plt.subplots()
-
-# LEFT axis: coefficient (solid)
-ax.plot(x, df["tolerance_coef"], color="black", lw=2, ls="-")
-
-# RIGHT axis: mean education (dash-dot)
-ax2 = ax.twinx()
-ax2.plot(x, df["mean_education"], color="black", lw=2, ls="-.")
-```
-
-### C) Lock **axis limits and ticks** to match GT
-```python
-# Left y-axis (coefficients)
 ax.set_ylim(-0.5, -0.1)
 ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])
 
-# Right y-axis (education)
 ax2.set_ylim(12, 15)
 ax2.set_yticks([12, 13, 14, 15])
 ```
 
-### D) Match x tick labels/rotation/placement
-```python
-ax.set_xticks(x)
-ax.set_xticklabels(genres, rotation=45, ha="right")
-ax.tick_params(axis="x", length=10, width=1.5)
-```
-
-### E) Keep the horizontal “Sample Mean Education” line on the **education scale** (right axis)
-- In GT, the dotted horizontal line corresponds to mean education (~13) and spans the plot.
-```python
-sample_mean_edu = 13.0  # replace with the exact value used in the paper if known
-ax2.axhline(sample_mean_edu, color="black", lw=1, ls=":", zorder=0)
-```
-- If you computed it, ensure it’s computed on the same population as the paper (no extra filtering, same weights if applicable).
-
-### F) Fix annotation targets so they point to the correct lines (after swapping)
-```python
-# Education label should point to dash-dot series on ax2
-ax2.annotate("Mean Education of Genre Audience",
-             xy=(2, df.loc[df["genre"].eq("Blues/R&B"), "mean_education"].iloc[0]),
-             xytext=(3, 14.2),
-             arrowprops=dict(arrowstyle="-", color="black"),
-             fontsize=12, fontweight="bold")
-
-# Coefficient label should point to solid series on ax
-ax.annotate("Coefficient for Musical Tolerance",
-            xy=(2, df.loc[df["genre"].eq("Blues/R&B"), "tolerance_coef"].iloc[0]),
-            xytext=(3, -0.47),
-            arrowprops=dict(arrowstyle="-", color="black"),
-            fontsize=12, fontweight="bold")
-```
-(Adjust `xy/xytext` to visually match GT; the key fix is **which axis** and **which series** the annotation references.)
-
-### G) Ensure no unintended smoothing/aggregation changes
-- Use the raw per-genre values used in the paper (no rolling mean, no interpolation).
-- If your data pipeline currently groups multiple subgenres (e.g., “Classical/Chamber”), **collapse them to the paper’s categories** *before* plotting.
-
 ---
 
-### Minimal checklist (most important)
-- [ ] Replace/normalize genre labels to GT names.  
-- [ ] Reindex dataframe to the exact GT genre order (don’t sort).  
-- [ ] Plot **tolerance_coef** on left axis as **solid**.  
-- [ ] Plot **mean_education** on right axis as **dash-dot**.  
-- [ ] Put the dotted “Sample Mean Education” line on **ax2** at ~13.  
-
-If you paste your current plotting code + the dataframe columns you’re using, I can provide an exact diff-style patch (line-by-line edits) tailored to your script.
+If you share the plotting code (or the dataframe column names you used for each series), I can point to the exact lines where the swap happened and give a minimal diff.

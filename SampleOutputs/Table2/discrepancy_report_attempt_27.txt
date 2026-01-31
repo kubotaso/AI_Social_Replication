@@ -1,0 +1,152 @@
+Score: 14/100
+============================================================
+
+## 1) Variable-name / DV-definition mismatches
+
+### A. DV labels don’t match the paper
+- **Generated (Model 1 DV):** “Dislike of minority-linked genres (count of 6)”
+- **True (Model 1 DV):** “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music”
+- **Generated (Model 2 DV):** “Dislike of remaining genres (count of 12)”
+- **True (Model 2 DV):** “Dislike of the 12 Remaining Genres”
+
+**Fix:** Rename DV text to match the table exactly (and ensure the item composition matches: rap, reggae, blues/R&B, jazz, gospel, latin for Model 1; the other 12 for Model 2). If your “minority-linked” index uses any different items (or excludes any of those six), rebuild the index to match the paper.
+
+---
+
+## 2) Sample size and fit-statistic mismatches (major)
+
+### A. N is far too small in generated models
+- **Generated N:** Model 1 = 261; Model 2 = 259  
+- **True N:** Model 1 = 644; Model 2 = 605
+
+This alone implies your “listwise” analytic sample is not replicating Bryson’s (1996) handling of missingness.
+
+**Fix options (pick the one that matches the paper’s approach):**
+1. **Reproduce the same missing-data strategy as the paper.** Your missingness table shows very high missingness on `racism_score` (~0.48) and `cons_prot` (~0.36). If you require listwise deletion across all predictors + DV, you will crash N. The paper’s N suggests they either:
+   - used a different construction with less missingness,
+   - did not listwise-delete across everything the same way,
+   - or used a different source subset / recode rules.
+2. **Verify you constructed `racism_score` correctly.** Your `racism_score` missingness (0.476) is extremely high relative to what would typically allow N=644. A common replication error is requiring all racism items non-missing rather than allowing partial completion (e.g., mean of available items with a minimum item threshold).
+3. **Do not drop “no_religion” as “no variation.”** In the paper it is included and has coefficients. If you set it up incorrectly (see section 4), you may also be inadvertently filtering cases.
+
+### B. R² and Adjusted R² do not match
+- **Model 1:** Generated R²=0.178 (Adj 0.142) vs True R²=0.145 (Adj 0.129)
+- **Model 2:** Generated R²=0.151 (Adj 0.113) vs True R²=0.147 (Adj 0.130)
+
+**Fix:** Once N and variable coding match, R² should come closer. Right now the mismatch is consistent with different samples + different covariate coding (and Model 2’s intercept also being wildly off—see below).
+
+### C. Constant (intercept) mismatches
+- **Model 1 Constant:** Generated 2.599*** vs True 2.415***
+- **Model 2 Constant:** Generated 5.198*** vs True 7.860 (paper reports 7.860 and does *not* show stars)
+
+**Fix:** Intercepts are very sensitive to (a) DV construction, (b) inclusion/coding of dummies, and (c) sample. If you standardize variables, you also must be consistent about whether the intercept is reported from the unstandardized model or the standardized model. Bryson reports standardized slopes but still reports an intercept in the table; you need to replicate that exact reporting convention and DV scaling.
+
+---
+
+## 3) Coefficient (standardized beta) mismatches, variable by variable
+
+Below I compare Generated vs True (paper). “Sig” refers to the stars printed in the paper.
+
+### Model 1 coefficient mismatches
+
+| Variable | Generated | True | Mismatch type |
+|---|---:|---:|---|
+| Racism score | 0.144* | 0.130** | magnitude + significance |
+| Education | -0.260*** | -0.175*** | magnitude |
+| Income pc | -0.013 | -0.037 | magnitude |
+| Occ prestige | 0.057 | -0.020 | **sign reversal** |
+| Female | -0.036 | -0.057 | magnitude |
+| Age | 0.174** | 0.163*** | significance |
+| Black | -0.207 | -0.132*** | magnitude + **missing significance** |
+| Hispanic | 0.040 | -0.058 | **sign reversal** |
+| Other race | -0.005 | -0.017 | magnitude |
+| Cons Protestant | 0.117 | 0.063 | magnitude |
+| No religion | NaN (dropped) | 0.057 | **missing variable** |
+| Southern | -0.059 | 0.024 | **sign reversal** |
+
+### Model 2 coefficient mismatches
+
+| Variable | Generated | True | Mismatch type |
+|---|---:|---:|---|
+| Racism score | -0.009 | 0.080 | **sign reversal + magnitude** |
+| Education | -0.165* | -0.242*** | magnitude + significance |
+| Income pc | -0.079 | -0.065 | magnitude |
+| Occ prestige | -0.083 | 0.005 | **sign reversal** |
+| Female | -0.084 | -0.070 | magnitude |
+| Age | 0.125 | 0.126** | significance |
+| Black | 0.025 | 0.042 | magnitude |
+| Hispanic | 0.018 | -0.029 | **sign reversal** |
+| Other race | 0.124* | 0.047 | magnitude + significance |
+| Cons Protestant | 0.141* | 0.048 | magnitude + significance |
+| No religion | NaN (dropped) | 0.024 | **missing variable** |
+| Southern | 0.101 | 0.069 | magnitude |
+
+**How to fix coefficient mismatches (root causes to check):**
+1. **Coding of race/region dummies**  
+   The repeated sign reversals (Hispanic, Southern; plus prestige in both models) strongly suggest different reference categories or reversed coding (e.g., 1=non-South instead of 1=South).
+   - Ensure: `Southern = 1 if South, 0 otherwise` (and verify against codebook).
+   - Ensure race dummies match paper’s reference group (almost certainly White non-Hispanic as reference).
+2. **Index construction differences**
+   - DV indices must match exactly the items and coding used (e.g., “dislike” direction, handling “don’t know,” missing, etc.).
+   - `racism_score` construction is especially suspect because (a) missingness is huge and (b) Model 2 sign flips relative to the paper.
+3. **Standardization method**
+   - The paper reports “standardized OLS coefficients.” That means you should fit an OLS on unstandardized variables and report standardized betas, or equivalently regress Z(DV) on Z(X)’s. But you must do this consistently and match how the paper standardizes with missingness/weights.
+4. **Weights**
+   Bryson (1996) uses GSS data; many GSS analyses apply weights (e.g., WTSSALL or older equivalents). If you ran unweighted OLS but Bryson used weights (or vice versa), coefficients and significance can shift.
+
+---
+
+## 4) “No religion” is wrongly dropped in the generated output
+
+- **Generated:** “Dropped_no_variation: no_religion” and `No religion = NaN` in both model tables
+- **True:** “No religion” is included and has coefficients in both models (0.057; 0.024)
+
+**Fix:**
+- Check the construction of `no_religion`. It should not be a constant in the analytic sample. Common mistakes:
+  - Creating `no_religion` after filtering in a way that makes it constant.
+  - Coding `no_religion` as missing for everyone except a subset, then listwise deletion removes everyone else leaving only one value.
+  - Collapsing religion categories incorrectly (e.g., coding all as 0).
+- Verify frequencies before modeling **within the same analytic sample**:
+  - `tab(no_religion)` (or equivalent) after all filters but before listwise deletion.
+- Ensure you’re using the same religion scheme as Bryson (Conservative Protestant, No religion, with another category as reference).
+
+---
+
+## 5) Significance / inference mismatches (interpretation/reporting)
+
+### A. The paper does not report standard errors
+- **True-results note:** Table 2 reports standardized coefficients and stars only; no SEs.
+- **Generated:** also doesn’t show SEs, but your stars often don’t match the paper.
+
+**Fix:**
+- If you want to match Bryson’s stars, you must match:
+  1) sample selection,  
+  2) weighting (if any),  
+  3) exact model specification, and  
+  4) p-value calculation (two-tailed) and thresholds.
+- Also ensure you’re using **OLS with the same treatment of missingness**. With N=261 instead of 644, standard errors inflate/deflate and stars will not match.
+
+### B. Star mismatches to highlight
+- Model 1: Racism should be ** (you have *); Age should be *** (you have **); Black should be *** (you have none)
+- Model 2: Education should be *** (you have *); Age should be ** (you have none); Racism is shown as 0.080 (no star) but you have negative.
+
+**Fix:** Once coefficients and N match, recompute p-values and apply the same star cutoffs.
+
+---
+
+## 6) What to change so the generated analysis matches the “true” table
+
+A practical checklist:
+
+1. **Rebuild both DVs** from the exact genre items used in the paper, with the same “dislike” coding and missing handling.
+2. **Rebuild `racism_score`** with the same item set and the same missing-data rule as Bryson (very likely not “all items required”). Your current approach produces implausibly large missingness and collapses N.
+3. **Fix dummy codings and reference groups**
+   - Race dummies: Black, Hispanic, Other race with White (non-Hispanic) as omitted group.
+   - Southern: confirm 1=South.
+   - Religion: Conservative Protestant and No religion included; confirm omitted reference category matches paper.
+4. **Stop dropping `no_religion`**; diagnose why it became “no variation” in your analytic sample.
+5. **Match weighting and sample restrictions** used in Bryson (1996) / GSS 1993.
+6. **Recompute standardized betas** using the same approach as the paper and then compare coefficients and stars again.
+7. **Only after all above:** compare R², Adj R², intercept, and N; they should move toward 0.145/0.129 with N=644 (Model 1) and 0.147/0.130 with N=605 (Model 2).
+
+If you paste your variable construction code (especially for `racism_score`, both DV indices, religion dummies, and any filters/weights), I can pinpoint exactly which step produces each sign flip and the N collapse.

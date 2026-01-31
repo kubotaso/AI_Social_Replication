@@ -1,0 +1,81 @@
+## combined_table2_betas
+                                Independent Variable  ModelA_Std_Beta ModelA_Sig  ModelB_Std_Beta ModelB_Sig
+                                  Racism score (0–5)         0.143236          *        -0.008615           
+                                   Education (years)        -0.260312        ***        -0.164730          *
+        Household income per capita (REALINC/HOMPOP)        -0.013162                   -0.079230           
+                    Occupational prestige (PRESTG80)         0.057189                   -0.083343           
+                                   Female (1=female)        -0.035065                   -0.083679           
+                                         Age (years)         0.174182         **         0.125111           
+      Black (mutually exclusive; Hispanic overrides)        -0.101422                    0.011939           
+            Hispanic (ETHNIC==1; mutually exclusive)        -0.149223          *         0.041464           
+ Other race (mutually exclusive; Hispanic overrides)        -0.005002                    0.124074          *
+Conservative Protestant (proxy: RELIG==1 & DENOM==1)         0.118463                    0.141434          *
+                              No religion (RELIG==4)              NaN                         NaN           
+                                Southern (REGION==3)        -0.059959                    0.101306           
+
+## combined_fit
+                                                                      DV   N       R2   Adj_R2  Constant Constant_Sig Dropped_no_variation
+Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music (count) 261 0.178151 0.141845  2.599955          ***          no_religion
+                              Dislike of the 12 Remaining Genres (count) 259 0.151059 0.113251  5.197665          ***          no_religion
+
+## dv_descriptives
+             Sample                                                                       DV    N     Mean       SD  Min  P25  Median  P75  Max
+1993 (DV available) Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music (count) 1134 2.057319 1.575628  0.0  1.0     2.0  3.0  6.0
+1993 (DV available)                               Dislike of the 12 Remaining Genres (count) 1057 3.778619 2.514329  0.0  2.0     3.0  5.0 12.0
+   Model A analytic Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music (count)  261 2.022989 1.477626  0.0  1.0     2.0  3.0  6.0
+   Model B analytic                               Dislike of the 12 Remaining Genres (count)  259 3.671815 2.246494  0.0  2.0     3.0  5.0 12.0
+
+## missingness_1993
+                variable  share_missing_1993                                                                    label
+            racism_score            0.476339                                                       Racism score (0–5)
+               cons_prot            0.363014                     Conservative Protestant (proxy: RELIG==1 & DENOM==1)
+dv2_remaining12_dislikes            0.341843                               Dislike of the 12 Remaining Genres (count)
+  dv1_minority6_dislikes            0.293898 Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music (count)
+                   black            0.222914                           Black (mutually exclusive; Hispanic overrides)
+                hispanic            0.222914                                 Hispanic (ETHNIC==1; mutually exclusive)
+              other_race            0.222914                      Other race (mutually exclusive; Hispanic overrides)
+               income_pc            0.086550                             Household income per capita (REALINC/HOMPOP)
+            occ_prestige            0.049813                                         Occupational prestige (PRESTG80)
+             no_religion            0.005604                                                   No religion (RELIG==4)
+               age_years            0.003113                                                              Age (years)
+               education            0.002491                                                        Education (years)
+                  female            0.000000                                                        Female (1=female)
+                southern            0.000000                                                     Southern (REGION==3)
+
+## modelA_table
+                                Independent Variable  Std_Beta Sig
+                                  Racism score (0–5)  0.143236   *
+                                   Education (years) -0.260312 ***
+        Household income per capita (REALINC/HOMPOP) -0.013162    
+                    Occupational prestige (PRESTG80)  0.057189    
+                                   Female (1=female) -0.035065    
+                                         Age (years)  0.174182  **
+      Black (mutually exclusive; Hispanic overrides) -0.101422    
+            Hispanic (ETHNIC==1; mutually exclusive) -0.149223   *
+ Other race (mutually exclusive; Hispanic overrides) -0.005002    
+Conservative Protestant (proxy: RELIG==1 & DENOM==1)  0.118463    
+                              No religion (RELIG==4)       NaN    
+                                Southern (REGION==3) -0.059959    
+
+## modelB_table
+                                Independent Variable  Std_Beta Sig
+                                  Racism score (0–5) -0.008615    
+                                   Education (years) -0.164730   *
+        Household income per capita (REALINC/HOMPOP) -0.079230    
+                    Occupational prestige (PRESTG80) -0.083343    
+                                   Female (1=female) -0.083679    
+                                         Age (years)  0.125111    
+      Black (mutually exclusive; Hispanic overrides)  0.011939    
+            Hispanic (ETHNIC==1; mutually exclusive)  0.041464    
+ Other race (mutually exclusive; Hispanic overrides)  0.124074   *
+Conservative Protestant (proxy: RELIG==1 & DENOM==1)  0.141434   *
+                              No religion (RELIG==4)       NaN    
+                                Southern (REGION==3)  0.101306    
+
+## modelA_fit
+                                                                      DV   N       R2   Adj_R2  Constant Constant_Sig Dropped_no_variation
+Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music (count) 261 0.178151 0.141845  2.599955          ***          no_religion
+
+## modelB_fit
+                                        DV   N       R2   Adj_R2  Constant Constant_Sig Dropped_no_variation
+Dislike of the 12 Remaining Genres (count) 259 0.151059 0.113251  5.197665          ***          no_religion

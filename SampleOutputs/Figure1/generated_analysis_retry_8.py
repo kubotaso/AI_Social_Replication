@@ -1,310 +1,396 @@
 def run_analysis(data_source):
     import os
+    import re
+    import warnings
     import numpy as np
     import pandas as pd
     import matplotlib.pyplot as plt
-    import matplotlib.ticker as mticker
     from matplotlib.ticker import FuncFormatter
-    import statsmodels.api as sm
 
-    # ----------------------------
+    warnings.filterwarnings("ignore")
+
+    # -----------------------------
     # Helpers
-    # ----------------------------
-    def find_col(df, preferred_names, contains_any=None):
+    # -----------------------------
+    def norm_col(s):
+        return re.sub(r"[^a-z0-9]+", "", str(s).strip().lower())
+
+    def find_column(df, candidates, required=True):
         cols = list(df.columns)
-        lower_map = {c.lower(): c for c in cols}
+        norm_map = {norm_col(c): c for c in cols}
 
-        for name in preferred_names:
-            if name is None:
+        # exact normalized match
+        for cand in candidates:
+            nc = norm_col(cand)
+            if nc in norm_map:
+                return norm_map[nc]
+
+        # contains match fallback
+        for cand in candidates:
+            nc = norm_col(cand)
+            if not nc:
                 continue
-            key = str(name).lower()
-            if key in lower_map:
-                return lower_map[key]
+            for k, orig in norm_map.items():
+                if nc in k or k in nc:
+                    return orig
 
-        if contains_any:
-            tokens = [str(t).lower() for t in contains_any if t is not None and str(t).strip() != ""]
-            hits = []
-            for c in cols:
-                cl = c.lower()
-                if any(tok in cl for tok in tokens):
-                    hits.append(c)
-            if len(hits) == 1:
-                return hits[0]
-
-        # fallback: unique substring match
-        for name in preferred_names:
-            if name is None:
-                continue
-            n = str(name).lower()
-            matches = [c for c in cols if n in c.lower()]
-            if len(matches) == 1:
-                return matches[0]
-
+        if required:
+            raise KeyError(
+                f"Could not find required column among candidates={candidates}. "
+                f"Available columns={list(df.columns)}"
+            )
         return None
 
-    def to_num(s):
-        return pd.to_numeric(s, errors="coerce")
+    def to_num(x):
+        return pd.to_numeric(x, errors="coerce")
 
-    def recode_dislike(series):
-        # 1 if 4/5, 0 if 1/2/3, NaN otherwise
+    def recode_music_item(series):
+        """
+        Return numeric 1..5 where possible; DK/NA/invalid -> NaN.
+        Accepts numeric or string labels.
+        """
+        # numeric path
         x = to_num(series)
-        out = pd.Series(np.nan, index=series.index, dtype="float64")
-        out[(x >= 1) & (x <= 3)] = 0.0
-        out[(x == 4) | (x == 5)] = 1.0
+        if x.notna().sum() > 0:
+            x = x.where(x.between(1, 5), np.nan)
+            return x
+
+        # string path
+        s = series.astype(str).str.strip().str.lower()
+        s = s.str.replace(r"\s+", " ", regex=True)
+        s = s.str.replace("dont", "don't", regex=False).str.replace("do not", "don't", regex=False)
+
+        mapping = {
+            "like very much": 1,
+            "like it": 2,
+            "mixed feelings": 3,
+            "dislike": 4,
+            "dislike it": 4,
+            "dislike very much": 5,
+            "don't know much about it": np.nan,
+            "dont know much about it": np.nan,
+            "dk": np.nan,
+            "don't know": np.nan,
+            "dont know": np.nan,
+            "no answer": np.nan,
+            "na": np.nan,
+            "n/a": np.nan,
+            "refused": np.nan,
+        }
+        x2 = s.map(mapping)
+        x2 = to_num(x2).where(to_num(x2).between(1, 5), np.nan)
+        return x2
+
+    def dislike_indicator(x_1to5):
+        """
+        D_g = 1 if 4 or 5; 0 if 1..3; missing otherwise.
+        """
+        x = x_1to5
+        out = pd.Series(np.nan, index=x.index, dtype=float)
+        valid = x.between(1, 5)
+        out.loc[valid] = (x.loc[valid] >= 4).astype(float)
         return out
 
-    def recode_like(series):
-        # 1 if 1/2, 0 if 3/4/5, NaN otherwise
-        x = to_num(series)
-        out = pd.Series(np.nan, index=series.index, dtype="float64")
-        out[(x == 1) | (x == 2)] = 1.0
-        out[(x >= 3) & (x <= 5)] = 0.0
-        return out
+    def like_audience_mask(x_1to5):
+        """
+        Audience = Like very much (1) or Like it (2).
+        """
+        return x_1to5.isin([1, 2])
 
-    def no_leading_zero(x, pos):
-        s = f"{x:.1f}"
-        s = s.replace("-0.", "-.").replace("0.", ".")
-        return s
+    def fit_logit_irls(X, y, max_iter=100, tol=1e-10):
+        """
+        Logistic regression via IRLS / Newton-Raphson.
+        X includes intercept column.
+        Returns beta vector.
+        """
+        X = np.asarray(X, dtype=float)
+        y = np.asarray(y, dtype=float)
 
-    # ----------------------------
-    # Load data
-    # ----------------------------
+        beta = np.zeros(X.shape[1], dtype=float)
+
+        for _ in range(max_iter):
+            eta = X @ beta
+            p = 1.0 / (1.0 + np.exp(-np.clip(eta, -35, 35)))
+            w = p * (1.0 - p)
+            w = np.clip(w, 1e-9, None)
+
+            z = eta + (y - p) / w
+
+            WX = X * w[:, None]
+            XtWX = X.T @ WX
+            XtWz = X.T @ (w * z)
+
+            try:
+                beta_new = np.linalg.solve(XtWX, XtWz)
+            except np.linalg.LinAlgError:
+                beta_new = np.linalg.pinv(XtWX) @ XtWz
+
+            if np.max(np.abs(beta_new - beta)) < tol:
+                beta = beta_new
+                break
+            beta = beta_new
+
+        return beta
+
+    # -----------------------------
+    # Read data
+    # -----------------------------
     df = pd.read_csv(data_source)
 
-    # YEAR filter (case-insensitive)
-    year_col = find_col(df, ["YEAR", "year"])
-    if year_col is not None:
-        df[year_col] = to_num(df[year_col])
-        df = df.loc[df[year_col] == 1993].copy()
+    year_col = find_column(df, ["YEAR", "year"], required=True)
+    educ_col = find_column(df, ["EDUC", "educ", "education", "years_education", "yrs_educ"], required=True)
 
-    # EDUC
-    educ_col = find_col(df, ["EDUC", "educ", "education", "years_education", "schooling"])
-    if educ_col is None:
-        raise ValueError("Could not find education column (EDUC/educ).")
-    df[educ_col] = to_num(df[educ_col])
-
-    # Drop missing education up-front (CRITICAL)
-    df = df.dropna(subset=[educ_col]).copy()
-
-    # ----------------------------
-    # Genres: exact Figure-1 x-order and labels
-    # ----------------------------
-    order = [
-        "Latin/Salsa", "Jazz", "Blues/R&B", "Show Tunes", "Oldies", "Classical",
-        "Reggae", "Swing", "New Age/Space", "Opera", "Bluegrass", "Folk",
-        "Easy Listening", "Pop/Rock", "Rap", "Heavy Metal", "Country", "Gospel"
-    ]
-
-    # Map labels -> likely columns (robust, case-insensitive)
-    genre_candidates = {
-        "Latin/Salsa": ["LATIN", "latin"],
-        "Jazz": ["JAZZ", "jazz"],
-        "Blues/R&B": ["BLUES", "blues"],
-        "Show Tunes": ["MUSICALS", "musicals", "SHOWTUNES", "showtunes"],
-        "Oldies": ["OLDIES", "oldies"],
-        "Classical": ["CLASSICL", "classicl", "CLASSICAL", "classical"],
-        "Reggae": ["REGGAE", "reggae"],
-        "Swing": ["BIGBAND", "bigband", "SWING", "swing"],
-        "New Age/Space": ["NEWAGE", "newage", "NEW_AGE", "new_age"],
-        "Opera": ["OPERA", "opera"],
-        "Bluegrass": ["BLUGRASS", "blugrass", "BLUEGRASS", "bluegrass"],
-        "Folk": ["FOLK", "folk"],
-        "Easy Listening": ["MOODEASY", "moodeasy", "EASYLIST", "easylist", "EASY", "easy"],
-        "Pop/Rock": ["CONROCK", "conrock", "POPROCK", "poprock", "ROCK", "rock"],
-        "Rap": ["RAP", "rap", "HIPHOP", "hiphop", "HIP_HOP", "hip_hop"],
-        "Heavy Metal": ["HVYMETAL", "hvymetal", "HEAVYMETAL", "heavymetal", "HEAVY_METAL", "heavy_metal"],
-        "Country": ["COUNTRY", "country", "COUNTRYWESTERN", "countrywestern", "COUNTRY_WESTERN", "country_western"],
-        "Gospel": ["GOSPEL", "gospel"],
+    # Canonical GSS 1993 music battery
+    genre_col_candidates = {
+        "Latin/Salsa": ["LATIN", "MUSICLAT", "MUSICLATIN", "musiclat", "musiclatin", "latin"],
+        "Jazz": ["JAZZ", "MUSICJAZ", "MUSICJAZZ", "musicjaz", "musicjazz", "jazz"],
+        "Blues/R&B": ["BLUES", "MUSICBLU", "MUSICBLUES", "musicblu", "musicblues", "blues"],
+        "Show Tunes": ["MUSICALS", "MUSICMUS", "MUSICMUSICALS", "musicmus", "musicmusicals", "musicals", "showtunes"],
+        "Oldies": ["OLDIES", "MUSICOLD", "MUSICOLDIES", "musicold", "musicoldies", "oldies"],
+        "Classical": ["CLASSICL", "MUSICCLA", "MUSICCLASSICAL", "classicl", "musiccla", "musicclassical", "classical"],
+        "Swing": ["BIGBAND", "MUSICBIG", "MUSICBIGBAND", "bigband", "musicbig", "musicbigband", "swing"],
+        "New Age/Space": ["NEWAGE", "MUSICNEW", "MUSICNEWAGE", "newage", "musicnew", "musicnewage", "space"],
+        "Opera": ["OPERA", "MUSICOPR", "MUSICOPERA", "musicopr", "musicopera", "opera"],
+        "Bluegrass": ["BLUGRASS", "MUSICBLG", "MUSICBLUEGRASS", "blugrass", "musicblg", "musicbluegrass", "bluegrass"],
+        "Folk": ["FOLK", "MUSICFOL", "MUSICFOLK", "musicfol", "musicfolk", "folk"],
+        "Reggae": ["REGGAE", "MUSICREG", "MUSICREGGAE", "musicreg", "musicreggae", "reggae"],
+        "Easy Listening": ["MOODEASY", "MUSICEZL", "musicezl", "moodeasy", "easylistening", "mood"],
+        "Pop/Rock": ["CONROCK", "MUSICPOP", "MUSICROK", "MUSICROCK", "conrock", "musicpop", "musicrok", "musicrock", "poprock"],
+        "Rap": ["RAP", "MUSICRAP", "musicrap", "rap"],
+        "Heavy Metal": ["HVYMETAL", "MUSICMET", "hvymetal", "musicmet", "heavymetal", "metal"],
+        "Country": ["COUNTRY", "MUSICCNT", "MUSICCOUNTRY", "countrywestern", "musiccnt", "musiccountry", "country"],
+        "Gospel": ["GOSPEL", "MUSICGOS", "MUSICGOSPEL", "musicgos", "musicgospel", "gospel"],
     }
+    genre_cols = {g: find_column(df, cands, required=True) for g, cands in genre_col_candidates.items()}
 
-    resolved_cols = {}
-    for label in order:
-        col = find_col(df, genre_candidates.get(label, []))
-        if col is None:
-            tokens = label.lower().replace("/", " ").replace("&", " ").replace("-", " ").split()
-            col = find_col(df, [], contains_any=tokens)
-        if col is None:
-            raise ValueError(f"Could not find column for genre '{label}'.")
-        resolved_cols[label] = col
+    # -----------------------------
+    # Filter to 1993 + clean education
+    # -----------------------------
+    df = df.copy()
+    df[year_col] = to_num(df[year_col])
+    df = df.loc[df[year_col] == 1993].copy()
 
-    # ----------------------------
-    # Recode dislikes/likes; drop/impute missing before models (CRITICAL)
-    # ----------------------------
-    dislike = pd.DataFrame(index=df.index)
-    like = pd.DataFrame(index=df.index)
-    for label in order:
-        col = resolved_cols[label]
-        dislike[label] = recode_dislike(df[col])
-        like[label] = recode_like(df[col])
+    df[educ_col] = to_num(df[educ_col])
+    df.loc[~df[educ_col].between(0, 25), educ_col] = np.nan
 
-    # Sample mean education: respondent-level, non-missing education (already dropped)
-    sample_mean_edu = float(df[educ_col].mean()) if len(df) else np.nan
+    sample_mean_educ = float(df[educ_col].mean(skipna=True)) if df[educ_col].notna().any() else np.nan
 
-    # ----------------------------
-    # Fit per-genre logistic models; compute audience mean education
-    # ----------------------------
+    # -----------------------------
+    # Recode music items to 1..5 and build dislike indicators
+    # -----------------------------
+    music_1to5 = {}
+    dislike = {}
+    for g, col in genre_cols.items():
+        music_1to5[g] = recode_music_item(df[col])
+        dislike[g] = dislike_indicator(music_1to5[g])
+
+    # -----------------------------
+    # Compute per-genre logit tolerance coefficient + mean education of audience
+    # -----------------------------
+    genre_list = list(genre_cols.keys())
     rows = []
-    for g in order:
+
+    for g in genre_list:
+        others = [h for h in genre_list if h != g]
+        other_dislike = pd.DataFrame({h: dislike[h] for h in others})
+
+        # tolerance: count of other genres NOT disliked (1..17), requires complete info on other 17
+        complete_other = other_dislike.notna().all(axis=1)
+        not_disliked = (other_dislike == 0.0).astype(float).where(other_dislike.notna(), np.nan)
+        T_minus_g = not_disliked.sum(axis=1).where(complete_other, np.nan)
+
         y = dislike[g]
         educ = df[educ_col]
 
-        others = [h for h in order if h != g]
-        others_dislike = dislike[others]
+        # CRITICAL: drop NaNs before fitting
+        model_df = pd.DataFrame({"y": y, "T": T_minus_g, "educ": educ}).dropna()
+        model_df = model_df.loc[model_df["y"].isin([0.0, 1.0])].copy()
 
-        # Require all 17 other genres observed to compute tolerance_-g (avoid implicit imputation)
-        not_disliked = 1.0 - others_dislike
-        tol_minus_g = not_disliked.sum(axis=1, min_count=len(others))  # NaN if any of the 17 is missing
+        beta_T = np.nan
+        if (
+            model_df.shape[0] >= 50
+            and model_df["y"].nunique() == 2
+            and model_df["T"].nunique() >= 2
+            and model_df["educ"].nunique() >= 2
+        ):
+            X = np.column_stack(
+                [
+                    np.ones(model_df.shape[0], dtype=float),
+                    model_df["T"].to_numpy(dtype=float),
+                    model_df["educ"].to_numpy(dtype=float),
+                ]
+            )
+            yv = model_df["y"].to_numpy(dtype=float)
+            beta = fit_logit_irls(X, yv)
+            beta_T = float(beta[1])
 
-        # Drop missing values before modeling (CRITICAL)
-        model_df = pd.DataFrame({"y": y, "tolerance": tol_minus_g, "educ": educ}).dropna()
+        like_mask = like_audience_mask(music_1to5[g])
+        mean_edu = float(df.loc[like_mask, educ_col].mean(skipna=True)) if like_mask.any() else np.nan
 
-        coef_tol = np.nan
-        pval_tol = np.nan
-        if len(model_df) > 0 and model_df["y"].nunique() >= 2 and model_df["tolerance"].nunique() >= 2:
-            X = sm.add_constant(model_df[["tolerance", "educ"]], has_constant="add")
-            try:
-                fit = sm.Logit(model_df["y"], X).fit(disp=False, maxiter=300)
-                coef_tol = float(fit.params["tolerance"])
-                pval_tol = float(fit.pvalues["tolerance"])
-            except Exception:
-                # Fallback for separation; coefficient still usable for plotting
-                try:
-                    fit = sm.Logit(model_df["y"], X).fit_regularized(disp=False, maxiter=2000)
-                    coef_tol = float(fit.params["tolerance"])
-                    pval_tol = np.nan
-                except Exception:
-                    coef_tol = np.nan
-                    pval_tol = np.nan
+        rows.append({"genre": g, "coef_tolerance": beta_T, "mean_edu": mean_edu})
 
-        # Audience mean education among "likers" (1/2 only), drop missing like & educ
-        aud_df = pd.DataFrame({"like": like[g], "educ": educ}).dropna()
-        if len(aud_df) and (aud_df["like"] == 1.0).any():
-            mean_edu = float(aud_df.loc[aud_df["like"] == 1.0, "educ"].mean())
-        else:
-            mean_edu = np.nan
+    res = pd.DataFrame(rows)
 
-        rows.append({"genre": g, "coef_tolerance": coef_tol, "pval": pval_tol, "mean_edu": mean_edu})
+    # -----------------------------
+    # Enforce EXACT x-axis order (GT)
+    # -----------------------------
+    required_order = [
+        "Latin/Salsa",
+        "Jazz",
+        "Blues/R&B",
+        "Show Tunes",
+        "Oldies",
+        "Classical",
+        "Reggae",
+        "Swing",
+        "New Age/Space",
+        "Opera",
+        "Bluegrass",
+        "Folk",
+        "Easy Listening",
+        "Pop/Rock",
+        "Rap",
+        "Heavy Metal",
+        "Country",
+        "Gospel",
+    ]
 
-    res = pd.DataFrame(rows).set_index("genre").reindex(order).reset_index()
+    res = res.drop_duplicates(subset=["genre"]).set_index("genre").reindex(required_order).reset_index()
+    res["genre"] = pd.Categorical(res["genre"], categories=required_order, ordered=True)
+    res = res.sort_values("genre").reset_index(drop=True)
 
-    # ----------------------------
-    # Plot (match Figure 1 styling/mapping)
-    # ----------------------------
-    out_path = "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260119_074740/Figure1/generated_results.jpg"
+    # -----------------------------
+    # Plot (matplotlib only)
+    # -----------------------------
+    out_path = "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260130_222138/Figure1/generated_results.jpg"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
-    x = np.arange(len(order), dtype=int)
+    x = np.arange(len(required_order), dtype=float)
 
-    fig, ax = plt.subplots(figsize=(10.5, 5.5), dpi=150)
+    fig, ax = plt.subplots(figsize=(10.5, 4.3), dpi=200)
     ax2 = ax.twinx()
 
-    # Coefficient on LEFT (solid)
-    ax.plot(x, res["coef_tolerance"].to_numpy(dtype="float64"), color="black", lw=1.6, ls="-", zorder=3)
-
-    # Mean education on RIGHT (dash-dot)
-    edu_line = ax2.plot(x, res["mean_edu"].to_numpy(dtype="float64"), color="black", lw=1.6, ls="-.", zorder=2)[0]
-    # Optional: closer to printed dash-dot cadence
-    edu_line.set_dashes([8, 3, 2, 3])  # dash, gap, dot, gap
-
-    # Sample mean education line on RIGHT (dotted)
-    if np.isfinite(sample_mean_edu):
-        ax2.axhline(sample_mean_edu, color="black", lw=1.0, ls=":", zorder=1)
-
-    # Labels (comparable to article)
-    ax.set_xlabel("Type of Music", fontweight="bold")
-    ax.set_ylabel(
-        "Coefficients for Musical Tolerance as It Affects\n"
-        "One’s Probability of Disliking Each Music Genre"
-    )
-    ax2.set_ylabel(
-        "Mean Educational Level of Respondents Who\n"
-        "Reported Liking Each Music Genre",
-        rotation=270,
-        labelpad=28
+    # LEFT axis: tolerance coefficient (SOLID)
+    ax.plot(
+        x,
+        res["coef_tolerance"].to_numpy(dtype=float),
+        color="black",
+        linewidth=2.5,
+        linestyle="-",
+        marker=None,
+        zorder=3,
     )
 
+    # RIGHT axis: mean education (DASH-DOT)
+    edu_line = ax2.plot(
+        x,
+        res["mean_edu"].to_numpy(dtype=float),
+        color="black",
+        linewidth=2.5,
+        linestyle="-.",
+        marker=None,
+        zorder=2,
+    )[0]
+
+    # Ensure a clear dash-dot appearance
+    edu_line.set_dashes([6, 3, 1.5, 3])
+
+    # Sample mean education dotted reference line on RIGHT axis (computed, not hard-coded)
+    if np.isfinite(sample_mean_educ):
+        ax2.axhline(sample_mean_educ, color="black", linewidth=1.2, linestyle=(0, (2, 2)), zorder=1)
+
+    # X axis ticks + labels
     ax.set_xticks(x)
-    ax.set_xticklabels(order, rotation=45, ha="right")
+    ax.set_xticklabels(required_order, rotation=55, ha="right")
+    ax.set_xlabel("Type of Music", fontweight="bold")
 
-    # Axis ranges/ticks
+    # Left y-axis formatting + label (verbatim from summary)
     ax.set_ylim(-0.5, -0.1)
     ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])
-    ax.yaxis.set_major_formatter(FuncFormatter(no_leading_zero))
 
+    def tick_fmt(v, pos):
+        s = f"{v:.1f}"
+        return s.replace("-0.", "-.").replace("0.", ".")
+
+    ax.yaxis.set_major_formatter(FuncFormatter(tick_fmt))
+    ax.set_ylabel(
+        "Coefficients for Musical Tolerance in Affecting Odds (Probability) of Disliking Each Individual Genre",
+        fontweight="bold",
+    )
+
+    # Right y-axis formatting + label (verbatim from summary)
     ax2.set_ylim(12, 15)
     ax2.set_yticks([12, 13, 14, 15])
-    ax2.yaxis.set_major_formatter(mticker.FormatStrFormatter("%d"))
+    ax2.set_ylabel(
+        "Mean Educational Level of Respondents Who Reported Liking Each Audience",
+        fontweight="bold",
+        rotation=270,
+        labelpad=32,
+    )
 
-    # No gridlines
+    # Styling to match monochrome figure
     ax.grid(False)
     ax2.grid(False)
-
-    # Spines/ticks for classic B/W look
     ax.spines["top"].set_visible(False)
     ax2.spines["top"].set_visible(False)
-    ax.tick_params(direction="out", length=6, width=1)
-    ax2.tick_params(direction="out", length=6, width=1)
 
-    # ----------------------------
-    # Annotations / callouts with leader lines
-    # ----------------------------
-    coef_vals = res["coef_tolerance"].to_numpy(dtype="float64")
-    edu_vals = res["mean_edu"].to_numpy(dtype="float64")
+    for a in (ax, ax2):
+        a.tick_params(axis="both", which="major", width=2.0, length=10, color="black")
 
-    def first_finite_idx(arr, fallback=2):
-        for i, v in enumerate(arr):
-            if np.isfinite(v):
-                return i
-        return min(fallback, len(arr) - 1)
+    ax.spines["left"].set_linewidth(2.0)
+    ax.spines["bottom"].set_linewidth(2.0)
+    ax2.spines["right"].set_linewidth(2.0)
 
-    i_anchor = first_finite_idx(edu_vals, fallback=2)
-    j_anchor = first_finite_idx(coef_vals, fallback=2)
+    # -----------------------------
+    # In-plot annotations (point to correct series/axes)
+    # -----------------------------
+    idx_blues = int(required_order.index("Blues/R&B"))
+    if idx_blues < len(res) and np.isfinite(res.loc[idx_blues, "mean_edu"]):
+        ax2.annotate(
+            "Mean Education of Genre Audience",
+            xy=(idx_blues, float(res.loc[idx_blues, "mean_edu"])),
+            xycoords=("data", "data"),
+            xytext=(idx_blues - 1.3, 14.35),
+            textcoords=("data", "data"),
+            arrowprops=dict(arrowstyle="-", color="black", lw=1.5),
+            fontsize=13,
+            fontweight="bold",
+            ha="left",
+            va="center",
+        )
 
-    # Mean Education label -> targets dash-dot series (ax2)
-    ax2.annotate(
-        "Mean Education of Genre Audience",
-        xy=(i_anchor, float(edu_vals[i_anchor]) if np.isfinite(edu_vals[i_anchor]) else 14.0),
-        xycoords=("data", "data"),
-        xytext=(max(0.7, i_anchor - 1.2), 14.2),
-        textcoords=("data", "data"),
-        arrowprops=dict(arrowstyle="-", color="black", lw=1.0),
-        fontsize=11,
-        fontweight="bold",
-        ha="left",
-        va="center",
-    )
+    idx_jazz = int(required_order.index("Jazz"))
+    if idx_jazz < len(res) and np.isfinite(res.loc[idx_jazz, "coef_tolerance"]):
+        ax.annotate(
+            "Coefficient for Musical Tolerance",
+            xy=(idx_jazz, float(res.loc[idx_jazz, "coef_tolerance"])),
+            xycoords=("data", "data"),
+            xytext=(idx_jazz + 0.8, -0.475),
+            textcoords=("data", "data"),
+            arrowprops=dict(arrowstyle="-", color="black", lw=1.5),
+            fontsize=13,
+            fontweight="bold",
+            ha="left",
+            va="center",
+        )
 
-    # Coefficient label -> targets solid series (ax)
-    ax.annotate(
-        "Coefficient for Musical Tolerance",
-        xy=(j_anchor, float(coef_vals[j_anchor]) if np.isfinite(coef_vals[j_anchor]) else -0.35),
-        xycoords=("data", "data"),
-        xytext=(max(0.7, j_anchor + 0.6), -0.47),
-        textcoords=("data", "data"),
-        arrowprops=dict(arrowstyle="-", color="black", lw=1.0),
-        fontsize=11,
-        fontweight="bold",
-        ha="left",
-        va="center",
-    )
-
-    # Sample Mean Education label with upward arrow (ax2)
-    if np.isfinite(sample_mean_edu):
-        mean_x = int(min(6, len(order) - 1))
+    # Sample mean education label+arrow near Reggae/Swing region (use Reggae position)
+    if np.isfinite(sample_mean_educ):
+        idx_reggae = int(required_order.index("Reggae"))
         ax2.annotate(
             "Sample Mean Education",
-            xy=(mean_x, sample_mean_edu),
+            xy=(idx_reggae, sample_mean_educ),
             xycoords=("data", "data"),
-            xytext=(mean_x, 12.7),
+            xytext=(idx_reggae, sample_mean_educ - 0.45),
             textcoords=("data", "data"),
             ha="center",
-            va="center",
-            arrowprops=dict(arrowstyle="-|>", color="black", lw=1.0),
-            fontsize=11,
+            va="top",
+            arrowprops=dict(arrowstyle="-|>", color="black", lw=1.5),
+            fontsize=13,
             fontweight="bold",
         )
 
-    fig.tight_layout()
+    plt.tight_layout()
     fig.savefig(out_path, dpi=300, format="jpg")
     plt.close(fig)
 

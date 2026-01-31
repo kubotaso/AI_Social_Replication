@@ -1,0 +1,233 @@
+Score: 23/100
+============================================================
+
+Below is a complete discrepancy audit between your **Generated Results** and the paper’s **True Results (Bryson 1996 Table 2)**, plus concrete fixes to make the generated analysis match what the table reports.
+
+---
+
+## 1) Fundamental reporting mismatch: standardized vs. unstandardized (and SEs shown vs. not shown)
+
+### What the true table reports
+- **Standardized OLS coefficients (betas)**.
+- **No standard errors, t-stats, or p-values are printed** in Table 2 (only significance stars).
+
+### What the generated output reports
+- Coefficients labeled `beta` with accompanying `se`, `t`, `p`.
+- The coefficients look like *standardized betas* (many are in ~[-.30, .30]), but the **constant is near 0**, which is typical of a regression on standardized DV—or of reporting a standardized intercept—whereas Table 2 reports **large unstandardized constants** (2.415 and 7.860).
+
+### Why this is a mismatch
+You are mixing two different reporting conventions:
+- **Table 2:** standardized slopes + **unstandardized intercept** (as printed), and no SEs.
+- **Generated:** standardized slopes + a **standardized intercept** (near 0) *and* SE/t/p.
+
+### How to fix
+Choose one target and align everything:
+
+**If your goal is to replicate Table 2 exactly:**
+1. Report **standardized slopes** (betas) *but keep the intercept unstandardized* (or at least match the table’s intercept).
+2. Suppress SE/t/p in the table output (or compute them but do not present them as “matching Table 2”).
+
+**Implementation options**
+- If you use software that returns standardized betas (e.g., by z-scoring X and Y), then the intercept will be ~0. To match Table 2, you must:
+  - Fit the model on the **original DV scale** (so the intercept matches), and compute standardized betas separately, e.g.  
+    \[
+    \beta_j^{std} = b_j \cdot \frac{s_{x_j}}{s_y}
+    \]
+  - Then display `beta_std` for slopes and display the original model’s intercept.
+
+---
+
+## 2) Model/DV definition mismatch (your DV names do not match the paper’s DVs)
+
+### True DV definitions
+- **Model 1 DV:** “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music” (a specific 6-genre index).
+- **Model 2 DV:** “Dislike of the 12 Remaining Genres” (a 12-genre index).
+
+### Generated DV labels/descriptives
+- `dv1_minority_dislike` / `model_dv1_minority_linked`
+- `dv2_remaining_dislike` / `model_dv2_remaining`
+
+Those labels are plausible, but your *descriptives strongly suggest the DV construction is not the same scale as the paper*:
+- Generated `dv2_remaining_dislike` has max **12** (suggesting you may be summing binary dislikes across 12 genres).
+- Generated `dv1_minority_dislike` has max **6** (same idea for 6 genres).
+
+In Table 2, the constants (2.415 and 7.860) imply the DV is likely on a **count scale**, but the exact construction (and any weighting, missing-data handling, and coding of “dislike”) must match the author’s. Your N_used is also far smaller (see §4).
+
+### How to fix
+Replicate the DV construction exactly:
+- Confirm how “dislike” is defined (e.g., bottom category only? bottom two? a reverse-coded liking scale?).
+- Confirm whether the index is a **sum**, **mean**, or something else.
+- Confirm missing-data rules: are indices computed if some genres are missing? Is there imputation? Listwise deletion?
+
+Until DV construction and missingness handling match the paper, coefficients/R²/N will not line up.
+
+---
+
+## 3) Variable-name/content mismatches (Hispanic is missing and replaced; “No religion” sign mismatch)
+
+### (A) “Hispanic” in the true table vs. absent in generated
+**True models include:**
+- `Hispanic` (separate from `Other race`)
+
+**Generated includes:**
+- `other_race`
+- but **no `hispanic`**
+  
+So your race coding does not match Table 2.
+
+#### Fix
+Recreate Bryson’s race dummy specification:
+- Include **both** `hispanic` and `other_race`, with the same omitted reference category as the paper (almost certainly White non-Hispanic).
+- Keep `black` as a separate dummy as in the table.
+
+### (B) “No religion” coefficient sign differs (Model 1 especially)
+- **True Model 1:** `No religion = +0.057`
+- **Generated Model 1:** `no_religion = -0.0218` (and oddly shares the same t/p as const—see §6)
+
+This could indicate:
+- The dummy is coded opposite (1 = has religion instead of none),
+- The reference category differs,
+- Or it’s not the same variable (e.g., “none” vs “other”),
+- Or your model is mis-specified (collinearity / dropped category issues).
+
+#### Fix
+- Verify coding: `no_religion = 1` only if respondent reports none.
+- Verify reference group for religion is the same as the paper (e.g., mainline Protestant/Catholic/etc.).
+- Ensure you did not accidentally include both a full set of religious dummies plus intercept (dummy trap).
+
+---
+
+## 4) Massive mismatch in sample size and model fit statistics (N and R²)
+
+### True
+- Model 1: **N = 644**, **R² = 0.145**, **Adj R² = 0.129**
+- Model 2: **N = 605**, **R² = 0.147**, **Adj R² = 0.130**
+
+### Generated
+- Model 1: **N_used = 340**, **R² = 0.205**, **Adj R² = 0.181**
+- Model 2: **N_used = 326**, **R² = 0.167**, **Adj R² = 0.141**
+
+Your N is roughly **half** the true N. That alone guarantees the results won’t match, and it likely changes coefficient magnitudes and significance.
+
+#### Fix
+- Reproduce the paper’s inclusion criteria:
+  - Same survey/year/sample restrictions.
+  - Same handling of missing data (likely **not** listwise deletion across all 10 predictors + all 18 genre items unless that’s what Bryson did).
+- Check if you inadvertently restricted to a subgroup (e.g., only people with complete “minority linked” items).
+- Ensure you used the same weights (if any). (The paper may use weighted analyses; if you ran unweighted, N may be similar but coefficients/R² can shift.)
+
+---
+
+## 5) Coefficient mismatches variable-by-variable (direction/magnitude)
+
+Even ignoring N and DV construction, many slopes do not match closely. Here are the direct comparisons.
+
+### Model 1 (minority-linked genres DV)
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.130 | 0.1396 | close-ish (but inference differs because N differs) |
+| Education | -0.175 | -0.2661 | too negative |
+| Income pc | -0.037 | -0.0478 | close-ish |
+| Occ prestige | -0.020 | 0.0239 | **sign flip** |
+| Female | -0.057 | -0.0258 | attenuated |
+| Age | 0.163 | 0.2189 | too large |
+| Black | -0.132 | -0.1151 | close-ish |
+| Hispanic | -0.058 | (missing) | **omitted** |
+| Other race | -0.017 | 0.0113 | **sign flip** |
+| Cons Protestant | 0.063 | 0.0705 | close-ish |
+| No religion | 0.057 | -0.0218 | **sign flip** |
+| Southern | 0.024 | 0.0155 | close-ish |
+| Constant | 2.415 | 0.0688 | **wrong scale/standardization** |
+
+### Model 2 (remaining genres DV)
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.080 | 0.0076 | far smaller |
+| Education | -0.242 | -0.1996 | not too far but still off |
+| Income pc | -0.065 | -0.0971 | more negative |
+| Occ prestige | 0.005 | -0.0238 | sign flip (small though) |
+| Female | -0.070 | -0.0733 | close |
+| Age | 0.126 | 0.1292 | close |
+| Black | 0.042 | 0.0849 | about 2× |
+| Hispanic | -0.029 | (missing) | omitted |
+| Other race | 0.047 | 0.1215 | too large |
+| Cons Protestant | 0.048 | 0.0944 | too large |
+| No religion | 0.024 | -0.0015 | near zero and wrong sign |
+| Southern | 0.069 | 0.1101 | too large |
+| Constant | 7.860 | 0.0046 | wrong scale/standardization |
+
+#### Fixes (to address coefficient mismatches)
+These mismatches are exactly what you’d expect from:
+1. Wrong sample (your N is ~half).
+2. Wrong DV construction or scaling.
+3. Missing `hispanic` (race composition effects get absorbed into other coefficients).
+4. Possibly different coding of occupational prestige, no religion, or the DV itself.
+
+Once you correct (1)–(3), many coefficients should move toward the table.
+
+---
+
+## 6) Internal inconsistencies/bugs in the generated regression output (not just “doesn’t match the paper”)
+
+There are red flags that your generated `betas_long` table may be **wrongly assembled**:
+
+### (A) `no_religion` shares identical t and p with `const` in both models
+- Model 1: const t=1.552532 p=0.121496 and no_religion t= -1.552532 p=0.121496 (same magnitude, same p)
+- Model 2: const t=0.102924 p=0.918089 and no_religion t= -0.102924 p=0.918089
+
+That is extremely unlikely to happen naturally and suggests a join/assignment bug (e.g., you copied the intercept’s stats into the no_religion row, or you computed t/p from the wrong columns).
+
+#### Fix
+- Recompute t and p **row-wise**: `t = coef / se`.
+- Ensure `se` is the correct standard error for that coefficient from the model covariance matrix.
+- When reshaping to long format, ensure the mapping from coefficient names to SE/t/p is aligned (same ordering and keys).
+
+### (B) `black` in Model 2 has the exact same SE as `age` (0.054440)
+Not impossible, but suspicious given multiple other issues.
+
+#### Fix
+Same as above: verify coefficient-to-SE alignment after reshaping/merging.
+
+---
+
+## 7) Degrees of freedom/model size inconsistencies
+
+Generated fit shows `DF_model = 10` for both models, but your coefficient table includes:
+- const + 11 predictors (racism_score, educ, income_pc, prestg80, female, age, black, other_race, cons_prot, no_religion, southern) = **12 parameters**, implying **11 predictors** → DF_model should be 11 (if intercept counted separately, many packages report DF_model = number of predictors excluding intercept).
+
+But you also appear to be missing `hispanic` compared to the true model, which would change DF_model too.
+
+#### Fix
+- Confirm how `DF_model` is computed by your library.
+- Ensure the number of predictors in the fit object equals what you print in `betas_long`.
+- Add `hispanic` dummy so your predictor set matches the paper (and DF_model should reflect that).
+
+---
+
+## 8) Interpretation mismatch (significance and “stars”)
+
+Your generated results provide p-values and would lead to interpretations like:
+- Racism significant in model 1 but not model 2 (generated p=0.887), whereas the paper shows racism is 0.080 (not starred) in model 2—so qualitatively similar there—but many others differ.
+- Education and age are significant in both in generated, which is broadly consistent, but magnitudes differ.
+
+However, because Table 2 uses standardized betas + stars (and possibly a different N/weighting), you should not interpret your p-values as “matching Table 2”.
+
+#### Fix
+- After you truly replicate N/DVs/predictors/weights, then:
+  - either compute stars using your p-values and show them,
+  - or just report betas and compare to Table 2 without claiming exact significance replication unless your p-values align.
+
+---
+
+# Checklist to make the generated analysis match Table 2
+
+1. **Rebuild both DVs** exactly as Bryson defines them (same genres, same dislike coding, same aggregation, same missing-data rule).
+2. **Use the correct sample** so N matches (~644 and ~605). Identify why your N collapses to ~340.
+3. **Match predictors exactly**, especially add **Hispanic** dummy and ensure race reference category matches.
+4. **Compute standardized betas correctly** while keeping intercept on the DV’s original scale (to match constants 2.415 and 7.860), or otherwise acknowledge intercept won’t match if you standardize Y.
+5. **Fix the table-building bug** that duplicates/interchanges t/p values (notably const vs no_religion).
+6. **Recompute and report R²/Adj R²** from the correctly specified models; they should move toward ~0.145 and ~0.147 once steps 1–3 are correct.
+
+If you paste your model formula(s) and the exact code that constructs `dv1_minority_dislike` and `dv2_remaining_dislike` (plus how you created `hispanic`/race dummies and handled missingness), I can point to the exact lines causing the N drop and the coefficient/SE misalignment.

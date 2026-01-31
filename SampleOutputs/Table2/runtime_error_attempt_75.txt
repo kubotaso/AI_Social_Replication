@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Table2.py", line 286, in try_run_generated_code
+    result = mod.run_analysis(str(data_path))  # type: ignore[attr-defined]
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260130_222138/Table2/generated_analysis_retry_75.py", line 417, in run_analysis
+    tmp[c] = tmp[c].map(lambda v: fmt(v, 3))
+             ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/series.py", line 4719, in map
+    new_values = self._map_values(arg, na_action=na_action)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/base.py", line 925, in _map_values
+    return algorithms.map_array(arr, mapper, na_action=na_action, convert=convert)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/algorithms.py", line 1743, in map_array
+    return lib.map_infer(values, mapper, convert=convert)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pandas/_libs/lib.pyx", line 2999, in pandas._libs.lib.map_infer
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260130_222138/Table2/generated_analysis_retry_75.py", line 417, in <lambda>
+    tmp[c] = tmp[c].map(lambda v: fmt(v, 3))
+                                  ~~~^^^^^^
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260130_222138/Table2/generated_analysis_retry_75.py", line 53, in fmt
+    return f"{float(x):.{nd}f}"
+              ~~~~~^^^
+ValueError: could not convert string to float: ''

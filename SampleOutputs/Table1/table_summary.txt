@@ -1,101 +1,75 @@
-## Data source(s) relevant to Table 1
-- **General Social Survey (GSS), 1993**, NORC (national probability sample of noninstitutionalized U.S. adults).
-- **Music dislikes module (1993 Culture module):** 18 music genres rated on a 5-point Likert scale (“like very much” … “dislike very much”).
-- Table 1 analytic sample sizes vary by model because of missing data and because the political intolerance battery was asked of **~2/3 of the sample**.
+## Data source(s) used for Table 1 (and directly related analyses)
+- **Primary dataset:** **1993 General Social Survey (GSS)**, NORC (noninstitutionalized U.S. adults; stratified random sample).
+- **Music module:** 18 music genres each rated on a **5-point Likert scale** from *“like very much”* to *“dislike very much”*, plus “don’t know”/missing.
+- **Analytic sample for Table 1:** varies by model due to missingness and (for political tolerance) split-ballot:
+  - SES Model: **N = 787**
+  - Demographic Model: **N = 756**
+  - Political Intolerance Model: **N = 503** (tolerance questions asked of ~2/3 sample)
 
-## Table 1 dependent variable (DV)
-**Musical exclusiveness** = *count of music genres disliked*  
-- Constructed by counting “**dislike**” + “**dislike very much**” across **18 genres**.
-- **“Don’t know” treated as missing**; respondents with any missing on the 18 items are dropped for that DV construction → smaller N.
-- Stated distribution for the exclusiveness scale (in Measures section): mean **5.78**, SD **3.76**, range **0–18**.
+## Table 1: Dependent variable (outcome)
+**Musical exclusiveness** = **count of music genres disliked**  
+- Constructed as the number of genres (out of 18) rated **“dislike”** or **“dislike very much.”**
+- “Don’t know” treated as missing; cases with any DK on the 18 items are excluded from that scale construction (author reports 912 valid cases for the full exclusiveness scale; Table 1 model Ns are lower after adding covariates / split ballot).
 
-## Table 1 statistical method
-- **OLS regression** with **standardized coefficients (β)** reported.
-- **Two-tailed significance tests** with thresholds: * p < .05, ** p < .01, *** p < .001.
-- Model fit reported: **R²** and **Adjusted R²**.
-- Table title: “Standardized OLS Coefficients from the Regression of the Number of Music Genres Disliked on Measures of Socioeconomic Status, Group Identities, and Political Intolerance: GSS 1993.”
+## Table 1: Regression models and variables
+Table 1 reports **standardized coefficients (β)** from **OLS regressions** where DV = *number of music genres disliked*.
 
----
+### Model 1: **SES Model** (tests SES predictors)
+**DV:** number of music genres disliked (count 0–18)
 
-# Table 1: variables and regression models
+**IVs:**
+- **Education** (years)
+- **Household income per capita**
+- **Occupational prestige**
 
-## Model set-up
-All three models use the same DV: **# of music genres disliked**.
+### Model 2: **Demographic Model** (SES + demographic/group identities)
+**DV:** number of music genres disliked
 
-### Model 1: **SES Model** (N = 787; R² = .107; Adj R² = .104)
-**IVs included**
-1. **Education (years)**: β = **−.322***  
-2. **Household income per capita**: β = −.037 (n.s.)  
-3. **Occupational prestige**: β = .016 (n.s.)  
-- Constant = 10.920
+**IVs:**
+- **Education** (years)
+- **Household income per capita**
+- **Occupational prestige**
+- **Female** (indicator)
+- **Age** (continuous)
+- **Black** (indicator)
+- **Hispanic** (indicator)
+- **Other race** (indicator)
+- **Conservative Protestant** (indicator)
+- **No religion** (indicator)
+- **Southern** (indicator)
 
-**Interpretation of purpose (per text):** tests SES-based hypotheses (education/income/prestige) about musical exclusiveness.
+### Model 3: **Political Intolerance Model** (adds political intolerance)
+**DV:** number of music genres disliked
 
----
+**IVs:**
+- **Education** (years)
+- **Household income per capita**
+- **Occupational prestige**
+- **Female**
+- **Age**
+- **Black**
+- **Hispanic**
+- **Other race**
+- **Conservative Protestant**
+- **No religion**
+- **Southern**
+- **Political intolerance** (scale)
 
-### Model 2: **Demographic Model** (N = 756; R² = .151; Adj R² = .139)
-Includes SES variables + demographic/group identity controls:
+## “Related” measures referenced around Table 1 (key constructs)
+Even though not in Table 1, these are conceptually and empirically adjacent in the paper:
 
-**SES variables**
-1. **Education (years)**: β = **−.246***  
-2. **Household income per capita**: β = −.054 (n.s.)  
-3. **Occupational prestige**: β = −.006 (n.s.)
+### Political intolerance scale (enters Table 1 Model 3)
+- **Construction:** count of **intolerant** responses across **15 dichotomous items** (3 civil-liberties permissions × 5 target groups).
+- **Target groups:** anti-religion; believes Blacks genetically inferior; Communist; advocates military rule; homosexual.
+- **Range:** 0–15; mean 5.24; SD 4.72; **α = .9163**.
 
-**Demographic / group identity variables**
-4. **Female**: β = **−.083***  
-5. **Age**: β = **.140***  
-6. **Black**: β = .029 (n.s.)  
-7. **Hispanic**: β = −.029 (n.s.)  
-8. **Other race**: β = .005 (n.s.)  
-9. **Conservative Protestant**: β = .059 (n.s.)  
-10. **No religion**: β = −.012 (n.s.)  
-11. **Southern**: β = **.097**  
-- Constant = 8.507
+### Musical taste items underlying exclusiveness DV
+- 18 genres (listed in Table 3): Latin/Salsa, Jazz, Blues/R&B, Show tunes, Oldies, Classical/Chamber, Reggae, Swing/Big band, New age/Space, Opera, Bluegrass, Folk, Easy listening, Contemporary rock, Pop, Rap, Heavy metal, Country/Western, Gospel.
 
----
+## Statistical methods used for Table 1
+- **Ordinary Least Squares (OLS) regression**
+- Reported coefficients are **standardized (beta) coefficients**
+- Model fit: **R² and adjusted R²**
+- Significance: two-tailed tests with thresholds (* p < .05, ** p < .01, *** p < .001)
 
-### Model 3: **Political Intolerance Model** (N = 503; R² = .169; Adj R² = .148)
-Includes the Demographic Model variables + political intolerance:
-
-**SES variables**
-1. **Education (years)**: β = **−.151**  
-2. **Household income per capita**: β = −.009 (n.s.)  
-3. **Occupational prestige**: β = −.022 (n.s.)
-
-**Demographic / group identity variables**
-4. **Female**: β = **−.095***  
-5. **Age**: β = **.110***  
-6. **Black**: β = .049 (n.s.)  
-7. **Hispanic**: β = .031 (n.s.)  
-8. **Other race**: β = .053 (n.s.)  
-9. **Conservative Protestant**: β = .066 (n.s.)  
-10. **No religion**: β = .024 (n.s.)  
-11. **Southern**: β = **.121**  
-
-**Political attitude variable**
-12. **Political intolerance (0–15 count scale)**: β = **.164***  
-- Constant = 6.516
-
----
-
-## Related measurement details for Table 1 key predictors (from text)
-
-### Education / SES measures
-- **Education:** years of schooling.
-- **Household income per capita:** income adjusted per person (paper’s term; exact construction not further detailed in Table 1).
-- **Occupational prestige:** prestige score (scale not specified in Table 1 text excerpt).
-
-### Political intolerance scale (used in Model 3)
-- **Count (0–15)** of intolerant responses to 15 items: 5 target groups × 3 civil-liberty contexts (speech, teach at college, book in library).
-- Target groups: anti-religion, racist (believes Blacks genetically inferior), communist, military-rule advocate, homosexual.
-- Reliability: **alpha ≈ .9163** (as reported).
-- Asked of **two-thirds** of sample → smaller N in Model 3.
-
-### Demographic/group identity indicators
-- Sex: **Female** dummy.
-- **Age** (years).
-- Race/ethnicity dummies: **Black**, **Hispanic**, **Other race** (reference appears to be White non-Hispanic, implied).
-- Religion dummies: **Conservative Protestant**, **No religion** (reference category not shown in table; likely other religions).
-- Region: **Southern** dummy.
-
-If you want, I can also (a) rewrite Table 1 in a clean “model equation” format, or (b) extract Table 2/3 and the logistic models used for Figure 1, since they are explicitly “related” to Table 1’s core DV and theory.
+If you want, I can also extract the **exact β estimates** shown in Table 1 for each covariate (education, age, southern, etc.) and present them in a tidy model-comparison table.

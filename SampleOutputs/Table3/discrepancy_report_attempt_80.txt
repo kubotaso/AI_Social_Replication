@@ -1,0 +1,199 @@
+Score: 72/100
+============================================================
+
+## 1) Row items / categories (names and number of items)
+
+### A. Missing attitude rows in the generated table
+Your generated table shows these rows:
+
+- (1) Like very much  
+- (2) Like it  
+- (3) Mixed feelings  
+- (4) Dislike it  
+- (5) Dislike very much  
+- (M) Don’t know much about it **(all zeros)**
+- (M) No answer **(all zeros)**
+- Mean
+
+But the **true table includes nonzero counts** for both missing-data rows:
+
+- **(M) Don’t know much about it** (nonzero for every genre)
+- **(M) No answer** (nonzero for every genre)
+
+So the generated output has the *right row labels*, but the *wrong content* (zeros) and effectively behaves as if those rows don’t exist.
+
+**Fix:** When generating frequencies, include missing categories as valid response levels and tabulate them from the raw data (or from the table), rather than forcing them to 0. Concretely:
+- Ensure the response variable is treated as a **7-level categorical**: `{1,2,3,4,5, M_dk, M_noans}`.
+- If you’re computing from microdata, do **not** drop missing codes; instead recode GSS missing values into the two “M” categories and count them.
+
+### B. Column / genre naming discrepancy: “Opera” embedded incorrectly
+In the generated header you have a single combined label:
+
+- **“New Age/Space Opera”** (one column)
+
+But the true table has **two separate columns**:
+
+- **New Age/Space**
+- **Opera**
+
+**Fix:** Split that combined column into **two distinct genre variables**:
+- `New Age/Space`
+- `Opera`
+
+This is a structural mismatch (wrong number of items/columns), not just a value error.
+
+---
+
+## 2) Frequency counts: every mismatch
+
+### Panels 1 and 3 (most genres): main 1–5 rows match, missing rows do not
+For these genres, the generated counts for response categories **(1)–(5)** match the true table, but the missing rows are wrong (all zeros instead of true values):
+
+#### Panel 1 genres (Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber)
+Generated has:
+- Don’t know much about it = **0** for all  
+- No answer = **0** for all  
+
+True values (must replace zeros with these):
+
+- **Latin/Salsa:** DK=221, NA=12  
+- **Jazz:** DK=38, NA=15  
+- **Blues/R&B:** DK=56, NA=12  
+- **Show Tunes:** DK=77, NA=14  
+- **Oldies:** DK=41, NA=10  
+- **Classical/Chamber:** DK=66, NA=11  
+
+#### Panel 3 genres (Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel)
+Same problem: generated DK/NA are zero but true are nonzero:
+
+- **Pop/Easy Listening:** DK=72, NA=13  
+- **Contemporary Rock:** DK=50, NA=12  
+- **Rap:** DK=61, NA=11  
+- **Heavy Metal:** DK=70, NA=10  
+- **Country/Western:** DK=22, NA=10  
+- **Gospel:** DK=35, NA=12  
+
+**Fix:** Same as above—don’t drop or overwrite missing categories; compute them.
+
+---
+
+### Panel 2 genres: additional major errors due to the “New Age/Space Opera” merge
+Panel 2 is where the generated table diverges structurally and numerically.
+
+#### Reggae
+Generated 1–5 counts match the true table, but missing rows are wrong:
+
+- True DK=295, NA=11 (generated shows 0,0)
+
+#### Swing/Big Band
+Generated 1–5 counts match, missing wrong:
+
+- True DK=164, NA=12 (generated shows 0,0)
+
+#### Bluegrass
+Generated 1–5 counts match, missing wrong:
+
+- True DK=163, NA=11 (generated shows 0,0)
+
+#### Folk
+Generated 1–5 counts match, missing wrong:
+
+- True DK=78, NA=12 (generated shows 0,0)
+
+#### New Age/Space and Opera (this is the biggest discrepancy)
+The generated table has **one** column “New Age/Space Opera” with counts:
+
+- Like very much 48  
+- Like it 186  
+- Mixed feelings 269  
+- Dislike it 429  
+- Dislike very much 368  
+- DK 0  
+- NA 0  
+- Mean 3.68  
+
+Those numbers correspond **exactly to the true “New Age/Space” column for rows (1)–(5) and mean**.
+
+But the generated table **omits the Opera column entirely**, and also omits DK/NA for New Age/Space.
+
+True values you are missing:
+
+**New Age/Space** (add DK/NA):
+- DK=292, NA=14
+
+**Opera** (entire column missing):
+- Like very much=73
+- Like it=257
+- Mixed feelings=359
+- Dislike it=515
+- Dislike very much=306
+- DK=83
+- NA=13
+- Mean=3.48
+
+**Fix:**
+- Create two separate columns and populate each from the correct genre.
+- Add DK/NA counts for New Age/Space; add all counts for Opera.
+
+---
+
+## 3) Percentages
+Neither table shows percentages—only counts and means. If your “generated analysis” was supposed to include percentages, then you are missing an entire output component.
+
+**Fix (if required):**
+- Compute column percentages within each genre:
+  - `% = count / (sum of all 7 rows for that genre) * 100`
+- Be consistent about whether the denominator includes DK/NA. The true table reports counts only; if you add percentages, you must specify the denominator.
+
+---
+
+## 4) Summary statistics (means, totals, etc.)
+
+### A. Means
+The **means in the generated table match the true means** for every genre that exists as a column in the generated output.
+
+However, because:
+- DK/NA rows are incorrectly zeroed, and
+- Opera is missing / merged into a label,
+
+the means are “matching” only because you copied the mean row (or computed it only from valid 1–5 responses and ignored missingness). The true table’s means appear to be computed on the 1–5 scale excluding DK/NA (standard practice), so the mean values can still match even if missing rows are present—but you must still report correct missing counts.
+
+**Fix:** Keep mean computation excluding DK/NA (likely correct), but **do not set DK/NA counts to zero**, and **restore Opera as a separate column** with its own mean (3.48).
+
+### B. Totals / Ns (implicit mismatch)
+Even though totals aren’t printed, the generated table implies each genre has N equal to the sum of categories (1)–(5), because DK/NA are zeros. In the true table, each genre’s total N is larger by DK+NA.
+
+Example (Latin/Salsa):
+- Generated implied N = 85+325+416+403+144 = **1373**
+- True N = 1373 + 221 + 12 = **1606**
+
+This mismatch exists for every genre.
+
+**Fix:** If you report totals (or if downstream computations assume totals), use:
+- `N_total = sum(1–5) + DK + NA`
+
+---
+
+## 5) Missing or extra column categories
+
+### Missing column
+- **Opera** is missing as its own genre column.
+
+### Extra/incorrect column label
+- **“New Age/Space Opera”** is not a valid single genre in the true table; it incorrectly concatenates two genres.
+
+**Fix:** Replace the single column with two columns: **New Age/Space** and **Opera**.
+
+---
+
+## What to change so generated matches true (checklist)
+
+1. **Split the combined header** “New Age/Space Opera” into two separate columns:
+   - New Age/Space
+   - Opera
+2. **Populate Opera** with the true counts (all 7 rows) and mean 3.48.
+3. **For every genre column**, replace DK and No answer rows from 0 to the true counts listed above.
+4. If you compute from raw data:
+   - Recode “don’t know” and “no answer” into explicit categories instead of treating them as system missing.
+   - Ensure the tabulation includes those levels (don’t drop unused levels).
+5. If you later add percentages or totals, compute them using the correct full N per genre (including DK/NA unless you explicitly define otherwise).

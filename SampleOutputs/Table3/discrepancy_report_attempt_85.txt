@@ -1,0 +1,167 @@
+Score: 71/100
+============================================================
+
+## 1) Row items/categories: mismatches
+
+### A. Generated table merges/splits a column incorrectly
+- **Generated column header:** `New Age/Space Opera` (single column)
+- **True table headers (Panel 2):** `New Age/Space` **and** `Opera` (two separate columns)
+
+**Why this is wrong:** You combined two distinct genres into one column, which collapses two sets of frequencies into one and makes all counts under that “merged” column uninterpretable.
+
+**Fix:** Replace the single generated column **New Age/Space Opera** with **two columns**:
+- `New Age/Space`
+- `Opera`
+…and then populate each with its correct frequencies (see section 2).
+
+---
+
+## 2) Frequency count mismatches (cell-by-cell)
+
+Below are all the cells where the generated counts differ from the true table.
+
+### Panel 1 mismatches (Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber)
+
+Only the “missing-type” rows are wrong; the 1–5 rows and means match.
+
+**(M) Don’t know much about it**
+- Latin/Salsa: **Generated 210** vs **True 221** (−11) → set to **221**
+- Jazz: **48** vs **38** (+10) → set to **38**
+- Blues/R&B: **61** vs **56** (+5) → set to **56**
+- Show Tunes: **82** vs **77** (+5) → set to **77**
+- Oldies: **46** vs **41** (+5) → set to **41**
+- Classical/Chamber: **69** vs **66** (+3) → set to **66**
+
+**(M) No answer**
+- Latin/Salsa: **23** vs **12** (+11) → set to **12**
+- Jazz: **5** vs **15** (−10) → set to **15**
+- Blues/R&B: **7** vs **12** (−5) → set to **12**
+- Show Tunes: **9** vs **14** (−5) → set to **14**
+- Oldies: **5** vs **10** (−5) → set to **10**
+- Classical/Chamber: **8** vs **11** (−3) → set to **11**
+
+**Pattern:** For these genres, your “Don’t know” and “No answer” values are shifted between one another and/or mis-copied.
+
+---
+
+### Panel 2 mismatches (Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk)
+
+**Reggae**
+- (M) Don’t know: **275** vs **295** (−20) → set to **295**
+- (M) No answer: **31** vs **11** (+20) → set to **11**
+
+**Swing/Big Band**
+- (M) Don’t know: **158** vs **164** (−6) → set to **164**
+- (M) No answer: **18** vs **12** (+6) → set to **12**
+
+**New Age/Space and Opera (this is the big structural issue)**
+You currently have one merged column: **“New Age/Space Opera”** with:
+- Like very much = 48
+- Like it = 186
+- Mixed = 269
+- Dislike = 429
+- Dislike very much = 368
+- Don’t know = 275
+- No answer = 31
+
+But the true table has **two separate columns**:
+
+**New Age/Space (true)**
+- Like very much 48
+- Like it 186
+- Mixed 269
+- Dislike 429
+- Dislike very much 368
+- Don’t know 292
+- No answer 14
+- Mean 3.68
+
+**Opera (true)**
+- Like very much 73
+- Like it 257
+- Mixed 359
+- Dislike 515
+- Dislike very much 306
+- Don’t know 83
+- No answer 13
+- Mean 3.48
+
+**Fix:** Split your merged column into two columns and fill them with the above true values. (Right now, your merged column mostly matches **New Age/Space** for rows 1–5 and mean, but its missing rows don’t match either New Age or Opera.)
+
+**Bluegrass**
+- (M) Don’t know: **157** vs **163** (−6) → set to **163**
+- (M) No answer: **17** vs **11** (+6) → set to **11**
+
+**Folk**
+- (M) Don’t know: **81** vs **78** (+3) → set to **78**
+- (M) No answer: **9** vs **12** (−3) → set to **12**
+
+---
+
+### Panel 3 mismatches (Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel)
+
+For Panel 3, the 1–5 rows and means match; errors are in the missing-type rows.
+
+**Pop/Easy Listening**
+- (M) Don’t know: **76** vs **72** (+4) → set to **72**
+- (M) No answer: **9** vs **13** (−4) → set to **13**
+
+**Contemporary Rock**
+- (M) Don’t know: **56** vs **50** (+6) → set to **50**
+- (M) No answer: **6** vs **12** (−6) → set to **12**
+
+**Rap**
+- (M) Don’t know: **65** vs **61** (+4) → set to **61**
+- (M) No answer: **7** vs **11** (−4) → set to **11**
+
+**Heavy Metal**
+- (M) Don’t know: **72** vs **70** (+2) → set to **70**
+- (M) No answer: **8** vs **10** (−2) → set to **10**
+
+**Country/Western**
+- (M) Don’t know: **29** vs **22** (+7) → set to **22**
+- (M) No answer: **3** vs **10** (−7) → set to **10**
+
+**Gospel**
+- (M) Don’t know: **42** vs **35** (+7) → set to **35**
+- (M) No answer: **5** vs **12** (−7) → set to **12**
+
+**Pattern:** In Panel 3, many errors look like “Don’t know” and “No answer” were partially swapped or mis-entered, with differences that often mirror each other (e.g., +7 and −7).
+
+---
+
+## 3) Summary statistics mismatches
+
+### Means
+- **All reported means in the generated table match the true table** for the columns that exist.
+- However, because you **merged `New Age/Space` and `Opera` into one column**, you are **missing the separate mean for Opera** and you incorrectly label the merged header.
+
+**Fix:** Add an **Opera** column and report its mean **3.48**; keep New Age/Space mean **3.68**.
+
+---
+
+## 4) Missing/extra column categories
+
+### Missing column
+- **Opera** is missing as a standalone genre column.
+
+### Extra/incorrect column
+- **New Age/Space Opera** is an invalid combined category not present in the true table.
+
+**Fix:** Replace `New Age/Space Opera` with two columns: `New Age/Space` and `Opera`.
+
+---
+
+## 5) Percentages
+- **Neither table shows percentages**, only counts (and means). So there are no percentage mismatches to enumerate.
+- If your generated analysis elsewhere computed percentages using these incorrect “Don’t know/No answer” counts (and the merged genre), those percentages will be wrong too.
+
+**Fix:** After correcting counts and splitting the genre columns, recompute any percentages using the corrected denominators.
+
+---
+
+## Practical correction checklist
+1. **Split** `New Age/Space Opera` into `New Age/Space` and `Opera`.
+2. **Replace** all incorrect `(M) Don’t know much about it` and `(M) No answer` counts with the true values listed above.
+3. Ensure each genre column totals are internally consistent (your errors strongly suggest mis-copying between the two missing categories).
+4. Recompute any downstream percentages or any stats that depend on missingness.

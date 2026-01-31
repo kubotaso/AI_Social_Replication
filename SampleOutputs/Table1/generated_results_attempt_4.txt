@@ -1,37 +1,91 @@
 ## fit_stats
-                          model   n       r2   adj_r2
+                          model   N       R2   Adj_R2
                   Model 1 (SES) 793 0.107613 0.104220
-          Model 2 (Demographic)  37 0.489203 0.343261
-Model 3 (Political intolerance)  19 0.588157 0.176314
+          Model 2 (Demographic) 401 0.176241 0.157280
+Model 3 (Political intolerance) 227 0.191060 0.153609
 
-## tables
-{'Model 1 (SES)':        term       beta             p  sig
-0  Constant  10.832928  2.000622e-64  ***
-1      educ  -0.329748  1.471664e-15  ***
-2    inc_pc  -0.033565  3.634342e-01     
-3  prestg80   0.029083  4.757084e-01     , 'Model 2 (Demographic)':          term      beta         p  sig
-0    Constant  8.690073  0.136699     
-1        educ -0.795555  0.000895  ***
-2      inc_pc  0.182328  0.472232     
-3    prestg80  0.425471  0.017826    *
-4      female  0.076569  0.626556     
-5         age -0.018253  0.914908     
-6       black  0.025024  0.897898     
-7    hispanic       NaN       NaN     
-8   otherrace       NaN       NaN     
-9   cons_prot  0.319996  0.058167     
-10    norelig       NaN       NaN     
-11      south  0.224252  0.120364     , 'Model 3 (Political intolerance)':          term      beta         p sig
-0    Constant -7.185114  0.561031    
-1        educ -0.283646  0.466373    
-2      inc_pc  0.207455  0.674407    
-3    prestg80  0.510764  0.140733    
-4      female  0.206254  0.455396    
-5         age  0.147711  0.667894    
-6       black  0.078812  0.854209    
-7    hispanic       NaN       NaN    
-8   otherrace       NaN       NaN    
-9   cons_prot  0.529036  0.062677    
-10    norelig       NaN       NaN    
-11      south  0.217989  0.495445    
-12  pol_intol  0.313215  0.495088    }
+## table1_style_betas
+Model 1 (SES) Model 2 (Demographic) Model 3 (Political intolerance)
+    -0.330***             -0.310***                         -0.167*
+       -0.034                -0.031                          -0.015
+        0.029                 0.040                           0.010
+          NaN                -0.079                          -0.091
+          NaN               0.134**                           0.110
+          NaN                 0.061                           0.105
+          NaN                                                      
+          NaN                -0.002                           0.064
+          NaN                 0.055                           0.040
+          NaN                                                      
+          NaN               0.129**                          0.142*
+          NaN                   NaN                         0.188**
+       10.833                 8.816                           6.416
+
+## coefficients_long
+                          model         term      coef_raw  beta_std        p_raw sig
+                  Model 1 (SES)        const  1.083293e+01       NaN 2.000622e-64 ***
+                  Model 1 (SES)         educ -3.975559e-01 -0.329748 1.533161e-15 ***
+                  Model 1 (SES)       inc_pc -8.470578e-06 -0.033565 3.637382e-01    
+                  Model 1 (SES)     prestg80  7.672500e-03  0.029083 4.759880e-01    
+          Model 2 (Demographic)        const  8.815812e+00       NaN 1.418421e-13 ***
+          Model 2 (Demographic)         educ -3.745033e-01 -0.310422 3.264821e-07 ***
+          Model 2 (Demographic)       inc_pc -7.866689e-06 -0.031191 5.522546e-01    
+          Model 2 (Demographic)     prestg80  1.090097e-02  0.040284 4.717229e-01    
+          Model 2 (Demographic)       female -5.728089e-01 -0.079153 9.087365e-02    
+          Model 2 (Demographic)          age  3.077556e-02  0.134500 6.061027e-03  **
+          Model 2 (Demographic)        black  6.984211e-01  0.060678 2.069567e-01    
+          Model 2 (Demographic)     hispanic -2.422595e-17       NaN 8.831774e-01    
+          Model 2 (Demographic)   other_race -4.053395e-02 -0.001996 9.660563e-01    
+          Model 2 (Demographic) conserv_prot  3.982212e-01  0.054997 2.693778e-01    
+          Model 2 (Demographic)  no_religion  0.000000e+00       NaN          NaN    
+          Model 2 (Demographic)        south  9.512228e-01  0.129202 5.930854e-03  **
+Model 3 (Political intolerance)        const  6.416416e+00       NaN 2.657113e-04 ***
+Model 3 (Political intolerance)         educ -2.189485e-01 -0.166790 3.925186e-02   *
+Model 3 (Political intolerance)       inc_pc -3.424651e-06 -0.014894 8.339987e-01    
+Model 3 (Political intolerance)     prestg80  2.869166e-03  0.010495 8.897515e-01    
+Model 3 (Political intolerance)       female -6.658108e-01 -0.091494 1.475842e-01    
+Model 3 (Political intolerance)          age  2.659451e-02  0.109689 1.024078e-01    
+Model 3 (Political intolerance)        black  1.288076e+00  0.104854 1.020162e-01    
+Model 3 (Political intolerance)     hispanic -1.884614e-15       NaN 1.748024e-01    
+Model 3 (Political intolerance)   other_race  1.580750e+00  0.063838 3.178615e-01    
+Model 3 (Political intolerance) conserv_prot  2.899189e-01  0.039716 5.556879e-01    
+Model 3 (Political intolerance)  no_religion  0.000000e+00       NaN          NaN    
+Model 3 (Political intolerance)        south  1.047738e+00  0.141537 2.741378e-02   *
+Model 3 (Political intolerance)     polintol  1.548149e-01  0.187520 6.122075e-03  **
+
+## missingness_model1
+          var  missing_n  missing_pct
+       inc_pc         70     0.078387
+     prestg80         33     0.036954
+         educ          1     0.001120
+exclusiveness          0     0.000000
+
+## missingness_model2
+          var  missing_n  missing_pct
+ conserv_prot        333     0.372900
+     hispanic        173     0.193729
+       inc_pc         70     0.078387
+     prestg80         33     0.036954
+  no_religion          3     0.003359
+          age          1     0.001120
+         educ          1     0.001120
+        black          0     0.000000
+exclusiveness          0     0.000000
+       female          0     0.000000
+   other_race          0     0.000000
+        south          0     0.000000
+
+## missingness_model3
+          var  missing_n  missing_pct
+     polintol        402     0.450168
+ conserv_prot        333     0.372900
+     hispanic        173     0.193729
+       inc_pc         70     0.078387
+     prestg80         33     0.036954
+  no_religion          3     0.003359
+          age          1     0.001120
+         educ          1     0.001120
+        black          0     0.000000
+exclusiveness          0     0.000000
+       female          0     0.000000
+   other_race          0     0.000000
+        south          0     0.000000

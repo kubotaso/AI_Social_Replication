@@ -1,0 +1,203 @@
+Score: 43/100
+============================================================
+
+Below is a variable-by-variable audit of what your **Generated Results** report versus the **True Results (Bryson 1996, Table 2)**, plus concrete fixes to make the generated output match the table.
+
+---
+
+## 1) Global / structural mismatches
+
+### A. Wrong model numbering / labels
+- **Generated:** “Model A (Minority-linked genres: 6)” and “Model B (Remaining genres: 12)”
+- **True:** “Model 1” and “Model 2” with those same DVs.
+
+**Fix:** Rename Model A → **Model 1**; Model B → **Model 2** (or explicitly state equivalence).
+
+---
+
+### B. Wrong sample sizes (N)
+- **Generated:** Model A **N=549**; Model B **N=507**
+- **True:** Model 1 **N=644**; Model 2 **N=605**
+
+**Fix:** Your analytic samples are not the same as Bryson’s. To match:
+1. Use the same dataset and year(s) Bryson used.
+2. Replicate Bryson’s **case inclusion rules** (listwise deletion vs. specific missing-data handling).
+3. Replicate construction of the DV counts and all predictors.
+4. Ensure you are not accidentally dropping cases due to recodes (e.g., Hispanic “no variation” issue—see below).
+
+---
+
+### C. R² and Adjusted R² don’t match
+- **Generated:**  
+  - Model A R² **0.1330**, Adj R² **0.1153**  
+  - Model B R² **0.1200**, Adj R² **0.1005**
+- **True:**  
+  - Model 1 R² **0.145**, Adj R² **0.129**  
+  - Model 2 R² **0.147**, Adj R² **0.130**
+
+**Fix:** Once you correct the sample (N) and the exact variable construction, R² should move substantially toward the published values.
+
+---
+
+### D. You are mixing “standardized betas” with unstandardized intercepts without clarity
+- **Generated tables:** show **Std_Beta** but also list a “Constant_unstd”.
+- **True table:** shows standardized coefficients for predictors, but the constant is shown as a raw number in the table (Bryson prints it; predictors are standardized). This is common, but you must be explicit.
+
+**Fix:** In your table output, label clearly:
+- Predictors: **Standardized OLS coefficients (β)**
+- Constant: **Unstandardized intercept** (and don’t label it “Std_Beta = NaN”)
+
+---
+
+### E. “Hispanic dropped (no variation)” is flatly inconsistent with the true model
+- **Generated:** Hispanic is **dropped (no variation)** in both models.
+- **True:** Hispanic has coefficients in both models (**-0.058** and **-0.029**).
+
+**Fix:** This indicates a coding or subsetting error. Likely causes:
+1. You filtered the dataset to a subgroup where `hispanic` is all 0 (or all 1).
+2. You recoded Hispanic incorrectly (e.g., turned missing into 0 and then filtered to complete cases in a way that wiped variation).
+3. You created mutually exclusive race dummies incorrectly (e.g., “black”, “other_race” defined, but “hispanic” overwritten or made dependent).
+
+Concrete correction:
+- Rebuild race/ethnicity dummies from the original race/ethnicity variable(s):
+  - `black = 1 if race==Black`
+  - `hispanic = 1 if ethnicity==Hispanic` (or if Bryson used “Hispanic” as race category, replicate that)
+  - `other_race = 1 if race not White/Black/Hispanic`
+  - Reference category should be **White non-Hispanic** (or whatever Bryson used—verify).
+- Verify variation before modeling: `tab hispanic` (or `value_counts()`), overall and within the modeling sample.
+
+---
+
+## 2) Variable name mismatches
+
+### A. Age variable naming
+- **Generated:** uses `age_years` in samples but labels output as **Age**
+- **True:** **Age**
+
+**Fix:** Either rename consistently (Age everywhere) or note that `age_years` corresponds to Table 2’s Age.
+
+### B. DV names
+- **Generated DVs:** `dv1_minority6` and `dv2_remaining12`
+- **True DV wording:** “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music” and “Dislike of the 12 Remaining Genres”
+
+**Fix:** Rename DVs in printed output to match the paper titles (fine to keep internal variable names).
+
+---
+
+## 3) Coefficient-by-coefficient mismatches (Model 1 / Generated “Model A”)
+
+True Model 1 coefficients vs Generated Model A “Std_Beta”:
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.130** | 0.131833** | close (ok) |
+| Education | -0.175*** | -0.180139*** | slightly too negative |
+| Household income per capita | -0.037 | **0.008961** | **wrong sign** and magnitude |
+| Occupational prestige | -0.020 | -0.019019 | close (ok) |
+| Female | -0.057 | -0.071658 | too negative |
+| Age | 0.163*** | 0.156851*** | slightly low |
+| Black | -0.132*** | -0.141030** | significance level wrong (*should be ***, not **) and magnitude off |
+| Hispanic | -0.058 | **dropped** | **missing** |
+| Other race | -0.017 | 0.010867 | **wrong sign** |
+| Conservative Protestant | 0.063 | 0.083766 | too high |
+| No religion | 0.057 | 0.068263 | somewhat high |
+| Southern | 0.024 | 0.026711 | close (ok) |
+| Constant | 2.415*** | 2.461148 (p shown) | intercept differs |
+
+**Fixes to align Model 1:**
+1. **Restore Hispanic variation** (major fix).
+2. **Recompute income_pc exactly** as Bryson did. Your sign flip is a red flag that:
+   - you used a different income measure (raw vs logged vs per-capita vs categories),
+   - you standardized differently, or
+   - you reversed coding (e.g., higher values = lower income).
+3. **Other race sign mismatch** suggests your race coding/reference differs from Bryson’s. Ensure the same reference category.
+4. **Black significance mismatch**: because Bryson reports *** for Black in Model 1, your p-value/star assignment is inconsistent with the table. This will correct only if the sample/SEs match; but also note: Bryson’s stars are based on his N/model—yours won’t match until you replicate N and variable construction.
+
+---
+
+## 4) Coefficient-by-coefficient mismatches (Model 2 / Generated “Model B”)
+
+True Model 2 coefficients vs Generated Model B “Std_Beta”:
+
+| Variable | True β | Generated β | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.080 | -0.002233 | **wrong sign & near zero** |
+| Education | -0.242*** | -0.194316*** | **too small in magnitude** |
+| Household income per capita | -0.065 | -0.035654 | too small in magnitude |
+| Occupational prestige | 0.005 | -0.012431 | **wrong sign** |
+| Female | -0.070 | -0.069205 | close (ok) |
+| Age | 0.126** | 0.119317** | close (ok) |
+| Black | 0.042 | 0.066914 | somewhat high |
+| Hispanic | -0.029 | **dropped** | **missing** |
+| Other race | 0.047 | 0.076128 | too high |
+| Conservative Protestant | 0.048 | 0.101269* | **way too high** and has a star it shouldn’t |
+| No religion | 0.024 | 0.018895 | close (ok) |
+| Southern | 0.069 | 0.075385 | close (ok) |
+| Constant | 7.860 | 4.957739 | **far off** |
+
+**Fixes to align Model 2:**
+1. **Restore Hispanic** (again).
+2. **DV construction mismatch is likely huge here**. The intercept and multiple slopes (racism, education) being far off suggests you did not replicate the “12 remaining genres” count variable the same way.
+3. **Occupational prestige sign mismatch** strongly suggests either:
+   - different prestige scale,
+   - reverse-coded prestige,
+   - different sample/standardization.
+4. **Conservative Protestant inflated**: likely different definition (e.g., you coded “cons_prot” differently than Bryson—perhaps including evangelicals broadly, or misclassifying denominations).
+
+---
+
+## 5) Standard errors: not comparable and should not be fabricated
+- **True:** Table 2 **does not report standard errors**.
+- **Generated:** does not show SEs, but does show p-values/stars and “Constant_p”.
+
+**Mismatch in interpretation/reporting:** You’re effectively presenting inferential detail (p-values/stars) as if it were directly comparable to Bryson’s stars. But Bryson’s stars come from *his* model/sample; your computed stars will differ unless you replicate exactly.
+
+**Fix options:**
+- **Option 1 (best for “match the paper”):** Report **only standardized betas and Bryson’s printed stars**, and do not compute your own p-values.
+- **Option 2 (if you must compute):** Clearly label stars as “replication-estimated p-values” and expect mismatch until N/variables match exactly.
+
+---
+
+## 6) Interpretation mismatches
+
+### A. Racism score interpretation in Model 2
+- **True:** Racism score is **positive (0.080)** (and not significant).
+- **Generated:** Racism score is essentially **zero/negative (-0.002)**.
+
+**Fix:** This is not a “wording” issue; it’s a model/data mismatch. Rebuild:
+- the DV for Model 2,
+- racism scale construction (items, direction, standardization),
+- sample selection.
+
+### B. Hispanic “dropped” implies incorrect narrative about composition
+If you interpret “Hispanic dropped (no variation)” substantively, it would imply no Hispanics in the analytic sample—contradicted by Bryson’s table.
+
+**Fix:** Treat this as a fatal data-processing error, not a finding.
+
+---
+
+## 7) What to change in your code/workflow (action checklist)
+
+1. **Stop dropping Hispanic**:
+   - Validate: `mean(hispanic)`, `std(hispanic)` in the modeling sample must be > 0.
+2. **Replicate Bryson’s DV construction exactly**:
+   - Identify the exact 6 “minority-linked” genres and the exact 12 “remaining” genres as coded in the survey.
+   - Ensure the “dislike” threshold matches Bryson (e.g., “dislike” vs “strongly dislike”, or top-box).
+   - Ensure counts range correctly (0–6; 0–12).
+3. **Replicate independent variables exactly**:
+   - **Income per capita**: confirm formula and whether it’s logged, scaled, or categorized.
+   - **Occupational prestige**: confirm scale (e.g., NORC prestige) and coding direction.
+   - **Conservative Protestant**: confirm denomination classification rule.
+   - **Racism score**: confirm items, reverse-coding, and scaling.
+4. **Match missing-data handling**:
+   - Bryson’s N is larger; your pipeline is likely discarding too many cases.
+   - Apply the same listwise deletion rules as the paper (if stated), otherwise replicate as closely as possible.
+5. **Standardization procedure**:
+   - Standardize predictors the same way (typically z-scores over the analysis sample).
+   - Do not standardize the DV if you want the intercept comparable to the paper’s constant (though the paper’s presentation mixes standardized betas with a raw intercept; replicate that convention explicitly).
+6. **Recompute and reprint**:
+   - Once variables and sample match, your betas and stars should move toward the true table.
+
+---
+
+If you want, paste (a) your code for constructing the two DVs and (b) the code for race/ethnicity and `cons_prot`; those are the two biggest sources of the severe mismatches (Hispanic dropping, DV2 intercept/racism reversal, and Conservative Protestant inflation).

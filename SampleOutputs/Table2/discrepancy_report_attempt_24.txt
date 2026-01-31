@@ -1,0 +1,179 @@
+Score: 17/100
+============================================================
+
+Below is a complete audit of mismatches between the **Generated Results** and the **True Results (Bryson 1996, Table 2)**, plus what to change so the generated analysis matches the published table.
+
+---
+
+## 1) Variable-name / definition mismatches
+
+### A. “Racism score (0–5)” vs “Racism score”
+- **Mismatch:** Name is slightly different; more importantly, the generated work implies a specific 0–5 scaling, but Table 2 just reports “Racism score.”
+- **Fix:** Ensure the racism scale is coded exactly as in Bryson (same items, same coding direction, same range). Then label it as “Racism score” (no need to add range unless you can verify it matches the paper’s construction).
+
+### B. Race/ethnicity construction differs from paper
+Generated labels:
+- “Black (mutually exclusive; Hispanic overrides)”
+- “Hispanic (ETHNIC==1; mutually exclusive)”
+- “Other race (mutually exclusive; Hispanic overrides)”
+
+- **Mismatch:** Table 2 uses **Black, Hispanic, Other race** (implicitly vs. White reference), but the generated model uses a *specific exclusivity rule (“Hispanic overrides”)* that may not match Bryson’s coding.
+- **Fix:** Reconstruct race/ethnicity exactly as Bryson did. If the paper used separate indicators without the “override” rule (or a different priority), your coefficients will differ. Use the paper’s stated coding (or replicate from the original dataset/codebook if the paper is not explicit).
+
+### C. “Conservative Protestant (proxy: RELIG==1 & DENOM==1)”
+- **Mismatch:** The generated variable is explicitly a **proxy**, which often will not match the author’s operationalization (e.g., detailed denominational classification).
+- **Fix:** Implement Conservative Protestant using the paper’s definition (likely a denominational family classification). A crude RELIG/DENOM filter is very likely to change both coefficients and sample size due to missingness.
+
+### D. “No religion (RELIG==4)” is dropped/NaN in generated output
+- **Mismatch:** True table reports **No religion** with nonzero coefficients in both models (Model 1: 0.057; Model 2: 0.024). Generated models show **NaN** and “Dropped_no_variation = no_religion.”
+- **Fix:** This is a clear coding/modeling bug:
+  1. Verify `no_religion` varies in the analytic sample (has both 0 and 1).
+  2. Do **not** compute it in a way that collapses to all-0 or all-1 after listwise deletion (e.g., defining it from a variable that becomes constant after filtering).
+  3. If you use dummy variables for religion categories, don’t include a perfectly collinear set (e.g., include all categories plus an intercept). Use one reference category.
+
+### E. “Southern (REGION==3)” sign differs sharply from paper
+- **Mismatch:** Generated uses an explicit REGION==3 definition; in the true table “Southern” is positive in both models.
+- **Fix:** Confirm the region coding aligns with the paper’s “South” definition. REGION codes vary by dataset/year; REGION==3 may not be “South” in your extract.
+
+---
+
+## 2) Coefficient mismatches (including sign flips)
+
+Table below: **True vs Generated** standardized betas.
+
+### Model 1 (DV: minority-liked 6 genres)
+
+| Variable | True | Generated | Problem type |
+|---|---:|---:|---|
+| Racism score | 0.130** | 0.143* | sig mismatch (**, *), coef off |
+| Education | -0.175*** | -0.260*** | magnitude too large |
+| Income pc | -0.037 | -0.013 | magnitude too small |
+| Occ prestige | -0.020 | +0.057 | **sign flip** |
+| Female | -0.057 | -0.035 | smaller magnitude |
+| Age | +0.163*** | +0.174** | sig mismatch (*** vs **), coef off |
+| Black | -0.132*** | -0.101 | missing significance + coef off |
+| Hispanic | -0.058 | -0.149* | magnitude too large + spurious sig |
+| Other race | -0.017 | -0.005 | small diff |
+| Cons. Protestant | +0.063 | +0.118 | magnitude too large |
+| No religion | +0.057 | NaN (dropped) | **variable missing** |
+| Southern | +0.024 | -0.060 | **sign flip** |
+| Constant | 2.415*** | 2.600*** | coef mismatch |
+| R² / Adj R² | 0.145 / 0.129 | 0.178 / 0.142 | fit mismatch |
+| N | 644 | 261 | **major sample mismatch** |
+
+### Model 2 (DV: remaining 12 genres)
+
+| Variable | True | Generated | Problem type |
+|---|---:|---:|---|
+| Racism score | +0.080 | -0.009 | **sign flip** |
+| Education | -0.242*** | -0.165* | too small + wrong sig |
+| Income pc | -0.065 | -0.079 | close-ish |
+| Occ prestige | +0.005 | -0.083 | **sign flip** + huge magnitude |
+| Female | -0.070 | -0.084 | close-ish |
+| Age | +0.126** | +0.125 (ns) | sig mismatch |
+| Black | +0.042 | +0.012 | smaller |
+| Hispanic | -0.029 | +0.041 | **sign flip** |
+| Other race | +0.047 | +0.124* | too large + spurious sig |
+| Cons. Protestant | +0.048 | +0.141* | too large + spurious sig |
+| No religion | +0.024 | NaN (dropped) | **variable missing** |
+| Southern | +0.069 | +0.101 | direction ok, magnitude diff |
+| Constant | 7.860 (no stars shown) | 5.198*** | constant + significance mismatch |
+| R² / Adj R² | 0.147 / 0.130 | 0.151 / 0.113 | adj R² mismatch |
+| N | 605 | 259 | **major sample mismatch** |
+
+**Key pattern:** You have multiple **sign reversals** (occ prestige, southern in Model 1; racism, prestige, Hispanic in Model 2). That typically indicates **variable coding differences**, **different sample**, and/or **different model specification**.
+
+---
+
+## 3) Standard errors issue (and interpretation)
+
+- **Mismatch:** The user request mentions “standard errors,” but:
+  - **True Table 2 does not report SEs.**
+  - **Generated output also does not provide SEs**—only standardized betas and significance stars.
+- **Fix:** To match the paper, **do not invent or compare SEs**. If your pipeline is producing SEs elsewhere, keep them internal but do not claim Table 2 reports them. Your comparison should focus on **standardized coefficients, N, R², Adj R², and stars**.
+
+Also, treat “Sig” carefully:
+- If you are generating stars from your own regression p-values, they **won’t match** the published stars unless:
+  1. your sample matches,
+  2. your coding matches,
+  3. your standardization and model match,
+  4. the paper’s exact handling of weights/design is replicated.
+
+---
+
+## 4) The biggest mismatch: sample size (N) and missingness
+
+- **Mismatch:** Paper N = **644** and **605**. Generated N = **261** and **259**.
+- Your own missingness table shows extreme missingness: racism_score missing 47.6%, cons_prot missing 36.3%, DV missing 29–34%, plus race indicators missing 22%.
+- **Fix:** To replicate Bryson:
+  1. Use the **same survey year and sample restrictions** as Bryson.
+  2. Handle missing data the same way as the author (likely **not** the same listwise deletion you used, or you constructed variables in ways that introduce extra missingness).
+  3. Verify that you’re using the correct source variables for racism and religion; your “proxy” construction may be turning a lot of cases into missing/invalid.
+  4. Check whether the paper uses weights and whether weighted N differs from unweighted N (Table 2 reports “Number of cases,” usually unweighted, but confirm).
+
+Until N matches, coefficient comparison is not meaningful.
+
+---
+
+## 5) Model fit statistics and constants don’t match
+
+### R² / Adj R²
+- Model 1: True R² 0.145 vs Generated 0.178
+- Model 2: True Adj R² 0.130 vs Generated 0.113
+
+**Fix:** These will generally align only after you align:
+- sample (N),
+- DV construction,
+- all IV coding,
+- and any weighting/design corrections.
+
+### Constant
+- Model 1 constant: 2.415*** vs 2.600***
+- Model 2 constant: 7.860 (no stars shown) vs 5.198***
+
+**Fix:** Even with standardized betas, the intercept depends on **DV scaling** and sample. If your DV construction differs even slightly (e.g., which genres included, dislike threshold), intercepts will change dramatically.
+
+---
+
+## 6) DV construction likely differs (and must match exactly)
+
+The DV labels are similar, but that’s not enough.
+
+- **Mismatch risk:** The paper’s DV is a **count of dislikes** across specified genres. If you:
+  - used different genre availability,
+  - different “dislike” coding (e.g., combining “dislike” and “strongly dislike” vs only one),
+  - different handling of “don’t know,” “never heard,” or missing,
+  - or different genre lists,
+  then coefficients and N will diverge.
+
+- **Fix:** Rebuild the two DV counts exactly as in the paper:
+  1. Confirm the exact list of the “6 genres disproportionately liked by Hispanic or Black respondents.”
+  2. Confirm the exact list of the “12 remaining genres.”
+  3. Confirm how “dislike” is defined from the raw response categories.
+  4. Confirm whether the count is over all genres or only those answered (i.e., denominator issues).
+
+---
+
+## 7) What to change in the generated analysis (actionable checklist)
+
+To make the generated output match Table 2:
+
+1. **Use Bryson’s analytic sample** (year, population, any exclusions).  
+2. **Reconstruct both DVs** using the exact genres and exact “dislike” definition.
+3. **Reconstruct IVs using the paper’s definitions**, especially:
+   - Racism score (items, scaling, direction),
+   - Conservative Protestant (not a proxy unless verified),
+   - Southern (correct region coding),
+   - Race/ethnicity (match coding rules; avoid ad hoc “Hispanic overrides” unless documented).
+4. **Fix “No religion” being dropped**
+   - Ensure it varies, avoid dummy-variable trap collinearity, and avoid post-filter constant collapse.
+5. **Replicate missing-data handling**
+   - If the paper used listwise deletion, replicate it—but with correct variable construction so you don’t create artificial missingness.
+   - If the paper used another approach (imputation, “missing” categories), match that.
+6. **Compute standardized coefficients the same way**
+   - Standardize using the same sample used in the regression (after exclusions), and confirm whether the paper standardized y and x or only x (Table says “standardized OLS coefficients,” typically both).
+7. **Only then compare stars, R², Adj R², constants, and N**.
+
+---
+
+If you paste your codebook mappings (which raw variables you used for racism, religion/denomination, region, and the exact genre items + dislike recode), I can pinpoint which specific recodes are producing each sign flip (especially prestige, Southern, and racism in Model 2).

@@ -1,46 +1,41 @@
-Dataset columns you need to reproduce **Figure 1** (Bryson 1996; **1993 GSS culture module**) are:
+Dataset columns you need to reproduce **Figure 1** (1993 GSS culture module):
 
-## 1) Filter to the correct survey year
-- `YEAR` (keep `YEAR == 1993`)
+## 1) Filter / identifiers
+- `YEAR` (to restrict to **1993**)
+- `ID` (not required for calculations, but useful for tracking respondents / merges)
 
-## 2) Education (only control in each logit)
-- `EDUC` (years of schooling; continuous)
+## 2) Control variable (used in every logit + for the “sample mean education” reference line)
+- `EDUC` (years of education; continuous)
 
-## 3) The 18 music-genre “taste” items (raw Likert responses)
-These are the source items you recode into **Dislike_g** and also use to compute **Tolerance_-g**:
+## 3) The 18 music-genre taste items (5-point like/dislike + DK/NA)
+These are the core inputs for:
+- each genre’s **dislike DV** (`dislike it` or `dislike very much`)
+- the **tolerance count** (number of other genres *not* disliked)
+- the **genre-audience education mean** (mean `EDUC` among those who “like” a genre)
 
-1. Latin/Salsa: `LATIN`
-2. Jazz: `JAZZ`
-3. Blues/R&B: `BLUES`
-4. Show tunes / musicals: `MUSICALS`
-5. Oldies: `OLDIES`
-6. Classical/chamber: `CLASSICL`
-7. Swing/Big Band: `BIGBAND`
-8. New Age/Space: `NEWAGE`
-9. Opera: `OPERA`
-10. Bluegrass: `BLUGRASS`
-11. Folk: `FOLK`
-12. Easy Listening: `MOODEASY`
-13. Pop/Contemporary Rock: `CONROCK`
-14. Reggae: `REGGAE`
-15. Rap: `RAP`
-16. Heavy Metal: `HVYMETAL`
-17. Country/Western: `COUNTRY`
-18. Gospel: `GOSPEL`
+Exact columns (as shown in your documentation):
+1. `LATIN` (Latin/Mariachi/Salsa)
+2. `JAZZ`
+3. `BLUES` (Blues or Rhythm and Blues)
+4. `MUSICALS` (Broadway musicals/show tunes)
+5. `OLDIES` (Oldies rock)
+6. `CLASSICL` (Classical—symphony & chamber)
+7. `BIGBAND` (Big Band/Swing)
+8. `NEWAGE` (New age/space music)
+9. `OPERA`
+10. `BLUGRASS` (Bluegrass)
+11. `FOLK`
+12. `REGGAE`
+13. `MOODEASY` (Mood/easy listening)
+14. `CONROCK` (Contemporary pop/rock)
+15. `RAP`
+16. `HVYMETAL` (Heavy metal)
+17. `COUNTRY` (Country/Western)
+18. `GOSPEL`
 
-These variables have the needed 1–5 scale where **4–5 = dislike/dislike very much**, and include “don’t know much about it” as special missing codes (in your extract represented as `NA(...)`).
+## Robust fallbacks if your extract uses different names
+If any of the above are missing in your file, look for the same 1993 music battery under alternate/legacy names like:
+- `MUSICLAT`, `MUSICJAZ`, `MUSICBLU`, `MUSICMUS`, `MUSICOLD`, `MUSICCLA`, `MUSICBIG`, `MUSICNEW`, `MUSICOPR`, `MUSICBLG`, `MUSICFOL`, `MUSICREG`, `MUSICEZL`, `MUSICPOP`/`MUSICROK`, `MUSICRAP`, `MUSICMET`, `MUSICCNT`, `MUSICGOS`
+or “LIKE/DISLIKE” prefixes such as `LIKEJAZZ`, `LIKEOPERA`, etc. (same response scale).
 
-## 4) Optional identifiers (not required for Figure 1, but useful)
-- `ID` (respondent id; for debugging/merging)
-
-## Robust fallbacks if your extract uses different genre column names
-If any of the above are missing in your file/version, search for:
-- Prefix patterns like `MUSIC*`, `LIK*`, `TASTE*`, or labels containing the genre strings (“Latin/Mariachi/Salsa”, “New age/space”, “Mood/easy listening”, “Contemporary pop/rock”, etc.).
-- Common alternate spellings seen in some GSS harmonizations:
-  - classical: `CLASSICAL` instead of `CLASSICL`
-  - heavy metal: `HEAVYMETAL` instead of `HVYMETAL`
-  - easy listening: `EASYLIST` / `EASY` instead of `MOODEASY`
-  - contemporary rock: `POPROCK` / `ROCK` instead of `CONROCK`
-  - show tunes: `SHOWTUNES` instead of `MUSICALS`
-
-But given your documentation, the **exact columns** for Figure 1 are `EDUC` plus the 18 genre items listed above (and `YEAR` to select 1993).
+Those 20 variables (`YEAR`, `ID`, `EDUC`, and the 18 genre items) are sufficient to compute every element plotted in Figure 1.

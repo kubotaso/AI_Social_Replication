@@ -1,0 +1,33 @@
+Traceback (most recent call last):
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Table2.py", line 286, in try_run_generated_code
+    result = mod.run_analysis(str(data_path))  # type: ignore[attr-defined]
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260130_222138/Table2/generated_analysis_retry_34.py", line 179, in run_analysis
+    df["hispanic"] = np.where(eth.notna(), eth.astype(int).isin(list(candidate_band)).astype(float), np.nan)
+                                           ~~~~~~~~~~^^^^^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/generic.py", line 6665, in astype
+    new_data = self._mgr.astype(dtype=dtype, copy=copy, errors=errors)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/internals/managers.py", line 449, in astype
+    return self.apply(
+           ~~~~~~~~~~^
+        "astype",
+        ^^^^^^^^^
+    ...<3 lines>...
+        using_cow=using_copy_on_write(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/internals/managers.py", line 363, in apply
+    applied = getattr(b, f)(**kwargs)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/internals/blocks.py", line 784, in astype
+    new_values = astype_array_safe(values, dtype, copy=copy, errors=errors)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/dtypes/astype.py", line 237, in astype_array_safe
+    new_values = astype_array(values, dtype, copy=copy)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/dtypes/astype.py", line 182, in astype_array
+    values = _astype_nansafe(values, dtype, copy=copy)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/dtypes/astype.py", line 101, in _astype_nansafe
+    return _astype_float_to_int_nansafe(arr, dtype, copy)
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/dtypes/astype.py", line 145, in _astype_float_to_int_nansafe
+    raise IntCastingNaNError(
+        "Cannot convert non-finite values (NA or inf) to integer"
+    )
+pandas.errors.IntCastingNaNError: Cannot convert non-finite values (NA or inf) to integer

@@ -1,129 +1,244 @@
-Score: 37/100
+Score: 32/100
 ============================================================
 
-## Discrepancy report (GT Fig. 1 vs generated)
+## Discrepancy report (ground-truth Fig. 1 vs generated)
 
-### 1) X-axis categories and ordering
-- **Order is reversed / different.**
-  - **GT order (left→right):** `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
-  - **Generated order (left→right):** starts at `Gospel …` and ends at `Latin/Salsa` (roughly reversed) and also differs in the middle.
-- **Category names differ (mismatched labels / merged groups).**
-  - GT has **Pop/Rock**; generated uses **Pop/Contemporary Rock**.
-  - GT has **Classical**; generated uses **Classical/Chamber**.
-  - GT has **Country**; generated uses **Country/Western**.
-  - GT includes **Swing** (standalone); generated includes **Swing/Big Band**.
-  - GT includes **New Age/Space**; generated has it but ordering differs.
+### 1) X-axis category set, names, and order
+**Ground-truth:**
+Order (left→right):  
+`Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
 
-### 2) Which series maps to which y-axis (swapped)
-- **GT:**  
-  - **Solid line** = *Coefficient for Musical Tolerance* (left axis, negative values).  
-  - **Dashed line** = *Mean Education of Genre Audience* (right axis, ~12–15).
-- **Generated:** the **dotted** series is plotted on the **left axis** (negative scale) but labeled as education; the education curve appears to be treated like a negative-valued series. Net effect: **education and coefficient are effectively swapped/mis-scaled.**
+**Generated:**
+Order (left→right):  
+`Gospel, Country/Western, Heavy Metal, Rap, Pop/Contemporary Rock, Opera, Easy Listening, Folk, Oldies, Bluegrass, New Age/Space, Classical/Chamber, Reggae, Swing/Big Band, Show Tunes, Latin/Salsa, Jazz, Blues/R&B`
 
-### 3) Line styles (don’t match)
-- **GT:** education is **dash-dot** (or long dash pattern); coefficient is **solid**.
-- **Generated:** education is **dotted**; coefficient is **solid** (solid ok, education style not).
-
-### 4) Horizontal reference line (sample mean education) is wrong axis, value, and style
-- **GT:** “Sample Mean Education” is a **horizontal dotted line** on the **right axis** at approximately **13.0**.
-- **Generated:** horizontal line is **solid** and drawn at about **-0.31** on the **left axis** (incorrect variable/axis/value/style).
-
-### 5) Axis ranges and tick formatting
-- **Left y-axis (coefficients):**
-  - **GT:** approx **-0.50 to -0.10** with ticks at **-0.5, -0.4, -0.3, -0.2, -0.1** (one decimal).
-  - **Generated:** top is **-0.10** but bottom looks around **-0.47**, and tick density/format differs (two decimals shown on some ticks).
-- **Right y-axis (education):**
-  - **GT:** **12 to 15** with integer ticks **12, 13, 14, 15**.
-  - **Generated:** ticks shown around **12.5–14.0** (not integer endpoints), indicating **wrong limits and tick locations**.
-
-### 6) Annotations / callouts differ
-- **GT:** has angled leader lines pointing to each series label (“Mean Education…” and “Coefficient…”) and an **arrow pointing upward** to the sample mean line.
-- **Generated:** text is placed directly on top of the lines (no leader lines like GT), and the “Coefficient…” label overlaps the reference line; the sample mean label has no arrow.
-
-### 7) Visual styling (gridlines)
-- **GT:** no (or minimal) gridlines; classic black/white look.
-- **Generated:** visible horizontal gridlines.
+**Exact discrepancies:**
+- **Reversed / different ordering** (GT starts with Latin/Salsa; generated starts with Gospel).
+- **Renamed categories** not matching GT:
+  - `Country/Western` vs **GT: `Country`**
+  - `Pop/Contemporary Rock` vs **GT: `Pop/Rock`**
+  - `Classical/Chamber` vs **GT: `Classical`**
+  - `Swing/Big Band` vs **GT: `Swing`**
+- **Missing category present in GT:** `Rock` / `PopRock`?  
+  GT has **`Pop/Rock`** only; generated uses **`Pop/Contemporary Rock`** (likely a different column/label mapping).
+- **Extra/merged subgenres** in generated (Chamber, Big Band, Contemporary) that are not in GT labels.
 
 ---
 
-## Exact fixes (data processing + matplotlib changes)
+### 2) Which series is mapped to which axis (and which line style)
+**Ground-truth:**
+- **Solid line** = **Coefficient for Musical Tolerance** (left y-axis, negative values around -0.2 to -0.45)
+- **Dash-dot line** = **Mean Education of Genre Audience** (right y-axis, 12–15)
 
-### Data / preprocessing
-- **Use the exact GT category set and names** (no merged genres):
-  - Replace/rename:
-    - `Pop/Contemporary Rock → Pop/Rock`
-    - `Classical/Chamber → Classical`
-    - `Country/Western → Country`
-    - `Swing/Big Band → Swing`
-- **Enforce GT x-order explicitly** (do not sort by coefficient/education):
+**Generated:**
+- **Dashed line** appears to be the **coefficient** (left y-axis).
+- **Solid line** appears to be **education** (right y-axis), with a spike up to ~14.0 around New Age/Space.
+
+**Exact discrepancies:**
+- **Line styles swapped** relative to GT (coeff should be solid; education should be dash-dot).
+- Likely **series-to-axis mapping swapped** (education should be on the right axis; coefficient on the left).
+
+---
+
+### 3) Y-axis ranges, ticks, and tick formatting
+**Ground-truth left axis (coefficients):**
+- Range: **-0.5 to -0.1**
+- Tick labels shown as **“.1, .2, .3, .4, .5”** with leading dot and negative sign implied by placement (stylized formatting).
+
+**Generated left axis:**
+- Range: approximately **-0.38 to 0.02**
+- Ticks labeled with **0.00, -0.05, -0.10, ...** (linear, with 0 included).
+
+**Exact discrepancies:**
+- **Wrong left-axis limits** (should be [-0.5, -0.1], not including 0).
+- **Wrong tick locations** (should be at -0.5, -0.4, -0.3, -0.2, -0.1).
+- **Wrong tick label formatting** (GT uses “.1” style; generated uses standard decimals).
+
+**Ground-truth right axis (education):**
+- Range: **12 to 15** with integer ticks.
+
+**Generated right axis:**
+- Range: roughly **12.4 to 14.0** with ticks every 0.2.
+
+**Exact discrepancies:**
+- **Wrong right-axis limits** (should be [12, 15]).
+- **Wrong tick spacing/labels** (should be integers 12, 13, 14, 15).
+
+---
+
+### 4) Reference line (“Sample Mean Education”)
+**Ground-truth:**
+- Horizontal **dotted** line at **education = 13** on the **right axis**, labeled “Sample Mean Education” with an arrow pointing to the line.
+
+**Generated:**
+- Dotted line drawn around **-0.25** on the **left axis** (visually aligned to left scale), label placed at right.
+
+**Exact discrepancies:**
+- **Reference line drawn in the wrong coordinate system/axis** (must be y=13 on right axis, not y≈-0.25 on left).
+- Annotation placement differs (GT arrow points upward from below near mid-plot).
+
+---
+
+### 5) Annotations and text placement
+**Ground-truth includes:**
+- “Mean Education of Genre Audience” with an arrow pointing to the **dash-dot** education line (upper left-ish).
+- “Coefficient for Musical Tolerance” with an arrow pointing to the **solid** coefficient line (lower left-ish).
+- “Sample Mean Education” with arrow pointing to dotted reference line near the center.
+
+**Generated:**
+- “Mean Education…” placed near the top center pointing to near-zero area (likely wrong series).
+- “Coefficient…” points to dashed line mid-right (style/series mismatch).
+- “Sample Mean Education” label at far right; arrow missing or not matching GT.
+
+**Exact discrepancies:**
+- Annotation targets point to the **wrong series** because line styles/axis mapping differ.
+- Annotation positions differ substantially from GT.
+
+---
+
+### 6) Styling: line styles
+**Ground-truth:**
+- Coefficient: **solid**, medium thickness.
+- Education: **dash-dot** (not dashed).
+
+**Generated:**
+- Coefficient: **dashed**.
+- Education: **solid**.
+
+**Exact discrepancy:**
+- Missing **dash-dot** style entirely.
+
+---
+
+### 7) Title/caption and axis labels
+**Ground-truth:**
+- No long top caption inside the plot area; the figure is styled like a paper figure with internal labels and big bold axis titles:
+  - Left y: “Coefficients for Musical Tolerance as It Affects One’s Probability of Disliking Each Music Genre”
+  - Right y: “Mean Educational Level of Respondents Who Reported Liking Each Music Genre”
+  - X: “Type of Music”
+
+**Generated:**
+- Adds a long title: “Figure 1. The Effect of Being Musically Tolerant…” at top.
+- Left y label wording differs (“…Disliking Each Individual” etc).
+- X label missing “Type of Music” and overall typography differs.
+
+**Exact discrepancies:**
+- **Text not matching** GT (caption vs none; label wording differs; emphasis/bold/rotation differs).
+
+---
+
+## Step-by-step fixes (data processing + matplotlib)
+
+### A) Force exact category labels + order (most important)
+- Create a canonical ordered list exactly matching GT:
   ```python
   order = ["Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical",
            "Reggae","Swing","New Age/Space","Opera","Bluegrass","Folk",
            "Easy Listening","Pop/Rock","Rap","Heavy Metal","Country","Gospel"]
-  df = df.set_index("genre").loc[order].reset_index()
   ```
-- **Keep variables on their correct scales**:
-  - `coef_tolerance` must be the negative coefficient values (left axis).
-  - `mean_edu` must be education in years (~12–15) (right axis).
-  - Remove any normalization/standardization applied to education (no z-score/min-max).
-
-### Matplotlib / plotting calls
-- **Plot coefficient on left axis (solid)** and education on right axis (dash-dot)**:
+- Rename your dataset categories to match GT **before plotting**:
   ```python
-  x = np.arange(len(df))
-  fig, ax = plt.subplots(figsize=(10.5, 5.5), dpi=150)
-
-  ax.plot(x, df["coef_tolerance"], color="black", lw=2.0, ls="-")
-  ax.set_ylim(-0.5, -0.1)
-  ax.set_yticks([-0.5,-0.4,-0.3,-0.2,-0.1])
-  ax.yaxis.set_major_formatter(mticker.FormatStrFormatter('%.1f'))
+  rename = {
+      "Country/Western": "Country",
+      "Pop/Contemporary Rock": "Pop/Rock",
+      "Classical/Chamber": "Classical",
+      "Swing/Big Band": "Swing",
+  }
+  df["genre"] = df["genre"].replace(rename)
   ```
+- Reindex/sort both series to this order and **drop anything not in `order`**:
+  ```python
+  df = df[df["genre"].isin(order)].copy()
+  df["genre"] = pd.Categorical(df["genre"], categories=order, ordered=True)
+  df = df.sort_values("genre")
+  ```
+
+### B) Ensure the correct series is on the correct axis
+- Left axis must plot **coefficient for musical tolerance**; right axis must plot **mean education**.
+  ```python
+  x = np.arange(len(order))
+  coef = df["coef"].to_numpy()       # left axis
+  edu  = df["mean_edu"].to_numpy()   # right axis
+  ```
+
+### C) Match line styles exactly (solid vs dash-dot)
+- Plot coefficients as **solid**:
+  ```python
+  l1, = ax.plot(x, coef, color="black", lw=2.0, ls="-")
+  ```
+- Plot education as **dash-dot** on the twin axis:
   ```python
   ax2 = ax.twinx()
-  ax2.plot(x, df["mean_edu"], color="black", lw=2.0, ls="-.")  # match GT dash style
-  ax2.set_ylim(12, 15)
-  ax2.set_yticks([12,13,14,15])
+  l2, = ax2.plot(x, edu, color="black", lw=2.0, ls="-.")
   ```
-- **Draw sample mean education on the RIGHT axis with dotted style**:
+- Do **not** use markers.
+
+### D) Fix axis limits and ticks to match GT
+- Left axis (coefficients): set limits and ticks:
   ```python
-  sample_mean_edu = df_all["education"].mean()   # from respondent-level data, not genre means
-  ax2.axhline(sample_mean_edu, color="black", lw=1.0, ls=":")
+  ax.set_ylim(-0.5, -0.1)
+  ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])
   ```
-- **Fix x-ticks rotation/placement to match GT**:
+- Format left tick labels to the “.1” style used in GT:
+  ```python
+  from matplotlib.ticker import FuncFormatter
+  ax.yaxis.set_major_formatter(FuncFormatter(lambda v, p: f"{v:.1f}".replace("0.", ".").replace("-0.", "-.")))
+  ```
+- Right axis (education): set limits and integer ticks:
+  ```python
+  ax2.set_ylim(12, 15)
+  ax2.set_yticks([12, 13, 14, 15])
+  ```
+
+### E) Draw “Sample Mean Education” line on the RIGHT axis at y=13
+- Use `ax2.axhline`, not `ax.axhline`:
+  ```python
+  ax2.axhline(13, color="black", lw=1.0, ls=":", zorder=0)
+  ```
+- Place the label/arrow pointing to that line (in right-axis coordinates):
+  ```python
+  ax2.annotate("Sample Mean Education",
+               xy=(len(order)*0.35, 13), xycoords=("data","data"),
+               xytext=(len(order)*0.35, 12.75), textcoords=("data","data"),
+               arrowprops=dict(arrowstyle="-|>", color="black", lw=1.0),
+               ha="center", va="top")
+  ```
+
+### F) Make x-ticks match GT (labels + rotation)
+- Set ticks/labels in the GT order and rotate like the original:
   ```python
   ax.set_xticks(x)
-  ax.set_xticklabels(order, rotation=45, ha="right")  # ~45° like GT
-  ax.set_xlabel("Type of Music", fontweight="bold")
+  ax.set_xticklabels(order, rotation=45, ha="right")
+  ax.set_xlabel("Type of Music")
   ```
-- **Remove gridlines to match GT**:
-  ```python
-  ax.grid(False)
-  ax2.grid(False)
-  ```
-- **Match GT annotations with leader lines/arrows** (example positions; tune `xy`/`xytext`):
+
+### G) Match annotations to the correct lines
+- Recreate the three text callouts and ensure arrows point to the correct line objects:
   ```python
   ax2.annotate("Mean Education of Genre Audience",
-               xy=(2, df["mean_edu"].iloc[2]), xycoords=("data","data"),
-               xytext=(1.5, 14.2), textcoords=("data","data"),
-               arrowprops=dict(arrowstyle="-", color="black", lw=1.0),
-               fontsize=11, fontweight="bold")
+               xy=(2, edu[2]), xytext=(1, 14.3),
+               arrowprops=dict(arrowstyle="-", lw=1.0, color="black"),
+               ha="left")
 
   ax.annotate("Coefficient for Musical Tolerance",
-              xy=(2, df["coef_tolerance"].iloc[2]), xycoords=("data","data"),
-              xytext=(2.2, -0.47), textcoords=("data","data"),
-              arrowprops=dict(arrowstyle="-", color="black", lw=1.0),
-              fontsize=11, fontweight="bold")
-
-  ax2.annotate("Sample Mean Education",
-               xy=(6, sample_mean_edu), xycoords=("data","data"),
-               xytext=(6, 12.7), textcoords=("data","data"),
-               ha="center",
-               arrowprops=dict(arrowstyle="-|>", color="black", lw=1.0))
+              xy=(2, coef[2]), xytext=(1.5, -0.46),
+              arrowprops=dict(arrowstyle="-", lw=1.0, color="black"),
+              ha="left")
   ```
-- **Ensure monochrome styling** (no markers):
+  (Adjust `xy` and `xytext` indices to visually match GT’s placements.)
+
+### H) Remove the generated long title; use axis labels like GT
+- Remove `plt.title(...)` entirely (GT doesn’t show that long caption inside the plot).
+- Set left/right y-labels exactly (verbatim) and rotate/weight if needed:
   ```python
-  # Do not pass marker=...
-  # Keep both lines black.
+  ax.set_ylabel("Coefficients for Musical Tolerance as It Affects\nOne’s Probability of Disliking Each Music Genre",
+                fontweight="bold")
+  ax2.set_ylabel("Mean Educational Level of Respondents Who\nReported Liking Each Music Genre",
+                 fontweight="bold", rotation=270, labelpad=25)
   ```
 
-If you share the code that produced the generated plot (or the dataframe columns), I can point to the exact lines to change (e.g., where sorting/relabeling and axis assignment went wrong).
+### I) Ensure no smoothing/aggregation differences
+- If you currently smooth (rolling mean) or reorder by value, **disable it**.
+- Use the raw per-genre coefficients and per-genre mean education values **without sorting by either series**—sort only by the fixed `order`.
+
+If you paste the code that produced the generated figure (especially how you compute `coef` and `mean_edu`, and how you order genres), I can point to the exact lines to change and provide a drop-in corrected snippet.

@@ -1,149 +1,173 @@
-Score: 63/100
+Score: 65/100
 ============================================================
 
-### 1) Row items/categories: missing and incorrect rows
+### 1) Row items / categories (names and number of items)
 
-**True Table 3 has 8 rows per genre:**
-1. (1) Like very much  
-2. (2) Like it  
-3. (3) Mixed feelings  
-4. (4) Dislike it  
-5. (5) Dislike very much  
-6. (M) Don’t know much about it  
-7. (M) No answer  
-8. Mean  
+**Mismatch: “Opera” column name got mangled into the header**
+- **Generated header** includes a single combined label: **“New Age/Space Opera”**.
+- **True table (Panel 2)** has **two separate columns**: **“New Age/Space”** and **“Opera”**.
+- However, your generated table *does* show two distinct columns’ worth of numbers in that region (one under “New Age/Space” and one under “Opera”), but the header text is wrong/merged.
 
-**Generated table has only 8 numeric rows, but rows 6–7 are wrong:**
-- Row 6 in the generated table contains numbers, but it **does not match** the true “Don’t know much about it” counts.
-- Row 7 in the generated table is **all zeros**, but the true table has **nonzero “No answer”** counts for every genre.
-- The generated output also **omits the row labels entirely**, making it easy to misinterpret which row is which.
+**How to fix**
+- Split/rename the headers to exactly match the true table:
+  - `New Age/Space`
+  - `Opera`
+- Ensure column count stays at 18 genres total, with these as two separate genre variables.
 
-**Fix:**  
-Output Table 3 with explicit row labels and include both missingness categories as separate rows:
-- Add a “(M) Don’t know much about it” row with the correct counts.
-- Add a “(M) No answer” row with the correct counts (not zeros).
-- Ensure ordering matches the true table.
+**Mismatch: Missing the “Don’t know much about it” row (values replaced with zeros)**
+- **Generated** row: `(M) Don’t know much about it` is **all 0** for every genre.
+- **True** table: this row has **nonzero counts** for every genre.
 
----
+**How to fix**
+- Populate `(M) Don’t know much about it` with the correct counts (listed below in section 2).
+- This is likely a coding/recoding issue where that response category was dropped or mapped to missing and then printed as 0.
 
-### 2) Column items/categories: columns match, but the content in missingness rows does not
+**Mismatch: “No answer” row exists but values are wrong (they look like the true DK counts)**
+- Generated `(M) No answer` counts are large (e.g., Latin/Salsa 233), which is impossible given the true “No answer” values are ~10–15.
+- This indicates the generated “No answer” row is actually carrying the **true DK (“Don’t know much about it”) counts**, not the true “No answer” counts.
 
-**Columns present:** The generated table includes all 18 genres (Latin/Salsa … Gospel). No extra or missing genre columns.
-
-**However:** because the “Don’t know…” and “No answer” rows are wrong, the *effective* category structure per column does not match the true table.
-
-**Fix:** Keep the same 18 columns, but correct rows 6–7 values.
+**How to fix**
+- Correct the mapping of missing codes:
+  - Map the survey code for **“Don’t know much about it”** to the DK row.
+  - Map the survey code for **“No answer”** to the No answer row.
+  - Do not collapse these two categories together.
 
 ---
 
-### 3) Frequency count mismatches (by response category)
+### 2) Frequency count mismatches (by row/category)
 
-#### A) Rows (1)–(5): appear to match the true table
-For all 18 genres, the generated counts for:
-- Like very much
-- Like it
-- Mixed feelings
-- Dislike it
-- Dislike very much
+#### Rows (1)–(5): Like/Dislike categories
+For **every genre**, the generated counts for:
+- (1) Like very much
+- (2) Like it
+- (3) Mixed feelings
+- (4) Dislike it
+- (5) Dislike very much
 
-**match the true table exactly** (spot checks across all three panels show perfect agreement).
-
-No fixes needed for rows 1–5.
-
----
-
-#### B) Row (M) “Don’t know much about it”: **mismatched for every genre**
-The generated table’s 6th numeric row is:
-
-- Latin/Salsa 233 (true **221**)
-- Jazz 53 (true **38**)
-- Blues/R&B 68 (true **56**)
-- Show Tunes 91 (true **77**)
-- Oldies 51 (true **41**)
-- Classical/Chamber 77 (true **66**)
-- Reggae 306 (true **295**)
-- Swing/Big Band 176 (true **164**)
-- New Age/Space 306 (true **292**)
-- Opera 96 (true **83**)
-- Bluegrass 174 (true **163**)
-- Folk 90 (true **78**)
-- Pop/Easy Listening 85 (true **72**)
-- Contemporary Rock 62 (true **50**)
-- Rap 72 (true **61**)
-- Heavy Metal 80 (true **70**)
-- Country/Western 32 (true **22**)
-- Gospel 47 (true **35**)
-
-So the generated “Don’t know much about it” counts are consistently too high.
-
-**Fix:** Replace the entire “Don’t know much about it” row with the true values:
-
-Latin/Salsa **221**, Jazz **38**, Blues/R&B **56**, Show Tunes **77**, Oldies **41**, Classical/Chamber **66**,  
-Reggae **295**, Swing/Big Band **164**, New Age/Space **292**, Opera **83**, Bluegrass **163**, Folk **78**,  
-Pop/Easy Listening **72**, Contemporary Rock **50**, Rap **61**, Heavy Metal **70**, Country/Western **22**, Gospel **35**.
+**match the true table exactly.**  
+So the only frequency problems are in the two “M” rows.
 
 ---
 
-#### C) Row (M) “No answer”: **missing entirely (shown as all zeros)**
-The generated 7th numeric row is all 0.000000, but the true table has:
+#### (M) Don’t know much about it — generated is all zeros (should not be)
 
-- Latin/Salsa **12**
-- Jazz **15**
-- Blues/R&B **12**
-- Show Tunes **14**
-- Oldies **10**
-- Classical/Chamber **11**
-- Reggae **11**
-- Swing/Big Band **12**
-- New Age/Space **14**
-- Opera **13**
-- Bluegrass **11**
-- Folk **12**
-- Pop/Easy Listening **13**
-- Contemporary Rock **12**
-- Rap **11**
-- Heavy Metal **10**
-- Country/Western **10**
-- Gospel **12**
+**True DK counts (must replace the zeros):**
 
-**Fix:** Replace the all-zero row with these “No answer” counts and label it correctly.
+**Panel 1 (Latin/Salsa–Classical/Chamber)**
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
 
----
+**Panel 2 (Reggae–Folk)**
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
 
-### 4) Summary statistics (means): match; but they’ll be inconsistent with the incorrect missingness rows
+**Panel 3 (Pop/Easy Listening–Gospel)**
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
 
-The generated **Mean** row values match the true table (to the displayed precision) for all 18 genres:
-- e.g., Latin/Salsa 3.142753 (~3.14), Jazz 2.60528 (~2.61), Rap 3.921773 (~3.92), Heavy Metal 4.122543 (~4.12), etc.
-
-**But:** With the generated (incorrect) missingness counts, the means would generally not reconcile with totals if someone recomputed them (depending on the denominator used). In the true table, the mean is presumably computed on valid attitude responses (1–5), excluding missing categories.
-
-**Fix:** After correcting missingness rows, ensure mean computation rules match the true approach:
-- Compute mean using only categories (1)–(5) as valid responses (exclude both M categories).
-- Round to two decimals for presentation (as in the true table).
+**Fix**
+- In your tabulation, ensure DK is counted as its own category, not treated as missing/excluded.
 
 ---
 
-### 5) Missing/extra column categories (response options)
+#### (M) No answer — generated values are wrong for every genre
 
-**True table includes two missing categories:**
-- “(M) Don’t know much about it”
-- “(M) No answer”
+Generated “No answer” equals (or closely tracks) the **true DK** counts instead of the true No answer counts.
 
-**Generated table effectively has:**
-- A wrong “Don’t know…” row (values don’t match)
-- A “No answer” row incorrectly set to zero
+Below are the **true “No answer”** counts you should have:
 
-**Fix:** Ensure both missing categories are present and correctly populated, not collapsed, not overwritten, and not default-filled with zeros.
+**Panel 1**
+- Latin/Salsa **12** (generated 233)
+- Jazz **15** (generated 53)
+- Blues/R&B **12** (generated 68)
+- Show Tunes **14** (generated 91)
+- Oldies **10** (generated 51)
+- Classical/Chamber **11** (generated 77)
+
+**Panel 2**
+- Reggae **11** (generated 306)
+- Swing/Big Band **12** (generated 176)
+- New Age/Space **14** (generated 306)
+- Opera **13** (generated 96)
+- Bluegrass **11** (generated 174)
+- Folk **12** (generated 90)
+
+**Panel 3**
+- Pop/Easy Listening **13** (generated 85)
+- Contemporary Rock **12** (generated 62)
+- Rap **11** (generated 72)
+- Heavy Metal **10** (generated 80)
+- Country/Western **10** (generated 32)
+- Gospel **12** (generated 47)
+
+**Fix**
+- Correctly assign the survey’s “No answer” code to the “No answer” row.
+- Do not substitute DK into No answer (or vice versa).
+- If you’re using labeled factors, verify that labels match numeric codes (common failure: swapping code labels).
 
 ---
 
-## What to change in the generated analysis so it matches the true table
+### 3) Percentages
+- The generated output shows **counts only**, not percentages.
+- The true table also shows **counts only** (plus means).
 
-1. **Add row labels** and enforce the 8-row structure exactly as Table 3.
-2. **Replace the generated row 6** with the true “Don’t know much about it” counts (listed above).
-3. **Replace the generated row 7 (zeros)** with the true “No answer” counts (listed above).
-4. **Keep rows 1–5 and means** as they are (they already match).
-5. If the table was produced programmatically: ensure missing codes for “don’t know” and “no answer” are not:
-   - being reclassified into each other,
-   - being mistakenly counted as valid categories,
-   - or being dropped and then replaced with zeros during reshaping/pivoting.
+So: **no percentage mismatches to report** (none provided).
+
+If you intended percentages, you’d need:
+- consistent denominators (usually including/excluding DK/NA must match the true table’s convention).
+
+---
+
+### 4) Summary statistics (Means)
+
+**Means match perfectly for every genre.**
+- Latin/Salsa 3.14, Jazz 2.61, … Gospel 2.39 all align.
+
+**But there is an internal inconsistency to fix:**  
+Your mean computation clearly **excluded DK and No answer** (as it should for a 1–5 attitude mean), but your printed missing-category frequencies are wrong (DK shown as 0; No answer inflated). This will confuse readers because the distribution doesn’t reconcile with the mean logic.
+
+**Fix**
+- Keep the mean calculation excluding DK/NA.
+- Fix DK/NA counts so the full distribution is coherent.
+
+---
+
+### 5) Missing or extra column categories
+
+**Extra/incorrect column label**
+- “New Age/Space Opera” should be split into **two columns**:
+  - “New Age/Space”
+  - “Opera”
+
+**No other missing/extra genres**
+- All 18 genres are present in the generated output (despite the header merge).
+
+---
+
+## Root cause diagnosis (why this happened) + concrete fix
+This pattern strongly indicates the code that builds the frequency table:
+1. **Dropped DK** from the tabulation (treating it as missing), hence zeros.
+2. **Mis-assigned DK counts into the “No answer” bucket**, hence huge “No answer.”
+3. **Merged two adjacent column labels** for New Age/Space and Opera.
+
+**To fix in analysis code**
+- Ensure your value mapping is correct, e.g.:
+  - 1–5 = substantive responses
+  - a specific code (e.g., 8/9/0 depending on dataset) = DK
+  - another code = No answer
+- Tabulate with explicit category levels, e.g. set factor levels to include DK and No answer rather than dropping “missing.”
+- Build the header from the actual variable names (not concatenated strings), and verify you have two separate variables/columns for New Age/Space and Opera.
+
+If you tell me what software you used (R/Stata/SPSS/Python) and the raw codes for DK/NA, I can give the exact recode/tabulation commands to make the generated table match the true one.

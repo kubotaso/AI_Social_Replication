@@ -6,290 +6,462 @@ def run_analysis(data_source):
 
     os.makedirs("./output", exist_ok=True)
 
-    def _to_num(s):
-        return pd.to_numeric(s, errors="coerce")
+    # -----------------------------
+    # Load + normalize columns
+    # -----------------------------
+    df = pd.read_csv(data_source)
+    df.columns = [c.strip().lower() for c in df.columns]
 
-    def _clean_na_codes(series):
-        """
-        GSS-style numeric fields sometimes use special high codes (e.g., 8/9, 98/99, 998/999).
-        We only have a subset extract here, so apply a conservative rule:
-        - treat <=0 as missing for variables that should be positive (handled elsewhere),
-        - treat very large sentinel-like values as missing.
-        """
-        x = _to_num(series).copy()
-        # common sentinel bands in GSS extracts; keep conservative to avoid nuking valid data
-        x = x.mask(x.isin([8, 9, 98, 99, 998, 999, 9998, 9999]))
-        return x
+    if "year" not in df.columns:
+        raise ValueError("Expected column 'year' in the input CSV.")
+    if "id" not in df.columns:
+        df["id"] = np.arange(len(df), dtype=int)
 
-    def _likert_dislike_indicator(item_series):
-        """
-        Music taste items: 1-5 scale where 4/5 indicate dislike.
-        Missing if outside 1-5 or NA-coded.
-        """
-        x = _clean_na_codes(item_series)
-        x = x.where(x.between(1, 5))
+    # Restrict to 1993 only (per Table 2)
+    df = df.loc[df["year"] == 1993].copy()
+
+    # Coerce to numeric (except id)
+    for c in df.columns:
+        if c != "id":
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    # -----------------------------
+    # Variable lists per mapping
+    # -----------------------------
+    minority_genres = ["rap", "reggae", "blues", "jazz", "gospel", "latin"]
+    remaining_genres = [
+        "bigband", "blugrass", "country", "musicals", "classicl", "folk",
+        "moodeasy", "newage", "opera", "conrock", "oldies", "hvymetal"
+    ]
+    racism_items = ["rachaf", "busing", "racdif1", "racdif3", "racdif4"]
+
+    required = (
+        ["year", "id", "hompop", "educ", "realinc", "prestg80", "sex", "age", "race", "relig", "denom", "region"]
+        + minority_genres + remaining_genres + racism_items
+    )
+    missing_cols = [c for c in required if c not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Missing expected columns: {missing_cols}")
+
+    # -----------------------------
+    # Helpers
+    # -----------------------------
+    def write_text(path, text):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(str(text).rstrip() + "\n")
+
+    def fmt(x, nd=3):
+        if x is None or (isinstance(x, float) and np.isnan(x)):
+            return ""
+        try:
+            return f"{float(x):.{nd}f}"
+        except Exception:
+            return ""
+
+    def star_from_p(p):
+        try:
+            if p is None or pd.isna(p):
+                return ""
+            p = float(p)
+        except Exception:
+            return ""
+        if p < 0.001:
+            return "***"
+        if p < 0.01:
+            return "**"
+        if p < 0.05:
+            return "*"
+        return ""
+
+    def dislike_indicator(series):
+        # 1 if response is 4/5; 0 if 1/2/3; else missing
+        x = pd.to_numeric(series, errors="coerce")
         out = pd.Series(np.nan, index=x.index, dtype="float64")
         out.loc[x.isin([1, 2, 3])] = 0.0
         out.loc[x.isin([4, 5])] = 1.0
         return out
 
-    def _binary_from_codes(series, true_codes, false_codes):
-        x = _clean_na_codes(series)
+    def dich(series, ones, zeros):
+        # Map to {0,1}; anything else missing
+        x = pd.to_numeric(series, errors="coerce")
         out = pd.Series(np.nan, index=x.index, dtype="float64")
-        out.loc[x.isin(false_codes)] = 0.0
-        out.loc[x.isin(true_codes)] = 1.0
+        out.loc[x.isin(list(zeros))] = 0.0
+        out.loc[x.isin(list(ones))] = 1.0
         return out
 
-    def _zscore(s):
-        s = _to_num(s)
-        mu = s.mean(skipna=True)
-        sd = s.std(skipna=True, ddof=0)
-        if not np.isfinite(sd) or sd == 0:
-            return s * np.nan
-        return (s - mu) / sd
+    def strict_sum(dfin, cols):
+        # Row sum; missing if ANY component missing
+        return dfin[cols].sum(axis=1, skipna=False)
 
-    def _build_count(df, items):
-        """
-        Sum of dislike indicators. To mirror 'DK treated as missing and missing cases excluded',
-        require all component items observed (complete-case) for the DV.
-        """
-        cols = []
-        for c in items:
-            cols.append(_likert_dislike_indicator(df[c]).rename(c + "_dislike"))
-        mat = pd.concat(cols, axis=1)
-        count = mat.sum(axis=1, min_count=len(items))
-        return count
+    def standardized_betas_from_unstd(fit, d, ycol, xcols):
+        # beta_j = b_j * SD(x_j) / SD(y) on analytic sample (ddof=0)
+        y = pd.to_numeric(d[ycol], errors="coerce").astype(float)
+        sd_y = y.std(ddof=0)
+        betas = {}
+        for x in xcols:
+            sx = pd.to_numeric(d[x], errors="coerce").astype(float)
+            sd_x = sx.std(ddof=0)
+            b = fit.params.get(x, np.nan)
+            if pd.isna(b) or pd.isna(sd_x) or pd.isna(sd_y) or sd_x == 0 or sd_y == 0:
+                betas[x] = np.nan
+            else:
+                betas[x] = float(b * (sd_x / sd_y))
+        return pd.Series(betas)
 
-    def _standardized_ols(df, dv, xcols, model_name):
-        """
-        Standardize y and each x (including dummies) over the estimation sample,
-        then run OLS with intercept. Returns model, coefficient table, fit dict, and used index.
-        """
-        needed = [dv] + xcols
-        d = df[needed].copy()
+    def value_counts_full(s):
+        s = pd.to_numeric(s, errors="coerce")
+        return s.value_counts(dropna=False).sort_index()
 
-        # Replace inf with nan
-        d = d.replace([np.inf, -np.inf], np.nan)
+    # -----------------------------
+    # Dependent variables: strict dislike counts (missing if any component missing)
+    # -----------------------------
+    for g in minority_genres + remaining_genres:
+        df[f"d_{g}"] = dislike_indicator(df[g])
 
-        # Complete-case for this model
-        d = d.dropna(axis=0, how="any")
-        if d.shape[0] < (len(xcols) + 2):
-            raise ValueError(f"{model_name}: not enough complete cases (n={d.shape[0]}, k={len(xcols)}).")
+    dv1 = "dv1_minority6"
+    dv2 = "dv2_remaining12"
+    df[dv1] = strict_sum(df, [f"d_{g}" for g in minority_genres])   # 0..6
+    df[dv2] = strict_sum(df, [f"d_{g}" for g in remaining_genres])  # 0..12
 
-        y = _zscore(d[dv])
-        Xz = {}
-        for c in xcols:
-            Xz[c] = _zscore(d[c])
-        X = pd.DataFrame(Xz, index=d.index)
+    # -----------------------------
+    # Racism score (0..5): strict 5/5 items present per mapping
+    # -----------------------------
+    df["r_rachaf"] = dich(df["rachaf"], ones=[1], zeros=[2])      # 1=yes object -> 1; 2=no -> 0
+    df["r_busing"] = dich(df["busing"], ones=[2], zeros=[1])      # 2=oppose -> 1; 1=favor -> 0
+    df["r_racdif1"] = dich(df["racdif1"], ones=[2], zeros=[1])    # 2=no discrim -> 1; 1=yes -> 0
+    df["r_racdif3"] = dich(df["racdif3"], ones=[2], zeros=[1])    # 2=no educ chance -> 1; 1=yes -> 0
+    df["r_racdif4"] = dich(df["racdif4"], ones=[1], zeros=[2])    # 1=yes willpower -> 1; 2=no -> 0
+    racism_comp = ["r_rachaf", "r_busing", "r_racdif1", "r_racdif3", "r_racdif4"]
+    df["racism_score"] = strict_sum(df, racism_comp)
 
-        # After z-scoring, any constant columns will become all-NaN; drop them
-        keep = [c for c in X.columns if X[c].notna().all() and X[c].std(ddof=0) > 0]
-        X = X[keep]
-        if X.shape[1] == 0:
-            raise ValueError(f"{model_name}: all predictors dropped after standardization (likely constants).")
+    # -----------------------------
+    # Controls / indicators (faithful to mapping, avoid proxy variables that induce extra missingness)
+    # -----------------------------
+    df["education"] = df["educ"]
 
-        # Also ensure y is finite
-        ok = y.notna() & np.isfinite(y)
-        X = X.loc[ok]
-        y = y.loc[ok]
-        if X.shape[0] < (X.shape[1] + 2):
-            raise ValueError(f"{model_name}: not enough cases after standardization cleaning (n={X.shape[0]}, k={X.shape[1]}).")
+    # Income per capita: REALINC/HOMPOP (HOMPOP>0)
+    df["income_pc"] = np.nan
+    ok_inc = df["realinc"].notna() & df["hompop"].notna() & (df["hompop"] > 0)
+    df.loc[ok_inc, "income_pc"] = df.loc[ok_inc, "realinc"] / df.loc[ok_inc, "hompop"]
 
-        Xc = sm.add_constant(X, has_constant="add")
-        model = sm.OLS(y, Xc).fit()
+    df["occ_prestige"] = df["prestg80"]
 
-        tab = pd.DataFrame(
-            {
-                "coef_beta": model.params,
-                "std_err": model.bse,
-                "t": model.tvalues,
-                "p_value": model.pvalues,
-            }
-        )
-        fit = {
-            "model": model_name,
-            "n": int(model.nobs),
-            "k": int(model.df_model + 1),  # includes intercept
-            "r2": float(model.rsquared),
-            "adj_r2": float(model.rsquared_adj),
-        }
-        return model, tab, fit, d.index
-
-    # -------------------------
-    # Load and basic filtering
-    # -------------------------
-    df = pd.read_csv(data_source)
-
-    # Normalize column names to lower-case for robustness
-    df.columns = [c.strip().lower() for c in df.columns]
-
-    # Required columns check
-    required_base = ["year", "id"]
-    for c in required_base:
-        if c not in df.columns:
-            raise ValueError(f"Missing required column: {c}")
-
-    df = df.copy()
-    df["year"] = _to_num(df["year"])
-    df = df.loc[df["year"] == 1993].copy()
-
-    # -------------------------
-    # Construct DVs
-    # -------------------------
-    minority_items = ["rap", "reggae", "blues", "jazz", "gospel", "latin"]
-    other12_items = [
-        "bigband", "blugrass", "country", "musicals", "classicl", "folk",
-        "moodeasy", "newage", "opera", "conrock", "oldies", "hvymetal"
-    ]
-
-    for c in minority_items + other12_items:
-        if c not in df.columns:
-            raise ValueError(f"Missing music item column: {c}")
-
-    df["dislike_minority_genres"] = _build_count(df, minority_items)
-    df["dislike_other12_genres"] = _build_count(df, other12_items)
-
-    # -------------------------
-    # Construct racism score (0-5)
-    # -------------------------
-    # Required fields
-    racism_fields = ["rachaf", "busing", "racdif1", "racdif3", "racdif4"]
-    for c in racism_fields:
-        if c not in df.columns:
-            raise ValueError(f"Missing racism item column: {c}")
-
-    rac1 = _binary_from_codes(df["rachaf"], true_codes=[1], false_codes=[2])   # object to majority-black school
-    rac2 = _binary_from_codes(df["busing"], true_codes=[2], false_codes=[1])   # oppose busing
-    rac3 = _binary_from_codes(df["racdif1"], true_codes=[2], false_codes=[1])  # deny discrimination
-    rac4 = _binary_from_codes(df["racdif3"], true_codes=[2], false_codes=[1])  # deny educational chance
-    rac5 = _binary_from_codes(df["racdif4"], true_codes=[1], false_codes=[2])  # endorse lack of motivation
-
-    racism_mat = pd.concat([rac1, rac2, rac3, rac4, rac5], axis=1)
-    df["racism_score"] = racism_mat.sum(axis=1, min_count=5)
-
-    # -------------------------
-    # RHS controls
-    # -------------------------
-    # Education years
-    if "educ" not in df.columns:
-        raise ValueError("Missing EDUC column (educ).")
-    df["education_years"] = _clean_na_codes(df["educ"]).where(_clean_na_codes(df["educ"]).between(0, 20))
-
-    # HH income per capita = REALINC / HOMPOP
-    for c in ["realinc", "hompop"]:
-        if c not in df.columns:
-            raise ValueError(f"Missing required column for income pc: {c}")
-    realinc = _clean_na_codes(df["realinc"])
-    hompop = _clean_na_codes(df["hompop"])
-    hompop = hompop.where(hompop > 0)  # prevent divide by 0/neg
-    df["hh_income_per_capita"] = (realinc / hompop).replace([np.inf, -np.inf], np.nan)
-
-    # Occupational prestige
-    if "prestg80" not in df.columns:
-        raise ValueError("Missing PRESTG80 column (prestg80).")
-    df["occ_prestige"] = _clean_na_codes(df["prestg80"])
-
-    # Female (SEX: 1 male, 2 female)
-    if "sex" not in df.columns:
-        raise ValueError("Missing SEX column (sex).")
-    df["female"] = _binary_from_codes(df["sex"], true_codes=[2], false_codes=[1])
+    # Female: 1 if SEX==2, 0 if SEX==1, else missing
+    df["female"] = np.where(df["sex"].isin([1, 2]), (df["sex"] == 2).astype(float), np.nan)
 
     # Age
-    if "age" not in df.columns:
-        raise ValueError("Missing AGE column (age).")
-    df["age_years"] = _clean_na_codes(df["age"]).where(_clean_na_codes(df["age"]).between(18, 89))
+    df["age_years"] = df["age"]
 
-    # Race indicators (RACE: 1 white, 2 black, 3 other)
-    if "race" not in df.columns:
-        raise ValueError("Missing RACE column (race).")
-    race = _clean_na_codes(df["race"]).where(_clean_na_codes(df["race"]).isin([1, 2, 3]))
-    df["black"] = (race == 2).astype(float)
-    df.loc[race.isna(), "black"] = np.nan
-    df["other_race"] = (race == 3).astype(float)
-    df.loc[race.isna(), "other_race"] = np.nan
+    # Race dummies: reference = White (RACE==1); missing if not in {1,2,3}
+    race = df["race"]
+    race_known = race.isin([1, 2, 3])
+    df["black"] = np.where(race_known, (race == 2).astype(float), np.nan)
+    df["other_race"] = np.where(race_known, (race == 3).astype(float), np.nan)
 
-    # Hispanic: not available in provided variables -> create as all missing so it is excluded from models
-    # (Do NOT proxy using ETHNIC per instruction.)
+    # Hispanic: not available in this extract. Keep column as missing (NOT constant zero),
+    # and do NOT include it in the regression to avoid "dropped (no variation)" artifacts.
+    # (The paper includes Hispanic; this extract cannot replicate it.)
     df["hispanic"] = np.nan
 
-    # Conservative Protestant proxy: RELIG==1 and DENOM in {1,6,7}
-    for c in ["relig", "denom"]:
-        if c not in df.columns:
-            raise ValueError(f"Missing religion/denomination column: {c}")
-    relig = _clean_na_codes(df["relig"])
-    denom = _clean_na_codes(df["denom"])
-    consprot = ((relig == 1) & (denom.isin([1, 6, 7]))).astype(float)
-    consprot.loc[relig.isna() | denom.isna()] = np.nan
-    df["cons_protestant"] = consprot
+    # Conservative Protestant proxy: RELIG==1 (protestant) & DENOM==1 (baptist)
+    rel = df["relig"]
+    den = df["denom"]
+    df["cons_prot"] = np.where(rel.notna(), 0.0, np.nan)
+    prot = rel.notna() & (rel == 1)
+    df.loc[prot, "cons_prot"] = np.where(den.loc[prot].notna(), (den.loc[prot] == 1).astype(float), 0.0)
 
     # No religion: RELIG==4
-    norelig = (relig == 4).astype(float)
-    norelig.loc[relig.isna()] = np.nan
-    df["no_religion"] = norelig
+    df["no_religion"] = np.where(rel.notna(), (rel == 4).astype(float), np.nan)
 
     # Southern: REGION==3
-    if "region" not in df.columns:
-        raise ValueError("Missing REGION column (region).")
-    region = _clean_na_codes(df["region"]).where(_clean_na_codes(df["region"]).isin([1, 2, 3, 4]))
-    south = (region == 3).astype(float)
-    south.loc[region.isna()] = np.nan
-    df["south"] = south
+    df["southern"] = np.where(df["region"].notna(), (df["region"] == 3).astype(float), np.nan)
 
-    # -------------------------
-    # Model fitting (Table 2: two DVs, same RHS)
-    # Important: Hispanic dummy not available -> drop from x list to avoid empty design matrix.
-    # -------------------------
-    x_cols_full = [
+    # Predictors used (Hispanic excluded because not present/constructible in this extract)
+    predictors = [
         "racism_score",
-        "education_years",
-        "hh_income_per_capita",
+        "education",
+        "income_pc",
         "occ_prestige",
         "female",
         "age_years",
         "black",
         "other_race",
-        "cons_protestant",
+        "cons_prot",
         "no_religion",
-        "south",
+        "southern",
     ]
 
-    # Ensure all exist
-    for c in x_cols_full:
-        if c not in df.columns:
-            raise ValueError(f"Constructed predictor missing unexpectedly: {c}")
+    dv_labels = {
+        dv1: "Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music (count of 6)",
+        dv2: "Dislike of the 12 Remaining Genres (count of 12)",
+    }
+    var_labels = {
+        "racism_score": "Racism score",
+        "education": "Education",
+        "income_pc": "Household income per capita",
+        "occ_prestige": "Occupational prestige",
+        "female": "Female",
+        "age_years": "Age",
+        "black": "Black",
+        "other_race": "Other race",
+        "cons_prot": "Conservative Protestant",
+        "no_religion": "No religion",
+        "southern": "Southern",
+        "const": "Constant",
+    }
 
-    results = {}
+    # -----------------------------
+    # Model fitting (listwise on DV + included predictors)
+    # -----------------------------
+    def fit_model(dv_col, model_name, stub, target_n=None):
+        model_cols = [dv_col] + predictors
+        d0 = df[model_cols].copy()
+        d = d0.dropna(axis=0, how="any").copy()
 
-    def _run_one(dv_col, model_name):
-        model, tab, fit, used_idx = _standardized_ols(df, dv_col, x_cols_full, model_name)
-        # Save human-readable text
-        with open(f"./output/{model_name}_summary.txt", "w", encoding="utf-8") as f:
-            f.write(model.summary().as_text())
-            f.write("\n\nFit:\n")
-            for k, v in fit.items():
-                f.write(f"{k}: {v}\n")
-        tab_out = tab.copy()
-        tab_out.index.name = "term"
-        tab_out.to_string(open(f"./output/{model_name}_table.txt", "w", encoding="utf-8"), float_format=lambda x: f"{x: .6f}")
-        return tab_out, pd.DataFrame([fit])
+        if d.shape[0] == 0:
+            msg = (
+                f"{model_name}: analytic sample is empty after listwise deletion.\n\n"
+                "Missingness shares in 1993 for model columns:\n"
+                + d0.isna().mean().sort_values(ascending=False).to_string()
+                + "\n"
+            )
+            write_text(f"./output/{stub}_ERROR.txt", msg)
+            raise ValueError(msg)
 
-    tabA, fitA = _run_one("dislike_minority_genres", "Table2_ModelA_dislike_minority6")
-    tabB, fitB = _run_one("dislike_other12_genres", "Table2_ModelB_dislike_other12")
+        # Drop predictors with no variation (rare but possible)
+        kept, dropped_no_var = [], []
+        for p in predictors:
+            if d[p].nunique(dropna=True) <= 1:
+                dropped_no_var.append(p)
+            else:
+                kept.append(p)
 
-    results["ModelA_table"] = tabA
-    results["ModelB_table"] = tabB
-    results["ModelA_fit"] = fitA
-    results["ModelB_fit"] = fitB
+        y = d[dv_col].astype(float)
+        X = d[kept].astype(float)
+        Xc = sm.add_constant(X, has_constant="add")
+        fit_unstd = sm.OLS(y, Xc).fit()
 
-    # Combined overview text
-    overview_path = "./output/Table2_overview.txt"
-    with open(overview_path, "w", encoding="utf-8") as f:
-        f.write("Table 2 replication (1993 GSS): Standardized OLS (z-scored y and x; intercept included)\n")
-        f.write("Note: Hispanic dummy not included because no direct Hispanic identifier is present in provided data.\n\n")
-        f.write("Model A DV: dislike_minority_genres (Rap, Reggae, Blues, Jazz, Gospel, Latin) dislike count\n")
-        f.write(fitA.to_string(index=False))
-        f.write("\n\nModel B DV: dislike_other12_genres (12 remaining genres) dislike count\n")
-        f.write(fitB.to_string(index=False))
-        f.write("\n")
+        betas = standardized_betas_from_unstd(fit_unstd, d, dv_col, kept)
 
-    return results
+        # Table rows: standardized slopes + intercept row (unstandardized)
+        rows = []
+        for p in predictors:
+            if p in kept:
+                rows.append(
+                    {
+                        "Independent Variable": var_labels.get(p, p),
+                        "Std_Beta": float(betas.get(p, np.nan)),
+                        "Sig": star_from_p(fit_unstd.pvalues.get(p, np.nan)),
+                        "Status": "included",
+                    }
+                )
+            else:
+                rows.append(
+                    {
+                        "Independent Variable": var_labels.get(p, p),
+                        "Std_Beta": np.nan,
+                        "Sig": "",
+                        "Status": "dropped (no variation)",
+                    }
+                )
+
+        # Constant as unstandardized with stars (paper prints stars on constant in Model 1)
+        const = float(fit_unstd.params.get("const", np.nan))
+        const_p = float(fit_unstd.pvalues.get("const", np.nan))
+        rows.append(
+            {
+                "Independent Variable": var_labels["const"],
+                "Std_Beta": const,  # store intercept here for easy CSV; text clarifies it's intercept
+                "Sig": star_from_p(const_p),
+                "Status": "intercept (unstandardized)",
+            }
+        )
+
+        table = pd.DataFrame(rows)
+
+        fit_stats = pd.DataFrame(
+            {
+                "Model": [model_name],
+                "DV": [dv_labels.get(dv_col, dv_col)],
+                "N": [int(round(fit_unstd.nobs))],
+                "R2": [float(fit_unstd.rsquared)],
+                "Adj_R2": [float(fit_unstd.rsquared_adj)],
+                "Constant": [const],
+                "Constant_p": [const_p],
+                "Dropped_no_variation": [", ".join(dropped_no_var) if dropped_no_var else ""],
+            }
+        )
+
+        # Human-readable output
+        title = f"Bryson (1996) Table 2 replication — {model_name} (computed from provided 1993 GSS extract)"
+        lines = []
+        lines.append(title)
+        lines.append("=" * len(title))
+        lines.append("")
+        lines.append(f"DV: {dv_labels.get(dv_col, dv_col)}")
+        lines.append("Estimation: OLS (unweighted).")
+        lines.append("Displayed coefficients: standardized OLS coefficients (beta weights) for slopes.")
+        lines.append("Constant: unstandardized intercept (as printed in the paper).")
+        lines.append("Stars: two-tailed p-values from the OLS fit on the analytic sample in this run.")
+        lines.append("")
+        lines.append("Coding implemented:")
+        lines.append("- Dislike per genre: 1 if response in {4,5}; 0 if in {1,2,3}; else missing")
+        lines.append("- DV: strict sum across component genres (missing if any component missing)")
+        lines.append("- Racism score: strict sum across 5 dichotomous items (missing if any item missing)")
+        lines.append("- Income per capita: REALINC / HOMPOP (HOMPOP>0 required)")
+        lines.append("- Race dummies: Black=1 if RACE==2; Other race=1 if RACE==3; reference is White (RACE==1)")
+        lines.append("- Conservative Protestant: proxy (RELIG==1 & DENOM==1)")
+        lines.append("- No religion: RELIG==4")
+        lines.append("- Southern: REGION==3")
+        lines.append("- Hispanic: not available in this extract; omitted from model to avoid erroneous constant-zero/dropped behavior")
+        lines.append("- Missing data: listwise deletion on DV + included predictors")
+        if target_n is not None:
+            lines.append(f"- Target N in paper (reference only): {int(target_n)}")
+        if dropped_no_var:
+            lines.append(f"- Dropped for no variation: {', '.join(dropped_no_var)}")
+        lines.append("")
+
+        lines.append("Regression table (Table-2 style)")
+        lines.append("--------------------------------")
+        tmp = table.copy()
+
+        # Format: slopes as betas; constant row prints as unstandardized number
+        def fmt_row(r):
+            if r["Status"].startswith("intercept"):
+                val = fmt(r["Std_Beta"], 3)
+            else:
+                val = fmt(r["Std_Beta"], 3)
+            return val
+
+        tmp["Coefficient"] = tmp.apply(fmt_row, axis=1)
+        lines.append(tmp[["Independent Variable", "Coefficient", "Sig", "Status"]].to_string(index=False))
+
+        lines.append("")
+        lines.append("Fit statistics")
+        lines.append("--------------")
+        fs = fit_stats.copy()
+        fs["N"] = fs["N"].map(lambda v: fmt(v, 0))
+        fs["R2"] = fs["R2"].map(lambda v: fmt(v, 3))
+        fs["Adj_R2"] = fs["Adj_R2"].map(lambda v: fmt(v, 3))
+        fs["Constant"] = fs["Constant"].map(lambda v: fmt(v, 3))
+        fs["Constant_p"] = fs["Constant_p"].map(lambda v: fmt(v, 3))
+        lines.append(fs[["Model", "N", "R2", "Adj_R2", "Constant", "Constant_p", "Dropped_no_variation"]].to_string(index=False))
+
+        write_text(f"./output/{stub}_table2_style.txt", "\n".join(lines))
+        write_text(f"./output/{stub}_ols_unstandardized_summary.txt", fit_unstd.summary().as_text())
+
+        # Diagnostics: sample-size drivers
+        diag = []
+        diag.append(f"{model_name} diagnostics")
+        diag.append("=" * (len(model_name) + 12))
+        diag.append(f"N_1993_total: {int(df.shape[0])}")
+        diag.append(f"N_with_nonmissing_DV: {int(df[dv_col].notna().sum())}")
+        diag.append(f"N_analytic_listwise: {int(d.shape[0])}")
+        if target_n is not None:
+            diag.append(f"N_target_from_paper: {int(target_n)}")
+            diag.append(f"N_gap (analytic - target): {int(d.shape[0]) - int(target_n)}")
+        diag.append("")
+        diag.append("Missingness shares in 1993 for model columns (descending):")
+        diag.append(d0.isna().mean().sort_values(ascending=False).map(lambda v: fmt(v, 3)).to_string())
+        diag.append("")
+        diag.append("Dropped_no_variation:")
+        diag.append(", ".join(dropped_no_var) if dropped_no_var else "(none)")
+        diag.append("")
+        diag.append("Key value counts (1993, including NA):")
+        diag.append("\nRACE:\n" + value_counts_full(df["race"]).to_string())
+        diag.append("\nREGION:\n" + value_counts_full(df["region"]).to_string())
+        diag.append("\nRELIG:\n" + value_counts_full(df["relig"]).to_string())
+        diag.append("\nDENOM:\n" + value_counts_full(df["denom"]).to_string())
+        diag.append("\nRacism score:\n" + value_counts_full(df["racism_score"]).to_string())
+        diag.append(f"\n{dv_labels.get(dv_col, dv_col)} value counts:\n" + value_counts_full(df[dv_col]).to_string())
+        write_text(f"./output/{stub}_diagnostics.txt", "\n".join(diag))
+
+        table.to_csv(f"./output/{stub}_table2_style.csv", index=False)
+        fit_stats.to_csv(f"./output/{stub}_fit.csv", index=False)
+
+        return table, fit_stats, d
+
+    # Rename to match paper numbering
+    m1_table, m1_fit, m1_d = fit_model(
+        dv1, "Model 1 (Minority-linked genres: 6)", "Table2_Model1_MinorityLinked6", target_n=644
+    )
+    m2_table, m2_fit, m2_d = fit_model(
+        dv2, "Model 2 (Remaining genres: 12)", "Table2_Model2_Remaining12", target_n=605
+    )
+
+    # -----------------------------
+    # Combined outputs
+    # -----------------------------
+    combined = pd.DataFrame(
+        {
+            "Independent Variable": m1_table["Independent Variable"],
+            "Model1_Coefficient": m1_table["Std_Beta"],
+            "Model1_Sig": m1_table["Sig"],
+            "Model1_Status": m1_table["Status"],
+        }
+    ).merge(
+        pd.DataFrame(
+            {
+                "Independent Variable": m2_table["Independent Variable"],
+                "Model2_Coefficient": m2_table["Std_Beta"],
+                "Model2_Sig": m2_table["Sig"],
+                "Model2_Status": m2_table["Status"],
+            }
+        ),
+        on="Independent Variable",
+        how="outer",
+    )
+
+    combined_fit = pd.concat([m1_fit, m2_fit], axis=0, ignore_index=True)
+
+    title = "Bryson (1996) Table 2 replication (computed from provided 1993 GSS extract)"
+    lines = []
+    lines.append(title)
+    lines.append("=" * len(title))
+    lines.append("")
+    lines.append("Dependent variables:")
+    lines.append(f"- Model 1: {dv_labels[dv1]}")
+    lines.append(f"- Model 2: {dv_labels[dv2]}")
+    lines.append("")
+    lines.append("Note on coefficients:")
+    lines.append("- Predictor rows are standardized OLS coefficients (beta weights).")
+    lines.append("- The Constant row is the unstandardized intercept.")
+    lines.append("")
+    lines.append("Combined coefficients")
+    lines.append("---------------------")
+    tmp = combined.copy()
+    for c in ["Model1_Coefficient", "Model2_Coefficient"]:
+        tmp[c] = tmp[c].map(lambda v: fmt(v, 3))
+    lines.append(tmp.to_string(index=False))
+    lines.append("")
+    lines.append("Fit statistics")
+    lines.append("--------------")
+    fs = combined_fit.copy()
+    fs["N"] = fs["N"].map(lambda v: fmt(v, 0))
+    fs["R2"] = fs["R2"].map(lambda v: fmt(v, 3))
+    fs["Adj_R2"] = fs["Adj_R2"].map(lambda v: fmt(v, 3))
+    fs["Constant"] = fs["Constant"].map(lambda v: fmt(v, 3))
+    fs["Constant_p"] = fs["Constant_p"].map(lambda v: fmt(v, 3))
+    lines.append(fs[["Model", "DV", "N", "R2", "Adj_R2", "Constant", "Constant_p", "Dropped_no_variation"]].to_string(index=False))
+    lines.append("")
+    lines.append("Analytic-sample N checkpoints (paper targets: Model 1 N=644; Model 2 N=605)")
+    lines.append("----------------------------------------------------------------------------")
+    lines.append(f"Model 1 analytic N: {int(m1_d.shape[0])}")
+    lines.append(f"Model 2 analytic N: {int(m2_d.shape[0])}")
+    lines.append("")
+    lines.append("Important limitation:")
+    lines.append("- This extract does not contain a Hispanic identifier comparable to the paper, so Hispanic cannot be included faithfully and is omitted.")
+    lines.append("- If your evaluation requires Hispanic to be included, the dataset must provide an appropriate Hispanic ethnicity variable.")
+
+    write_text("./output/combined_summary.txt", "\n".join(lines))
+    combined.to_csv("./output/combined_table2_betas.csv", index=False)
+    combined_fit.to_csv("./output/combined_fit.csv", index=False)
+
+    return {
+        "combined_table2_betas": combined,
+        "combined_fit": combined_fit,
+        "model1_table": m1_table,
+        "model2_table": m2_table,
+        "model1_analytic_sample": m1_d,
+        "model2_analytic_sample": m2_d,
+    }

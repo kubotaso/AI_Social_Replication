@@ -1,141 +1,127 @@
-Score: 68/100
+Score: 62/100
 ============================================================
 
-## Discrepancy report (ground-truth top vs generated bottom)
+## Discrepancy report (Ground-truth Fig. 1 vs Generated)
 
-### 1) Series mapping is swapped / wrong y-axis assignment
+### 1) Series mapping is swapped between y-axes (major)
 - **Ground-truth:**  
-  - **Solid line** = *Coefficient for Musical Tolerance* (uses **left** y-axis, ~[-0.5, -0.1]).  
-  - **Dash-dot line** = *Mean Education of Genre Audience* (uses **right** y-axis, [12, 15]).
+  - **Solid line** = *Coefficient for Musical Tolerance* (LEFT y-axis, −0.5 to −0.1).  
+  - **Dash-dot line** = *Mean Education of Genre Audience* (RIGHT y-axis, 12 to 15).
 - **Generated:**  
-  - The **solid line is increasing to ~15** (so it’s being plotted on/with the **education scale**), while the **dashed line fluctuates around -0.3 to -0.45** (so it’s being plotted on/with the **coefficient scale**).  
-- **Exact discrepancy:** The two series are **interchanged** (and/or plotted against the wrong axis).
+  - **Solid line** is increasing to ~15-range behavior (i.e., it’s plotting *Mean Education* on the LEFT axis).  
+  - **Dash-dot line** is in the −0.3 to −0.45 range (i.e., it’s plotting *Coefficient* on the RIGHT axis).
+- **Exact discrepancy:** the two series are plotted against the wrong axes (or assigned to the wrong y-data).
 
-### 2) Linestyle mismatch for the education series
-- **Ground-truth education line:** **dash-dot** (`-.`) and black.
-- **Generated education line:** appears **dashed** (`--`) (not dash-dot).
-- **Exact discrepancy:** `-.` vs `--`.
-
-### 3) Music-genre order on x-axis differs (data/order mismatch)
-- **Ground-truth x-order (left→right):**  
+### 2) Genre order on x-axis does not match (major)
+- **Ground-truth x-order:**  
   `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
 - **Generated x-order:**  
-  `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
-- **Exact discrepancy:** **None** in label order (it matches).  
-  However, the **shapes** indicate the **values are not aligned to the same genre order as ground-truth** (especially because education should rise strongly toward Rap/Metal/Country/Gospel in the ground-truth, but in generated the rising series is the *wrong* one). This is consistent with **series swap**, not x-order.
+  `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Swing, New Age/Space, Opera, Bluegrass, Folk, Reggae, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
+- **Exact discrepancy:** **Reggae, Swing, Folk** positions differ:  
+  - Ground-truth places **Reggae before Swing** and **Folk after Bluegrass**.  
+  - Generated places **Swing before Reggae** (and generally shifts the middle order).
 
-### 4) Annotations/leader lines placement differs
-- **Ground-truth:**  
-  - “Mean Education of Genre Audience” text near upper-left with a leader pointing to the **dash-dot** line around **Blues/R&B–Show Tunes** region.  
-  - “Coefficient for Musical Tolerance” text near bottom-left with leader pointing to the **solid** line near **Blues/R&B** region.  
-  - “Sample Mean Education” arrow points upward to the horizontal dotted line near **Reggae**.
-- **Generated:**  
-  - Same labels exist, but leader lines point to the **wrong series** (because series are swapped), and positions differ (text and callouts are not located the same).
-- **Exact discrepancy:** callouts are not anchored to the same data series/points.
+### 3) Line styles appear correct but attached to wrong data (major)
+- **Ground-truth:** solid=coefficient, dash-dot=education.  
+- **Generated:** styles look similar, but they’re applied to the opposite series due to the axis/data swap.
 
-### 5) Visual relationship to “Sample Mean Education” line is wrong (data meaning error)
-- **Ground-truth:** dotted horizontal line is at **13** on right axis; education series crosses/relates to it around early genres.
-- **Generated:** dotted line at ~13 exists, but since education series is mis-assigned, the relationship between the education series and that dotted line is incorrect.
-- **Exact discrepancy:** the dotted line is correct, but **the education series is not the one being compared to it**.
+### 4) Annotation leader lines point to wrong series because of swap (secondary)
+- Labels “Mean Education of Genre Audience” and “Coefficient for Musical Tolerance” exist in both, but in the generated image the leader lines/placement correspond to the swapped lines (visually, “Mean Education…” points to a line living in coefficient range and vice versa).
+
+### 5) The horizontal “Sample Mean Education” reference line is on the wrong axis (major)
+- **Ground-truth:** dotted horizontal line at **Education = 13** on the **RIGHT** axis (and text/arrow “Sample Mean Education” points to it).
+- **Generated:** dotted line is drawn at about **−0.35** on the **LEFT** axis (i.e., you used `axhline` on the left axis instead of `ax2.axhline(13, ...)` on the right).
+
+### 6) Right-axis tick labeling differs (minor but visible)
+- **Ground-truth right axis:** shows **12, 13, 14, 15** clearly and evenly spaced.
+- **Generated:** right axis shows those labels, but because the education series is not actually on that axis, the visual meaning is inconsistent (functionally wrong even if labels match).
 
 ---
 
-## How to fix (data processing + matplotlib) — step-by-step
+## Fixes (data processing + matplotlib) — step-by-step
 
-### A) Fix the series-to-axis mapping (core issue)
-- **Ensure coefficient series is plotted on `ax` (left axis):**
-  - `ax.plot(x, coef, color='black', lw=2, ls='-')`
-  - `ax.set_ylim(-0.5, -0.1)`
-  - `ax.set_yticks([-0.5, -0.4, -0.3, -0.2, -0.1])`
-- **Ensure education series is plotted on `ax2 = ax.twinx()` (right axis):**
-  - `ax2.plot(x, edu, color='black', lw=2, ls='-.')`
-  - `ax2.set_ylim(12, 15)`
-  - `ax2.set_yticks([12, 13, 14, 15])`
-
-**Concrete code fix (minimal):**
-```python
-x = np.arange(len(genres))
-
-fig, ax = plt.subplots(figsize=(12, 6))
-ax2 = ax.twinx()
-
-# LEFT axis: coefficient (solid)
-ax.plot(x, coef_by_genre, color='black', lw=2, ls='-')
-
-# RIGHT axis: education (dash-dot)
-ax2.plot(x, edu_by_genre, color='black', lw=2, ls='-.')
-```
-
-### B) Enforce dash-dot linestyle for education (not dashed)
-- Replace any `ls='--'` (or default) for education with:
-```python
-ls='-.'
-```
-
-### C) Guarantee genre alignment (prevent accidental re-sorting / mis-merge)
-If you compute both series from a DataFrame, force a single canonical order and reindex both series to it:
+### A) Enforce the exact x-category order (fixes discrepancy #2)
+- Create an explicit ordered list and reindex/sort your data to it:
 ```python
 genre_order = [
-  "Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical","Reggae","Swing",
-  "New Age/Space","Opera","Bluegrass","Folk","Easy Listening","Pop/Rock","Rap",
-  "Heavy Metal","Country","Gospel"
+    "Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical",
+    "Reggae","Swing","New Age/Space","Opera","Bluegrass","Folk",
+    "Easy Listening","Pop/Rock","Rap","Heavy Metal","Country","Gospel"
 ]
 
-coef_by_genre = coef_by_genre.reindex(genre_order)
-edu_by_genre  = edu_by_genre.reindex(genre_order)
+df = df.set_index("genre").loc[genre_order].reset_index()
+x = np.arange(len(genre_order))
 ```
-- If you merge two frames, merge then sort by a categorical:
+- Use `genre_order` as tick labels (not whatever order comes from sorting/unique).
+
+### B) Plot the correct series on the correct axes (fixes discrepancies #1, #3)
+- Left axis = coefficient; Right axis = mean education:
 ```python
-df["genre"] = pd.Categorical(df["genre"], categories=genre_order, ordered=True)
-df = df.sort_values("genre")
+fig, ax = plt.subplots(figsize=(12,5))
+ax2 = ax.twinx()
+
+# LEFT axis (Coefficient)
+ax.plot(x, df["coef_tolerance"], color="black", lw=2.5, ls="-")
+
+# RIGHT axis (Mean education)
+ax2.plot(x, df["mean_education"], color="black", lw=2.5, ls="-.")
+```
+- If you currently pass the wrong columns, swap them.
+
+### C) Put the “Sample Mean Education” reference line on the RIGHT axis at 13 (fixes discrepancy #5)
+```python
+ax2.axhline(13, color="black", lw=1.2, ls=(0,(2,2)))  # dotted
+```
+- Do **not** use `ax.axhline(...)` for this line.
+
+### D) Match axis ranges and ticks exactly (helps validate the swap is fixed)
+```python
+# Left y-axis: -0.5 to -0.1 with ticks at -0.5,-0.4,-0.3,-0.2,-0.1
+ax.set_ylim(-0.5, -0.1)
+ax.set_yticks([-0.5,-0.4,-0.3,-0.2,-0.1])
+
+# Right y-axis: 12 to 15 with ticks 12,13,14,15
+ax2.set_ylim(12, 15)
+ax2.set_yticks([12,13,14,15])
 ```
 
-### D) Recreate the “Sample Mean Education” horizontal line on the RIGHT axis
-- Draw the dotted line using `ax2.axhline(13, ...)` (not `ax.axhline`):
+### E) Ensure the dash-dot style is truly dash-dot (not default “-.“ rendering differences)
+If your backend makes `ls="-. "` look different than the original, force a custom dash pattern:
 ```python
-ax2.axhline(13, color='black', lw=1, ls=':', alpha=0.9)
+line = ax2.lines[-1]
+line.set_dashes([6,3,1.5,3])  # dash, gap, dot, gap
 ```
-This ensures it is truly at **13 on the education scale**.
 
-### E) Re-anchor annotations to the correct axes/series
-- Anchor “Mean Education…” to a point on the **education line** (use `ax2` coordinates):
+### F) Fix annotations to point to the correct line/axis (fixes discrepancy #4)
+- Place annotation using the axis that owns the data:
 ```python
-i = genre_order.index("Blues/R&B")  # pick the same anchor region as the original
+# Mean Education label pointing to dash-dot line (ax2 coordinates)
 ax2.annotate("Mean Education of Genre Audience",
-             xy=(i, edu_by_genre.iloc[i]),
-             xytext=(i+1.5, 14.2),
-             arrowprops=dict(arrowstyle='-', lw=1.5, color='black'),
-             fontsize=14, fontweight='bold')
-```
-- Anchor “Coefficient for Musical Tolerance” to a point on the **coefficient line** (use `ax` coordinates):
-```python
-i = genre_order.index("Blues/R&B")
+             xy=(3, df.loc[df["genre"]=="Show Tunes","mean_education"].item()),
+             xytext=(1.5, 14.2),
+             arrowprops=dict(arrowstyle="-", color="black", lw=1.5),
+             fontsize=16, fontweight="bold")
+
+# Coefficient label pointing to solid line (ax coordinates)
 ax.annotate("Coefficient for Musical Tolerance",
-            xy=(i, coef_by_genre.iloc[i]),
-            xytext=(i+1.0, -0.47),
-            arrowprops=dict(arrowstyle='-', lw=1.5, color='black'),
-            fontsize=14, fontweight='bold')
+            xy=(2, df.loc[df["genre"]=="Blues/R&B","coef_tolerance"].item()),
+            xytext=(2.2, -0.47),
+            arrowprops=dict(arrowstyle="-", color="black", lw=1.5),
+            fontsize=16, fontweight="bold")
 ```
-- “Sample Mean Education” arrow should point to **y=13 on ax2**:
+- And “Sample Mean Education” should reference the right-axis line:
 ```python
-i = genre_order.index("Reggae")
 ax2.annotate("Sample Mean Education",
-             xy=(i, 13),
-             xytext=(i-2.5, 12.8),
-             arrowprops=dict(arrowstyle='-|>', lw=1.2, color='black'),
-             fontsize=14, fontweight='bold')
+             xy=(6, 13), xytext=(4.5, 12.6),
+             arrowprops=dict(arrowstyle="-|>", lw=1.5, color="black"),
+             fontsize=16, fontweight="bold")
 ```
 
-### F) Match tick-label formatting and placement
-- Rotate x labels and match spacing:
+### G) X ticks/rotation to match
 ```python
 ax.set_xticks(x)
-ax.set_xticklabels(genre_order, rotation=50, ha='right')
-```
-- Make sure left y tick labels show as `-.1, -.2, ...` (no leading zero). Use a formatter:
-```python
-from matplotlib.ticker import FuncFormatter
-ax.yaxis.set_major_formatter(FuncFormatter(lambda v, p: f"{v:.1f}".replace("-0.", "-.")))
+ax.set_xticklabels(genre_order, rotation=50, ha="right")
+ax.set_xlabel("Type of Music", fontsize=16, fontweight="bold")
 ```
 
-If you share your current plotting code (and how you compute `coef_by_genre` and `edu_by_genre`), I can point to the exact lines to change and provide a drop-in corrected snippet.
+If you share the plotting code (and the dataframe column names), I can point to the exact lines to change (e.g., which `plot(...)` calls/columns are swapped).

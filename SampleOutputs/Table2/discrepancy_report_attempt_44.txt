@@ -1,0 +1,225 @@
+Score: 17/100
+============================================================
+
+## A. What must match (the “True Results” target)
+Bryson (1996) Table 2 reports **standardized OLS coefficients (betas)**, **significance stars**, **constants**, **R²/Adj. R²**, and **N** for **two models**:
+
+- **Model 1 (Minority-linked 6 genres)**, N=644
+- **Model 2 (Remaining 12 genres)**, N=605
+
+It **does not report standard errors**. So if your “generated analysis” displays SEs, t’s, etc., that’s already a mismatch with the table as printed (even if those SEs are correctly computed).
+
+---
+
+## B. Exhaustive mismatches: variable names, coefficients, significance, constants, fit stats, N, and interpretation
+
+### 1) Model naming / DV labeling mismatch
+**Generated:**
+- “Model 2A (DV1: minority-linked 6)”
+- “Model 2B (DV2: remaining 12)”
+
+**True:**
+- “Model 1” = minority-linked 6
+- “Model 2” = remaining 12
+
+**Fix:** Rename to match the paper:
+- Generated Model 2A → **Model 1**
+- Generated Model 2B → **Model 2**
+and reproduce the DV titles exactly (or nearly exactly).
+
+---
+
+### 2) Sample size (N) mismatch (major)
+**Generated analytic N:**
+- Model 2A: **261**
+- Model 2B: **259**
+(and dv descriptives show N in the thousands, but models use ~260)
+
+**True N:**
+- Model 1: **644**
+- Model 2: **605**
+
+**Fix:** Your analytic sample construction is not reproducing Bryson’s. To match:
+- Use the **same survey/year** and **same inclusion criteria** as Bryson (GSS-based).
+- Apply the same **missing-data handling** as the paper (likely listwise deletion on the model variables, but starting from the correct base and correct items).
+- Use **weights** (if Bryson did), and ensure you’re not accidentally restricting to a tiny sub-sample (e.g., only complete cases for extra variables you added or mis-coded).
+
+A telltale sign: your “No religion” is dropped for no variation—this is essentially impossible in a correctly constructed GSS sample of N≈600. That strongly indicates a coding/filtering error.
+
+---
+
+### 3) “No religion” incorrectly dropped (and thus coefficient missing)
+**Generated:**
+- “No religion (RELIG==4)” = **NaN**, “dropped (no variation)”
+
+**True:**
+- Model 1: **0.057**
+- Model 2: **0.024**
+
+**Fix:** Your RELIG recode is wrong and/or your sample filter eliminated almost everyone except one RELIG category.
+- Verify RELIG coding for that GSS year: in many GSS waves, **RELIG is typically 1=Protestant, 2=Catholic, 3=Jewish/other, 4=None**, but you must confirm for the exact file.
+- Ensure you are not recoding RELIG to missing incorrectly.
+- Ensure you did not subset to a religious subgroup earlier.
+- Once RELIG is correctly coded and the sample is correct, “No religion” should vary and be estimable.
+
+---
+
+### 4) Conservative Protestant definition mismatch (proxy vs Bryson’s measure)
+**Generated variable name/definition:**
+- “Conservative Protestant (proxy: RELIG==1 & DENOM==1)”
+
+**True variable in table:**
+- “Conservative Protestant” (Bryson’s operationalization is not “DENOM==1” in general; Bryson likely uses a standard fundamentalist/evangelical classification from denomination codes, not a single DENOM value.)
+
+**Fix:** Recreate Bryson’s actual conservative Protestant classification:
+- Use the **correct denominational typology** (often derived from GSS denominational codes into “fundamentalist/evangelical/moderate/liberal” Protestant families).
+- Do **not** use a simplistic `(RELIG==1 & DENOM==1)` rule unless that is documented as identical (it won’t be).
+This affects both the coefficient and the sample N (if you inadvertently create missingness).
+
+---
+
+### 5) Hispanic coding mismatch (and “missing preserved” is not Bryson’s)
+**Generated:**
+- “Hispanic (proxy from ETHNIC; missing preserved)”
+
+**True:**
+- “Hispanic” (as a dummy in the table, no “missing preserved” note)
+
+**Fix:**
+- Use the same variable definition as Bryson: likely a race/ethnicity indicator built from GSS **HISPANIC** (if available) or from **ETHNIC** with a specific rule, and then **handle missing the same way** Bryson did (almost certainly listwise deletion for the regression).
+- “Missing preserved” suggests you may be treating missing as a separate category or not dropping missing—this changes estimates and N.
+
+---
+
+### 6) Region/South coding mismatch likely (sign flips suggest wrong coding or sample)
+**Generated:**
+- Southern (REGION==3): Model2A beta = **-0.050806**; Model2B = **0.112661**
+
+**True:**
+- Model 1 Southern = **0.024**
+- Model 2 Southern = **0.069**
+
+**Fix:**
+- Confirm the **REGION coding** (REGION categories differ across data; “3” may not equal South).
+- In GSS, “South” is often coded in **REGION** but not necessarily as 3 depending on coding scheme; sometimes “South” is 5, etc.
+- Use the correct South dummy as in the paper.
+
+---
+
+## C. Coefficient + significance mismatches (by model)
+
+Below I list **every coefficient mismatch** between Generated and True. (All are mismatches.)
+
+### Model 1 (True) vs Generated “Model 2A”
+| Variable | Generated beta (sig) | True beta (sig) | Mismatch |
+|---|---:|---:|---|
+| Racism score | 0.139* | 0.130** | beta slightly off; sig level wrong |
+| Education | -0.260*** | -0.175*** | beta far too negative |
+| Income pc | -0.015 (ns) | -0.037 (ns) | wrong magnitude |
+| Occ prestige | +0.058 (ns) | -0.020 (ns) | wrong sign |
+| Female | -0.033 (ns) | -0.057 (ns) | wrong magnitude |
+| Age | 0.174** | 0.163*** | sig wrong (and slightly off) |
+| Black | -0.176* | -0.132*** | magnitude + sig wrong |
+| Hispanic | -0.039 (ns) | -0.058 (ns) | magnitude off |
+| Other race | +0.002 (ns) | -0.017 (ns) | sign wrong |
+| Cons Prot | +0.115 (ns) | +0.063 (ns) | magnitude off |
+| No religion | dropped | +0.057 | should exist |
+| Southern | -0.051 (ns) | +0.024 (ns) | sign wrong |
+| Constant | 2.628*** | 2.415*** | wrong value |
+| R² / Adj R² | 0.179 / 0.143 | 0.145 / 0.129 | too high |
+| N | 261 | 644 | wrong sample |
+
+**Fix summary for Model 1 mismatches:** They are consistent with (i) wrong sample, (ii) wrong coding for key predictors (South, religion, race/ethnicity), (iii) possibly wrong dependent variable construction, and (iv) possibly not using weights / not using same standardization.
+
+---
+
+### Model 2 (True) vs Generated “Model 2B”
+| Variable | Generated beta (sig) | True beta (sig) | Mismatch |
+|---|---:|---:|---|
+| Racism score | -0.014 (ns) | +0.080 (ns) | wrong sign and magnitude |
+| Education | -0.165* | -0.242*** | magnitude + sig wrong |
+| Income pc | -0.081 (ns) | -0.065 (ns) | magnitude off |
+| Occ prestige | -0.081 (ns) | +0.005 (ns) | wrong sign |
+| Female | -0.082 (ns) | -0.070 (ns) | slightly off |
+| Age | +0.123 (ns) | +0.126** | sig wrong |
+| Black | +0.041 (ns) | +0.042 (ns) | basically matches (tiny diff) |
+| Hispanic | -0.054 (ns) | -0.029 (ns) | magnitude off |
+| Other race | +0.132* | +0.047 (ns) | magnitude + sig wrong |
+| Cons Prot | +0.138 (ns) | +0.048 (ns) | magnitude off |
+| No religion | dropped | +0.024 | should exist |
+| Southern | +0.113 (ns) | +0.069 (ns) | magnitude off |
+| Constant | 5.270*** | 7.860 (no stars shown) | wrong value and inference |
+| R² / Adj R² | 0.154 / 0.116 | 0.147 / 0.130 | Adj R² too low |
+| N | 259 | 605 | wrong sample |
+
+**Fix summary for Model 2 mismatches:** Again points to wrong sample and/or DV construction; also your racism effect flips sign (very unlikely to happen solely from rounding), which strongly suggests DV item set or coding direction differs from Bryson.
+
+---
+
+## D. Interpretation mismatches (what the generated output implies vs the true table)
+
+### 1) “Standard errors” focus is misplaced
+You were asked to check SEs, but **the true table has no SEs**. So any generated claim like “SE=…” or inference based on SEs is not comparable to Bryson’s printed results.
+
+**Fix:** Remove SE-based comparisons; compare only **standardized betas, stars, constants, R², Adj R², N**.
+
+### 2) DV construction mismatch is very likely
+Your DV names:
+- `dv1_minority6_dislikes` and `dv2_remaining12_dislikes`
+
+The true DV1 is explicitly: **Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, Latin** (count of 6).
+If any genre list differs (e.g., you included “R&B” differently, split/merged items, used different item names, dropped gospel/latin due to missing), coefficients and N will drift.
+
+**Fix:**
+- Verify you used **exactly those six genres** for DV1.
+- Verify DV2 includes the **other 12** genres exactly as Bryson defines them in that survey wave.
+- Ensure the **direction** matches: “dislike” coding must be consistent (e.g., higher = more dislikes).
+- Ensure count is based on the same threshold (e.g., “dislike” vs “neutral,” etc.). Bryson’s operationalization matters.
+
+### 3) Constant interpretation mismatch
+Generated constants are starred and treated as meaningful; Bryson reports constants, but for Model 2 he prints **7.860** with no stars shown in your transcription.
+
+**Fix:** If you want to match the printed table, replicate exactly how Bryson presents the constant (including whether stars are shown). More importantly: if your DV is a *count*, constant depends heavily on coding and sample—so mismatch is another DV/sample red flag.
+
+---
+
+## E. Concrete steps to “fix so the generated analysis matches”
+
+1) **Rebuild the dataset to match Bryson’s analytic sample**
+- Use the correct GSS wave(s) and restrict to the same respondents Bryson used.
+- Apply the same listwise deletion rules **only on variables in the model** (not on extra variables you computed but don’t use).
+
+2) **Recode predictors exactly**
+- **South**: create from REGION using the correct category for South in that dataset.
+- **Race/ethnicity**: reproduce Bryson’s White/Black/Hispanic/Other coding. Do not “preserve missing” unless Bryson did (the table implies standard dummies with listwise deletion).
+- **Conservative Protestant**: reproduce the established denominational classification used by Bryson (not a DENOM==1 shortcut).
+- **No religion**: verify RELIG coding and do not drop it; it must vary.
+
+3) **Recreate the racism scale exactly (0–5)**
+- Use the exact 5 dichotomies Bryson used.
+- Make sure “higher = more racist” matches Bryson’s direction.
+- Handle missing items consistently (e.g., require all 5 answered vs allow partial sums)—this alone can change N a lot.
+
+4) **Recreate the two DVs exactly**
+- Exact genre membership in each DV.
+- Exact “dislike” threshold.
+- Exact counting rule and missing handling (e.g., require valid response on all 6/12 items).
+
+5) **Use standardized OLS coefficients**
+- Run OLS and report **standardized betas**.
+- Ensure standardization matches Bryson (typically standardize X and Y over the analytic sample used in that model).
+
+6) **Match reporting**
+- Output only: betas + stars, constant + stars (if Bryson prints them), R², Adj R², N.
+- Do not claim “Table 2 reports SEs”; it doesn’t.
+
+---
+
+## F. Minimal “must-change” list (the biggest blockers)
+- Your **N is wrong by ~2.5x** in both models.
+- **No religion is wrongly dropped** (clear coding/sample error).
+- **Racism coefficient in Model 2 has wrong sign** (DV or racism scale mismatch).
+- **Occ prestige sign flips** (coding or standardization mismatch).
+- **South sign flips in Model 1** (REGION coding mismatch).
+
+If you provide your codebook assumptions (RELIG/DENOM/REGION codings) and the exact genre items used for each DV, I can pinpoint which recodes are incorrect and propose exact corrected coding rules.

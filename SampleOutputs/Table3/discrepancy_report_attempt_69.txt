@@ -1,0 +1,156 @@
+Score: 72/100
+============================================================
+
+## 1) Row items/categories mismatches (names/structure)
+
+### A. **“Opera” column label is wrong in the Generated Results**
+- **Generated:** `New Age/Space Opera` (looks like one combined genre)
+- **True:** two separate genres/columns: `New Age/Space` **and** `Opera` (Panel 2)
+
+**How to fix**
+- Split the generated merged header into **two columns**:
+  - `New Age/Space`
+  - `Opera`
+- Keep their frequencies as separate columns (your generated numbers already appear to be in the right two columns, just mis-labeled/merged in the header).
+
+---
+
+## 2) Frequency count mismatches (cell-by-cell)
+
+Below are all cells where the **Generated** count ≠ **True** count.
+
+### Panel 1 columns
+
+#### Latin/Salsa
+- **(M) Don’t know much about it:** Generated **210**, True **221** (−11)
+- **(M) No answer:** Generated **23**, True **12** (+11)
+
+#### Jazz
+- **(M) Don’t know much about it:** Generated **48**, True **38** (+10)
+- **(M) No answer:** Generated **5**, True **15** (−10)
+
+#### Blues/R&B
+- **(M) Don’t know much about it:** Generated **61**, True **56** (+5)
+- **(M) No answer:** Generated **7**, True **12** (−5)
+
+#### Show Tunes
+- **(M) Don’t know much about it:** Generated **82**, True **77** (+5)
+- **(M) No answer:** Generated **9**, True **14** (−5)
+
+#### Oldies
+- **(M) Don’t know much about it:** Generated **46**, True **41** (+5)
+- **(M) No answer:** Generated **5**, True **10** (−5)
+
+#### Classical/Chamber
+- **(M) Don’t know much about it:** Generated **69**, True **66** (+3)
+- **(M) No answer:** Generated **8**, True **11** (−3)
+
+**Pattern:** In Panel 1, your Generated table is systematically shifting cases between “Don’t know much about it” and “No answer” (and sometimes between those two in opposite directions). The “substantive” categories (1–5) match perfectly.
+
+---
+
+### Panel 2 columns
+
+#### Reggae
+- **(M) Don’t know much about it:** Generated **275**, True **295** (−20)
+- **(M) No answer:** Generated **31**, True **11** (+20)
+
+#### Swing/Big Band
+- **(M) Don’t know much about it:** Generated **158**, True **164** (−6)
+- **(M) No answer:** Generated **18**, True **12** (+6)
+
+#### New Age/Space
+- **(M) Don’t know much about it:** Generated **275**, True **292** (−17)
+- **(M) No answer:** Generated **31**, True **14** (+17)
+
+#### Opera  *(but mislabeled/merged in your header)*
+- **(M) Don’t know much about it:** Generated **86**, True **83** (+3)
+- **(M) No answer:** Generated **10**, True **13** (−3)
+
+#### Bluegrass
+- **(M) Don’t know much about it:** Generated **157**, True **163** (−6)
+- **(M) No answer:** Generated **17**, True **11** (+6)
+
+#### Folk
+- **(M) Don’t know much about it:** Generated **81**, True **78** (+3)
+- **(M) No answer:** Generated **9**, True **12** (−3)
+
+**Pattern:** Again, the errors are concentrated in the two “M” rows, typically moving counts between “Don’t know much” and “No answer”.
+
+---
+
+### Panel 3 columns
+
+#### Pop/Easy Listening
+- **(M) Don’t know much about it:** Generated **76**, True **72** (+4)
+- **(M) No answer:** Generated **9**, True **13** (−4)
+
+#### Contemporary Rock
+- **(M) Don’t know much about it:** Generated **56**, True **50** (+6)
+- **(M) No answer:** Generated **6**, True **12** (−6)
+
+#### Rap
+- **(M) Don’t know much about it:** Generated **65**, True **61** (+4)
+- **(M) No answer:** Generated **7**, True **11** (−4)
+
+#### Heavy Metal
+- **(M) Don’t know much about it:** Generated **72**, True **70** (+2)
+- **(M) No answer:** Generated **8**, True **10** (−2)
+
+#### Country/Western
+- **(M) Don’t know much about it:** Generated **29**, True **22** (+7)
+- **(M) No answer:** Generated **3**, True **10** (−7)
+
+#### Gospel
+- **(M) Don’t know much about it:** Generated **42**, True **35** (+7)
+- **(M) No answer:** Generated **5**, True **12** (−7)
+
+---
+
+## 3) Summary statistics mismatches (means, totals, etc.)
+
+### Means
+- **All means match exactly** between Generated and True for every genre.
+
+### Implied totals / N by column
+Even where the “M” rows are wrong, note that in many columns the **pair** (“Don’t know” + “No answer”) often still sums to the same total as the true table—indicating a **misallocation between missing categories**, not a different N.  
+Example: **Latin/Salsa**
+- True: 221 + 12 = 233
+- Generated: 210 + 23 = 233  
+So N is consistent, but missing categories are swapped/mis-coded.
+
+---
+
+## 4) Missing or extra column categories
+
+- **Column category error:** `New Age/Space Opera` is an **incorrect combined label**. True output requires **two columns**: `New Age/Space` and `Opera`.
+
+No other genres are missing or extra (you have 18 genres total), but the **labeling makes it look like 17** because of the merge.
+
+---
+
+## 5) How to fix so the generated analysis matches the true table
+
+1. **Fix the genre headers**
+   - Replace `New Age/Space Opera` with **two separate columns**: `New Age/Space` and `Opera`.
+
+2. **Fix missing-value handling (core problem)**
+   - Your (1)–(5) counts match perfectly; the errors are almost entirely in:
+     - **(M) Don’t know much about it**
+     - **(M) No answer**
+   - This strongly suggests that during recoding, you:
+     - misread one of the missing codes, or
+     - collapsed multiple non-substantive codes incorrectly, or
+     - treated “no answer”/“DK” differently across variables.
+
+   **Concrete fix approach**
+   - Re-check the original coding for the attitude items and explicitly map:
+     - “Don’t know much about it” to the correct code(s)
+     - “No answer” to the correct code(s)
+   - Ensure you are not accidentally routing some “No answer” cases into “Don’t know much about it” (or vice versa).
+   - Apply the **same recode logic to all 18 variables** (your inconsistencies vary by genre, which can happen if different items have slightly different codeframes and you didn’t harmonize them).
+
+3. **After recoding, regenerate the frequency table**
+   - Verify for each genre that the two M-rows exactly match the True table values listed above.
+
+If you tell me what software/code you used to generate the table (R/Stata/SPSS/Python) and the raw codes for the attitude variables, I can specify the exact recode statements needed to make the “Don’t know” vs “No answer” rows match perfectly.

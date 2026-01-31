@@ -1,0 +1,145 @@
+Score: 68/100
+============================================================
+
+## 1) Row items/categories: missing in the generated table
+
+### Missing attitude rows (present in True, absent/zeroed in Generated)
+For **every genre**, the generated table incorrectly shows **0** for:
+
+- **(M) Don’t know much about it**
+- **(M) No answer**
+
+In the true table, both rows have **nonzero** counts for all 18 genres.
+
+**How to fix**
+- Add these two rows back with the **correct nonzero counts** (listed below).
+- Do not collapse them into 0 or omit them from totals used for percentages/means (see notes under “summary stats”).
+
+---
+
+## 2) Column items/categories: mismatch (name/structure)
+
+### “New Age/Space Opera” is wrong
+- **Generated column:** `New Age/Space Opera`
+- **True table:** has **two separate columns**: `New Age/Space` and `Opera`
+
+In the generated output, “Opera” has been incorrectly merged into the header, but the data clearly still contain an Opera column (because there is also a standalone `Opera` column in the generated header list: “… New Age/Space Opera Bluegrass …” is ambiguous, but the true structure is definitely two columns).
+
+**How to fix**
+- Split into **two distinct columns**:
+  - `New Age/Space`
+  - `Opera`
+- Ensure the counts for each are assigned to the correct column (they currently align with the true table’s New Age/Space and Opera columns in Panel 2).
+
+---
+
+## 3) Frequency counts: exact mismatches
+
+All counts for response categories **(1) through (5)** match the true table.
+
+The **only frequency mismatches** are the two missing rows **(M) Don’t know much about it** and **(M) No answer**, which are incorrectly shown as 0 across all genres.
+
+### Correct values to insert (True table values)
+
+#### Panel 1: Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber
+**(M) Don’t know much about it**
+- Latin/Salsa **221**
+- Jazz **38**
+- Blues/R&B **56**
+- Show Tunes **77**
+- Oldies **41**
+- Classical/Chamber **66**
+
+**(M) No answer**
+- Latin/Salsa **12**
+- Jazz **15**
+- Blues/R&B **12**
+- Show Tunes **14**
+- Oldies **10**
+- Classical/Chamber **11**
+
+#### Panel 2: Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk
+**(M) Don’t know much about it**
+- Reggae **295**
+- Swing/Big Band **164**
+- New Age/Space **292**
+- Opera **83**
+- Bluegrass **163**
+- Folk **78**
+
+**(M) No answer**
+- Reggae **11**
+- Swing/Big Band **12**
+- New Age/Space **14**
+- Opera **13**
+- Bluegrass **11**
+- Folk **12**
+
+#### Panel 3: Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel
+**(M) Don’t know much about it**
+- Pop/Easy Listening **72**
+- Contemporary Rock **50**
+- Rap **61**
+- Heavy Metal **70**
+- Country/Western **22**
+- Gospel **35**
+
+**(M) No answer**
+- Pop/Easy Listening **13**
+- Contemporary Rock **12**
+- Rap **11**
+- Heavy Metal **10**
+- Country/Western **10**
+- Gospel **12**
+
+**How to fix**
+- Replace the generated zeros with these counts in the two missing rows.
+
+---
+
+## 4) Percentages: missing/implicitly wrong
+
+The generated output contains **no percentages**. Your mismatch criteria include “counts or percentages”; since the true table provided also doesn’t show percentages, there’s nothing to numerically compare—but if your generated analysis elsewhere computed percentages, they would be wrong if based on totals that exclude the (M) categories.
+
+**How to fix (if percentages are needed)**
+- Decide denominator:
+  - **All responses including M categories**, or
+  - **Valid responses only (1–5)**, excluding “Don’t know” and “No answer”
+- Then compute consistently and label clearly.
+
+---
+
+## 5) Summary statistics (Mean): values match, but may be computed on the wrong base
+
+### Mean row
+The **mean values shown in Generated match the True table exactly** for all genres.
+
+However, because the generated table set the M categories to 0, it strongly suggests the **mean was computed from (1–5) only** (valid cases), which is typical.
+
+**Potential discrepancy (methodological, not numeric here)**
+- If your generated workflow also used those “0” rows when computing totals or means, it would be wrong. The fact the means match suggests you likely computed means correctly (valid-only), but the table presentation is inconsistent because it shows M categories as 0.
+
+**How to fix**
+- Keep the mean calculation as in the true table (almost certainly **excluding** M categories).
+- But display the correct M counts so the table is internally consistent.
+
+---
+
+## 6) Missing “total N” checks (implied inconsistency)
+
+Because the generated table zeroes out the M rows, any “total responses per genre” computed from the displayed rows would be **too small** by exactly:
+- `Don’t know much about it + No answer` for that genre.
+
+**How to fix**
+- If you report totals, compute as:
+  - **Total N = sum of (1–5) + (M don’t know) + (M no answer)**
+
+---
+
+# Minimal set of corrections to make Generated match True
+1. **Add correct nonzero counts** for:
+   - `(M) Don’t know much about it`
+   - `(M) No answer`
+   for all 18 genres (use the values listed above).
+2. **Fix the column labeling/structure**: split **New Age/Space** and **Opera** into separate columns (no merged “New Age/Space Opera” label).
+3. (If applicable) Recompute any percentages/totals using the correct denominators and include M categories appropriately.

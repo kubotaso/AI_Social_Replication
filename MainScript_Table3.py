@@ -54,8 +54,6 @@ client = OpenAI()
 # ──────────────────────────────────────────────────
 
 ALIGNMENT_SCORE_THRESHOLD = 95  # Skip detailed check if score >= threshold (early exit)
-MAX_CONTEXT_CHARS = 12000  # Maximum characters for best code/result context in prompts
-MAX_FEEDBACK_CHARS = 60000  # Maximum accumulated feedback size
 MAX_OUTPUT_TOKENS = 20000  # Maximum output tokens for LLM responses
 
 
@@ -67,12 +65,22 @@ MAX_OUTPUT_TOKENS = 20000  # Maximum output tokens for LLM responses
 @dataclass
 class RunState:
     """Track state across retry attempts."""
+    # Best attempt tracking
     best_score: int = -1
     best_result_text: Optional[str] = None
     best_attempt: int = 0
     best_code_path: Optional[Path] = None
+    best_discrepancy: Optional[str] = None
+
+    # Previous attempt tracking
+    prev_attempt: int = 0
+    prev_code_path: Optional[Path] = None
+    prev_result_text: Optional[str] = None
+    prev_discrepancy: Optional[str] = None
+    prev_error: Optional[str] = None
+
+    # Current attempt
     last_score: int = -1
-    accumulated_feedback: str = ""
     current_code_path: Optional[Path] = None
     generated_text: str = ""
 
@@ -233,21 +241,6 @@ def _normalize_result_to_text(result) -> str:
     return str(result)
 
 
-def _truncate_text(text: str, max_chars: int = MAX_CONTEXT_CHARS) -> str:
-    """
-    Truncate text to prevent context window overflow.
-    Tries to truncate at a natural boundary (newline) and adds indicator if truncated.
-    """
-    if len(text) <= max_chars:
-        return text
-    # Find a good break point (newline) near the limit
-    truncated = text[:max_chars]
-    last_newline = truncated.rfind('\n')
-    if last_newline > max_chars * 0.8:  # If newline is in last 20%, use it
-        truncated = truncated[:last_newline]
-    return truncated + "\n\n[... TRUNCATED ...]\n"
-
-
 def save_best_result(
     output_dir: Path,
     attempt: int,
@@ -320,13 +313,13 @@ def summarize_and_extract_pdf(
     # Summarize the paper
     summary_instructions = (
         "You are a concise, careful research assistant with strong skills in "
-        "quantitative methods in social science. Extract the structure and content of summary tables."
+        "quantitative methods in sociology. Extract the structure and content of summary tables."
     )
     summary_content = [
         {
             "type": "input_text",
             "text": (
-                "Task: Read the attached paper PDF and identify the target summary/frequency table.\n"
+                "Task: Read the attached paper PDF and identify Table 3 (the target summary/frequency table).\n"
                 "List all row categories (items) in the table, identify the column categories (response options), "
                 "and note what summary statistics are shown (e.g., counts/frequencies, percentages, means).\n"
                 "This is a descriptive summary table, NOT a regression table with coefficients."
@@ -342,7 +335,7 @@ def summarize_and_extract_pdf(
         {
             "type": "input_text",
             "text": (
-                "Read the attached paper PDF and extract the target summary/frequency table.\n"
+                "Read the attached paper PDF and extract Table 3 (the target summary/frequency table).\n"
                 "For each row item, extract:\n"
                 "- Counts or frequencies for each response/column category\n"
                 "- Any summary statistics shown (means, percentages, totals, etc.)\n"
@@ -376,7 +369,6 @@ def summarize_instruction(
     prompt = (
         "Based on the analysis summary below, produce an explanation that maps the analysis variables "
         "to the data fields described in the attached variable documentation. This mapping will be used to run the analysis.\n"
-        "Focus on the variables needed for the summary table and their coding.\n"
         "You do not need to ask questions or make suggestions. Just produce the mapping explanation.\n\n"
         f"[Analysis Summary]\n{analysis_summary}\n\n"
         f"[Variable Documentation]\n{inst_content}\n"
@@ -392,31 +384,36 @@ def ask_code_with_data(
     instruction_summary: str,
     *,
     model: str,
-    error_feedback: Optional[str] = None,
-    best_result_text: Optional[str] = None,
-    best_score: Optional[int] = None,
+    is_retry: bool = False,
+    # Best attempt info
     best_code_text: Optional[str] = None,
+    best_discrepancy: Optional[str] = None,
+    best_score: Optional[int] = None,
+    # Previous attempt info
+    prev_code_text: Optional[str] = None,
+    prev_discrepancy: Optional[str] = None,
+    prev_error: Optional[str] = None,
     sample_rows: int = 5,
 ) -> str:
     """
-    Ask the model to generate Python code implementing the summary/frequency table analysis.
-    If error_feedback is provided, this is a retry with discrepancy/runtime feedback.
+    Ask the model to generate Python code implementing the analysis.
+    For retries, provides best attempt and previous attempt context.
     """
     sample_csv = _df_sample_csv(df, data_columns, n=sample_rows)
     cols_str = ", ".join(data_columns)
 
-    if error_feedback:
+    if is_retry:
         instructions = "You fix issues precisely and write simple, correct code for summary/frequency tables."
     else:
         instructions = (
-            "You are a replication-focused researcher in quantitative methods in social science. "
+            "You are a replication-focused researcher in quantitative methods in sociology. "
             "Produce minimal, correct, and readable code for generating summary/frequency tables."
         )
 
     # Build the prompt
     prompt_parts = []
 
-    if error_feedback:
+    if is_retry:
         prompt_parts.append("We previously ran your analysis and found discrepancies or runtime errors. Use the feedback below to correct your code.\n")
 
     prompt_parts.append(f"[Analysis Summary]\n{analysis_summary}\n")
@@ -425,21 +422,27 @@ def ask_code_with_data(
     prompt_parts.append(f"[Available Variables]\n{cols_str}\n")
     prompt_parts.append(f"[Path to the full dataset]\n{data_path}\n")
 
-    # Add best result/code context if available (for retries)
-    if best_result_text and best_score is not None:
-        best_result_trim = _truncate_text(best_result_text, MAX_CONTEXT_CHARS)
+    # Add best attempt context (if exists and is_retry)
+    if is_retry and best_code_text and best_score is not None:
         prompt_parts.append(
-            f"[Best Result So Far (Score: {best_score}/100)]\n"
+            f"[Best Attempt So Far (Score: {best_score}/100)]\n"
             f"Try to improve upon or maintain this quality.\n"
-            f"{best_result_trim}\n"
         )
+        prompt_parts.append(f"[Best Code]\n{best_code_text}\n")
+        if best_discrepancy:
+            prompt_parts.append(f"[Best Attempt Discrepancy Report]\n{best_discrepancy}\n")
 
-    if best_code_text:
-        best_code_trim = _truncate_text(best_code_text, MAX_CONTEXT_CHARS)
-        prompt_parts.append(f"[Best Code So Far]\n{best_code_trim}\n")
-
-    if error_feedback:
-        prompt_parts.append(f"[Feedback — MUST FIX]\n{error_feedback}\n")
+    # Add previous attempt context (if different from best)
+    if is_retry and prev_code_text:
+        # Check if prev is different from best (avoid duplicates)
+        is_same_as_best = (best_code_text and prev_code_text == best_code_text)
+        if not is_same_as_best:
+            prompt_parts.append("[Previous Attempt (most recent)]\n")
+            prompt_parts.append(f"[Previous Code]\n{prev_code_text}\n")
+            if prev_error:
+                prompt_parts.append(f"[Previous Runtime Error — MUST FIX]\n{prev_error}\n")
+            elif prev_discrepancy:
+                prompt_parts.append(f"[Previous Discrepancy Report — MUST FIX]\n{prev_discrepancy}\n")
 
     prompt_parts.append(
         "Generate a single Python function with the exact signature:\n"
@@ -474,13 +477,9 @@ def score_alignment(
     Score how well generated summary/frequency table results match true results (0-100).
     Scoring criteria adapted for summary/frequency tables (no coefficients or standard errors).
     """
-    # Truncate texts to prevent context window overflow
-    generated_truncated = _truncate_text(generated_text)
-    true_truncated = _truncate_text(true_result_text)
-
     instructions = "Return only an integer from 0 to 100. No other text."
     prompt = (
-        "Score alignment between generated and true summary/frequency table results (0-100).\n\n"
+        "Score alignment between generated and true Table 3 summary/frequency table results (0-100).\n\n"
         "SCORING CRITERIA FOR SUMMARY/FREQUENCY TABLE:\n"
         "- All row items/categories present: 20 points\n"
         "- Frequency counts or percentages match (within 5% tolerance): 35 points\n"
@@ -488,8 +487,8 @@ def score_alignment(
         "- All response/column categories present: 10 points\n"
         "- Overall structure and formatting match: 10 points\n\n"
         "Return only the integer score (0-100), nothing else.\n\n"
-        f"[Generated Results]\n{generated_truncated}\n\n"
-        f"[True Results]\n{true_truncated}"
+        f"[Generated Results]\n{generated_text}\n\n"
+        f"[True Results]\n{true_result_text}"
     )
     result = _llm_call(prompt, model=model, instructions=instructions).strip()
     try:
@@ -557,20 +556,15 @@ def run_single_attempt(
         print(f"[Retry Loop] attempt {attempt}/{max_attempts}")
         print(f"{'='*60}")
 
-        # Generate discrepancy report if we have results from previous attempt
-        if state.generated_text:
-            discrepancy = report_discrepancy(true_result_text, state.generated_text, model=model)
-            state.accumulated_feedback = discrepancy if not state.accumulated_feedback else f"{state.accumulated_feedback}\n\n---\n{discrepancy}"
+        # Generate discrepancy report for previous attempt (if it had results)
+        if state.prev_result_text:
+            state.prev_discrepancy = report_discrepancy(true_result_text, state.prev_result_text, model=model)
             score_header = f"Score: {state.last_score}/100\n{'='*60}\n\n"
-            save_artifact(output_dir, f"discrepancy_report_attempt_{attempt-1}.txt", score_header + discrepancy)
+            save_artifact(output_dir, f"discrepancy_report_attempt_{attempt-1}.txt", score_header + state.prev_discrepancy)
             print(f"[Mismatch] Saved discrepancy report → discrepancy_report_attempt_{attempt-1}.txt")
         else:
+            state.prev_discrepancy = None
             print("[Info] Skipping discrepancy report due to previous runtime error.")
-
-        # Limit accumulated feedback size
-        if len(state.accumulated_feedback) > MAX_FEEDBACK_CHARS:
-            state.accumulated_feedback = state.accumulated_feedback[-MAX_FEEDBACK_CHARS:]
-            print(f"[Info] Truncated accumulated feedback to last {MAX_FEEDBACK_CHARS} chars")
 
         # Read best code if available
         best_code_text = None
@@ -581,14 +575,25 @@ def run_single_attempt(
             except Exception:
                 pass
 
-        # Generate revised code
+        # Read previous code if available
+        prev_code_text = None
+        if state.prev_code_path and state.prev_code_path.exists():
+            try:
+                prev_code_text = state.prev_code_path.read_text(encoding="utf-8")
+            except Exception:
+                pass
+
+        # Generate revised code with best + prev context
         code = ask_code_with_data(
             summary, df, data_path, cols, instruction,
             model=model,
-            error_feedback=state.accumulated_feedback,
-            best_result_text=state.best_result_text,
-            best_score=state.best_score if state.best_score >= 0 else None,
+            is_retry=True,
             best_code_text=best_code_text,
+            best_discrepancy=state.best_discrepancy,
+            best_score=state.best_score if state.best_score >= 0 else None,
+            prev_code_text=prev_code_text,
+            prev_discrepancy=state.prev_discrepancy,
+            prev_error=state.prev_error,
         )
         code_path = output_dir / f"generated_analysis_retry_{attempt}.py"
         save_artifact(output_dir, f"generated_analysis_retry_{attempt}.py", code)
@@ -608,7 +613,11 @@ def run_single_attempt(
     if runtime_error:
         save_artifact(output_dir, f"runtime_error_attempt_{attempt}.txt", runtime_error)
         print(f"[Runtime Error] Saved traceback → runtime_error_attempt_{attempt}.txt")
-        state.accumulated_feedback = f"{state.accumulated_feedback}\n\n--- RUNTIME ERROR ---\n{runtime_error}" if state.accumulated_feedback else runtime_error
+        # Store as previous attempt info for next iteration
+        state.prev_attempt = attempt
+        state.prev_code_path = code_path
+        state.prev_result_text = None
+        state.prev_error = runtime_error
         state.generated_text = ""
         success = "0"
     else:
@@ -628,8 +637,16 @@ def run_single_attempt(
         success = "1" if is_aligned else "0"
         print(f"[Score {attempt}] {state.last_score}/100, Aligned: {is_aligned}")
 
+        # Store as previous attempt info for next iteration
+        state.prev_attempt = attempt
+        state.prev_code_path = code_path
+        state.prev_result_text = generated_text
+        state.prev_error = None
+
         # Update best if needed
         if state.last_score > state.best_score:
+            # Generate discrepancy for the new best (will be used in future retries)
+            state.best_discrepancy = report_discrepancy(true_result_text, generated_text, model=model)
             state.best_score = state.last_score
             state.best_result_text = generated_text
             state.best_attempt = attempt
@@ -674,6 +691,12 @@ def main(
     data_path = Path(data_path)
 
     state = RunState()
+
+    print(f"\n{'='*70}")
+    print(f"[Config] Model: {model}")
+    print(f"[Config] Max attempts: {max_attempts}")
+    print(f"[Config] Output directory: {output_dir}")
+    print(f"{'='*70}")
 
     # (1) Summarize the paper PDF and target table and extract true results
     summary, true_result_text = summarize_and_extract_pdf(pdf_path, model=model)
@@ -720,7 +743,7 @@ def main(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Replicate a summary/frequency table from a paper using PDF + Codebook + CSV with LLM assistance.")
+    parser = argparse.ArgumentParser(description="Replicate a summary/frequency table (Table 3) from a paper using PDF + Codebook + CSV with LLM assistance.")
     parser.add_argument("--pdf", dest="pdf_path", type=str,
                         default="Bryson_paper.pdf",
                         help="Path to the paper PDF.")

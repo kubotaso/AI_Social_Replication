@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/MainScript_Table2.py", line 286, in try_run_generated_code
+    result = mod.run_analysis(str(data_path))  # type: ignore[attr-defined]
+  File "/Users/kubotaso/Library/CloudStorage/Dropbox/lib/AI_WVS/Replication_scripts/output_run_all/20260130_222138/Table2/generated_analysis_retry_16.py", line 453, in run_analysis
+    fs = combined_fit[["DV", "N", "R2", "Adj_R2", "Constant", "Constant_Replication_Sig", "Dropped_predictors_no_variation"]].copy()
+         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/frame.py", line 4119, in __getitem__
+    indexer = self.columns._get_indexer_strict(key, "columns")[1]
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/indexes/base.py", line 6212, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kubotaso/.venv/lib/python3.13/site-packages/pandas/core/indexes/base.py", line 6264, in _raise_if_missing
+    raise KeyError(f"{not_found} not in index")
+KeyError: "['Constant_Replication_Sig', 'Dropped_predictors_no_variation'] not in index"

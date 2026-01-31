@@ -1,0 +1,195 @@
+Score: 78/100
+============================================================
+
+## 1) Row items/categories (names or number of items)
+
+### A. Missing split of “New Age/Space” and “Opera”
+- **True table (Panel 2)** has **two separate columns**: **“New Age/Space”** and **“Opera”**.
+- **Generated table** incorrectly merges them into a **single column** labeled **“New Age/Space Opera”**.
+
+**How to fix**
+- Replace the single generated column **“New Age/Space Opera”** with **two columns**:
+  - **New Age/Space**
+  - **Opera**
+- Populate each with the correct (true) frequencies and mean (see section 2).
+
+### B. “(M) No answer” row label is fine, but values are not
+- The row categories match in name and order overall (1–5, DK, No answer, Mean), **but multiple “(M) No answer” counts differ** (see below).
+
+---
+
+## 2) Frequency count mismatches (cell-by-cell)
+
+Below are **every** count that differs between Generated vs True.
+
+### Panel 1 columns (Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber)
+
+**(M) Don’t know much about it**
+- Latin/Salsa: **Generated 198** vs **True 221** (should be **221**)
+- Jazz: **45** vs **38** (should be **38**)
+- Blues/R&B: **58** vs **56** (should be **56**)
+- Oldies: **43** vs **41** (should be **41**)
+- Classical/Chamber: **65** vs **66** (should be **66**)
+- Show Tunes: **77 vs 77** (matches)
+
+**(M) No answer**
+- Latin/Salsa: **35** vs **12** (should be **12**)
+- Jazz: **8** vs **15** (should be **15**)
+- Blues/R&B: **10** vs **12** (should be **12**)
+- Oldies: **8** vs **10** (should be **10**)
+- Classical/Chamber: **12** vs **11** (should be **11**)
+- Show Tunes: **14 vs 14** (matches)
+
+All rows (1)–(5) in Panel 1 **match** the true table; the mismatches are only in DK/No answer.
+
+---
+
+### Panel 2 columns (Reggae, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk)
+
+**Reggae**
+- (M) Don’t know: **Generated 260** vs **True 295** (should be **295**)
+- (M) No answer: **46** vs **11** (should be **11**)
+
+**Swing/Big Band**
+- (M) Don’t know: **150** vs **164** (should be **164**)
+- (M) No answer: **26** vs **12** (should be **12**)
+
+**New Age/Space** (cannot match because generated merges with Opera)
+- True New Age/Space:
+  - Like very much **48**
+  - Like it **186**
+  - Mixed **269**
+  - Dislike **429**
+  - Dislike very much **368**
+  - Don’t know **292**
+  - No answer **14**
+  - Mean **3.68**
+
+**Opera** (also cannot match because merged)
+- True Opera:
+  - Like very much **73**
+  - Like it **257**
+  - Mixed **359**
+  - Dislike **515**
+  - Dislike very much **306**
+  - Don’t know **83**
+  - No answer **13**
+  - Mean **3.48**
+
+**What the generated merged column shows (wrong)**
+- Generated “New Age/Space Opera”:
+  - Like very much **73** (this equals **Opera**, not New Age/Space)
+  - Like it **257** (equals **Opera**)
+  - Mixed **359** (equals **Opera**)
+  - Dislike **515** (equals **Opera**)
+  - Dislike very much **306** (equals **Opera**)
+  - Don’t know **82** (should be **Opera 83**; off by 1)
+  - No answer **14** (should be **Opera 13**; and New Age/Space is 14)
+  - Mean **3.48** (equals **Opera**, not New Age/Space)
+
+So the merged column is essentially **Opera’s distribution** (with small DK/No answer errors) and **New Age/Space is entirely missing**.
+
+**Bluegrass**
+- (M) Don’t know: **148** vs **163** (should be **163**)
+- (M) No answer: **26** vs **11** (should be **11**)
+
+**Folk**
+- (M) Don’t know: **76** vs **78** (should be **78**)
+- (M) No answer: **14** vs **12** (should be **12**)
+
+(1)–(5) rows for Reggae/Swing/Bluegrass/Folk **match**; mismatches are DK/No answer plus the missing New Age/Space column.
+
+---
+
+### Panel 3 columns (Pop/Easy Listening, Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel)
+
+**Pop/Easy Listening**
+- (M) Don’t know: **Generated 72** vs **True 72** (matches)
+- (M) No answer: **13 vs 13** (matches)
+
+**Contemporary Rock**
+- (M) Don’t know: **53** vs **50** (should be **50**)
+- (M) No answer: **9** vs **12** (should be **12**)
+
+**Rap**
+- (M) Don’t know: **61 vs 61** (matches)
+- (M) No answer: **11 vs 11** (matches)
+
+**Heavy Metal**
+- (M) Don’t know: **68** vs **70** (should be **70**)
+- (M) No answer: **12** vs **10** (should be **10**)
+
+**Country/Western**
+- (M) Don’t know: **27** vs **22** (should be **22**)
+- (M) No answer: **5** vs **10** (should be **10**)
+
+**Gospel**
+- (M) Don’t know: **40** vs **35** (should be **35**)
+- (M) No answer: **7** vs **12** (should be **12**)
+
+All (1)–(5) rows and means in Panel 3 **match**; mismatches are only DK/No answer for several columns.
+
+---
+
+## 3) Summary statistics mismatches (means, totals, etc.)
+
+### Means
+- **All generated means match the true table** *for the columns that exist*, including the merged Opera mean **3.48**.
+- However, because **New Age/Space is missing**, its mean **3.68** is also **missing** from the generated output.
+
+### Implied totals / consistency check
+- Many of the generated **DK + No answer counts are wrong**, which will also make the **per-genre total N** inconsistent with the true table.
+- Example (Latin/Salsa):
+  - True DK+NA = 221+12 = **233**
+  - Generated DK+NA = 198+35 = **233**
+  - Interestingly sums match here, but the **distribution across DK vs No answer is incorrect**.
+- For most other genres, even the **DK+NA sum changes**, altering total N.
+
+**How to fix**
+- Use the **exact true DK and No answer counts** shown in the true table.
+- Recompute any totals/percentages after correcting those counts.
+- Add the missing **New Age/Space** column and its mean.
+
+---
+
+## 4) Missing or extra column categories
+
+### Missing column
+- **New Age/Space** is **missing** entirely.
+
+### Extra/incorrect column
+- **“New Age/Space Opera”** is an **invalid extra/merged column** that does not exist in the true table.
+
+**How to fix**
+- Remove “New Age/Space Opera”.
+- Add two columns: “New Age/Space” and “Opera” with their correct frequencies and means.
+
+---
+
+## 5) What to change in the generated table (explicit corrections)
+
+### Structural correction
+- Replace:
+  - `New Age/Space Opera`
+- With:
+  - `New Age/Space`
+  - `Opera`
+
+### Value corrections (all DK / No answer cells that must be replaced)
+- **Latin/Salsa**: DK **221**, NA **12**
+- **Jazz**: DK **38**, NA **15**
+- **Blues/R&B**: DK **56**, NA **12**
+- **Oldies**: DK **41**, NA **10**
+- **Classical/Chamber**: DK **66**, NA **11**
+- **Reggae**: DK **295**, NA **11**
+- **Swing/Big Band**: DK **164**, NA **12**
+- **New Age/Space**: DK **292**, NA **14** (plus all other rows as in true table)
+- **Opera**: DK **83**, NA **13** (plus all other rows as in true table)
+- **Bluegrass**: DK **163**, NA **11**
+- **Folk**: DK **78**, NA **12**
+- **Contemporary Rock**: DK **50**, NA **12**
+- **Heavy Metal**: DK **70**, NA **10**
+- **Country/Western**: DK **22**, NA **10**
+- **Gospel**: DK **35**, NA **12**
+
+Once those are corrected and New Age/Space is separated from Opera, the generated table will match the true table.

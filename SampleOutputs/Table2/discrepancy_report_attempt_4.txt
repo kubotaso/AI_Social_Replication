@@ -1,0 +1,149 @@
+Score: 21/100
+============================================================
+
+### 1) Variable-name / specification mismatches
+
+**A. Missing predictor: `no_religion`**
+- **True Table 2 includes:** *No religion* (Model 1 = 0.057; Model 2 = 0.024)
+- **Generated results:** `no_religion` is **not** listed in `model_1_predictors_kept` or `model_2_predictors_kept`, and there are only **11** betas shown (true models have **12** IVs).
+- **Fix:** Add the `no_religion` dummy to both models (with the same reference category as Bryson). Re-run the models so the coefficient list matches Table 2.
+
+**B. DV definitions and scale do not match the paper**
+- **True DVs (two indices):**
+  - Model 1 DV: “Dislike of Rap, Reggae, Blues/R&B, Jazz, Gospel, and Latin Music”
+  - Model 2 DV: “Dislike of the 12 Remaining Genres”
+- **Generated DV descriptives look incompatible:** you report `dv1` and `dv2` with **N = 1134 and 1057**, means 2.06 and 3.78, max 6 and 12. The *max* aligns with “6 genres” and “12 genres”, but the **case counts** do not match the regression Ns (261/259) and also don’t match Bryson’s Ns (644/605).
+- **Fix:** Ensure you are using the same sample restriction and missing-data handling as the paper:
+  - construct the exact two DV indices from the same GSS items/years used by Bryson;
+  - restrict to the same analytic sample;
+  - use the same listwise deletion (or whatever the paper did) so the **regression N** matches 644 and 605.
+
+**C. Standardization mismatch**
+- **True results are standardized OLS coefficients (betas)** and the paper does **not** report SEs.
+- **Generated table is labeled `beta_model_*`, but the presence of an “unstd Constant” and your constant values suggest you are mixing standardized and unstandardized pieces.**
+- **Fix:** If you want to match Table 2, report **standardized coefficients for all predictors**, but keep in mind:
+  - constants in a fully standardized model are typically ~0 (if DV is standardized too).
+  - Bryson reports standardized betas **and still reports an unstandardized constant** (as shown). To match, you need to replicate *exactly* her method: standardized predictors (and/or DV) consistent with her computation, then report the constant as in the paper. (Many table-generators compute betas by post-hoc standardizing coefficients while leaving intercept unstandardized—replicate that approach if that’s what Bryson did.)
+
+---
+
+### 2) Coefficient mismatches (by variable)
+
+Below I align your generated betas (in the order implied by `model_1_predictors_kept`) with the true coefficients. Every row shown is a mismatch unless noted.
+
+#### Model 1 (True vs Generated)
+| Variable | True beta | Generated beta | Mismatch |
+|---|---:|---:|---|
+| racism_score | 0.130** | 0.143* | **star level wrong** (and value off) |
+| educ | -0.175*** | -0.260*** | **too negative** |
+| income_pc | -0.037 | -0.013 | different magnitude |
+| prestg80 | -0.020 | 0.056 | **sign wrong** |
+| female | -0.057 | -0.035 | magnitude off |
+| age | 0.163*** | 0.173** | **stars wrong** (and slightly off) |
+| black | -0.132*** | -0.175* | **stars very wrong** (and too negative) |
+| hispanic | -0.058 | 0.015 | **sign wrong** |
+| other_race | -0.017 | -0.005 | magnitude off |
+| cons_prot | 0.063 | 0.121 | **too large** |
+| southern | 0.024 | -0.063 | **sign wrong** |
+| no_religion | 0.057 | (missing) | **omitted variable** |
+
+#### Model 2 (True vs Generated)
+| Variable | True beta | Generated beta | Mismatch |
+|---|---:|---:|---|
+| racism_score | 0.080 | -0.008 | **sign wrong** |
+| educ | -0.242*** | -0.164* | **too small**, **stars wrong** |
+| income_pc | -0.065 | -0.080 | close-ish but not equal |
+| prestg80 | 0.005 | -0.084 | **sign wrong** |
+| female | -0.070 | -0.083 | close-ish but not equal |
+| age | 0.126** | 0.125 | **stars missing** |
+| black | 0.042 | 0.042 | **this one matches closely** |
+| hispanic | -0.029 | 0.009 | **sign wrong** |
+| other_race | 0.047 | 0.125* | **too large**, stars wrong |
+| cons_prot | 0.048 | 0.143* | **too large**, stars wrong |
+| southern | 0.069 | 0.099 | value off (and likely star mismatch) |
+| no_religion | 0.024 | (missing) | **omitted variable** |
+
+**Bottom line:** The generated coefficients do not look like “rounding differences.” Multiple **sign flips** strongly indicate you are not using the same coding, sample, DV construction, or model specification as the paper.
+
+---
+
+### 3) Standard errors / significance interpretation mismatches
+
+**A. The paper does not report SEs**
+- **Generated output includes stars, which implies you computed p-values from SEs/t-tests.**
+- But since Bryson doesn’t print SEs, you cannot “match” her stars unless:
+  1) you perfectly replicate her dataset, coding, and procedure; and  
+  2) you apply the same significance test assumptions (two-tailed OLS t-tests as noted).
+- **Fix:** Either (i) remove SEs/stars and present only standardized betas (closest to the paper), or (ii) fully replicate the analytic dataset so your stars align.
+
+**B. Stars are inconsistent with the true table even when betas are similar**
+Examples:
+- Model 1 racism: true ** (p<.01) vs generated *.
+- Model 2 age: true ** vs generated no star.
+- Model 1 black: true *** vs generated *.
+This again points to wrong N/sample and/or wrong variable construction (SEs depend heavily on N and variance).
+
+---
+
+### 4) Model fit / sample size mismatches
+
+**A. N is drastically wrong**
+- **True:** N=644 (Model 1), N=605 (Model 2)
+- **Generated:** N=261 and 259
+- **Fix:** You are dropping far too many cases. Common causes:
+  - using a different survey wave / subset;
+  - listwise deleting on variables not in Bryson’s models (e.g., accidentally including additional controls, weights, or genre items with missingness);
+  - coding DVs from many items and requiring complete data on all items (which can shrink N a lot).
+  
+  To match Bryson: apply the same missing-data rule she effectively used for constructing the indices (often: compute index if respondent answered enough items, or use mean of available items rather than complete-case across all items—depends on her method). Then listwise delete only on the IVs in the table.
+
+**B. R² values do not match**
+- **True:** R² = 0.145 (M1), 0.147 (M2)
+- **Generated:** R² = 0.178 (M1), 0.151 (M2)
+- **Fix:** Once you fix sample, DV construction, and add `no_religion`, R² should move closer. R² differences this large are also consistent with your much smaller N and altered variance.
+
+**C. Constants do not match**
+- **True constants:** 2.415*** (M1) and 7.860 (M2)
+- **Generated constants:** 2.605 and 5.195
+- **Fix:** Constants are very sensitive to DV coding (index construction, item coding direction, whether “dislike” is coded same way, etc.). Fix DV construction first; then confirm IV coding and reference categories for dummies.
+
+---
+
+### 5) Interpretation mismatches (what your generated results would imply vs the paper)
+
+Because of sign flips, your generated analysis would reverse several substantive claims relative to Bryson, for example:
+- **Model 2 racism_score:** true is positive (0.080), generated is ~0 (slightly negative). That changes the conclusion about racism and dislike of “remaining genres.”
+- **Southern (Model 1):** true positive (0.024), generated negative (-0.063). That flips regional interpretation.
+- **Prestige:** true near zero (M1 negative, M2 near zero), generated strongly negative in M2 and positive in M1—suggesting a socioeconomic pattern not in the original.
+
+**Fix:** Do not “interpret” until the coding/spec matches. Rebuild variables to match the paper and then re-check signs first.
+
+---
+
+## How to make the generated analysis match Bryson (action checklist)
+
+1. **Add the missing predictor**
+   - Include `no_religion` (coded exactly as Bryson; verify reference category for religion dummies).
+
+2. **Recreate the two dependent variables exactly**
+   - Ensure the same genre items, same “dislike” direction, same aggregation rule (sum/mean), and same handling of missing genre responses.
+
+3. **Match the analytic sample**
+   - Use the same survey year(s), age restrictions (if any), and exclusions as Bryson.
+   - Replicate missing-data handling to recover **N≈644 and N≈605**.
+
+4. **Match dummy coding / reference categories**
+   - Race dummies: confirm white is the reference.
+   - Region: confirm how “Southern” is defined.
+   - Gender: confirm female=1 matches the table’s direction.
+   - Religion: confirm “Conservative Protestant” definition and how “No religion” is separated.
+
+5. **Compute standardized coefficients the same way**
+   - Make sure the reported betas correspond to Table 2’s standardized OLS coefficients.
+   - If you compute betas post-estimation, verify it reproduces Bryson’s approach.
+
+6. **Only then compare stars**
+   - Apply two-tailed tests and the same p-value thresholds.
+   - If you still don’t match stars after matching coefficients closely, the remaining gap is likely sample/weighting/variance differences.
+
+If you paste the exact mapping between the 11 generated coefficient rows and variable names (since the printed table lacks row labels), plus your variable coding rules (especially for the two DVs and religion/race), I can pinpoint which specific row corresponds to which mismatch and which recode is causing each sign flip.

@@ -1,145 +1,168 @@
-Score: 78/100
+Score: 48/100
 ============================================================
 
-## Discrepancy report (GT Fig. 1 vs generated)
+## Discrepancy report (Ground-truth Fig 1 vs generated)
 
-### 1) Series mapping is swapped (wrong line on wrong y-axis)
-- **GT:**  
-  - **Solid line** = *Coefficient for Musical Tolerance* (left y-axis, values ~ -0.2 to -0.45).  
-  - **Dash-dot line** = *Mean Education of Genre Audience* (right y-axis, values ~ 12.6 to 14.8).
+### 1) Series mapping is swapped (major)
+- **Ground truth:**  
+  - **Solid line** = *Coefficient for Musical Tolerance* (left y-axis; negative coefficients, jagged).  
+  - **Dash-dot line** = *Mean Education of Genre Audience* (right y-axis; generally increasing left→right).
 - **Generated:**  
-  - **Solid line** is increasing to ~15 on the **right axis** pattern, i.e., it’s plotting **mean education** as solid.  
-  - **Dash-dot line** is negative and tracks the **tolerance coefficient** pattern, i.e., it’s plotting **coefficient** as dash-dot.
-- **Impact:** Labels/annotations point to the wrong series; visual relationship is reversed.
+  - **Solid line** is increasing left→right (looks like education), while **dash-dot** is jagged/declining (looks like coefficients).  
+- **Impact:** Both lines are plotted against the wrong axis (or labels/linestyles assigned to the wrong series).
+
+### 2) X-axis category set/order differs (major)
+- **Ground truth categories/order (left→right):**  
+  `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel`
+- **Generated categories/order:**  
+  `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk, Reggae, Easy Listening, Pop/Contemporary Rock, Rap, Heavy Metal, Country/Western, Gospel`
+- **Exact differences:**
+  - **Missing in generated:** `Classical` (replaced), `Swing` (replaced), `Pop/Rock` (replaced), `Country` (replaced), and **`Reggae` moved** (and not between Classical and Swing as in GT).
+  - **Extra/renamed in generated:** `Classical/Chamber`, `Swing/Big Band`, `Pop/Contemporary Rock`, `Country/Western`.
+  - **Order mismatch:** In GT `Reggae` is between `Classical` and `Swing`; in generated it appears later (after `Folk`).
+
+### 3) Education trend shape differs (major; indicates wrong aggregation or wrong data mapping)
+- **Ground truth dash-dot (education):** mostly monotonic upward across genres, ending highest at `Gospel`.
+- **Generated dash-dot:** oscillates and trends downward late (Rap→Gospel), not matching GT.
+- This is consistent with the **series swap**, but could also indicate **education computed per “liking” subset incorrectly** (see fixes).
+
+### 4) Coefficient series shape differs (major; indicates wrong values or smoothing/ordering)
+- **Ground truth solid (coefficients):** jagged with a notable dip around `Bluegrass` (~-0.39) and more negative toward `Heavy Metal/Country/Gospel`.
+- **Generated solid:** smooth monotonic rise from ~-0.42 to ~-0.12 (does not resemble GT coefficients at all).
+- Suggests **coefficients weren’t genre-specific** (e.g., sorted by education and then plotted, or cumulative mean, or smoothed), or again **series swap**.
+
+### 5) Horizontal reference line placement (minor/uncertain but likely wrong axis binding)
+- **Ground truth:** dotted horizontal line labeled “Sample Mean Education” corresponds to **right y-axis** around **13**.
+- **Generated:** dotted line is present at ~13, but if series are swapped, the annotation/reference may be tied to the wrong axis or computed from the wrong variable.
+
+### 6) Annotations/leader lines differ (minor)
+- **Ground truth:** two callouts with thin leader lines:
+  - “Mean Education of Genre Audience” pointing to dash-dot line early in plot.
+  - “Coefficient for Musical Tolerance” pointing to solid line low-left.
+- **Generated:** similar text exists, but pointers target the wrong series because the series mapping is swapped; placement differs.
+
+### 7) Layout/aspect differs (minor)
+- **Ground truth:** more square plotting area; thicker border; x labels rotated ~45°.  
+- **Generated:** wider/shorter aspect; different spacing. (Not data-wrong, but visible mismatch.)
 
 ---
 
-### 2) X-axis categories differ (names + order + missing/extra genres)
-- **GT x labels/order (19):**  
-  `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, Swing, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel` **(+ one more category present between Oldies and Classical?)**  
-  (GT clearly includes **Classical** and **Reggae** as separate ticks and uses **Pop/Rock**.)
-- **Generated x labels/order (18):**  
-  `Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical/Chamber, Swing/Big Band, New Age/Space, Opera, Bluegrass, Folk, Easy Listening, Pop/Contemporary Rock, Reggae, Rap, Heavy Metal, Country/Western, Gospel`
-- **Exact discrepancies:**
-  - **Classical/Chamber** ≠ **Classical**
-  - **Swing/Big Band** ≠ **Swing**
-  - **Pop/Contemporary Rock** ≠ **Pop/Rock**
-  - **Country/Western** ≠ **Country**
-  - **Reggae position:** in GT it occurs earlier (near Classical/Swing cluster); in generated it appears later (after Pop/Contemporary Rock).
-  - **Counts/order mismatch** → even if values are correct, they are plotted against the wrong genre.
+## Code/data fixes to match exactly (actionable steps)
 
----
+### A) Fix the genre list **and its order** (must match GT)
+- **Data processing**
+  - Build a canonical ordered list and reindex your dataframe before plotting:
+    ```python
+    genre_order = [
+        "Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies","Classical",
+        "Reggae","Swing","New Age/Space","Opera","Bluegrass","Folk",
+        "Easy Listening","Pop/Rock","Rap","Heavy Metal","Country","Gospel"
+    ]
+    df = df.set_index("genre").reindex(genre_order).reset_index()
+    ```
+  - **Rename categories to GT names** (undo your expanded labels):
+    ```python
+    rename = {
+      "Classical/Chamber":"Classical",
+      "Swing/Big Band":"Swing",
+      "Pop/Contemporary Rock":"Pop/Rock",
+      "Country/Western":"Country",
+    }
+    df["genre"] = df["genre"].replace(rename)
+    ```
+  - Ensure `Reggae` is its own row and not merged/mis-assigned.
 
-### 3) Education series shape/order doesn’t match (due to category ordering/aggregation)
-- **GT education (dash-dot)** rises fairly steadily from ~12.7 to ~14.8 with small steps.
-- **Generated education (currently solid)** oscillates more and shows a big late jump; this is consistent with **genre order mismatch and/or different grouping definitions** (e.g., Classical/Chamber combines subgenres; Pop/Contemporary Rock differs from Pop/Rock).
+- **Matplotlib**
+  - Use the `genre_order` as x tick labels explicitly (don’t let sorting change it):
+    ```python
+    x = np.arange(len(genre_order))
+    ax.set_xticks(x)
+    ax.set_xticklabels(genre_order, rotation=45, ha="right")
+    ```
 
----
-
-### 4) Horizontal reference line (sample mean education) placement/style
-- **Both** include a horizontal dotted line at ~13, but:
-  - **GT** dotted line is finer/lighter and positioned at the *sample mean education* used in the paper.
-  - **Generated** line looks thicker/darker and may be at a slightly different y-value (hard to read precisely), suggesting a **different mean** (again likely due to changed genre definitions / filtering).
-
----
-
-### 5) Annotations/leader lines geometry differs
-- **GT:** annotation leader lines are shorter and point to the correct series (solid for coefficient; dash-dot for education).
-- **Generated:** arrows point to lines, but because **series mapping is swapped**, the text callouts effectively reference the wrong variable.
-
----
-
-## How to fix (data processing + matplotlib) — step-by-step
-
-### A) Fix genre definitions and ordering (most critical)
-- **Create an explicit ordered category list matching GT** and enforce it before plotting:
+### B) Correct which series goes on which axis + correct linestyles (critical)
+- **Matplotlib: left axis = coefficients (solid), right axis = education (dash-dot)**
   ```python
-  gt_order = [
-      "Latin/Salsa","Jazz","Blues/R&B","Show Tunes","Oldies",
-      "Classical","Reggae","Swing","New Age/Space","Opera",
-      "Bluegrass","Folk","Easy Listening","Pop/Rock",
-      "Rap","Heavy Metal","Country","Gospel"
-  ]
+  fig, ax = plt.subplots()
+
+  # left y: coefficients (SOLID)
+  ax.plot(x, coef, color="black", lw=2.5, ls="-")
+
+  ax2 = ax.twinx()
+  # right y: education (DASH-DOT)
+  ax2.plot(x, educ, color="black", lw=2.5, ls="-.")
   ```
-- **Rename/standardize your genre labels to GT names** *before* grouping:
-  ```python
-  rename = {
-      "Classical/Chamber": "Classical",
-      "Swing/Big Band": "Swing",
-      "Pop/Contemporary Rock": "Pop/Rock",
-      "Country/Western": "Country",
-  }
-  df["genre"] = df["genre"].replace(rename)
-  ```
-- **If your source has combined categories**, you must either:
-  - **Split them back** (if data available), or
-  - Accept you cannot match GT exactly (but to replicate GT you need the same binning).
-- **Reindex grouped results to GT order** so values align with the correct tick:
-  ```python
-  edu = df.groupby("genre")["education"].mean().reindex(gt_order)
-  coef = coef_series.reindex(gt_order)  # wherever coefficients come from
-  ```
 
-### B) Ensure the correct series is plotted on the correct axis with correct linestyle
-- **Left axis (coefficients) must be SOLID**:
+- If you already have both lines but swapped: **swap the arrays** passed to `ax.plot` and `ax2.plot`, not just the labels.
+
+### C) Ensure you’re computing the *same* education statistic as GT
+The right y-axis label in GT is: **“Mean Educational Level of Respondents Who Reported Liking Each Music Genre”**.
+- **Data processing fix**
+  - Filter to *likers* per genre before averaging education:
+    ```python
+    educ = (
+      raw.loc[raw["likes_genre"] == 1]
+         .groupby("genre")["education_years"]
+         .mean()
+         .reindex(genre_order)
+         .to_numpy()
+    )
+    ```
+  - Do **not** average education over all respondents or over dislikers; and don’t use medians unless confirmed.
+
+### D) Ensure coefficients are genre-specific and not smoothed/accumulated
+GT shows discrete genre coefficients (jagged), not a monotone curve.
+- **Data processing fix**
+  - If coefficients come from a model, confirm you’re extracting the **genre-specific coefficient estimates** (or marginal effects) for the same outcome and same reference coding.
+  - Do not sort coefficients by value or by education before plotting; only use `genre_order`.
+  - Disable any rolling mean / interpolation:
+    - Avoid `np.convolve`, `rolling().mean()`, spline interpolation, or `sort_values`.
+
+### E) Match axis limits and ticks
+- **Left y-axis (coefficients):** from **-0.5 to -0.1** with ticks at `-0.5, -0.4, -0.3, -0.2, -0.1`
   ```python
-  ax.plot(gt_order, coef.values, color="black", lw=2.0, ls="-")
   ax.set_ylim(-0.5, -0.1)
   ax.set_yticks([-0.5,-0.4,-0.3,-0.2,-0.1])
-  ax.set_yticklabels(["-.5","-.4","-.3","-.2","-.1"])
   ```
-- **Right axis (education) must be DASH-DOT**:
+- **Right y-axis (education):** from **12 to 15** with ticks at `12, 13, 14, 15`
   ```python
-  ax2 = ax.twinx()
-  ax2.plot(gt_order, edu.values, color="black", lw=2.0, ls="-.")
   ax2.set_ylim(12, 15)
   ax2.set_yticks([12,13,14,15])
   ```
 
-### C) Match the sample-mean education reference line exactly
-- Compute the **paper’s sample mean** consistently with GT (same respondents, same weighting, same inclusion/exclusion).
+### F) Sample mean education reference line must be on the **right axis**
+- **Compute on the same “likers” population** used for the education series (or use the paper’s fixed value if known).
   ```python
-  sample_mean_edu = df["education"].mean()  # only if this matches GT's sample definition
-  ax2.axhline(sample_mean_edu, color="black", lw=1.0, ls=":", zorder=0)
+  sample_mean_educ = raw.loc[raw["likes_any_genre"]==1, "education_years"].mean()  # adjust to paper definition
+  ax2.axhline(sample_mean_educ, color="black", lw=1, ls=(0,(2,2)))  # dotted
   ```
-- If GT uses a fixed value (appears ~13.0), hardcode it to match:
-  ```python
-  ax2.axhline(13.0, color="black", lw=1.0, ls=":")
-  ```
+- If the paper uses the **overall sample mean education** (not conditional on liking), compute from full sample instead.
 
-### D) Fix x tick label formatting (rotation + exact strings)
-- Use the exact strings from GT and rotate similarly:
+### G) Remove legend; use annotations like GT (and point to correct line)
+- Don’t use `plt.legend()`; GT uses callouts.
+- After fixing series mapping, place annotations pointing to correct data coordinates:
   ```python
-  ax.set_xticks(range(len(gt_order)))
-  ax.set_xticklabels(gt_order, rotation=45, ha="right")
-  ```
-- If you use numeric x positions (recommended for exact control):
-  ```python
-  x = np.arange(len(gt_order))
-  ax.plot(x, coef.values, ...)
-  ax2.plot(x, edu.values, ...)
-  ax.set_xticks(x)
-  ax.set_xticklabels(gt_order, rotation=45, ha="right")
-  ```
-
-### E) Fix annotations so they point to the correct series
-- After swapping series correctly, update annotation anchor points (x index + y value):
-  ```python
-  # Example: point to education line near early genres
-  i = gt_order.index("Blues/R&B")
   ax2.annotate("Mean Education of Genre Audience",
-               xy=(i, edu.iloc[i]), xycoords=("data","data"),
-               xytext=(2, 14.1), textcoords=("data","data"),
-               arrowprops=dict(arrowstyle="-", color="black", lw=1.5),
-               fontsize=14, fontweight="bold")
-  ```
-- Do the same for coefficient label using `ax` (left axis), not `ax2`.
+               xy=(2, educ[2]), xytext=(3, 14.2),
+               arrowprops=dict(arrowstyle="-", lw=1, color="black"),
+               fontsize=16, fontweight="bold")
 
-### F) Match styling (line widths and dotted line weight)
-- Reduce dotted reference line thickness to match GT (lighter):
+  ax.annotate("Coefficient for Musical Tolerance",
+              xy=(2, coef[2]), xytext=(3, -0.47),
+              arrowprops=dict(arrowstyle="-", lw=1, color="black"),
+              fontsize=16, fontweight="bold")
+  ```
+
+### H) Match visual styling (optional but helps “exact”)
+- Use thicker spines/ticks and similar aspect:
   ```python
-  ax2.axhline(13.0, color="black", lw=1.0, ls=(0,(2,2)))
+  for a in (ax, ax2):
+      a.tick_params(width=2.5, length=12, labelsize=14)
+  for sp in ax.spines.values():
+      sp.set_linewidth(2.5)
+  for sp in ax2.spines.values():
+      sp.set_linewidth(2.5)
+  fig.set_size_inches(12, 7)  # adjust toward GT proportions
   ```
-- Keep both series black; no markers.
 
-If you paste your current plotting code (and how you compute `coef` and `edu`), I can point to the exact lines to change and provide a drop-in corrected snippet.
+If you paste your current plotting code + how you compute `coef` and `educ`, I can mark the exact lines to change (swap arrays, reindexing point, and the correct mean-education filter) so the output matches the ground truth pixel-for-pixel as closely as matplotlib allows.
