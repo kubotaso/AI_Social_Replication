@@ -4,7 +4,7 @@
 
 Kubota, Yakura, Coavoux, Yamada, Nakamura. "LLM-Assisted Replication as Scientific Infrastructure."
 
-The detailed version is `AI_Replication_Paper.pdf` in this directory.
+For methodological details and the full results, see `AI_Replication_Paper.pdf` in this directory.
 
 This repository provides tools for automatically replicating statistical analyses (tables and figures) from Bryson (1996) using Large Language Models (LLMs).
 
