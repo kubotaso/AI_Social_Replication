@@ -1,6 +1,8 @@
 # AI_Social_Science_Replication
 
-Kubota, Yakura, Coavoux, Yamada, Nakamura, "LLM-Assisted Replication for Statistical Research in Social Science"
+## [Download paper here (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1)
+
+Kubota, Yakura, Coavoux, Yamada, Nakamura, "LLM-Assisted Replication as Scientific Infrastructure"
 
 This repository provides tools for automatically replicating statistical analyses (tables and figures) from Bryson (1996) using Large Language Models (LLMs).
 
