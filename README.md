@@ -1,6 +1,6 @@
-# AI_Social_Science_Replication
+# LLM-Assisted Replication for Quantitative Social Science
 
-## [Download paper here (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1)
+## [Download perspevtive version paper here (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1)
 
 Kubota, Yakura, Coavoux, Yamada, Nakamura, "LLM-Assisted Replication as Scientific Infrastructure"
 
