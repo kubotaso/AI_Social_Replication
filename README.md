@@ -1,8 +1,10 @@
 # LLM-Assisted Replication for Quantitative Social Science
 
-## [Download perspevtive version paper here (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1)
+## [Download the paper here (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1)
 
-Kubota, Yakura, Coavoux, Yamada, Nakamura, "LLM-Assisted Replication as Scientific Infrastructure"
+Kubota, Yakura, Coavoux, Yamada, Nakamura. "LLM-Assisted Replication as Scientific Infrastructure."
+
+A detailed version is also available here: [AI_Replication_Paper.pdf](AI_Replication_Paper.pdf)
 
 This repository provides tools for automatically replicating statistical analyses (tables and figures) from Bryson (1996) using Large Language Models (LLMs).
 
@@ -12,8 +14,8 @@ The scripts in this repository use the OpenAI API to:
 1. Read and summarize a research paper PDF
 2. Map variables from the paper to a dataset codebook
 3. Generate Python code to replicate the analysis
-4. Compare generated results against the original paper
-5. Iteratively refine the code until results match
+4. Compare the generated results against the original paper
+5. Iteratively refine the code until the results match
 
 ## Prerequisites
 
@@ -30,7 +32,7 @@ Place the following files in the same directory as the scripts:
 
 ### Data Preparation
 
-Run the "CustomDocData.R" to download GSS 1993 data and create necessary files. The script uses `gssr` and `gssrdoc` packages.
+Run `CustomDocData.R` to download the GSS 1993 data and create the necessary files. The script uses the `gssr` and `gssrdoc` packages.
 - `gss93_selected.csv` - Dataset with selected variables
 - `gss_selected_variables_doc.txt` - Variable documentation/codebook
 
