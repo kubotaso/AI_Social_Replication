@@ -1,0 +1,553 @@
+PSID Variable Mapping for Topel (1991) Replication
+====================================================
+
+This document maps paper variables to PSID variable names for each wave year 1968-1983.
+Variables are identified from the Stata .do files accompanying each family file.
+
+Note: The PSID uses "V" numbering (V1, V2, ...) that differs across years.
+In 1976+, some questions changed format substantially (section-based coding like C3, D1, etc.)
+
+===============================================================================
+1. FAMILY INTERVIEW NUMBER (ID)
+===============================================================================
+Used to merge family data with individual file.
+
+Year  Variable  Label
+1968  V2        "INTERVIEW NUMBER 68" (cols 2-6)
+1969  V442      (first var in infix, cols 2-5) -- 1969 ID
+1970  V1102     (cols 2-5) -- 1970 ID
+1971  V1802     (cols 2-5) -- 1971 ID
+1972  V2402     (cols 2-5) -- 1972 ID
+1973  V3002     (cols 2-5) -- 1973 ID
+1974  V3402     "1974 ID NUMBER" (cols 2-5)
+1975  V3802     (cols 2-5) -- 1975 ID
+1976  V4302     "1976 ID NUMBER" (cols 2-5)
+1977  V5202     (cols 2-5) -- 1977 ID
+1978  V5702     (cols 2-5) -- 1978 ID
+1979  V6302     (cols 2-5) -- 1979 ID
+1980  V6902     "1980 INTERVIEW NUMBER"
+1981  V7502     "1981 INTERVIEW NUMBER"
+1982  V8202     "1982 INTERVIEW NUMBER"
+1983  V8802     "1983 INTERVIEW NUMBER"
+
+===============================================================================
+2. AGE OF HEAD
+===============================================================================
+
+Year  Variable  Label
+1968  V117      "AGE OF HEAD"
+1969  V1008     "AGE OF HEAD"
+1970  V1239     "AGE OF HEAD"
+1971  V1942     "AGE OF HEAD"
+1972  V2542     "AGE OF HEAD"
+1973  V3095     "AGE OF HEAD"
+1974  V3508     "AGE OF HEAD"
+1975  V3921     "AGE OF HEAD"
+1976  V4436     "AGE OF HEAD"
+1977  V5350     "AGE OF HEAD"
+1978  V5850     "AGE OF HEAD"
+1979  V6462     "AGE OF HEAD"
+1980  V7067     "AGE OF HEAD"
+1981  V7658     (inferred from sequence, near V7659 SEX)
+1982  V8352     (inferred from sequence, near V8353 SEX)
+1983  V8961     (inferred from sequence, near V8962 SEX)
+
+Note: For 1981-1983, the age variable is not explicitly labeled "AGE OF HEAD"
+in the search results. Must check .do files more carefully. In practice,
+age is typically immediately before sex in the variable sequence.
+
+===============================================================================
+3. SEX OF HEAD
+===============================================================================
+
+Year  Variable  Label
+1968  V119      "SEX OF HEAD"
+1969  V1010     "SEX OF HEAD"
+1970  V1240     "SEX OF HEAD"
+1971  V1943     "SEX OF HEAD"
+1972  V2543     "SEX OF HEAD"
+1973  V3096     "SEX OF HEAD"
+1974  V3509     "SEX OF HEAD"
+1975  V3922     "SEX OF HEAD"
+1976  V4437     "SEX OF HEAD"
+1977  V5351     "SEX OF HEAD"
+1978  V5851     "SEX OF HEAD"
+1979  V6463     "SEX OF HEAD"
+1980  V7068     "SEX OF HEAD"
+1981  V7659     "SEX OF 1981 HEAD"
+1982  V8353     "SEX OF 1982 HEAD"
+1983  V8962     "SEX OF 1983 HEAD"
+
+Coding: 1=Male, 2=Female
+
+===============================================================================
+4. RACE
+===============================================================================
+
+Year  Variable  Label
+1968  V181      "RACE"
+1969  V801      "RACE"
+1970  V1490     "RACE"
+1971  V2202     "RACE"
+1972  V2828     "RACE"
+1973  V3300     "RACE (FROM 1972 INT)"
+1974  V3720     "RACE"
+1975  V4204     "RACE"
+1976  V5096     "RACE"
+1977  V5662     "RACE (FROM 1972 DATA)"
+1978  V6209     "RACE (FROM 1972)"
+1979  V6802     "RACE (FROM 1972)"
+1980  V7447     "RACE (FROM 1972)"
+1981  V8099     "RACE (FROM 1972)"
+1982  V8723     "RACE (FROM 1972)"
+1983  V9408     "RACE (FROM 1972)"
+
+Coding: 1=White, 2=Negro/Black, 3=Puerto Rican/Mexican/Other
+Note: From 1972 onward, race is carried forward from the 1972 interview.
+
+===============================================================================
+5. EDUCATION OF HEAD (years of completed schooling)
+===============================================================================
+
+Year  Variable  Label
+1968  V313      "HEADS EDUCATION"
+1969  V794      "EDUCATION OF HEAD"
+1970  V1485     "EDUCATION OF HEAD"
+1971  V2197     "EDUCATION OF HEAD"
+1972  V2823     "EDUCATION OF HEAD"
+1973  V3241     "EDUCATION-HEAD"
+1974  V3663     "EDUCATION-HEAD"
+1975  V4093     "EDUCATION-HD"
+1976  V4684     "# YRS HD SCHOOLING K25"
+1977  V5647     "EDUCATION OF HEAD"
+1978  V6194     "EDUCATION 1978 HEAD"
+1979  V6787     "EDUCATION 1979 HEAD"
+1980  V7433     "EDUCATION 1980 HEAD"
+1981  V8085     "EDUCATION 1981 HEAD"
+1982  V8709     "EDUCATION 1982 HEAD"
+1983  V9395     "EDUCATION 1983 HEAD"
+
+Coding: 0-17 years of completed education. 99=NA/DK.
+
+===============================================================================
+6. MARITAL STATUS
+===============================================================================
+
+Year  Variable  Label
+1968  V239      "MARITAL STATUS"
+1969  V607      "MARITAL STATUS"
+1970  V1365     "MARITAL STATUS"
+1971  V2072     "MARITAL STATUS"
+1972  V2670     "MARITAL STATUS"
+1973  V3181     "MARITAL STATUS-HD"
+1974  V3598     "MARITAL STATUS"
+1975  V3815     "75 FU COMPOSITION" (use first digit or separate coding)
+1976  V4603     "MARITAL STATUS G1"
+1977  V5502     "MARITAL STAT G1"
+1978  V6197     "MARITAL STATUS" (summary var) or V6034 "G1 MARITAL STATUS"
+1979  V6790     "MARITAL STATUS"
+1980  V7261     "J1 MARITAL STATUS" or V7435 "MARITAL STATUS 1980"
+1981  V7952     "J1 MARITAL STATUS" or V8087 "MARITAL STATUS 1981"
+1982  V8603     "J1 MARITAL STATUS" or V8711 "MARITAL STATUS 1982"
+1983  V9276     "J1 MARITAL STATUS" or V9419 "MARITAL STATUS 1983"
+
+Coding: 1=Married, spouse present; 2=Single; 3=Widowed; 4=Divorced/Separated; 5=Separated
+For 1975: use family composition variable (first digit indicates presence of wife).
+
+===============================================================================
+7. HEAD'S WAGES AND SALARY (labor income)
+===============================================================================
+
+Year  Variable  Label                              Notes
+1968  V74       "HDS LABOR INCOME"                 Prior year (1967) income
+1969  V514      "LABOR INC HEAD"                   1968 income
+1970  V1196     "LABOR INC HEAD"                   1969 income
+1971  V1897     "LABOR INC HEAD"                   1970 income
+1972  V2498     "LABOR INC HEAD"                   1971 income
+1973  V3051     "HDS TOT LABOR Y"                  1972 income
+1974  V3463     (near V3458 "ANN WAGE-HEAD")       1973 income
+1975  V3863     "HEAD LABOR Y"                     1974 income
+1976  V5031     "HEAD TOTAL LABOR Y"               1975 income
+1977  V5627     "TOT 1976 LABOR INCM HEAD"         1976 income
+1978  V6174     "TOT 1977 HEAD LABOR Y"            1977 income
+1979  V6767     "TOT 1978 HEAD LABOR Y"            1978 income
+1980  V7413     "TOT HD LABOR $ Y 79"              1979 income
+1981  V8066     "TOT HD LABOR $ $ Y 80"            1980 income
+1982  V8690     "TOT HD LABOR $ $ Y 81"            1981 income
+1983  V9376     "TOTAL HEAD LABOR Y 82"            1982 income
+
+Alternative: Head's wages only (excludes farm/business):
+1968  V74       "HDS LABOR INCOME"
+1969  V514      "LABOR INC HEAD" (may include business)
+1970  V1191     "HEAD WAGES"
+1971  V1892     "HEAD WAGES"
+1972  V2493     "HEAD WAGES"
+1973  V3046     "HDS WAGE"
+1974  V3458     "ANN WAGE-HEAD"
+1975  V3858     "HEAD WAGES"
+1976  V4373     "ANNUAL WAGES H8"
+1977  V5283     "HEAD 1976 WAGES"
+1978  V5782     "HEAD 1977 WAGES"
+1979  V6391     "HEAD 1978 WAGES"
+1980  V6981     "HEAD 1979 WAGES"
+1981  V7573     "HEAD 1980 WAGES"
+1982  V8265     "HEAD 1981 WAGES"
+1983  V8873     "HEAD 1982 WAGES"
+
+Note: Topel uses labor income. Wages/salary is the primary component.
+Income refers to the PRIOR year (e.g., 1968 wave reports 1967 income).
+
+===============================================================================
+8. HEAD'S ANNUAL WORK HOURS
+===============================================================================
+
+Year  Variable  Label                              Notes
+1968  V47       "YRLY HEADS HRS"                   1967 hours
+1969  V465      "HRS HEAD WORKED"                  1968 hours
+1970  V1138     "HRS HEAD WORKED"                  1969 hours
+1971  V1839     "HRS HEAD WORKED"                  1970 hours
+1972  V2439     "HRS HEAD WORKED"                  1971 hours
+1973  V3027     "HDS ANN WORK HRS"                 1972 hours
+1974  V3423     "ANN WRK HRS-HD"                   1973 hours
+1975  V3823     "HRS HD WORKED"                    1974 hours
+1976  V4332     "ANN WORK HOURS"                   1975 hours
+1977  V5232     "HD ANN WRK HRS IN 76"             1976 hours
+1978  V5731     "HD ANN WRK HRS IN 77"             1977 hours
+1979  V6336     "HD ANN WRK HRS IN 78"             1978 hours
+1980  V6934     "HD ANN WRK HRS IN 79"             1979 hours
+1981  V7530     "HD ANN WRK HRS IN 1980"           1980 hours
+1982  V8228     "HD ANN WRK HRS IN 1981"           1981 hours
+1983  V8830     "HD ANN WRK HRS IN 1982"           1982 hours
+
+===============================================================================
+9. SELF-EMPLOYMENT STATUS
+===============================================================================
+
+Year  Variable  Label
+1968  V198      "SELF-EMPLOYED"
+1969  V641      "SELF-EMPLOYED HEAD"
+1970  V1280     "SELF EMPLOYED HEAD"
+1971  V1986     "SELF EMPLOYED HEAD"
+1972  V2584     "SELF EMPLOYED HEAD"
+1973  V3117     "WORK FOR SELF?(E)"
+1974  V3532     "WTR SELF-EMPLD (E)"
+1975  V3970     "SELF-EMP OR? (E)"
+1976  (not explicitly found; use employment status or occupation-based)
+1977  V5376     "WORK FOR SELF/OTR?(E) D5"
+1978  V5875     "D5 WORK FOR SELF/OTR (E)"
+1979  V6493     "C2 WORK SELF/OTR (HD-E)"
+1980  V7096     "C2 WORK SELF/OTR (HD-E)"
+1981  V7707     "C2 WORK SELF/OTR?(HD-E)"
+1982  V8375     "C2 WORK SELF/OTR?(HD-E)"
+1983  V9006     "C2 WORK SELF/OTR?(HD-E)"
+
+Coding varies by year:
+1968: 0=working for someone else, 1=self-employed, 9=NA
+1969-1972: 1=someone else, 2=both, 3=self only
+1973-1975: 1=someone else, 2=self-employed, 9=NA
+1977-1983: 1=someone else, 2=self-employed, 3=both
+
+===============================================================================
+10. OCCUPATION OF HEAD (1-digit)
+===============================================================================
+
+Year  Variable  Label
+1968  V197      "WORKING NOW" (V197_A = "OCCUPATION OF HEAD 68", 3-digit)
+1969  V640      "OCCUPATION OF HEAD" (V640_A = 3-digit)
+1970  V1279     "OCCUPATION-HEAD(E)" (V1279_A = 3-digit)
+1971  V1984     "OCCUPATION-HEAD(E)" (V1984_A = 3-digit)
+1972  V2582     "OCCUPATION-HEAD(E)" (V2582_A = 3-digit)
+1973  V3115     (V3115_A = "OCCUPATION OF HEAD 73", 3-digit)
+1974  V3530     (V3530_A = "OCCUPATION OF HEAD 74", 3-digit)
+1975  V3968     (V3968_A = "OCCUPATION OF HEAD 75", 3-digit)
+1976  V4459     "HEAD OCCUPATION D2" (V4459_A = 3-digit)
+1977  V5374     (V5374_A = "OCCUPATION OF HEAD 77", 3-digit)
+1978  V5873     (V5873_A = "OCCUPATION OF HEAD 78", 3-digit)
+1979  V6497     (V6497_A = "OCCUPATION OF HEAD 79", 3-digit)
+1980  V7100     (V7100_A = "OCCUPATION OF HEAD 80", 3-digit)
+1981-1983: Need to check .do files
+
+Note: 1-digit occupation codes (Census):
+1=Professional/Technical, 2=Managers, 3=Sales, 4=Clerical, 5=Craftsmen,
+6=Operatives, 7=Transport, 8=Laborers, 9=Farmers, 0=Service workers
+
+===============================================================================
+11. INDUSTRY OF HEAD
+===============================================================================
+
+Year  Variable  Label
+1968  V197_B    "INDUSTRY OF HEAD 68" (3-digit)
+1969  V640_B    "INDUSTRY OF HEAD 69"
+1970  V1279_B   "INDUSTRY OF HEAD 70"
+1971  V1985_A   "INDUSTRY OF HEAD 71"
+1972  V2583_A   "INDUSTRY OF HEAD 72"
+1973  V3116_A   "INDUSTRY OF HEAD 73"
+1974  V3531_A   "INDUSTRY OF HEAD 74"
+1975  V3969_A   "INDUSTRY OF HEAD 75"
+1976  V4460_A   "INDUSTRY OF HEAD 76"
+1977  V5375_A   "INDUSTRY OF HEAD 77"
+1978  V5874_A   "INDUSTRY OF HEAD 78"
+1979  V6498_A   "INDUSTRY OF HEAD 79"
+1980  V7101_A   "INDUSTRY OF HEAD 80"
+1981-1983: Need to check .do files
+
+Agriculture = industry codes 017-029 (Census 3-digit codes)
+
+===============================================================================
+12. GOVERNMENT EMPLOYMENT
+===============================================================================
+
+Not available in 1968-1974.
+
+Year  Variable  Label
+1975  V3971     "EMP BY GOVT? (E)"
+1976  V4462     "FED STATE OR LOC GOV D6"
+1977  V5377     "WRK FOR GOVT? (OTR)(E)D6" / V5385 "WRK FOR GOVT? (BTH-E)D14"
+1978  V5876     "D6 WRK FOR GOVT (OT-E)" / V5879 "D9 WRK FOR GOVT (BTH-E)"
+1979  V6494     "C3 WORK FOR GOVT (HD-E)"
+1980  V7097     "C3 WORK FOR GOVT (HD-E)"
+1981  V7708     "C3 WORK FOR GOVT?(HD-E)"
+1982  V8376     "C3 WORK FOR GOVT?(HD-E)"
+1983  V9007     "C3 WORK FOR GOVT?(HD-E)"
+
+Coding: 1=Yes (government), 5=No
+
+===============================================================================
+13. UNION MEMBERSHIP
+===============================================================================
+
+Not available in 1973-1974.
+
+Year  Variable  Label
+1968  V294      "UNION AND DUES"
+1969  V766      "UNION MEMBER"
+1970  V1434     "UNION MEMBER"
+1971  V2145     "UNION MEMBER"
+1972  V2787     "UNION MEMBER"
+1973  Not available
+1974  Not available
+1975  V4087     "WTR LABOR UNION-HD"
+1976  V4624     "BELONG TO LABOR UNION H48" or V4479 "BELONG TO THAT UNION D23"
+1977  V5559     "WTR LABOR UNION H52" or V5383 "BELONG TO UNION?(O-E)D12"
+1978  V6101     "H64 BELONG LABOR UNION"
+1979  V6707     "K75 UNION MEMBER-HD"
+1980  V7340     "K109 UNION MEMBER-HD"
+1981  V7971     "K54 UNION MEMBER?-HD"
+1982  (check .do file)
+1983  (check .do file)
+
+Coding: 1=Yes, 5=No (in most years)
+
+===============================================================================
+14. JOB TENURE / EMPLOYER CHANGE DETECTION
+===============================================================================
+
+For detecting employer changes across years:
+
+Early years (1968-1972): "HOW LONG HAD JOB" (coded, 1 digit)
+Year  Variable  Label
+1968  V200      "HOW LONG EMPLYR" (1 digit: coded years)
+1969  V642      "HOW LONG HAD JOB" (1 digit)
+1970  V1281     "HOW LONG HAD JOB"
+1971  V1987     "HOW LONG HAD JOB"
+1972  V2585     "HOW LONG HAD JOB"
+
+1973-1975: Not directly available in search results.
+
+1976: V4480 "HOW LONG PRES EMPLYR D24" + V4488 "HOW LONG PRES POSIT D32"
+      + V4863 "# MOS WKD-THIS EMPLR D24"
+
+1977: V5392 "# MOS WKD EMPLR(B-E) D21"
+      V5384 "# MO WKD EMPLR(OTR-E)D13"
+
+1978-1979: No explicit employer tenure variable found.
+
+1980: V7102 "C9 # MOS THIS JOB (HD-E)"
+
+1981-1983: "C6 # MOS THIS EMP(HD-E)" and "RET SAME EMPLR"
+1981  V7711 "C6 # MOS THIS EMP(HD-E)" + V7779 "C77 RET SAME EMPLR(H-E)"
+1982  V8379 "C6 # MOS THIS EMP(HD-E)" + V8444 "C71 RET SAME EMPLR(H-E)"
+1983  V9010 "C6 # MOS THIS EMP(HD-E)" + V9075 "C72 RET SAME EMPLR(H-E)"
+
+Also available for detecting job changes:
+1976: V4652 "WAS IT THE SAME JOB J12"
+1981-1983: V7780/V8445/V9076 "RET SAME JOB?(HD-E)"
+
+Strategy: Use tenure with employer (months or years) to detect new jobs.
+When tenure resets to a low value, or "same employer" = No, mark job change.
+
+===============================================================================
+15. DISABILITY / HEALTH LIMITATION
+===============================================================================
+
+Year  Variable  Label
+1968  V216      "DISABILITY"
+1969  V743      "DISAB LIM KIND WRK"
+1970  V1409     "DISAB LIM KIND WRK"
+1971  V2121     "DISAB LIM KIND WRK"
+1972  V2718     "DISAB LIM KIND WRK"
+1973  V3244     "HLTH LIMIT TYP WRK?"
+1974  V3666     "HLTH LIMIT TYPE WK?"
+1975  V4146     "WTR HLTH LIMITS WRK"
+1976  V4625     "PHYS OR NERV COND HD H49"
+1977  V5560     "WTR HEALTH LIMIT H53"
+1978  V6102     "H65 WTR HEALTH LMT-HD"
+1979  V6710     "K78 WTR HEALTH LMT-HD"
+1980  V7343     "K112 WTR HEALTH LMT-HD"
+1981  V7974     "K57 WTR PHYS-NERV PROB-H"
+1982  V8616     "K63 WTR PHYS-NERV PROB-H"
+1983  V9290     "K56 WTR PHYS-NERV PROB-H"
+
+===============================================================================
+16. CURRENT STATE / REGION
+===============================================================================
+
+State:
+Year  Variable  Label
+1968  (not found as separate var; use region)
+1969  V537      "STATE NOW"
+1970  V1103     "STATE NOW"
+1971  V1803     "STATE NOW"
+1972  V2403     "STATE NOW"
+1973  V3003     "STATE NOW"
+1974  V3403     "CURRENT STATE"
+1975  V3803     "STATE NOW"
+1976  V4303     "STATE NOW"
+1977  V5203     "CURRENT STATE 1977"
+1978  V5703     "CURRENT STATE 1978"
+1979  V6303     "CURRENT STATE"
+1980  V6903     "CURRENT STATE"
+1981  V7503     "CURRENT STATE"
+1982  V8203     "CURRENT STATE"
+1983  V8803     "CURRENT STATE"
+
+Region:
+Year  Variable  Label
+1968  V361      "REGION NOW"
+1969  V876      "CURRENT REGION"
+1970  V1572     "CURRENT REGION"
+1971  V2284     "CURRENT REGION"
+1972  V2911     "CURRENT REGION"
+1973  V3279     "CURRENT REGION"
+1974  V3699     "CURRENT REGION"
+1975  V4178     "CURRENT REGION"
+1976  V5054     "CURRENT REGION"
+1977  V5633     "REGION--1977 INTERVIEW"
+1978  V6180     "REGION - 1978 INT"
+1979  V6773     "REGION - 1979 INT"
+1980  V7419     "REGION 1980 INT"
+1981  V8071     "REGION 1981 INT"
+1982  V8695     "REGION 1982 INT"
+1983  V9381     "REGION OF 1983 INTERVIEW"
+
+Region coding:
+1=Northeast, 2=North Central, 3=South, 4=West
+(Some years use 5=Alaska/Hawaii)
+
+===============================================================================
+17. SMSA RESIDENCE
+===============================================================================
+
+Year  Variable  Label
+1968  V188      "NEAREST SMSA" (distance-based)
+1969  V539      "LRGST PLAC/SMSA PSU" or V808 "NEAREST SMSA"
+1970  V1506     "LRGST PLAC/SMSA PSU" or V1497 "NEAREST SMSA"
+1971  V1816     "LRGST PLAC/SMSA PSU" or V2209 "SMSA CODE"
+1972  V2406     "LRGST PLAC/SMSA PSU" or V2835 "NEAREST SMSA"
+1973  V3006     "LARGEST PLAC/SMSA" or V3250 "NEAREST SMSA"
+1974  V3406     "SIZE OF LGST SMSA" or V3672 "NEAREST SMSA"
+1975  V3806     "LRGST PLACE/SMSA" or V3933 "NEAREST SMSA"
+1976  V4306     "SIZE LGST CITY PSU"
+1977  V5206     "SIZE LGST PLACE SMSA 77"
+1978  V5706     "SIZE LGST CTY SMSA 78"
+1979  V6306     "SIZE LGST CTY SMSA 1979"
+1980  V6906     "SIZE LGST CTY SMSA 1980"
+1981  V7506     "SIZE LGST CITY/SMSA-1981"
+1982  V8206     "SIZE LGST CITY/SMSA-1982"
+1983  V8806     "SIZE LGST CITY/SMSA-1983"
+
+For "lives in SMSA": use SIZE LGST CITY/SMSA >= some threshold,
+or NEAREST SMSA = 0 (lives in SMSA).
+
+===============================================================================
+18. EMPLOYMENT STATUS
+===============================================================================
+
+Year  Variable  Label
+1968  V196      "WORKING NOW"
+1969  V639      "EMPLOYMENT STATUS"
+1970  V1278     "EMPLOYMENT STATUS"
+1971  V1983     "EMPLOYMENT STATUS"
+1972  V2581     "EMPLOYMENT STATUS"
+1973  V3114     "EMPLOYMENT STATUS"
+1974  V3528     "EMPLOYMENT STATUS"
+1975  V3967     "EMPLOYMENT STATUS"
+1976  V4458     "HD EMPLOYMENT STATUS D1"
+1977  V5373     "EMPLOYMENT STATUS D1"
+1978  V5872     "D1 EMPLOYMENT STATUS"
+1979  V6492     "C1 EMP STATUS HEAD"
+1980  V7095     "C1 EMP STATUS HEAD"
+1981  (inferred from C2 self/other at V7707)
+1982  (inferred from C2 self/other at V8375)
+1983  (inferred from C2 self/other at V9006)
+
+===============================================================================
+19. SRC vs SEO SAMPLE (needed to restrict to SRC/random sample)
+===============================================================================
+
+The 1968 interview number (V2 in 1968, ER30001 in individual file) encodes
+the sample type:
+- IDs 1-2930: SRC (Survey Research Center) cross-section sample
+- IDs 3001-3511: Census (SEO/poverty) sample
+- IDs 4001+: Later additions (Latino sample from 1990, immigrant sample from 1997)
+
+For Topel (1991), restrict to SRC sample: 1968 interview number < 3000.
+
+Also check: V4205 "SPLIT SAMPLE VAR" (1975), V5663 (1977), V6210 (1978),
+V6803 (1979), V7448 (1980), V8100 (1981), V8724 (1982), V9409 (1983).
+
+===============================================================================
+20. CROSS-YEAR INDIVIDUAL FILE VARIABLES
+===============================================================================
+
+File: IND2023ER.txt with IND2023ER.do
+
+Key variables:
+ER30001  "1968 INTERVIEW NUMBER" (cols 2-5) -- links to family 1968 ID
+ER30002  "PERSON NUMBER 68" (cols 6-8) -- person within family
+ER30003  "RELATIONSHIP TO HEAD 68"
+ER32000  "SEX OF INDIVIDUAL" (col 2057)
+
+For each year 1968-1983, the individual file has:
+- Interview number (family ID for that year)
+- Sequence number (whether person was in the family unit that year; 1-20 = in FU, 0 = not)
+- Relationship to head (1=head, 2=wife/"wife", 3+=other)
+
+Year  IntNum     SeqNum     RelToHead
+1968  ER30001    (none)     ER30003
+1969  ER30020    ER30021    ER30022
+1970  ER30043    ER30044    ER30045
+1971  ER30067    ER30068    ER30069
+1972  ER30091    ER30092    ER30093
+1973  ER30117    ER30118    ER30119
+1974  ER30138    ER30139    ER30140
+1975  ER30160    ER30161    ER30162
+1976  ER30188    ER30189    ER30190
+1977  ER30217    ER30218    ER30219
+1978  ER30246    ER30247    ER30248
+1979  ER30283    ER30284    ER30285
+1980  ER30313    ER30314    ER30315
+1981  ER30343    ER30344    ER30345
+1982  ER30373    ER30374    ER30375
+1983  ER30399    ER30400    ER30401
+
+Sequence number coding:
+1-20 = in family unit (valid respondent)
+0 = not in FU that year (nonresponse, moved out, died, etc.)
+51-59 = in institution
+71-80 = moved out
+
+Relationship to head:
+1 = Head
+2 = Wife/"Wife"
+3+ = Other family member

@@ -1,45 +1,45 @@
-# LLM-Assisted Replication for Quantitative Social Science
+# LLM-Assisted Replication as Scientific Infrastructure
 
-## [Download the paper here (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1)
+**Kubota, Yakura, Yamada, Nakamura and Coavoux (2026)**
 
-Kubota, Yakura, Coavoux, Yamada, Nakamura. "LLM-Assisted Replication as Scientific Infrastructure."
+[Download the paper (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1) | [Older API-based version (arXiv)](http://arxiv.org/abs/2602.18453)
 
-For methodological details and the full results, see **`AI_Replication_Paper.pdf`** in this directory.
+---
 
-This repository provides tools for automatically replicating statistical analyses (tables and figures) from Bryson (1996) using Large Language Models (LLMs).
+This repository provides tools for automatically replicating statistical analyses (tables and figures) from published research using Large Language Models (LLMs). The approach has been applied to five papers across economics, political science, and sociology.
 
-## Overview
+## How It Works
 
-The scripts in this repository use the OpenAI API to:
-1. Read and summarize a research paper PDF
-2. Map variables from the paper to a dataset codebook
-3. Generate Python code to replicate the analysis
-4. Compare the generated results against the original paper
-5. Iteratively refine the code until the results match
+The replication workflow uses [Claude Code](https://docs.anthropic.com/en/docs/claude-code) as a local AI agent. Given a research paper PDF, it autonomously:
 
-## Prerequisites
+1. **Discovers and acquires data** — reads the paper, identifies required datasets, and downloads them
+2. **Validates the data** — runs exploratory replication attempts to confirm sufficiency
+3. **Iteratively replicates** — generates Python code, scores results against the original, and refines until convergence
 
-### OpenAI API Account
+Each paper has a `CLAUDE.md` file containing the full replication protocol. See `sample_new_socarxiv_ver/` for examples.
 
-You need an OpenAI API account with access to the Responses API.
+## Quick Start
 
-### Required Files
+1. Place the research paper (PDF) and `CLAUDE.md` in a project directory
+2. Add figure screenshots for visual comparison (recommended)
+3. Start Claude Code and tell it what to replicate:
+   - `"Replicate Table 1"` — a single target
+   - `"Replicate all"` — all targets in parallel
+4. Results are saved to target-specific directories (e.g., `output_table1/`)
+5. A final report is saved to `replication_summary.md`
 
-Place the following files in the same directory as the scripts:
+## Replicated Papers
 
-- **`Bryson_paper.pdf`** - The research paper to replicate (Bryson 1996)
-- **`Fig1.jpg`** - Ground-truth image of Figure 1 from the paper (required only for Figure 1 replication)
+See each paper's directory under `sample_new_socarxiv_ver/` for detailed setup instructions, required files, and replication results.
 
-### Data Preparation
-
-Run `CustomDocData.R` to download the GSS 1993 data and create the necessary files. The script uses the `gssr` and `gssrdoc` packages.
-- `gss93_selected.csv` - Dataset with selected variables
-- `gss_selected_variables_doc.txt` - Variable documentation/codebook
-
-## Sample Outputs
-
-The `SampleOutputs/` directory contains example outputs from running each script.
+- Bartels, L. M. (2000). "Partisanship and Voting Behavior, 1952-1996." *American Journal of Political Science*, 44(1), 35-50.
+- Bernanke, B. S. and Blinder, A. S. (1992). "The Federal Funds Rate and the Channels of Monetary Transmission." *American Economic Review*, 82(4), 901-921.
+- Bryson, B. (1996). "Anything But Heavy Metal": Symbolic Exclusion and Musical Dislikes. *American Sociological Review*, 61(5), 884-899.
+- Inglehart, R. and Baker, W. E. (2000). "Modernization, Cultural Change, and the Persistence of Traditional Values." *American Sociological Review*, 65(1), 19-51.
+- Topel, R. (1991). "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority." *Journal of Political Economy*, 99(1), 145-176.
 
 ## Reference
 
-Bryson, B. (1996). "Anything But Heavy Metal": Symbolic Exclusion and Musical Dislikes. *American Sociological Review*, 61(5), 884-899.
+Kubota, Yakura, Yamada, Nakamura, Coavoux. "LLM-Assisted Replication as Scientific Infrastructure." SocArXiv, DOI: 10.31235/osf.io/qtgx8_v1. [https://osf.io/preprints/socarxiv/qtgx8_v1](https://osf.io/preprints/socarxiv/qtgx8_v1)
+
+Kubota, Yakura, Yamada, Nakamura, Coavoux. "LLM-Assisted Replication for Quantitative Social Science." arXiv:2602.18453. [http://arxiv.org/abs/2602.18453](http://arxiv.org/abs/2602.18453)
