@@ -15,7 +15,6 @@ The following files are not included in this repository due to copyright or lice
 **`Topel-SpecificCapitalMobility-1991.pdf`**
 
 - **JSTOR**: <https://www.jstor.org/stable/2937716>
-- **Your institution's library**: Search for the title or DOI
 - **DOI**: `10.1086/261744`
 
 Save the PDF as `Topel-SpecificCapitalMobility-1991.pdf` in this directory.

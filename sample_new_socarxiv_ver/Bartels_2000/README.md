@@ -15,7 +15,6 @@ The following files are not included in this repository due to copyright restric
 **`Bartels_2000.pdf`**
 
 - **JSTOR**: <https://www.jstor.org/stable/2669282>
-- **Your institution's library**: Search for the title or DOI
 - **DOI**: `10.2307/2669282`
 
 Save the PDF as `Bartels_2000.pdf` in this directory.

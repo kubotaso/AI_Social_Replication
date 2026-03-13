@@ -15,7 +15,6 @@ The following files are not included in this repository due to copyright restric
 **`Bryson_paper.pdf`**
 
 - **JSTOR**: <https://www.jstor.org/stable/2096460>
-- **Your institution's library**: Search for the title or DOI
 - **DOI**: `10.2307/2096460`
 
 Save the PDF as `Bryson_paper.pdf` in this directory.

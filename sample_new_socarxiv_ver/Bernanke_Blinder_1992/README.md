@@ -15,7 +15,6 @@ The following files are not included in this repository due to copyright restric
 **`Bernanke-FederalFundsRate-1992.pdf`**
 
 - **JSTOR**: <https://www.jstor.org/stable/2117350>
-- **Your institution's library**: Search for the title or DOI
 - **DOI**: `10.2307/2117350`
 
 Save the PDF as `Bernanke-FederalFundsRate-1992.pdf` in this directory.
