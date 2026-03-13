@@ -1,0 +1,62 @@
+INSTRUCTION SUMMARY: Table 4A — Remaining Job Duration and Current Wage Growth
+================================================================================
+
+DATA SOURCE: PSID Panel Dataset (data/psid_panel.csv)
+COMMON VARIABLES: See output_table2/instruction_summary.txt and output_table3/instruction_summary.txt
+
+================================================================
+TABLE 4A SPECIFIC INSTRUCTIONS
+================================================================
+
+This table augments the first-step regression (Table 2) with a measure of
+remaining job duration. The test checks whether current wage growth predicts
+future job separation (which would indicate selection bias rather than true
+returns to seniority).
+
+DEPENDENT VARIABLE: d_log_wage (change in log real wage, same as Table 2)
+
+REMAINING JOB DURATION:
+  For each person-year observation within a job:
+    remaining_duration = max_tenure_in_job - current_tenure
+  OR equivalently:
+    remaining_duration = (last year observed in job) - (current year)
+
+  This requires knowing how long each job lasts in the panel.
+  For right-censored jobs (still active at end of panel), the remaining
+  duration is censored.
+
+ROW 1: Linear remaining duration
+  Add remaining_duration as a regressor to the Table 2 Model 3 specification:
+    d_log_wage = [standard Table 2 regressors] + alpha * remaining_duration + error
+  Also include: remaining_duration * censor_dummy (interaction with censoring indicator)
+  Report coefficient alpha.
+
+ROW 2: Separate dummies for jobs ending at t+1, t+2, ..., t+6
+  Create dummy variables:
+    ends_t1 = 1 if job ends 1 year after current observation
+    ends_t2 = 1 if job ends 2 years after
+    ends_t3 = 1 if job ends 3 years after
+    ends_t4 = 1 if job ends 4 years after
+    ends_t5 = 1 if job ends 5 years after
+    ends_t6 = 1 if job ends exactly 6 years after
+  Omitted category: jobs that survive 6 or more additional years
+
+  Add these 6 dummies to the Table 2 Model 3 specification.
+
+VARIABLE CONSTRUCTION:
+  For each job_id, compute max_year = max(year) within that job.
+  remaining_duration = max_year - year (for the current observation)
+  censor_dummy = 1 if max_year == 1983 (job still active at panel end)
+
+  ends_tk = 1 if remaining_duration == k (for k = 1,2,3,4,5,6)
+  Omitted: remaining_duration > 6
+
+SAMPLE: Same as Table 2 (within-job first differences)
+
+================================================================
+SCORING NOTES
+================================================================
+Key values:
+- Row 1: coefficient .0006 with SE .0010
+- Row 2: 6 coefficients and SEs for t+1 through t+6
+- None should be statistically significant

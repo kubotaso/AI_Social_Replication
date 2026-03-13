@@ -1,0 +1,37 @@
+Variable Mapping for Table 4: Standardized Regressions
+
+DEPENDENT VARIABLES:
+- Traditional/Secular-Rational factor score: From Table 1 factor analysis, nation-level.
+- Survival/Self-Expression factor score: From Table 1 factor analysis, nation-level.
+
+INDEPENDENT VARIABLES:
+1. Cultural zone dummy (=1 for the zone in question, =0 otherwise)
+   Zone assignments (from Huntington 1993, 1996):
+   - Ex-Communist: Armenia, Azerbaijan, Belarus, Bosnia, Bulgaria, China, Croatia, Czech Republic, East Germany, Estonia, Georgia, Hungary, Latvia, Lithuania, Macedonia, Moldova, Poland, Romania, Russia, Slovakia, Slovenia, Ukraine, Yugoslavia
+   - Protestant Europe: Denmark, Finland, Iceland, Netherlands, Norway, Sweden, Switzerland, West Germany
+   - English-speaking: Australia, Canada, Great Britain, Ireland, New Zealand, Northern Ireland, USA
+   - Latin American: Argentina, Brazil, Chile, Colombia, Dominican Republic, Mexico, Peru, Puerto Rico, Uruguay, Venezuela
+   - African: Ghana, Nigeria, South Africa
+   - South Asian: Bangladesh, India, Pakistan, Philippines, Turkey
+   - Orthodox: (overlap with Ex-Communist; may include Armenia, Azerbaijan, Belarus, Bulgaria, Georgia, Moldova, Romania, Russia, Ukraine) - the paper treats Orthodox as a separate zone in Figure 1
+   - Confucian: China, Japan, South Korea, Taiwan
+
+2. Real GDP per capita, 1980: From World Bank data (data/world_bank_indicators.csv)
+   Use NY.GDP.PCAP.PP.KD for year ~1980, converted to $1,000s US.
+
+3. % employed in industrial sector, 1980: From World Bank (SL.IND.EMPL.ZS) for ~1980.
+
+4. % employed in service sector, 1980: From World Bank (SL.SRV.EMPL.ZS) for ~1980.
+   Note: For Trad/Sec-Rat regressions, service sector is NOT included.
+   For Surv/Self-Exp regressions, industrial sector is NOT included, but service sector IS.
+   The paper says "we use the square of the percentage in the service sector" for Surv/Self-Exp.
+
+PROCEDURE:
+1. Compute factor scores for each country from Table 1 analysis.
+2. Merge with World Bank economic data.
+3. Create zone dummy variables.
+4. For each zone: run OLS with standardized (z-scored) versions of all variables.
+5. Report standardized coefficients (beta), t-values, Adjusted R².
+6. N = number of countries with complete data (~49).
+
+STANDARDIZATION: All variables (DV and IVs) should be standardized (mean=0, sd=1) before regression to get standardized coefficients. Or use statsmodels and report standardized betas.

@@ -1,0 +1,39 @@
+Discrepancy Report - Attempt 8
+Score: 30/100
+
+APPROACH: Per-subsample step 1 (both intercept AND polynomial terms estimated
+within each occupation/union subsample) + OLS of w* on X_0 in step 2.
+
+KEY FINDINGS:
+1. Per-subsample polynomial terms are extremely unstable on small BC samples:
+   - BC_NU g2 = -0.031 (vs paper full-sample -0.0046) -- 7x larger
+   - BC_U g2 = -0.021 (vs paper -0.0046) -- 4.5x larger
+   - This causes cumulative returns to be wildly inflated (0.40-1.55 vs 0.14-0.33)
+
+2. Per-subsample b1+b2 intercepts are far too high for BC:
+   - BC_NU: 0.268 vs paper 0.152 (76% too high)
+   - BC_U: 0.234 vs paper 0.099 (135% too high)
+   - PS: 0.139 vs paper 0.131 (6% high, acceptable)
+
+3. beta_1 for PS is too low (0.038 vs 0.071) because the noisy polynomials
+   absorb too much variation in w*.
+
+CONCLUSION: Using per-subsample polynomial terms does NOT work. The paper likely:
+- Uses FULL SAMPLE step 1 polynomial terms (g2, g3, g4, d2, d3, d4)
+- But estimates subsample-specific b1+b2 intercepts
+- This is what attempt 7 did, and it performed better
+
+NEXT STEPS FOR ATTEMPT 9:
+1. Go back to attempt 7's approach: use paper's full-sample polynomial terms
+   but estimate subsample-specific b1+b2 intercepts
+2. Focus on fixing the sample size problem -- the N values are way off:
+   PS: 5959 vs 4946 (20% too high)
+   BC_NU: 1788 vs 2642 (32% too low)
+   BC_U: 2360 vs 2741 (14% too low)
+3. The union classification may be wrong -- try using current-year union status
+   instead of job-level union (>50% rule)
+4. The occupation classification needs review -- maybe use first-year occupation
+   for the entire job spell (as the paper says on p.164)
+5. The beta_2_se is consistently too high because we assume Var(beta_2) =
+   Var(b1b2) + Var(beta_1), but the paper's beta_2_se=0.013 < b1b2_se=0.025
+   implies positive covariance. Need to compute Cov(b1b2, beta_1) properly.

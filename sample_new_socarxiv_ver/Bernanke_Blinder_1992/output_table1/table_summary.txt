@@ -1,0 +1,104 @@
+Table 1 — "Marginal Significance Levels of Monetary Indicators for Forecasting Alternative Measures of Economic Activity: Six-Variable Prediction Equations"
+
+Source: Bernanke, Ben S. and Alan S. Blinder (1992). "The Federal Funds Rate and the Channels of Monetary Transmission." The American Economic Review, 82(4), 901-921.
+
+================================================================================
+STRUCTURE
+================================================================================
+
+The table shows p-values (marginal significance levels) for F-tests of excluding
+6 lags of each monetary/interest rate variable from an OLS prediction equation.
+
+Each equation includes:
+  - A constant
+  - 6 lags of the dependent variable
+  - 6 lags of log CPI
+  - 6 lags of log M1
+  - 6 lags of log M2
+  - 6 lags of BILL (3-month T-bill rate)
+  - 6 lags of BOND (10-year Treasury bond rate)
+  - 6 lags of FUNDS (federal funds rate)
+
+Total regressors per equation: 1 + 6*7 = 43
+
+Each column in the table tests the joint significance of dropping that column's
+variable (its 6 lags) from the equation. The reported values are p-values from
+the F-test.
+
+All real variables and CPI are in log levels.
+Interest rates (BILL, BOND, FUNDS) are in levels (annualized percent).
+
+Panel A: Sample 1959:7-1989:12
+Panel B: Sample 1959:7-1979:9 (pre-Volcker)
+
+Columns: M1, M2, BILL, BOND, FUNDS
+
+Row variables (9 forecasted/dependent variables):
+  1. Industrial production
+  2. Capacity utilization
+  3. Employment
+  4. Unemployment rate
+  5. Housing starts
+  6. Personal income
+  7. Retail sales
+  8. Consumption
+  9. Durable-goods orders
+
+================================================================================
+GROUND TRUTH VALUES — PANEL A (1959:7-1989:12)
+================================================================================
+
+                          M1      M2      BILL    BOND    FUNDS
+Industrial production    0.92    0.10    0.071   0.26    0.017
+Capacity utilization     0.74    0.22    0.16    0.40    0.031
+Employment               0.45    0.27    0.0040  0.085   0.0004
+Unemployment rate        0.96    0.37    0.0005  0.024   0.0001
+Housing starts           0.50    0.32    0.52    0.014   0.22
+Personal income          0.38    0.24    0.35    0.59    0.049
+Retail sales             0.64    0.036   0.33    0.74    0.014
+Consumption              0.96    0.11    0.12    0.46    0.0052
+Durable-goods orders     0.87    0.22    0.28    0.19    0.039
+
+================================================================================
+GROUND TRUTH VALUES — PANEL B (1959:7-1979:9)
+================================================================================
+
+                          M1      M2      BILL    BOND    FUNDS
+Industrial production    0.99    0.084   0.0092  0.61    0.0001
+Capacity utilization     0.96    0.40    0.025   0.18    0.0003
+Employment               0.57    0.41    0.0005  0.15    0.0004
+Unemployment rate        0.56    0.88    0.0006  0.13    0.0000
+Housing starts           0.34    0.17    0.73    0.72    0.11
+Personal income          0.43    0.095   0.20    0.91    0.037
+Retail sales             0.96    0.86    0.27    0.050   0.061
+Consumption              0.79    0.017   0.010   0.050   0.0000
+Durable-goods orders     0.80    0.030   0.014   0.0071  0.0002
+
+================================================================================
+NOTES FROM THE PAPER
+================================================================================
+
+- Data are monthly.
+- M1, M2, industrial production, employment, and housing starts are in log levels.
+- Personal income, retail sales, and consumption are deflated by CPI and in log levels.
+- Capacity utilization is in levels (percent), NOT in logs.
+  (The paper lists it among forecasted variables but it is a rate, like unemployment.)
+- Unemployment rate is in levels (percent), NOT in logs.
+- Data from DRI database (Data Resources Inc., now IHS Markit/S&P Global).
+- FUNDS = Federal funds rate (effective rate, monthly average).
+- BILL = 3-month Treasury bill rate (secondary market rate, monthly average).
+- BOND = 10-year government bond rate (constant maturity, monthly average).
+- Sample starts 1959:7 because money supply data begins 1959:1 and 6 lags are needed.
+- Panel B ends 1979:9, just before Paul Volcker became Fed Chair (October 1979).
+
+================================================================================
+SIGNIFICANCE PATTERNS (for validation)
+================================================================================
+
+Key findings from the paper:
+- FUNDS is consistently the most significant predictor of real activity.
+- M1 has essentially no marginal predictive power once interest rates are included.
+- M2 is occasionally significant but less consistently than FUNDS.
+- BILL is significant for employment and unemployment in both samples.
+- BOND is generally less significant than FUNDS.
+- The federal funds rate dominates other monetary indicators as a predictor.

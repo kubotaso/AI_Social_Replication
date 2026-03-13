@@ -1,0 +1,45 @@
+Discrepancy Report - Attempt 2
+
+Score: 80/100
+
+MAIN ISSUES:
+
+1. Advanced industrial values are far too high (0.80 at youngest cohort vs paper's ~0.42)
+   ROOT CAUSE: 10 of 22 advanced industrial countries come from EVS data which lacks
+   age/birth year variables. The 12 available countries are biased toward highly secular
+   nations (Germany, Sweden, Norway, Japan etc). Missing countries include Ireland (-2.52),
+   Portugal (-1.06), Austria (-0.01), Italy (+0.34), Belgium (+0.88) which would pull
+   the average down significantly.
+
+   FIX: Use deviation-based approach: compute cohort deviations from country means using
+   available countries, then add the group mean computed from ALL countries (including those
+   without cohort data). This approach was tested and gives Advanced industrial values of
+   -0.34 to 0.56, still higher than paper's -0.07 to 0.42 but much closer.
+
+2. Low-income values too low at oldest cohort (-1.09 vs paper's ~-0.88)
+   Likely due to small sample in oldest cohort (n=12 from only 3 countries)
+
+3. Visual improvements made in attempt 2:
+   - Inline annotations instead of legend box (correct)
+   - Matching line styles (solid, dots, dashes, dotted)
+   - Correct Y-axis range (-1.0 to 0.6)
+   - Removed grid, matching spines
+
+4. Visual issues remaining:
+   - Advanced industrial dots are too few/disconnected (need connecting line with dots)
+   - Annotation placement needs refinement
+   - Should match original's x-axis tick format "1907-1916" style
+   - Original has no title - remove it
+   - Need superscript letters (a, b, c, d) in annotations
+
+5. Data ordering: Ex-Communist and Advanced industrial lines should be CLOSE TOGETHER
+   and nearly overlap in the middle, with Ex-Communist overtaking at the end.
+   Currently Advanced industrial is much higher throughout.
+
+PLAN FOR ATTEMPT 3:
+- Use deviation-based approach for computing group means
+- This accounts for missing EVS countries by using nation-level scores
+- Refine visual style to match original more precisely
+- Remove title (original has no title)
+- Use connecting line with dot markers for Advanced industrial
+- Better annotation placement

@@ -1,0 +1,23 @@
+Discrepancy Report - Figure 3, Attempt 1
+==========================================
+Score: 76.3/100
+
+Main Issue: Proportions computed over ALL respondents with valid PID (including pure independents).
+This diluted the average coefficient, especially in later years when pure independents were more common.
+
+Data value comparison (generated vs. approximate original):
+1952: 1.12 vs ~1.13 (diff 0.01) - close
+1956: 1.16 vs ~1.15 (diff 0.01) - close
+1960: 1.05 vs ~1.13 (diff 0.08) - too low
+1964: 0.92 vs ~0.95 (diff 0.03) - close
+1968: 1.07 vs ~1.14 (diff 0.07) - too low
+1972: 0.69 vs ~0.76 (diff 0.07) - too low
+1976: 0.86 vs ~0.87 (diff 0.01) - close
+1980: 0.91 vs ~1.03 (diff 0.12) - too low
+1984: 1.08 vs ~1.15 (diff 0.07) - too low
+1988: 1.07 vs ~1.18 (diff 0.11) - too low
+1992: 1.15 vs ~1.29 (diff 0.14) - too low
+1996: 1.21 vs ~1.35 (diff 0.14) - too low
+
+Root cause: Using entire electorate for proportions rather than major-party voters.
+Fix: Compute proportions among major-party voters (same sample as probit).

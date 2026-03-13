@@ -1,0 +1,37 @@
+Discrepancy Report - Attempt 3
+================================
+
+Score: 40/100
+
+IMPROVEMENT: All signs now correct (6/6) with k-class estimator k=0.5.
+Previously 5/6 with 2SLS.
+
+REMAINING ISSUES:
+- Magnitudes still 3-10x too large across all methods
+- Paper: -0.007 to -0.021
+- Best (k=0.5): -0.043 to -0.077
+- Fundamental weak instrument problem with revised data
+
+EXPLORATION RESULTS:
+1. Different sample starts: beta ranges from 0.004 (start=1965) to -0.17 (start=1955)
+2. Different sample ends: beta ranges from -0.12 to -0.32
+3. NBR in levels: still too large when properly scaled
+4. 100*log form: same as scaled results (-0.131)
+5. 6-var VAR with CPI: reduced magnitude to -0.070 (closer but not matching paper's 5-var spec)
+6. First differences: made things worse
+7. Nominal vs real NBR: real is closer
+
+KEY REALIZATION:
+The problem is NOT the scaling or variable definition. It's the data vintage.
+With revised data, the contemporaneous correlation between macro innovations
+and NBR innovations is much weaker than in the original data.
+The first-stage F is ~2 in our data vs probably >10 in the original data.
+
+APPROACHES FOR ATTEMPT 4:
+1. Try a completely different interpretation: maybe the paper uses the STRUCTURAL
+   form of the VAR, not the reduced form. If the innovations are from the
+   structural decomposition (Choleski), the macro innovations would be
+   orthogonalized and have stronger instrument relevance.
+2. Try using the Choleski residuals as instruments
+3. Try estimating with GMM instead of 2SLS
+4. Try including more variables in the VAR to better identify the system

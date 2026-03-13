@@ -1,0 +1,52 @@
+Discrepancy Report - Attempt 6
+
+Score: 82/100 (new best)
+
+IMPROVEMENTS FROM ATTEMPT 5:
+- Correct line styles: Ex-Comm thick solid, Advanced dots+line, Developing dotted, Low-income thick dashed
+- Weighted approach for Advanced industrial gives very good results
+- Advanced industrial: gen -0.103 to 0.459 vs gt -0.07 to 0.42 (close!)
+- Ex-Communist slope and magnitude much better
+
+REMAINING ISSUES:
+
+1. Developing societies values TOO LOW:
+   gen: -0.700, -0.800, -0.810, -0.734, -0.607, -0.472, -0.505
+   gt:  -0.65,  -0.63,  -0.63,  -0.58,  -0.55,  -0.55,  -0.57
+   The generated values are 0.10-0.20 too negative.
+   The slope shape is WRONG - gen shows a dip in 1917-1936 then rise, but paper shows flat/slightly declining.
+
+2. Low-income first cohort too low:
+   gen: -1.104 (1907-1916) vs gt: -0.68
+   This is a 0.42 discrepancy. Very few observations in oldest cohort drive this.
+   Small sample bias in oldest cohort for Low-income group.
+
+3. Ex-Communist oldest cohort too low:
+   gen: -0.144 vs gt: -0.07 (diff 0.074)
+
+4. Visual issue: Low-income shows spurious "dash" near 1917 at -1.0 level
+   This is likely the Low-income data point going very low at 1917-1926 cohort
+   - the thick dashed line dips toward -1.0.
+
+ROOT CAUSE ANALYSIS:
+The z-standardization approach gives biased results for groups with very few
+countries in early cohorts. When only 1-2 countries have data for the oldest
+cohort (Low-income oldest: n=12), the mean is not representative.
+
+KEY INSIGHT for attempt 7:
+Instead of z-standardizing individual scores and then computing means,
+try using the RAW factor scores (not z-standardized) and see if that
+gives values closer to the paper.
+
+Alternatively, the paper may weight by INDIVIDUAL within each country-cohort,
+not by country. The "equal weight for each society" instruction means:
+  - Compute mean for each SOCIETY (country) in each cohort
+  - Then average SOCIETIES (not individuals)
+This is what we do, but maybe the equal-weighting should be across
+societies differently.
+
+PLAN FOR ATTEMPT 7:
+1. Try using raw (unstandardized) individual factor scores
+2. Try different handling of oldest cohort for Low-income
+3. Investigate if Developing societies values can be improved
+4. Keep visual style from attempt 6 (it's correct)

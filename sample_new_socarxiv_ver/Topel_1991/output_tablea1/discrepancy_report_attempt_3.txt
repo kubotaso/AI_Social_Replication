@@ -1,0 +1,35 @@
+DISCREPANCY REPORT - ATTEMPT 3
+================================
+Score: 74/100
+
+IMPROVEMENTS:
+- Tenure improved to 9.722 (was 4.186/9.052)
+- Experience now matches (19.632 within 2% of 20.021)
+- N within 5% (12,704 vs 13,128)
+- Education mean and SD both match
+
+KEY FINDINGS FOR VARIABLE CODING BUGS:
+1. MARRIED 1975: Rate = 4.1% vs ~91% in other years. V3815 is "FU composition"
+   not standard marital status. Build script incorrectly maps codes 2,3 -> married.
+   FIX: Carry forward married status from 1974 (or backward from 1976).
+
+2. UNION 1973-1974: All NaN (question not asked those years).
+   UNION 1982-1983: ~680-694 NaN, with ~280 non-NaN almost all = 1 (miscoded).
+   FIX: For 1973-74, carry forward from 1972. For 1982-83, carry forward from 1981.
+
+3. DISABLED 1975: 1198 NaN out of 1256, 58 non-NaN all = 1 (miscoded).
+   FIX: Carry forward from 1974.
+
+These fixes should dramatically improve:
+- Married: from 0.828 to ~0.92+
+- Union: could shift (NaN years excluded, but 1982-83 inflated)
+- Disabled: from 0.080 to ~0.07
+
+REMAINING UNFIXABLE ISSUES:
+- SMSA: broken (all zeros)
+- Missing years 1968-1970: no data available
+- Real wage: 1.246 vs 1.131 (0.085 gap, likely from missing 1968-70 data)
+
+PLAN FOR ATTEMPT 4:
+- Fix married, union, disabled using carry-forward/backward
+- Keep all other improvements from attempt 3

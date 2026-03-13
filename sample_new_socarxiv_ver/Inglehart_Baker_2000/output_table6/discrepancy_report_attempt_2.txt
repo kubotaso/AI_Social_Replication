@@ -1,0 +1,87 @@
+Discrepancy Report - Table 6, Attempt 2
+Score: 80/100
+
+SUMMARY:
+- Full match (within 1): 48 cells
+- Partial (within 3): 6 cells
+- Miss (>3 off): 12 cells
+- Missing (no data): 14 cells (1981 European countries from EVS Wave 1)
+
+MISSED CELLS (>3 difference):
+
+1. Brazil 1995-1998: gen=75 vs paper=54 (diff=21)
+   - LARGEST DISCREPANCY. WVS wave 3 for Brazil gives 75%.
+   - Possible causes: different wave assignment, or the paper used a different survey year.
+   - Brazil appears in WVS Wave 3 with S020 year. Need to check if Brazil has multiple entries.
+
+2. Hungary 1981: gen=32 vs paper=16 (diff=16)
+   - WVS Wave 1 Hungary gives 32%. Paper says 16%.
+   - The paper may be using a different source or the F028 variable has different coding in wave 1.
+   - Need to investigate: check F028 value distribution for Hungary wave 1.
+
+3. South Korea 1981: gen=45 vs paper=29 (diff=16)
+   - WVS Wave 1 South Korea gives 45%. Paper says 29%.
+   - Similar to Hungary, this may be a coding difference in wave 1.
+   - Need to check F028 distribution for South Korea wave 1.
+
+4. East Germany 1990-1991: gen=32 vs paper=20 (diff=12)
+   - G006 coding may be wrong. G006==2 gives 32% for EVS.
+   - Need to investigate G006 value distributions. The EVS may code East/West differently.
+
+5. East Germany 1995-1998: gen=20 vs paper=9 (diff=11)
+   - Same G006 issue. WVS wave 3 G006==2 gives 20%.
+
+6. Hungary 1990-1991: gen=23 vs paper=34 (diff=11)
+   - EVS Wave 2 Hungary gives 23%. Paper says 34%.
+   - Need to check if WVS wave 2 has different data for Hungary.
+
+7. West Germany 1995-1998: gen=15 vs paper=25 (diff=10)
+   - WVS wave 3 G006==1 gives 15%. Paper says 25%.
+   - G006 mapping is likely wrong.
+
+8. Mexico 1981: gen=81 vs paper=74 (diff=7)
+   - WVS Wave 1 Mexico gives 81%. Paper says 74%.
+
+9. South Africa 1981: gen=68 vs paper=61 (diff=7)
+   - WVS Wave 1 South Africa gives 68%. Paper says 61%.
+
+10. West Germany 1990-1991: gen=29 vs paper=33 (diff=4)
+    - EVS G006==1 gives 29%. Paper says 33%.
+
+11. Italy 1990-1991: gen=51 vs paper=47 (diff=4)
+    - EVS Italy gives 51%. Paper says 47%.
+
+12. South Korea 1990-1991: gen=64 vs paper=60 (diff=4)
+    - WVS wave 2 South Korea gives 64%.
+
+KEY ISSUES TO INVESTIGATE FOR ATTEMPT 3:
+
+1. GERMANY EAST/WEST SPLIT:
+   - G006 values need investigation. Values 1 and 2 may not correctly split East/West.
+   - Check full distribution of G006 in both WVS and EVS German data.
+   - East Germany values are consistently too HIGH (32 vs 20, 20 vs 9), suggesting some West Germans are being included in the East group.
+   - West Germany values are consistently too LOW (29 vs 33, 15 vs 25), confirming misassignment.
+
+2. HUNGARY WAVE 1 & 2:
+   - Wave 1: gen=32 vs paper=16 -- huge gap. Check F028 distribution.
+   - Wave 2 (EVS): gen=23 vs paper=34 -- also large gap in OPPOSITE direction.
+   - This pattern suggests: either the variable coding differs, or the paper used different data.
+
+3. SOUTH KOREA WAVE 1:
+   - gen=45 vs paper=29. Check F028 distribution.
+
+4. BRAZIL WAVE 3:
+   - gen=75 vs paper=54. Largest discrepancy. Check S020 year and wave assignment.
+
+5. MISSING 1981 CELLS (14 total):
+   - These are European countries from EVS Wave 1 (1981) which is not in our dataset.
+   - Belgium, Canada, France, GB, Iceland, Ireland, Italy, Netherlands, N.Ireland, Norway, Spain, Sweden, USA, W.Germany
+   - Some of these (USA, Canada) may be in WVS wave 1 -- need to check.
+   - US appears in WVS but result is missing from wave 1. Check why.
+
+FIX PLAN FOR ATTEMPT 3:
+1. Check G006 value distribution for Germany in both WVS and EVS
+2. Check if WVS has US Wave 1 data (S003=840, S002VS=1)
+3. Investigate Hungary F028 coding in waves 1 and 2
+4. Investigate Brazil wave 3 data
+5. Check South Korea F028 coding in wave 1

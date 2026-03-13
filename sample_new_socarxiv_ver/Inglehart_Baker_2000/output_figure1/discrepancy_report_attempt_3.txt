@@ -1,0 +1,36 @@
+Discrepancy Report - Attempt 3
+Score: 81.6/100
+
+IMPROVEMENTS:
+- Affine calibration drastically improved data values (17.3/25, up from 12.1)
+- 37/65 countries now within 0.3 of paper position (up from 20)
+- Average distance 0.307 (down from 0.517)
+
+REMAINING ISSUES:
+
+1. LARGE OUTLIERS (countries with distance > 0.5):
+   - PAK: dist=1.07 - only 6/10 factor items available, unreliable scores
+   - USA: dist=0.79 - surv_selfexp=0.72 vs paper 1.5 (way too low on X)
+   - CHN: dist=0.69 - trad_secrat=0.22 vs paper 0.9 (Y too low)
+   - DNK: dist=0.67 - both X and Y off
+   - TWN: dist=0.63 - trad=0.38 vs paper 0.8
+   - IRL: dist=0.63 - trad=-1.32 vs paper -0.7 (Y too negative)
+   - MKD: dist=0.62 - both axes off
+   - SWE: dist=0.62 - surv=1.23 vs paper 1.8 (X too low)
+   - TUR: dist=0.59 - surv=0.03 vs paper -0.5 (X wrong sign)
+   - JPN: dist=0.57 - trad=1.00 vs paper 1.5 (Y too low)
+   - KOR: dist=0.54 - trad=0.36 vs paper 0.9
+
+2. SYSTEMATIC ISSUES:
+   - The affine transformation can't fix nonlinear distortions
+   - Countries at the extremes of the distribution tend to be compressed
+     (SWE, USA on the self-expression end; Japan, E.Germany on the traditional end)
+   - The factor analysis using the modified shared module (GOD_IMP/AUTONOMY) produces
+     slightly different results than the original A006/A042 items
+
+3. PLAN FOR ATTEMPT 4:
+   - Try using the legacy A006/A042 items directly instead of GOD_IMP/AUTONOMY
+   - This means bypassing the shared module's load function and doing everything manually
+   - Also try weighting the calibration to give more weight to extreme/anchor countries
+   - Improve visual elements: boundary refinement, label positioning
+   - Consider using Procrustes analysis instead of simple affine for better alignment

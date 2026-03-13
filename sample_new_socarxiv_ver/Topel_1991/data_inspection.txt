@@ -1,0 +1,69 @@
+DATA INSPECTION REPORT
+======================
+Date: 2026-03-07
+
+1. CPS DISPLACED WORKERS SURVEY
+================================
+File: data/cps_dws.csv (IPUMS CPS extract)
+Format: CSV, rectangular
+Records: 305,657 (full file), ~5,770 displaced males age 20-60 currently employed
+Columns: 38 variables including YEAR, AGE, SEX, RACE, DWREAS, DWYEARS, DWWEEKL, DWWEEKC, DWWKSUN, DWSUPPWT
+Codebook: data/cps_dws_codebook.txt (93KB)
+Years: January 1984 and January 1986 supplements pooled
+Issues:
+  - DWWEEKL (prior earnings): some negative values and 9999.98 = NIU/missing
+  - DWWEEKC (current earnings): 9999.99 = NIU/missing
+  - DWYEARS: 99.99 = NIU
+  - DWWKSUN: 999 = NIU
+  - Target N=4,367 (paper); closest match with economic displacement + currently employed = 5,770
+  - Log wage changes will require GNP price deflator adjustment for cross-year comparisons
+Status: READY for Table 1 replication
+
+2. PSID PANEL DATASET
+======================
+File: data/psid_panel.csv (constructed from raw PSID files)
+Source files: psid_raw/fam{1968-1983}/ (16 family files) + psid_raw/ind2023er/ (individual file)
+Records: 13,993 person-year observations (paper target: 13,128)
+Unique persons: 2,407 (paper target: 1,540)
+Unique jobs: 3,154 (paper target: 3,228)
+Year range: 1971-1983 (post-tenure-restriction; full panel has 1968-1983)
+
+Key variables present:
+  - person_id, job_id, year
+  - age, education_clean, experience
+  - log_hourly_wage, hourly_wage, labor_inc, hours
+  - married, union_member, disabled, lives_in_smsa
+  - region (NE, NC, South, West dummies)
+  - occ_1digit, agriculture, self_employed, govt_worker
+  - tenure_topel (reconstructed), new_job
+  - d_log_wage (first difference of log wage within job)
+
+Known issues:
+  1. Education variable: Raw PSID uses categorical codes (0-8) in early years,
+     not actual years of schooling. Mean education = 6.1 (coded) vs paper's 12.645 (years).
+     NEEDS RECODING: Map categorical codes to midpoint years.
+  2. Unique persons (2,407) exceeds paper's 1,540 by ~56%. Job change detection
+     may be too aggressive (marking too many new jobs, splitting persons across jobs).
+  3. Government employment filter only available from 1975+; early years may retain
+     some government workers.
+  4. The tenure reconstruction starts at 0 for first observed year in a job;
+     for jobs in progress at panel start, starting tenure is not correctly gauged
+     from maximum reported tenure (per Topel's procedure).
+  5. No Alaska/Hawaii exclusion implemented (need state variable mapping).
+  6. CPS wage index deflation not yet applied to hourly wages.
+
+Status: PARTIALLY READY — usable for initial replication attempts but needs
+refinement of education coding, tenure reconstruction, and wage deflation.
+
+3. SUPPLEMENTARY DATA
+======================
+CPS Real Wage Index (from Murphy and Welch 1987):
+  Available in output_tablea1/table_summary.txt
+  Values: 1968=1.000 through 1983=1.089
+  Status: READY (hardcoded from paper)
+
+GNP Price Deflator for consumption expenditure:
+  Approximate values for CPS DWS deflation:
+  1978=72.2, 1979=78.6, 1980=85.7, 1981=94.0, 1982=100.0,
+  1983=103.9, 1984=107.7, 1985=110.9, 1986=113.8
+  Status: APPROXIMATE — may need verification

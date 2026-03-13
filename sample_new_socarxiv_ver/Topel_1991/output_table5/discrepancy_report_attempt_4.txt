@@ -1,0 +1,26 @@
+DISCREPANCY REPORT - ATTEMPT 4
+Score: 27/100
+
+Murphy-Topel SE correction implemented but SEs now too large.
+Correct w* construction (no linear term) implemented.
+Still fundamental issues with subsample step 1 estimates.
+
+KEY INSIGHT: The paper's Table 5 says "same two-step procedure as Table 3"
+but Table 3 uses the FULL SAMPLE for step 1 (Table 2, Model 3 on all N=8,683).
+
+For Table 5, the paper likely:
+1. Runs step 1 on each SUBSAMPLE separately to get subsample-specific beta_hat (intercept)
+2. BUT uses the FULL-SAMPLE higher-order terms (g2, g3, g4, d2, d3, d4)
+   from Table 2 Model 3 for the polynomial adjustment
+3. Then runs step 2 on each subsample
+
+This makes sense because:
+- The quartic polynomial requires a large sample to estimate stably
+- The paper reports these polynomial terms only once (Table 2, full sample)
+- Only the intercept (beta_1+beta_2) varies by subsample
+
+PLAN FOR ATTEMPT 5:
+- Use FULL-SAMPLE higher-order terms from Table 2 Model 3
+- Run step 1 on each subsample ONLY for the intercept
+- Use full-sample gammas in the w* construction for step 2
+- Recompute Murphy-Topel correction with appropriate variance

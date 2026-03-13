@@ -1,0 +1,38 @@
+Discrepancy Report - Attempt 8
+Score: 52.9/100 (DOWN from 53.0 in attempt 6)
+
+CHANGE: Used panel data files (panel_1960.csv, panel_1976.csv, panel_1992.csv)
+instead of CDF-only approach. Key findings:
+
+1. Panel files for 1960 and 1976 contain a VCF0301_lagged column, but it gives
+   IDENTICAL results to the CDF merge approach (merging via VCF0006a).
+
+2. Panel_1992.csv has pre-extracted pid_current, pid_lagged, vote_house.
+   This gives N=758 (vs CDF's N=759), slightly different coefficients, but
+   net effect on score is slightly negative (52.9 vs 53.0).
+
+3. Confirmed that Bartels used "the Cumulative Data File...supplemented with
+   data from the 1956-58-60, 1972-74-76, and 1990-91-92 panel data files"
+   (footnote 1, p.36). The original ANES study files from the CD-ROM may
+   have different variable coding than the CDF, explaining systematic
+   LL discrepancies (~10-27 points off across all models).
+
+SCORE BREAKDOWN:
+  Coefficients:     8.1/30 (same as attempt 6)
+  Std errors:      14.4/20 (same)
+  Sample size:     15.0/15 (same)
+  Variables:       10.0/10 (same)
+  Log-likelihood:   0.0/10 (same)
+  Pseudo-R2:        5.4/15 (same)
+  TOTAL:           52.9/100
+
+REMAINING ISSUES (same as attempt 6):
+- All LL values off by 9.6-27.7 from targets
+- Large coefficient discrepancies in 1960 (especially Weak: 0.841 vs 1.028)
+- IV coefficients for 1960 very far off (Weak: 0.205 vs 0.728)
+- R2 for 1976 and 1992 slightly off
+
+CONCLUSION: Score ceiling appears to be 53.0 with available data. The CDF
+harmonized variables do not match the original study files Bartels used.
+Attempt 6 remains the best at 53.0/100. Reverting to CDF approach for 1992
+in future attempts.

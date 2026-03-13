@@ -1,0 +1,54 @@
+Discrepancy Report -- Figure 4, Attempt 5
+==========================================
+
+Score: 80/100 (major improvement from 30)
+
+BREAKTHROUGH: Using irf.orth_irfs instead of irf.irfs fixed the core scaling issue.
+
+REMAINING DISCREPANCIES:
+
+1. Securities:
+   - Initial impact too large: -0.44 at month 1 (paper shows ~0)
+   - Recovers too much: -0.21 at month 24 (paper: -0.40)
+   - Peak trough OK: -0.97 at month 6 (paper: ~-0.80 to -0.85)
+   - The fast initial drop and too-much recovery suggest different dynamics
+   - Possible cause: bank_investments may not equal the paper's "securities"
+
+2. Deposits:
+   - Actually matches quite well from month 8 onwards
+   - Initial months (1-6) show faster decline than paper
+   - Month 12: -0.74 (paper: -0.80) -- 8% off, acceptable
+   - Month 24: -0.75 (paper: -0.70) -- 7% off, acceptable
+
+3. Loans:
+   - Doesn't fall enough: -1.00 at month 24 (paper: -1.35)
+   - The 26% discrepancy is persistent across months 12-24
+   - Initial impact shows POSITIVE value (+0.14 at month 1), paper shows ~0
+   - Shape is qualitatively correct (delayed decline) but magnitude insufficient
+
+4. Unemployment:
+   - Rises too fast and peaks earlier
+   - My peak: ~0.20 at month 19 (paper: ~0.17 at month 24)
+   - Still rising in paper at month 24, mine already declining
+   - Month 24: 0.185 (paper: 0.17) -- OK at 8.6%
+   - But month 12: 0.153 (paper: 0.07) -- 118% off
+
+ANALYSIS:
+The main issues are:
+1. Securities and loans have wrong magnitudes (too fast/strong for securities,
+   too weak for loans). This likely indicates the variable definitions are different
+   from what the paper used.
+2. The paper uses "total loans and investments - total loans" for securities.
+   I'm using bank_investments which may be a different measure.
+3. The deposits match well, suggesting the Choleski decomposition and scaling
+   are now correct.
+
+PLAN FOR ATTEMPT 6:
+1. Try computing securities = bank_credit_total - bank_loans
+   But note that bank_credit_total appears to be changes, not levels.
+   Need to check if we can reconstruct total credit in levels.
+2. Try using log_bank_deposits_total_real where available (post-1973),
+   or try a different deposits series.
+3. Investigate why loans don't fall enough -- maybe the CPI deflation
+   is different, or the sample period needs adjustment.
+4. The unemployment overshooting may be related to data vintage.

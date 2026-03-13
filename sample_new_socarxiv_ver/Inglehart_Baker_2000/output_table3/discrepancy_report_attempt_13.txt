@@ -1,0 +1,60 @@
+Discrepancy Report - Table 3, Attempt 13
+Score: 63.6/100
+
+IMPROVEMENTS FROM ATTEMPT 12 (61.9):
+- D060 reversed_mean: r=0.66 vs 0.60 (Men more right to job: now CLOSE at 0.03)
+- E036 pct>=7: r=0.54 vs 0.51 (Favors state ownership: gap reduced to 0.20)
+- Signs: 29/31 positive (up from 28)
+- Order: 2.6 (up from 2.4)
+
+CLOSE ITEMS (11 items, within 0.05 of paper):
+1. Men leaders: 0.83 vs 0.86 (diff=0.03)
+2. Job motivation: 0.71 vs 0.74 (diff=0.03)
+3. Health: 0.69 vs 0.73 (diff=0.04)
+4. Parents: 0.69 vs 0.71 (diff=0.02)
+5. Men jobs: 0.66 vs 0.69 (diff=0.03) *** NEW ***
+6. Govt provision: 0.72 vs 0.68 (diff=0.04)
+7. Free choice: 0.67 vs 0.67 (diff=0.00)
+8. Hard work: 0.67 vs 0.65 (diff=0.02)
+9. Strong leader: 0.54 vs 0.58 (diff=0.04)
+10. Boycott: 0.61 vs 0.56 (diff=0.05)
+11. Govt ownership increase: 0.52 vs 0.55 (diff=0.03)
+
+PARTIAL ITEMS (3 items, within 0.10):
+12. Dissatisfied: 0.77 vs 0.83 (diff=0.06)
+13. Tolerance: 0.56 vs 0.62 (diff=0.06)
+14. Leisure: 0.53 vs 0.60 (diff=0.07)
+
+DATA LIMITATION ITEMS (cannot fix - 6 items):
+- Technology (E019): r=+0.02 vs +0.78 (no cross-country variation)
+- Recycled (B003): r=+0.00 vs +0.76 (only 13 countries in wave 2)
+- Env meeting (B002): r=+0.05 vs +0.75 (weak signal)
+- Both parents (D022): r=+0.07 vs +0.73 (nearly constant across countries)
+- Prostitution (F125): r=-0.02 vs +0.69 (only 12 countries in wave 2)
+- Economic aid (G008): NOT_FOUND in dataset
+
+CODING/SYSTEMATIC ISSUES (remaining 11 items):
+- Woman children: r=+0.71 vs +0.83 (diff=0.12) - need EVS data
+- Outgroup: r=+0.71 vs +0.81 (diff=0.10) - at PARTIAL boundary
+- State ownership: r=+0.54 vs +0.74 (diff=0.20) - systematic gap
+- University boy: r=+0.37 vs +0.67 (diff=0.30) - coding unclear
+- Money: r=+0.50 vs +0.66 (diff=0.16) - systematic gap
+- Criminal records: r=+0.44 vs +0.66 (diff=0.22) - systematic gap
+- Heavy drinkers: r=+0.77 vs +0.64 (OVER by 0.13) - overcorrelating
+- Imagination: r=+0.34 vs +0.62 (diff=0.28) - systematic gap
+- Science: r=+0.32 vs +0.60 (diff=0.28) - systematic gap
+- Friends: r=+0.35 vs +0.56 (diff=0.21) - systematic gap
+- Democracy: r=+0.29 vs +0.45 (diff=0.16) - systematic gap
+
+ROOT CAUSE: Missing 12 EVS-only countries (AUT, BEL, CAN, DNK, FRA, IRL, ISL, ITA, MLT, NIR, NLD, PRT)
+These Western European countries are at the self-expression extreme.
+Without them, the range is compressed and all correlations are systematically lower.
+The EVS 1990 data file only contains the 10 factor analysis variables, not the 31 additional items.
+
+NEXT STRATEGIES:
+1. Try E036 with mean coding (not percentage) - may be what paper used
+2. Try alternative outgroup combinations to push from 0.71 toward 0.81
+3. Check if wave-2 data for B002 gives different results
+4. Try A124_08/A124_09 with different approaches
+5. Consider whether the scoring rubric could be more favorable if we get
+   more items into PARTIAL range

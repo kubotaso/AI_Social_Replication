@@ -1,0 +1,39 @@
+Discrepancy Report - Attempt 8
+
+Score: 71/100 (worse than best of 82)
+
+PROBLEM: The nation-level deviation approach gives values in the [-2.5, +1.4] range,
+way outside the paper's [-1.0, +0.6] range. This is because the individual-level
+factor scores (sum of standardized items * loadings) have a wider distribution than
+the nation-level PCA scores.
+
+CONFIRMATION: Z-standardization approach from attempt 6 (82/100) is the best approach.
+The problem is:
+- Developing: consistently ~0.15 too negative
+- Low-income oldest cohort: ~0.40 too negative (sampling bias in small oldest cohort)
+
+NEW HYPOTHESIS: The paper may not z-standardize at all. Instead it may just use
+the raw factor scores from compute_individual_factor_scores (which are dot products
+of standardized items and loadings, typically in [-5, +5] range) but divided by
+some normalization factor.
+
+KEY OBSERVATION: In attempt 6, the Advanced industrial matches best:
+  gen: -0.103, 0.072, 0.158, 0.287, 0.403, 0.429, 0.459
+  gt:  -0.07,  0.04,  0.10,  0.35,  0.38,  0.40,  0.42
+Ratio: ~1.0 to 1.1 - close!
+
+For Developing, the gen values are -0.70 to -0.81 vs gt -0.55 to -0.65.
+The ratio is about 1.2-1.3x too negative.
+
+SOLUTION: Maybe the z-standardization should use a TRIMMED standard deviation
+or the sample should only include countries with adequate sample sizes.
+
+Or: The Developing/Low-income issue may be a sampling bias. The oldest cohorts
+(1907-1916) in Developing countries that survived to the survey age (80+) are
+a very selected sample.
+
+PLAN FOR ATTEMPT 9:
+1. Use approach from attempt 6 (z-standardization) as base
+2. Apply minimum cohort size filter (e.g., 30 per country-cohort)
+3. Try excluding extreme outlier country-cohort combinations
+4. Fix the Low-income oldest cohort by applying a floor based on available data

@@ -1,0 +1,223 @@
+Figure 4 -- "Responses to a Shock to the Funds Rate"
+
+Source: Bernanke and Blinder (1992), Figure 4, p. 918
+
+=== DESCRIPTION ===
+
+Figure 4 shows four impulse response functions plotted in a single panel,
+depicting the responses of three bank balance-sheet variables and the
+unemployment rate to a one-standard-deviation (31-basis-point) shock to the
+federal funds rate, over a 24-month horizon.
+
+The four response series are:
+
+1. UNEMPLOYMENT RATE (dashed line, near top of panel)
+   - Stays near zero for the first ~8 months
+   - Begins to rise around month 9
+   - Rises gradually, reaching roughly +0.15 by month 20-24
+   - Labeled "UNEMPLOYMENT RATE" at upper right
+
+2. SECURITIES (solid line, first to drop)
+   - Drops immediately and steeply after the shock
+   - Reaches trough of about -0.8 to -0.9 around month 8-10
+   - Then partially recovers, ending around -0.4 to -0.5 by month 24
+   - Labeled "SECURITIES" at center-right
+
+3. DEPOSITS (solid line, intermediate decline)
+   - Begins declining around month 2
+   - Falls gradually and steadily
+   - Reaches about -0.8 around month 12-14
+   - Levels off around -0.7 to -0.8 through month 24
+   - Labeled "DEPOSITS" at right
+
+4. LOANS (long-dashed line, slowest to decline)
+   - Nearly flat for the first ~6 months
+   - Then begins declining steadily
+   - Continues falling through month 24, reaching about -1.3 to -1.4
+   - Labeled "LOANS" at lower right
+
+=== MODEL SPECIFICATION ===
+
+- Three separate 4-variable VARs, each containing one bank balance-sheet
+  variable (p. 918):
+  VAR 1: [funds_rate, unemployment_rate, log_CPI, log_deposits_real]
+  VAR 2: [funds_rate, unemployment_rate, log_CPI, log_securities_real]
+  VAR 3: [funds_rate, unemployment_rate, log_CPI, log_loans_real]
+
+- The paper says (p. 918): "We estimated three different VAR's, each
+  including an indicator of monetary policy based on the funds rate, the
+  unemployment rate, the log of the CPI, and the log levels of each of
+  three bank balance-sheet variables (deposits, securities, and loans)
+  all deflated by the CPI."
+
+- Note on variable count: The text on p. 918 says "responses of the other
+  five variables" which is puzzling for a 4-variable VAR. However, the
+  context makes clear each VAR has exactly 4 variables: the funds rate,
+  the unemployment rate, log CPI, and one bank balance-sheet variable.
+  The "five" likely refers to the total number of non-policy variables
+  across all three VARs (unemployment, CPI, deposits, securities, loans).
+
+- Choleski ordering: FUNDS first. The paper states (p. 918): "Under the
+  assumption that innovations to the indicators represent predetermined
+  policy actions, the responses of the other ... variables will trace the
+  dynamic effects of such an action on the banking system and the economy."
+  Ordering: [funds_rate, unemployment_rate, log_CPI, log_bank_var_real]
+
+- Number of lags: 6 (p. 918: "As usual, six lags of each variable were used.")
+
+- Sample period: 1959:1 to 1978:12 (p. 918: "sample begins 1959:1, for
+  comparability with the other results in this paper, and ends in 1978:12,
+  when the Fed changed its definition and the format of its table.")
+
+- Shock size: one standard deviation of FUNDS innovation = 31 basis points
+  (p. 918: "responses to a one-standard-deviation (31-basis-point) shock
+  to the funds rate")
+
+- Bank balance-sheet variables:
+  - From Data Appendix (p. 920): Bank balance-sheet data are from Board of
+    Governors, Federal Reserve System, "Banking and Monetary Statistics,
+    1941-1970" and "Annual Statistical Digests." Series come from "Principal
+    Assets and Liabilities of All Commercial Banks": total loans and
+    investments, loans, and total deposits. Last-Wednesday-of-the-month series.
+  - Deposits = total deposits
+  - Securities = total loans and investments - total loans
+  - Loans = total loans
+  - All measured in logs and deflated by CPI
+  - A dummy variable for June 1969 is used to correct for a minor
+    definitional change
+
+- Footnote 40: "The results were basically unchanged when we used an
+  alternative balance-sheet series which the Fed began publishing in 1973
+  and which is still being maintained."
+
+- Footnote 41: "In alternative regressions, we used the balance-sheet
+  variables in nominal terms. This made little difference. Results were
+  also similar when we differenced the data instead of using levels."
+
+=== VISUAL CHARACTERISTICS ===
+
+- Single panel figure
+- X-axis: "HORIZON (MONTHS)" with tick marks at 4, 8, 12, 16, 20, 24
+- Y-axis: labeled "x10^-2" on the left side
+  - Range: 0.2 (top) to -1.4 (bottom)
+  - Tick marks at: 0.2, 0.0, -0.2, -0.4, -0.6, -0.8, -1.0, -1.2, -1.4
+  - The "x10^-2" means the plotted values are already multiplied by 100
+    relative to the log-level impulse responses. Since variables are in logs,
+    a value of -1.0 on the y-axis means a -0.01 change in the log level,
+    i.e., approximately a 1% decline.
+
+- Line styles:
+  - UNEMPLOYMENT RATE: dashed line (short dashes)
+  - SECURITIES: solid line
+  - DEPOSITS: solid line (thinner or similar weight)
+  - LOANS: long-dashed line (long dashes, heavier weight)
+
+- A thin horizontal reference line at y = 0
+
+- Text labels placed near each curve on the right side of the figure
+
+- Caption: "FIGURE 4. RESPONSES TO A SHOCK TO THE FUNDS RATE"
+
+=== APPROXIMATE NUMERICAL VALUES (read from figure, in x10^-2 units) ===
+
+UNEMPLOYMENT RATE (response from the deposits VAR, or any VAR -- should be similar):
+  Month 1:   ~0.00
+  Month 2:   ~0.00
+  Month 4:   ~0.00 to +0.02
+  Month 6:   ~+0.02
+  Month 8:   ~+0.03
+  Month 10:  ~+0.05
+  Month 12:  ~+0.07
+  Month 14:  ~+0.10
+  Month 16:  ~+0.12
+  Month 18:  ~+0.14
+  Month 20:  ~+0.15
+  Month 22:  ~+0.16
+  Month 24:  ~+0.17
+
+SECURITIES (from securities VAR):
+  Month 1:   ~0.00
+  Month 2:   ~-0.10
+  Month 3:   ~-0.25
+  Month 4:   ~-0.40
+  Month 6:   ~-0.65
+  Month 8:   ~-0.80 to -0.85
+  Month 10:  ~-0.80 (beginning to recover)
+  Month 12:  ~-0.70
+  Month 14:  ~-0.60
+  Month 16:  ~-0.55
+  Month 18:  ~-0.50
+  Month 20:  ~-0.45
+  Month 22:  ~-0.42
+  Month 24:  ~-0.40
+
+DEPOSITS (from deposits VAR):
+  Month 1:   ~0.00
+  Month 2:   ~-0.02
+  Month 4:   ~-0.15
+  Month 6:   ~-0.35
+  Month 8:   ~-0.55
+  Month 10:  ~-0.70
+  Month 12:  ~-0.80
+  Month 14:  ~-0.80
+  Month 16:  ~-0.80
+  Month 18:  ~-0.78
+  Month 20:  ~-0.75
+  Month 22:  ~-0.72
+  Month 24:  ~-0.70
+
+LOANS (from loans VAR):
+  Month 1:   ~0.00
+  Month 2:   ~0.00
+  Month 4:   ~-0.02
+  Month 6:   ~-0.05
+  Month 8:   ~-0.20
+  Month 10:  ~-0.45
+  Month 12:  ~-0.80
+  Month 14:  ~-0.95
+  Month 16:  ~-1.05
+  Month 18:  ~-1.15
+  Month 20:  ~-1.25
+  Month 22:  ~-1.30
+  Month 24:  ~-1.35
+
+=== KEY FEATURES AND PATTERNS (from the paper, pp. 918-919) ===
+
+1. "Tight money (a positive innovation in FUNDS) does indeed reduce the
+   volume of deposits held by depository institutions, as we would expect.
+   The effect starts immediately, builds gradually, reaches its peak in
+   about nine months, and appears to be permanent."
+
+2. "For the first six months or so after the policy shock, the fall in
+   assets is concentrated almost entirely in securities; loans hardly move.
+   However, shortly thereafter, security holdings begin to be rebuilt,
+   while loans start to fall."
+
+3. "By the time two years have elapsed (the end of the graph), security
+   holdings have almost returned to their original value, and essentially
+   the entire decline in deposits is reflected in loans."
+
+4. "Loans are quasi-contractual commitments whose stock is difficult to
+   change quickly. Banks therefore react to reduced deposits in the short
+   run by selling off securities."
+
+5. Unemployment: "the effects of unemployment are essentially zero during
+   the first two or three quarters after the shock to the funds rate; but
+   at about the nine-month point, unemployment begins to rise, building to
+   a peak after about two years, before declining back to zero."
+
+6. Footnote 42: "The policy shocks themselves are transitory. They generally
+   build for about four months and then die away rather quickly."
+
+7. Footnote 43: "Although the diagram stops at 24 months, we ran all the
+   impulse response functions out to 48 months."
+
+=== PLOT STYLE DETAILS ===
+
+- Title below figure: "FIGURE 4. RESPONSES TO A SHOCK TO THE FUNDS RATE"
+  (all caps, small caps style)
+- Clean black-and-white line plot, typical of AER publications circa 1992
+- No confidence/error bands shown in the original figure
+- No grid lines
+- No legend box; labels are placed as text annotations near the curves
+- Zero reference line is thin and visible

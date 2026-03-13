@@ -1,0 +1,121 @@
+Instruction Summary: Table 5 — Variable Mapping and Construction
+================================================================
+
+This table is identical to Table 4 in all respects EXCEPT the dependent variable.
+Table 4 uses presidential vote; Table 5 uses congressional (House) vote.
+
+=== DEPENDENT VARIABLE ===
+Congressional (House) vote (major-party voters only)
+- Dataset variable: VCF0707 (2-party House vote)
+- Coding: 1 = Democrat, 2 = Republican
+- Recode to: 0 = Democrat, 1 = Republican
+- Exclude: third-party voters, non-voters, missing values
+
+=== INDEPENDENT VARIABLES (CURRENT PARTY ID) ===
+Same construction as Table 1 and Table 4, using VCF0301 (party identification,
+7-point scale).
+
+Party ID coding from VCF0301:
+  1 = Strong Democrat
+  2 = Weak Democrat
+  3 = Independent-leaning Democrat
+  4 = Independent
+  5 = Independent-leaning Republican
+  6 = Weak Republican
+  7 = Strong Republican
+
+Construct three directional variables:
+- Strong partisan: +1 if Strong Republican (7), -1 if Strong Democrat (1), 0 otherwise
+- Weak partisan: +1 if Weak Republican (6), -1 if Weak Democrat (2), 0 otherwise
+- Leaning partisan: +1 if Ind-leaning Republican (5), -1 if Ind-leaning Democrat (3), 0 otherwise
+
+Pure independents (4) have all three variables = 0.
+
+=== INDEPENDENT VARIABLES (LAGGED PARTY ID) ===
+Same as Table 4. For lagged party ID, need the panel data files to obtain party
+identification measured 2 years before the election year.
+
+Panel structure and lagged party ID sources:
+- 1960 panel: use the 1956-58-60 ANES panel study
+  - Lagged party ID from 1958 wave
+  - Need to match respondents across waves
+
+- 1976 panel: use the 1972-74-76 ANES panel study
+  - Lagged party ID from 1974 wave
+  - Need to match respondents across waves
+
+- 1992 panel: use the 1990-91-92 ANES panel study
+  - Lagged party ID from 1990 wave
+  - Need to match respondents across waves
+
+Lagged party ID variables are constructed identically to current party ID
+(strong, weak, leaning) but using the party ID value from the earlier wave.
+
+=== APPROACH TO OBTAINING PANEL DATA ===
+Option A: Use the ANES cumulative file (anes_timeseries_cdf_csv_20220916.csv)
+  - The cumulative file contains VCF0301 for each respondent's election-year
+    party ID, but does NOT contain lagged (off-year) party ID.
+  - Panel respondents can potentially be identified if the cumulative file
+    includes a panel indicator or if respondents appear in multiple years.
+  - However, the off-year party ID values are typically NOT in the cumulative file.
+
+Option B: Use individual ANES panel study files from the anesr R package
+  - The anesr package provides access to individual ANES studies including panels
+  - timeseries_1958 or panel_1956_1960 for the 1958 party ID
+  - timeseries_1974 or panel_1972_1976 for the 1974 party ID
+  - timeseries_1990 or panel_1990_1992 for the 1990 party ID
+  - These files contain the lagged party ID variables needed
+
+Option C: Download individual panel study files from ANES website
+  - 1956-58-60 panel: ANES study available from electionstudies.org
+  - 1972-74-76 panel: ANES study available from electionstudies.org
+  - 1990-92 panel: ANES study available from electionstudies.org
+
+=== SAMPLE RESTRICTIONS ===
+- Panel respondents only (those who appear in both the election year and the
+  lagged year wave)
+- Major-party congressional (House) voters only
+- Valid party ID in both current and lagged years
+- From footnote 16: "To make the comparison of current and lagged effects as
+  straightforward as possible, these estimates are based on data from panel
+  respondents only."
+
+=== STATISTICAL METHOD ===
+
+Row 1 (Current party ID): Standard probit regression
+  Vote_i = Phi(b1*Strong_current + b2*Weak_current + b3*Lean_current + b0)
+
+Row 2 (Lagged party ID): Standard probit regression
+  Vote_i = Phi(b1*Strong_lagged + b2*Weak_lagged + b3*Lean_lagged + b0)
+
+Row 3 (IV estimates): Instrumental variables probit
+  - Instruments: lagged party ID variables (Strong_lagged, Weak_lagged, Lean_lagged)
+  - Endogenous variables: current party ID variables (Strong_current, Weak_current, Lean_current)
+  - First stage: regress each current party ID variable on all lagged party ID variables
+  - Second stage: probit with predicted values from first stage
+  - This is IV probit (can use statsmodels IV probit or manual 2-stage procedure)
+  - Note: The lagged and IV rows share the same log-likelihood and pseudo-R2,
+    suggesting a specific IV procedure is used.
+
+=== MISSING DATA ===
+- Exclude respondents with missing party ID in either wave
+- Exclude respondents with missing congressional vote
+- Exclude third-party voters and non-voters
+- Standard ANES missing data codes: 0, 8, 9 for party ID (VCF0301)
+
+=== KEY DIFFERENCE FROM TABLE 4 ===
+The ONLY difference from Table 4 is:
+- Table 4 dependent variable: VCF0704a (presidential vote)
+- Table 5 dependent variable: VCF0707 (congressional/House vote)
+
+All independent variables, panel data sources, sample restrictions (panel
+respondents only), and statistical methods are identical.
+
+=== EXPECTED SAMPLE SIZES ===
+- 1960: N=911
+- 1976: N=682
+- 1992: N=760
+
+Note: These N values differ from Table 4 because the set of respondents who
+voted in congressional elections differs from those who voted in presidential
+elections (some presidential voters did not vote in the House race, and vice versa).

@@ -1,0 +1,23 @@
+Discrepancy Report - Attempt 4
+
+Score: 75/100
+
+Same as attempt 2 essentially, with EVS trend file providing NLD denomination data.
+NLD scores are slightly better but still far from paper positions.
+
+Key remaining issues:
+1. NLD Protestant (1.03, -0.25) vs paper (2.0, 0.55) - dist=1.254
+2. NLD Catholic (0.88, -0.14) vs paper (2.05, 0.35) - dist=1.266
+3. DEU_W Catholic (1.32, 1.08) vs paper (0.55, 1.1) - dist=0.767
+4. CHE Catholic (0.59, 0.01) vs paper (1.0, 0.4) - dist=0.567
+5. USA Catholic (1.44, -0.71) vs paper (1.1, -1.1) - dist=0.512
+
+STRATEGY FOR ATTEMPT 5:
+Use offset approach from nation-level calibrated positions:
+1. Get each country's calibrated position from Figure 1 RBF
+2. Compute raw PCA offset for each subgroup vs overall country
+3. Scale offsets to be reasonable (scale factor ~0.3-0.5 to avoid overshooting)
+4. Add scaled offsets to calibrated position
+
+For NLD specifically, the EVS data gives drastically different absolute scores
+but the *relative* differences between Protestant and Catholic should be more reliable.

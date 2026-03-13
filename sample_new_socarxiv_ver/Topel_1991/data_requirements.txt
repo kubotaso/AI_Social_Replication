@@ -1,0 +1,104 @@
+DATA REQUIREMENTS FOR TOPEL (1991) REPLICATION
+================================================
+
+Paper: "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority"
+Author: Robert Topel
+Source: Journal of Political Economy, Vol. 99, No. 1 (Feb. 1991), pp. 145-176
+
+DATASET 1: Panel Study of Income Dynamics (PSID)
+-------------------------------------------------
+Source Organization: Institute for Social Research, University of Michigan
+Waves needed: 1968-1983 (first 16 waves)
+Website: https://simba.isr.umich.edu
+
+Note: The data used in the paper were "kindly supplied by Joe Altonji and Nachum Sicherman"
+(footnote 10, p. 154). This was a specific extract already constructed from the PSID.
+
+Sample restrictions:
+- White males only
+- Ages 18-60 (inclusive)
+- Positive earnings in previous calendar year
+- Not self-employed at any time during the job
+- Not employed in agriculture
+- Not employed by government
+- Not from Alaska or Hawaii
+- Random, nonpoverty sample of the PSID (excludes SEO/poverty subsample)
+- Current job tenure >= 1 year (observations with <1 year tenure deleted)
+- Jobs with ambiguous tenure sequences deleted
+
+Final sample: 1,540 individuals, 3,228 jobs, 13,128 job-years
+
+Required variables:
+1. Log average hourly earnings (deflated by CPS wage index and GNP price deflator)
+2. Experience (years in labor market) = Age - Education - 6
+3. Tenure (years of current job seniority) - RECONSTRUCTED, not raw reported tenure
+4. Education (years of completed schooling)
+5. Married (1 if currently married, spouse present)
+6. Union (1 if union member - more than half of years on job)
+7. SMSA (1 if resides in SMSA)
+8. Disabled (1 if currently reporting disability)
+9. Year dummies (for survey years 1968-1983)
+10. Census region indicators (8 regions)
+11. Occupation (professional/service vs. craftsmen/operatives/laborers)
+12. Job identifier (to track within-job wage changes)
+13. Individual identifier
+14. Whether job started before or during the panel (for tenure construction)
+15. Initial experience on job (X_0 = experience at start of job)
+
+From PSID family files:
+- Head's hourly earnings (wages and salary / annual hours)
+- Head's age
+- Head's education
+- Head's marital status
+- Head's employment status (self-employed, government, agriculture)
+- Head's race
+- Head's union status
+- Head's tenure on current job (reported)
+- Head's occupation
+- Whether head changed employer
+- Head's state/region of residence
+- Head's disability status
+- SMSA residence indicator
+- Head's sex
+- Family interview number
+- Individual ID (from cross-year individual file)
+
+DATASET 2: CPS Displaced Workers Survey
+-----------------------------------------
+Source Organization: Bureau of Labor Statistics / Census Bureau
+Supplements: January 1984 and January 1986
+Website: NBER CPS Supplements - https://www.nber.org/research/data/current-population-survey-cps-supplements
+
+Sample: 4,367 men who report being displaced from a job for economic reasons
+(layoffs or plant closings) in the past 5 years and who are currently employed.
+Ages 20-60.
+
+Required variables:
+1. Prior job tenure (years of seniority on lost job) - binned: 0-5, 6-10, 11-20, 21+
+2. Log weekly earnings change (current vs. prior job)
+3. Weeks unemployed since displacement
+4. Reason for displacement (plant closing vs. layoff)
+5. Percentage displaced by plant closing
+6. Age
+7. Sex (male only)
+8. Current employment status
+
+Nominal wage data deflated by GNP price deflator for consumption expenditure.
+
+SUPPLEMENTARY DATA:
+-------------------
+CPS Real Wage Index (from Murphy and Welch 1987):
+Used to deflate PSID wages so they are comparable across years.
+Values reported in Table A1 of the paper:
+1968: 1.000, 1969: 1.032, 1970: 1.091, 1971: 1.115, 1972: 1.113,
+1973: 1.151, 1974: 1.167, 1975: 1.188, 1976: 1.117, 1977: 1.121,
+1978: 1.133, 1979: 1.128, 1980: 1.128, 1981: 1.109, 1982: 1.103,
+1983: 1.089
+
+GNP Price Deflator for consumption expenditure: Used for both PSID and CPS wage deflation.
+
+DATA ACQUISITION STATUS:
+------------------------
+PSID: Requires manual download (registration required at simba.isr.umich.edu)
+CPS Displaced Workers: Attempting automated download from NBER
+CPS Real Wage Index: Values provided in Table A1 of paper

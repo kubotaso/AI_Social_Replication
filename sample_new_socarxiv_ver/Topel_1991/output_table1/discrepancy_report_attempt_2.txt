@@ -1,0 +1,40 @@
+DISCREPANCY REPORT - ATTEMPT 2
+Score: 93.3/100
+
+MAJOR IMPROVEMENT: Score jumped from 73 to 93.3 by:
+- Including ALL displacement reasons (DWREAS 1-6) instead of just 1-3
+- Adding DWFULLTIME==2 filter (full-time on lost job)
+- Requiring valid wages (DWWEEKL, DWWEEKC) and valid DWLASTWRK
+
+N = 4371 (vs paper's 4367) -- essentially exact match (0.1% difference)
+
+REMAINING DISCREPANCIES (all 5 are log wage change means):
+1. lwc_mean 0-5:   gen=-0.132 vs gt=-0.095 (diff=0.037)
+2. lwc_mean 6-10:  gen=-0.243 vs gt=-0.223 (diff=0.020)
+3. lwc_mean 11-20: gen=-0.303 vs gt=-0.282 (diff=0.021)
+4. lwc_mean 21+:   gen=-0.513 vs gt=-0.439 (diff=0.074)
+5. lwc_mean Total: gen=-0.171 vs gt=-0.135 (diff=0.036)
+
+ALL OTHER VALUES MATCH:
+- All 5 plant closing means: MATCH (within 0.004)
+- All 5 plant closing SEs: MATCH
+- All 5 log wage change SEs: MATCH
+- All 5 weeks unemployed means: MATCH (within 0.62)
+- All 5 weeks unemployed SEs: MATCH
+- N: MATCH (4371 vs 4367, 0.1%)
+
+DIAGNOSIS:
+The log wage change means are systematically MORE NEGATIVE than the paper.
+This is consistent across all tenure bins and the total.
+The discrepancy increases with tenure (0.020 for 6-10 to 0.074 for 21+).
+Workers with more tenure tend to have been displaced earlier, requiring more deflation.
+This suggests the deflator values we use create a larger inflation adjustment
+than the vintage values used by Topel in the late 1980s.
+
+POSSIBLE FIXES FOR ATTEMPT 3:
+1. Try different deflator series (BEA has revised NIPA data multiple times since 1991)
+2. Try using CPI instead of PCE deflator
+3. Try adjusting deflation timing (maybe displacement year calculation differs)
+4. Check if DWWEEKL reports earnings from a different reference period
+5. Explore whether removing the DWFULLTIME filter and using DWREAS differently
+   could improve the wage change while maintaining other good matches

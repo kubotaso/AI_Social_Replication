@@ -1,0 +1,45 @@
+Discrepancy Report - Attempt 5
+Score: 67/100
+
+IMPROVEMENTS:
+- N=49 EXACTLY matches
+- Model 4 R²=0.73 (target 0.74) MATCH
+- Model 6 ex_communist = -0.413 vs -0.411 MATCH!
+- Model 6 R² = 0.85 vs 0.84 MATCH
+- Model 6 hist_orthodox SE = 0.232 vs 0.240 MATCH
+- Model 6 hist_protestant SE = 0.170 vs 0.175 MATCH
+- Service_sq coefficients mostly within tolerance
+
+REMAINING ISSUES:
+
+1. PROTESTANT COEFFICIENT TOO LARGE:
+   Model 3: 0.824 vs 0.672 (diff 0.15)
+   Model 5: 0.882 vs 0.509 (diff 0.37)
+   Model 6: 0.886 vs 0.415 (diff 0.47)
+   This is the biggest remaining problem
+
+2. GDP COEFFICIENT IN MODEL 6 TOO LOW:
+   0.052 vs 0.144 - off by 0.092
+   Protestant dummy absorbs GDP effect
+
+3. R² FOR MODEL 3 TOO HIGH: 0.80 vs 0.66
+   Protestant dummy too powerful
+
+4. GDP SEs SYSTEMATICALLY LOW:
+   Model 1: 0.017 vs 0.043
+   This means our GDP has higher variance relative to DV
+
+ROOT CAUSE ANALYSIS:
+- Protestant effect too large because factor scores for Protestant countries
+  are systematically higher than paper's values
+- Our factor scores: NLD=+1.94, AUS=+1.74, SWE=+2.23
+- Paper's scores (from Fig 1): NLD≈+1.6, AUS≈+1.5, SWE≈+2.0
+- Our scores are about 0.2-0.3 higher for Protestant countries
+- This inflates the Protestant dummy coefficient
+
+POTENTIAL FIXES:
+1. Try different factor analysis approach (e.g., using 22 variables like original)
+2. Try weighting schemes
+3. Try PCA with R (to match paper's methodology exactly)
+4. Accept the Protestant coefficient difference as a data artifact
+5. Focus on other improvements within our control

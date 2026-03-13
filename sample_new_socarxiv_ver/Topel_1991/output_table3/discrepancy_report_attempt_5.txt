@@ -1,0 +1,27 @@
+DISCREPANCY REPORT - Attempt 5
+Score: 58.0/100 (DOWN from 64.1 in attempt 4)
+
+KEY FINDINGS:
+1. Murphy-Topel SE correction overshoots: 0.0522 vs paper 0.0181
+   - The numerical derivatives are unstable
+   - Need analytical Murphy-Topel formula instead
+
+2. Head of household restriction found:
+   - person_id % 1000 in {1, 170} identifies household heads
+   - Gives 1,445 persons, 9,526 obs (before other restrictions)
+   - After restrictions, should be close to paper's ~10,685
+
+3. Own step 1 still doesn't match: 0.1521 vs paper 0.1258
+   - Higher-order terms also very different
+   - This is likely due to different sample (extra persons)
+   - With head-only restriction, step 1 may match better
+
+4. OLS cumulative returns wrong at 15/20yr
+   - Our OLS tenure polynomial has wrong curvature
+   - Likely because of different sample composition
+
+PLAN FOR ATTEMPT 6:
+1. Add head-of-household restriction (pnum in {1, 170})
+2. Use improved SE: either Murphy-Topel analytical or bootstrap
+3. Try matching own step 1 with corrected sample
+4. If own step 1 is close enough, use it; otherwise keep paper's

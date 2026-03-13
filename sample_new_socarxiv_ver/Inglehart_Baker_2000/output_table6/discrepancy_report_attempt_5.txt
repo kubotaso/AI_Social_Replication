@@ -1,0 +1,50 @@
+Discrepancy Report - Table 6, Attempt 5
+Score: 84/100
+
+KEY IMPROVEMENTS:
+- Used ZA4460 EVS Trend File directly (Stata format) for EVS data
+- Variable q336 = church attendance, matching paper exactly for all tested countries
+- country1=900 for West Germany, country1=901 for East Germany
+- East Germany 1990 now matches exactly (20%)
+- West Germany 1990 now matches exactly (33%)
+
+SCORE CEILING ANALYSIS:
+- 14 MISSING cells = 17.5% of all 80 cells
+- These 14 cells are all 1981 European/North American data from EVS Wave 1
+- EVS Wave 1 (1981) is NOT available in either data source:
+  * WVS Time Series v5.0 only has 8 countries in wave 1 (non-European)
+  * ZA4460 EVS Trend File only has 1990-1993 data
+- Maximum achievable score with 14 missing: ~86/100
+
+REMAINING MISSES (3):
+1. Brazil 1995-1998: gen=75 vs paper=54 (diff=21)
+   - WVS wave 3 Brazil has different scale coding (6-point vs 8-point)
+   - Values 5 and 7 are missing from the scale in wave 3
+   - Cannot fix without alternative data source
+
+2. Hungary 1990-1991: gen=23 vs paper=34 (diff=11)
+   - Both EVS sources (ZA4460 and reformatted CSV) give 23%
+   - Paper says 34% -- likely a different data version
+   - WVS doesn't have Hungary in wave 2
+
+3. Italy 1990-1991: gen=51 vs paper=47 (diff=4)
+   - EVS gives 51%, paper says 47%
+   - Possible data version difference
+
+REMAINING PARTIALS (6):
+- Argentina 1995: gen=43 vs paper=41 (diff=2)
+- Finland 1990: gen=11 vs paper=13 (diff=2)
+- Nigeria 1995: gen=90 vs paper=87 (diff=3)
+- South Korea 1981: gen=27 vs paper=29 (diff=2)
+- Switzerland 1995: gen=28 vs paper=25 (diff=3)
+- United States 1995: gen=57 vs paper=55 (diff=2)
+
+RECOMMENDATION:
+To achieve score >= 95, the EVS Wave 1 (1981) data file is needed.
+This is study ZA4438 (EVS - European Values Study 1981) from GESIS.
+Without this data, the maximum score is approximately 86/100.
+
+The best strategy for improvement would be to:
+1. Obtain EVS Wave 1 data (ZA4438) -- would add ~14 cells
+2. Investigate alternative data source for Hungary 1990
+3. Accept Brazil W3 and Italy 1990 as data version issues

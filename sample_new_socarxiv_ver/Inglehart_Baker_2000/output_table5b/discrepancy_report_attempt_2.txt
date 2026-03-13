@@ -1,0 +1,44 @@
+Discrepancy Report - Attempt 2
+Score: 45/100
+
+ISSUES:
+
+1. N=58 vs expected 49 - STILL TOO MANY COUNTRIES
+   - Need to identify which 49 countries the paper includes
+   - The paper says 65 societies, Table 5b N=49 (some lack economic data)
+   - East Germany and West Germany are listed separately in the paper but combined in our data
+   - N. Ireland lacks WB data and is excluded
+   - Nigeria, Serbia, Taiwan lack GNP data and are excluded
+   - That gives 58 - still 9 too many
+   - Some countries in our factor scores may not be in the paper's 65 societies
+   - Countries in our data NOT in the paper: MLT, MNE, SLV, ALB (already excluded)
+   - Still getting 58 - need to check further
+
+2. GDP COEFFICIENT TOO LARGE
+   - Model 1: 0.154 vs expected 0.090
+   - Using GNP PPP current $1995 instead of Real GDP per capita 1980
+   - The GDP scale matters: with current GNP in $1000s, range is 1.2 to 31.5
+   - Paper's scale is "Real GDP per capita, 1980 (in $1,000s U.S.)" - from Penn World Tables
+   - Values in PWT for 1980 would be MUCH lower (1980 prices not 1995 prices)
+   - E.g., USA in 1980: ~$12K in 1980 dollars vs $28.8K in 1995 PPP
+   - Need to scale GDP down by ~2.5x to approximate 1980 prices
+
+3. R-SQUARED TOO HIGH
+   - Model 1 R²=0.77 vs expected 0.63
+   - Too many countries included inflates R²
+   - Factor score scale may differ from paper's
+
+4. EX-COMMUNIST EFFECT TOO LARGE
+   - -1.136 vs -0.920 (Model 3)
+   - More ex-communist countries in our sample?
+   - Or factor scores have different scale
+
+5. PROTESTANT EFFECT TOO LARGE
+   - 0.906 vs 0.672 (Model 3)
+   - Classification includes EST, LVA as Protestant - check if paper does this
+
+FIXES FOR ATTEMPT 3:
+1. Scale GDP differently - try dividing GNP PPP by 2.0-2.5 to approximate 1980 values
+2. Reduce country count - need to match exactly 49
+3. Reconsider Protestant classification (remove EST, LVA?)
+4. Check factor score scale

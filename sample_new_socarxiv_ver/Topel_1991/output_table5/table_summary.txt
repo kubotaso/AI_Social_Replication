@@ -1,0 +1,86 @@
+TABLE 5: Estimated Returns to Job Seniority by Occupational Category and Union Status,
+Two-Step Estimator
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983
+Sample: White males, split by occupation and union status
+
+Three subsamples:
+  Column (1): Professional and Service workers - N = 4,946
+  Column (2): Craftsmen/Operatives/Laborers, Nonunion - N = 2,642
+  Column (3): Craftsmen/Operatives/Laborers, Union - N = 2,741
+  (Note: Total N across subsamples does not sum to Table 3's N = 10,685
+   because some observations may have missing occupation/union data)
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: IV / Two-step estimation table with subgroup analysis
+Layout: Two panels
+
+Top panel: Main effects (3 columns x 3 rows)
+  Columns: Professional/Service, Craftsmen etc. Nonunion, Craftsmen etc. Union
+  Rows: Experience (beta_1), Tenure (beta_2), beta_1 + beta_2
+
+Bottom panel: Estimated cumulative returns to tenure (4 columns x 4 rows)
+  Columns: Professional/Service, Nonunion, Union Sector, Union Relative to Nonunion
+  Rows: 5 years, 10 years, 15 years, 20 years
+
+==============================================================================
+GROUND-TRUTH VALUES - TOP PANEL: Main Effects (standard errors in parentheses)
+==============================================================================
+
+                                Professional     Craftsmen/Operatives/  Craftsmen/Operatives/
+                                and Service      Laborers Nonunion      Laborers Union
+                                (1)              (2)                    (3)
+
+Experience (beta_1):            .0707 (.0288)    .1066 (.0342)          .0592 (.0338)
+Tenure (beta_2):                .0601 (.0127)    .0513 (.0146)          .0399 (.0147)
+beta_1 + beta_2:                .1309 (.0254)    .1520 (.0311)          .0992 (.0297)
+
+==============================================================================
+GROUND-TRUTH VALUES - BOTTOM PANEL: Estimated Cumulative Returns to Tenure
+(standard errors in parentheses)
+==============================================================================
+
+                         Professional/    Nonunion     Union         Union Relative
+                         Service          (2)          Sector        to Nonunion
+                         (1)                           (3)           Sector (4)
+
+5 years:                 .1887 (.0388)    .1577 (.0428)  .1401 (.0437)  .2299 (.0931)
+10 years:                .2400 (.0560)    .2073 (.0641)  .2033 (.0620)  .3286 (.0854)
+15 years:                .2527 (.0656)    .2480 (.0802)  .2384 (.0739)  .4111 (.0855)
+20 years:                .2841 (.0663)    .3295 (.0914)  .2733 (.0783)  .4904 (.0957)
+
+Number of observations:  4,946            2,642          2,741
+
+==============================================================================
+NOTES
+==============================================================================
+
+- Column (4) in the bottom panel shows the union tenure profile relative
+  to nonunion sector, which accounts for the fact that union workers have
+  flatter experience profiles but steeper tenure profiles at longer durations
+- The Professional/Service category includes white-collar and service occupations
+- Craftsmen/Operatives/Laborers are blue-collar occupations split by union status
+- Union membership is determined by current union membership status
+- Returns to tenure are positive and significant in all three subsamples
+- The blue-collar nonunion sector shows the highest experience effect (beta_1)
+- The professional/service sector shows the highest tenure effect (beta_2)
+
+==============================================================================
+STATISTICAL METHOD
+==============================================================================
+
+Same two-step procedure as Table 3, applied separately to each subsample.
+Step 1: Within-job wage growth regressions estimated separately by group
+Step 2: Cross-sectional IV regressions estimated separately by group
+Cumulative returns calculated using group-specific higher-order tenure terms.
+Column (4) compares the union and nonunion tenure profiles directly.

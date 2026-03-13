@@ -1,0 +1,34 @@
+Discrepancy Report -- Figure 4, Attempt 9
+==========================================
+
+Score: 82/100
+
+KEY CHANGE: Normalized IRFs to paper's 31bp shock (scale factor 0.917).
+
+RESULTS AT KEY HORIZONS:
+  Dep m12: -0.68 (paper -0.80) -- 15.5% off
+  Sec m8:  -0.86 (paper -0.83) -- 4.1% off
+  Loans m24: -0.91 (paper -1.35) -- 32.4% off
+  Unemp m24: 0.169 (paper 0.17) -- 0.5% off (EXCELLENT)
+
+CHOLESKI VERIFICATION: Manual computation matches statsmodels exactly.
+
+IMPROVEMENTS:
+- Unemployment accuracy improved from 23% to 38% due to normalization
+- Securities at month 8 now 4.1% off (excellent)
+- Unemployment at month 24 now 0.5% off (excellent)
+
+REMAINING ISSUES:
+- Loans at month 24 still 32% too shallow (data vintage effect)
+- Securities recovers too much at month 24 (-0.19 vs -0.40)
+- Deposits slightly too shallow (-0.68 vs -0.80)
+
+These systematic differences are consistent with data vintage effects in
+the bank balance sheet data from FRED vs the original 1992 Federal Reserve
+historical data.
+
+The normalization helped unemployment significantly but made bank variables
+slightly worse (all scaled down by 8.3%, moving them further from their
+targets for deposits and loans which were already too shallow).
+
+ASSESSMENT: Score plateau at ~82. Further improvement requires different data.

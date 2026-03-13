@@ -1,0 +1,57 @@
+DISCREPANCY REPORT - Table 2, Attempt 3
+=======================================
+
+SCORE: 65/100
+
+KEY FIX APPLIED: Fixed education per person using 1975/1976 values (actual years)
+when available, modal value otherwise. This ensures d_experience = 1 for within-job
+observations (previously 21% had d_exp != 1, corrupting coefficients).
+
+RESULTS COMPARISON:
+                        Generated       Paper       Match?
+N                       9,103           8,683       CLOSE (4.8% off - within 5%)
+Mean d_log_wage         0.030           0.026       CLOSE
+Delta Tenure (1)        0.1277          0.1242      MATCH (within 0.05)
+Delta Tenure (2)        0.1227          0.1265      MATCH (within 0.05)
+Delta Tenure (3)        0.1216          0.1258      MATCH (within 0.05)
+d_Tenure^2 (2) x100    -0.0818         -0.0518     MATCH (within 0.05)
+d_Tenure^2 (3) x100    -0.3549         -0.4592     MISS (off by 0.10)
+d_Exp^2 (1) x100       -0.2476         -0.6051     MISS (off by 0.36)
+d_Exp^2 (2) x100       -0.2198         -0.6144     MISS (off by 0.39)
+d_Exp^2 (3) x100       -0.1888         -0.4067     MISS (off by 0.22)
+R^2 (1)                 0.011           0.022       MISS (off by 0.011)
+R^2 (2)                 0.011           0.023       MISS (off by 0.012)
+R^2 (3)                 0.011           0.025       MISS (off by 0.014)
+SE of regression        0.278           0.218       MISS (0.060 too high)
+
+REMAINING ISSUES:
+
+1. Experience polynomial coefficients are about 40-60% too small in magnitude.
+   Paper: d_Exp^2 = -0.6051, Ours: -0.2476.
+   Root cause: Our data spans 1971-1983 (missing 1968-1970). The missing early years
+   contain younger workers with steeper experience-wage profiles, which would
+   increase the magnitude of experience polynomial coefficients.
+
+2. SE of regression = 0.278 vs paper's 0.218 (28% too high).
+   This suggests more wage measurement error or noisier wage data.
+   Possible causes:
+   - Hourly wage computed from labor_inc/hours (potentially noisy)
+   - Missing early years change sample composition
+   - Different job change detection leading to more spurious within-job obs
+
+3. R^2 = 0.011 vs 0.022 (half the paper's value).
+   Lower R^2 reflects both the weaker experience coefficients and higher SE.
+
+4. Still 1,680 obs with d_exp != 1 even after fixing education.
+   These are from very young workers where experience = max(age-educ-6, 0) clips at 0.
+   Could try: drop persons where clipping occurs in any year.
+
+5. Predicted wage growth is 20-50% too high (0.085 vs 0.068 at tenure 1).
+   This is because the tenure polynomial coefficients differ from the paper.
+
+NEXT STEPS:
+1. Drop persons where experience ever clips at 0 (to eliminate remaining d_exp != 1)
+2. Try tighter wage outlier trimming to reduce SE
+3. Consider if the 1968-1970 data gap is causing systematic differences
+   that cannot be overcome with the available data
+4. Try using the full panel (psid_panel_full.csv) to get more year coverage

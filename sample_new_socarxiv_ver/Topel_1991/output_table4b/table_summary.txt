@@ -1,0 +1,79 @@
+TABLE 4B: Returns to Job Seniority Based on Various Remaining Job Durations
+in First-Step Model
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983
+Sample: White males
+This table shows the sensitivity of the two-step estimates to restricting
+the first-step sample by minimum remaining job duration.
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: IV / Two-step estimation table with varying first-step samples
+Layout: Two panels
+
+Top panel: Main effects (4 columns by 2 rows)
+  Columns: Remaining Job Duration >= 0, >= 1, >= 3, >= 5
+  Rows: Experience (beta_1), Tenure (beta_2)
+
+Bottom panel: Estimated tenure profile (4 columns by 4 rows)
+  Columns: Remaining Job Duration >= 0, >= 1, >= 3, >= 5
+  Rows: 5 years, 10 years, 15 years, 20 years
+
+==============================================================================
+GROUND-TRUTH VALUES - TOP PANEL: Main Effects (standard errors in parentheses)
+==============================================================================
+
+Remaining Job Duration:    >=0              >=1              >=3              >=5
+
+Experience (beta_1):       .0713 (.0181)    .0792 (.0204)    .0716 (.0245)    .0607 (.0292)
+Tenure (beta_2):           .0545 (.0079)    .0546 (.0089)    .0559 (.0109)    .0584 (.0132)
+
+==============================================================================
+GROUND-TRUTH VALUES - BOTTOM PANEL: Estimated Tenure Profile
+(standard errors in parentheses)
+==============================================================================
+
+Remaining Job Duration:    >=0              >=1              >=3              >=5
+
+5 years:                   .1793 (.0235)    .1725 (.0265)    .1703 (.0319)    .1815 (.0379)
+10 years:                  .2459 (.0341)    .2235 (.0376)    .2181 (.0437)    .2330 (.0514)
+15 years:                  .2832 (.0411)    .2439 (.0445)    .2503 (.0504)    .2565 (.0594)
+20 years:                  .3375 (.0438)    .2865 (.0469)    .3232 (.0531)    .3066 (.0647)
+
+==============================================================================
+NOTES
+==============================================================================
+
+- Column >=0 reproduces the baseline results from Table 3
+- The remaining job duration restriction applies only to the first-step
+  estimation sample (within-job wage growth regressions)
+- The second step always uses the full sample of wage levels
+- As the minimum remaining duration increases, the sample shrinks
+  (shorter jobs are excluded), but the estimated returns to tenure
+  remain stable, supporting the paper's main findings
+- This stability is evidence against the selection/match-quality
+  interpretation of within-job wage growth
+
+==============================================================================
+STATISTICAL METHOD
+==============================================================================
+
+Same two-step procedure as Table 3, but the first step is estimated on
+subsamples defined by minimum remaining job duration:
+  - >=0: all within-job observations (baseline)
+  - >=1: only observations where the worker stays at least 1 more year
+  - >=3: only observations where the worker stays at least 3 more years
+  - >=5: only observations where the worker stays at least 5 more years
+
+The second step uses the full sample regardless of the first-step restriction.
+Higher-order tenure terms from the first step (varying by subsample) are
+used to compute cumulative returns.

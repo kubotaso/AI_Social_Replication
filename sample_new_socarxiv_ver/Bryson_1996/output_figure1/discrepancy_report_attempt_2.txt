@@ -1,0 +1,35 @@
+Discrepancy Report - Attempt 2 - Score: 88/100
+
+IMPROVEMENTS FROM ATTEMPT 1:
+- Corrected understanding: coefficients go from most negative (Latin, -0.43) to least negative (Gospel, -0.13)
+- Verified against original figure image - values match well
+- Avg coefficient difference from paper: 0.007 (excellent)
+- Genre ordering: 16/18 correct
+
+REMAINING DISCREPANCIES:
+
+1. SWING/NEW AGE SWAP (2 pts lost)
+   - My order: ...Reggae, Swing, New Age/Space, Opera...
+   - Paper order: ...Reggae, New Age/Space, Swing, Opera...
+   - Coefficients: Swing = -0.3116, New Age = -0.3091 (diff = 0.0025)
+   - This is very close and may be due to sample differences (N=892 vs paper's sample)
+   - POSSIBLE FIX: Check if not requiring educ for the analysis sample changes the N and order. The paper may have N=912 respondents with all 18 genres valid, then only use educ in the regression (with those missing educ dropped per model). Or the paper may not drop those with missing educ from the sample.
+
+2. LINE STYLE
+   - Paper uses dash-dot (.-.) for the education line; my figure uses simple dashes (--)
+   - Need to change to '-.' line style
+
+3. VISUAL STYLE MATCHING
+   - Paper has annotation text directly on the plot with leader lines
+   - My labels are close but could better match paper placement
+   - The paper's right Y-axis label is rotated 270 degrees (reads bottom to top)
+
+4. SAMPLE SIZE (N=892 vs expected ~912)
+   - Dropping respondents with missing educ reduces sample from ~912 to 892
+   - Try keeping all respondents with valid genre ratings for the sample, but only using educ in regression (listwise deletion within each regression model)
+
+PLAN FOR ATTEMPT 3:
+- Try N=912 (don't require educ for sample restriction, only within regressions)
+- Use dash-dot line style
+- Better match visual style
+- Check if N=912 fixes the Swing/New Age order

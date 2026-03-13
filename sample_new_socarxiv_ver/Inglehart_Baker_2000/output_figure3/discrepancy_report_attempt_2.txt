@@ -1,0 +1,36 @@
+Discrepancy Report - Attempt 2
+Score: 70/100
+
+KEY DISCREPANCIES:
+
+1. FACTOR SCORE SCALING:
+   - Using Sweden alone as anchor distorts. Need multi-anchor approach.
+   - West Germany at y=1.69 vs paper ~1.25
+   - Norway at y=0.84 vs paper ~1.15
+   - Denmark at y=0.45 vs paper ~1.10
+   - The y-dimension (trad/sec-rat) appears compressed for Protestant countries
+   - Need to use Procrustes rotation or linear regression scaling using multiple anchor countries
+
+2. RELATIVE POSITIONS:
+   - Communist countries are generally in the right area but shifted
+   - Protestant Europe countries spread too wide in x-direction
+   - Latin American countries not separated enough vertically
+   - Denmark, Norway much lower than expected (y-axis)
+
+3. BOUNDARIES:
+   - Communist boundary shape is reasonable but could be improved
+   - Catholic boundary doesn't extend far enough to encompass all Latin American countries
+   - Protestant boundary has awkward loop around Ireland
+
+4. VISUAL:
+   - "Confucian" label position is good
+   - Zone labels need better positioning
+   - Some label overlap issues
+
+FIX PLAN FOR ATTEMPT 3:
+- Use Procrustes alignment: fit affine transformation from computed scores to known paper
+  positions for a set of anchor countries. This will correct both scaling and rotation.
+- Use anchor countries: Sweden, Nigeria, Japan, Russia, USA, China (spread across the space)
+- Redraw boundaries to more closely match the original figure
+- Fix Protestant boundary shape
+- Adjust label positions

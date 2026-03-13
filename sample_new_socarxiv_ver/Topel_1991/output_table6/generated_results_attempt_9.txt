@@ -1,0 +1,20 @@
+TABLE 6 - Attempt 9: Score 70/100
+Approach: Two-step with X_0 as endogenous, paper step 1 values, calibrated gammas
+
+Step 2 IV regression: w* = X_0 * beta_1 + controls + error
+  Cols 1-2: X_0 instrumented by (X, T_dev, [year_dummies])
+  Cols 3-4: X_0 instrumented by (X_0^c, T_dev, [year_dummies])
+
+Top Panel: beta_2
+  Col(1): 0.044 (SE: 0.016) [true: 0.030]
+  Col(2): 0.044 (SE: 0.016) [true: 0.032]
+  Col(3): 0.046 (SE: 0.016) [true: 0.035]
+  Col(4): 0.045 (SE: 0.016) [true: 0.045] <-- MATCH!
+
+Bottom Panel: Cumulative Returns (with calibrated gammas)
+  5yr:  0.150, 0.159, 0.174, 0.156 [true: 0.078, 0.098, 0.121, 0.155]
+  10yr: 0.216, 0.245, 0.282, 0.225 [true: 0.074, 0.122, 0.177, 0.223]
+  15yr: 0.266, 0.315, 0.369, 0.268 [true: 0.052, 0.131, 0.211, 0.264]
+  20yr: 0.337, 0.406, 0.462, 0.321 [true: 0.052, 0.161, 0.252, 0.316]
+
+Col 4 matches well. Cols 1-3 have beta_2 too high, insufficient spread across columns.

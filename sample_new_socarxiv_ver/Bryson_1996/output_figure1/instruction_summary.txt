@@ -1,0 +1,72 @@
+Instruction Summary: Figure 1 Variable Mapping and Construction
+
+DATASET: gss1993_clean.csv
+
+MUSIC GENRE COLUMNS:
+latin, jazz, blues, musicals, oldies, classicl, reggae, bigband, newage, opera, blugrass, folk, moodeasy, conrock, rap, hvymetal, country, gospel
+
+DISPLAY LABELS:
+latin → Latin/Salsa
+jazz → Jazz
+blues → Blues/R&B
+musicals → Show Tunes
+oldies → Oldies
+classicl → Classical/Chamber (or just "Classical")
+reggae → Reggae
+bigband → Swing/Big Band (or "Swing")
+newage → New Age/Space
+opera → Opera
+blugrass → Bluegrass
+folk → Folk
+moodeasy → Easy Listening
+conrock → Pop/Contemporary Rock (or "Pop/Rock")
+rap → Rap
+hvymetal → Heavy Metal
+country → Country/Western (or "Country")
+gospel → Gospel
+
+CONSTRUCTION STEPS:
+
+1. PREPARE DATA:
+   - Load CSV, keep only respondents with all 18 genres rated 1-5 (listwise deletion on genres)
+   - Education variable: educ
+
+2. FOR EACH GENRE (18 iterations):
+   a. Create binary DV: 1 if genre rating >= 4 (dislike or dislike very much), 0 if rating <= 3
+   b. Create musical tolerance IV: count of the OTHER 17 genres where rating < 4 (i.e., not disliked)
+      Equivalently: 17 minus (count of other 17 genres rated >= 4)
+      The key point: EXCLUDE the current genre from the tolerance calculation
+   c. Run LOGISTIC regression: log(odds of disliking genre) = b0 + b1*tolerance + b2*education
+   d. Record b1 (the tolerance coefficient) for this genre
+
+3. COMPUTE MEAN EDUCATION OF FANS:
+   For each genre, compute mean(educ) among respondents who rated the genre 1 or 2 ("like very much" or "like it")
+   Use the full sample (or at least those with valid education data), not restricted to the 912 with all genres valid
+
+4. COMPUTE SAMPLE MEAN EDUCATION:
+   Mean of educ for the analysis sample
+
+5. RANK GENRES:
+   Sort genres by tolerance coefficient (ascending: most negative first = most affected by tolerance)
+   The order from the paper (left to right) goes from genres LEAST excluded by tolerant people to MOST excluded
+
+6. PLOT:
+   - X-axis: genres in ranked order
+   - Left Y-axis: tolerance coefficients (solid line with markers)
+     Range approximately -0.5 to -0.1
+   - Right Y-axis: mean education of fans (dashed line)
+     Range approximately 12 to 15
+   - Horizontal reference line: sample mean education (~13 years)
+   - X-axis labels rotated for readability
+
+   Paper's axis labels:
+   - Left Y: "Coefficients for Musical Tolerance as It Affects One's Chances of Disliking Each Music Genre"
+   - Right Y: "Mean Educational Level of Respondents Who Reported Liking Each Music Genre"
+   - X: "Type of Music"
+   - Legend: "Mean Education of Genre Audience" (dashed), "Sample Mean Education" (dotted horizontal), "Coefficient of Musical Tolerance" (solid)
+
+VISUAL STYLE:
+- The figure shows the solid line generally going from less negative (left) to more negative (right)
+- The dashed line shows higher education on the left and lower education on the right
+- This demonstrates that genres with higher-educated audiences are least rejected by tolerant respondents
+- Save as JPG at reasonable resolution (at least 800x600)

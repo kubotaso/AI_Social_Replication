@@ -1,0 +1,39 @@
+DISCREPANCY REPORT - Attempt 3
+================================
+Score: 66.0/100 (no improvement from attempt 2)
+
+KEY FINDINGS FROM EXPLORATION:
+1. Deflation method changes R2 but not coefficients (year dummies absorb)
+   - CPS only: R2=0.489
+   - GNP+CPS: R2=0.289
+   - Paper: R2=0.422 (between these)
+   - Cannot match R2 with any standard deflation
+
+2. Experience^2 coefficient consistently wrong (-0.00053 vs -0.00079)
+   - Only matches when education is EXCLUDED from controls (-0.000766)
+   - Different education functional forms tried:
+     * Continuous years: exp_sq=-0.000531
+     * Category dummies: exp_sq=-0.000591
+     * ed+ed^2: exp_sq=-0.000603
+     * No education: exp_sq=-0.000766
+   - The paper likely has different data (1968-1983 vs our 1971-1983)
+     or different variable construction
+
+3. Interaction terms consistently wrong sign (negative vs positive)
+   - ct*tenure: -0.0027 (paper: +0.0142)
+   - This may be because ct and tenure are mechanically correlated
+     (ct >= tenure for all obs; corr = 0.635; ct*t corr with t^2 = 0.958)
+   - With "remaining tenure" instead of ct: interaction becomes positive
+     but much smaller (+0.002 vs +0.014)
+
+4. Imputed CT with proper hazard model gives different results from OLS fallback
+   - Hazard model has very low pseudo-R2 (0.018)
+   - Imputed CT coefficients are too large in unrestricted model
+
+PLAN FOR ATTEMPT 4:
+- Accept that some coefficients cannot be matched with current data
+- Focus on maximizing matched coefficients using best deflation
+- Try NO year dummies (let deflation handle time effects)
+  to see if that changes coefficient structure
+- Or try a completely different approach: use person fixed effects
+  that might be implicit in the paper's methodology

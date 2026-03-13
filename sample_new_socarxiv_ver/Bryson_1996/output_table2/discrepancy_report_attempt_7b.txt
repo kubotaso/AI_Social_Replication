@@ -1,0 +1,23 @@
+Discrepancy Report: Attempt 7
+Score: 85.5/100 (tied with best)
+
+APPROACH:
+- Old 5-item racism scale + denom==1 for Conservative Protestant
+- Using denom==1 (Baptist) reduces Model 2 Black from 0.103* to 0.079(ns)
+- But increases Model 2 Conservative Protestant from 0.074 to 0.109*
+
+KEY FINDING: denom==1 corrects Black coefficient direction but creates new
+Conservative Protestant problem. Net effect on score: zero improvement.
+
+Also tested 6-item + denom==1: scored 80.6 due to N penalty and sig issues.
+
+PERSISTENT ISSUES:
+1. Model 2 racism coefficient near zero (data limitation)
+2. Model 2 Black coefficient too high with fund==1, too high with denom==1
+3. Hispanic wrongly significant in Model 1 regardless of approach
+4. Model 2 R2 consistently 0.013-0.017 below paper value
+
+NEXT STEPS:
+- Try combining denom==1 with 6-item scale but with strict min_valid to lower N
+- Try hybrid: use 6-item scale + fund==1 but restrict ethnic==97 cases
+- Consider that the paper's exact configuration may not be reproducible

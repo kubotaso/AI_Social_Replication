@@ -1,0 +1,114 @@
+
+==========================================================================================
+Variant: cpbill_long (original)
+==========================================================================================
+  Industrial production     N=342  M1=0.4998  M2=0.3595  CPBILL=0.0024  TERM=0.5574  FUNDS=0.6263
+  Capacity utilization      N=342  M1=0.4928  M2=0.8095  CPBILL=0.0021  TERM=0.3591  FUNDS=0.0126
+  Employment                N=342  M1=0.5319  M2=0.2453  CPBILL=0.0043  TERM=0.3307  FUNDS=0.1369
+  Unemployment rate         N=342  M1=0.8486  M2=0.3075  CPBILL=0.1061  TERM=0.4440  FUNDS=0.0039
+  Housing starts            N=342  M1=0.1627  M2=0.1707  CPBILL=0.4718  TERM=0.3201  FUNDS=0.5416
+  Personal income           N=342  M1=0.3819  M2=0.1223  CPBILL=0.0286  TERM=0.1459  FUNDS=0.4646
+  Retail sales              N=342  M1=0.7667  M2=0.0256  CPBILL=0.9774  TERM=0.9594  FUNDS=0.1473
+  Consumption               N=342  M1=0.7303  M2=0.2062  CPBILL=0.8783  TERM=0.8942  FUNDS=0.3951
+  Durable-goods orders      N=96  M1=0.3694  M2=0.4161  CPBILL=0.5517  TERM=0.6803  FUNDS=0.3423
+
+==========================================================================================
+Variant: cpbill_spliced
+==========================================================================================
+  Industrial production     N=342  M1=0.5915  M2=0.0660  CPBILL=0.0150  TERM=0.3099  FUNDS=0.8634
+  Capacity utilization      N=342  M1=0.5786  M2=0.8195  CPBILL=0.0125  TERM=0.1261  FUNDS=0.4573
+  Employment                N=342  M1=0.9156  M2=0.1276  CPBILL=0.0147  TERM=0.7086  FUNDS=0.7397
+  Unemployment rate         N=342  M1=0.5319  M2=0.4431  CPBILL=0.0233  TERM=0.4783  FUNDS=0.2955
+  Housing starts            N=342  M1=0.4684  M2=0.1851  CPBILL=0.1198  TERM=0.3189  FUNDS=0.2563
+  Personal income           N=342  M1=0.2952  M2=0.1626  CPBILL=0.0102  TERM=0.0470  FUNDS=0.2972
+  Retail sales              N=342  M1=0.5852  M2=0.0251  CPBILL=0.4189  TERM=0.7512  FUNDS=0.1273
+  Consumption               N=342  M1=0.7663  M2=0.0981  CPBILL=0.0801  TERM=0.6126  FUNDS=0.3355
+  Durable-goods orders      N=96  M1=0.3694  M2=0.4161  CPBILL=0.5517  TERM=0.6803  FUNDS=0.3423
+
+==========================================================================================
+CPBILL p-value comparison across variants:
+==========================================================================================
+Variable                   cpbill_long      spliced        paper
+  Industrial production            0.0024        0.0150        0.0049
+  Capacity utilization             0.0021        0.0125        0.0008
+  Employment                       0.0043        0.0147        0.0320
+  Unemployment rate                0.1061        0.0233        0.0490
+  Housing starts                   0.4718        0.1198        0.2100
+  Personal income                  0.0286        0.0102        0.0200
+  Retail sales                     0.9774        0.4189        0.4800
+  Consumption                      0.8783        0.0801        0.0210
+  Durable-goods orders             0.5517        0.5517        0.0210
+
+Score for cpbill_long (original): 78.7
+
+Score for cpbill_spliced: 82.7
+
+Best variant: cpbill_spliced (score=82.7)
+
+==========================================================================================
+FINAL Table 3 (using cpbill_spliced)
+Sample: 1961:7 - 1989:12, 6 lags each
+==========================================================================================
+Variable                         M1        M2    CPBILL      TERM     FUNDS      N
+------------------------------------------------------------------------------------------
+Industrial production        0.5915    0.0660    0.0150    0.3099    0.8634    342
+Capacity utilization         0.5786    0.8195    0.0125    0.1261    0.4573    342
+Employment                   0.9156    0.1276    0.0147    0.7086    0.7397    342
+Unemployment rate            0.5319    0.4431    0.0233    0.4783    0.2955    342
+Housing starts               0.4684    0.1851    0.1198    0.3189    0.2563    342
+Personal income              0.2952    0.1626    0.0102    0.0470    0.2972    342
+Retail sales                 0.5852    0.0251    0.4189    0.7512    0.1273    342
+Consumption                  0.7663    0.0981    0.0801    0.6126    0.3355    342
+Durable-goods orders         0.3694    0.4161    0.5517    0.6803    0.3423     96
+
+============================================================
+SCORING: 82.7/100
+  Value: 27/45 -> 18.0/30
+  Significance: 37/45 -> 24.7/30
+  Present: 45/45 -> 15.0/15
+  N: 15/15, Lags: 10/10
+  Industrial production     / M1    : gen=0.5915 true=0.7200 sig:ns/ns match=True val=True
+  Industrial production     / M2    : gen=0.0660 true=0.8600 sig:*/ns match=False val=False
+  Industrial production     / CPBILL: gen=0.0150 true=0.0049 sig:**/*** match=False val=False
+  Industrial production     / TERM  : gen=0.3099 true=0.5500 sig:ns/ns match=True val=False
+  Industrial production     / FUNDS : gen=0.8634 true=0.8600 sig:ns/ns match=True val=True
+  Capacity utilization      / M1    : gen=0.5786 true=0.5000 sig:ns/ns match=True val=True
+  Capacity utilization      / M2    : gen=0.8195 true=0.7100 sig:ns/ns match=True val=True
+  Capacity utilization      / CPBILL: gen=0.0125 true=0.0008 sig:**/*** match=False val=False
+  Capacity utilization      / TERM  : gen=0.1261 true=0.6400 sig:ns/ns match=True val=False
+  Capacity utilization      / FUNDS : gen=0.4573 true=0.8500 sig:ns/ns match=True val=False
+  Employment                / M1    : gen=0.9156 true=0.7900 sig:ns/ns match=True val=True
+  Employment                / M2    : gen=0.1276 true=0.8200 sig:ns/ns match=True val=False
+  Employment                / CPBILL: gen=0.0147 true=0.0320 sig:**/** match=True val=True
+  Employment                / TERM  : gen=0.7086 true=0.5500 sig:ns/ns match=True val=True
+  Employment                / FUNDS : gen=0.7397 true=0.6300 sig:ns/ns match=True val=True
+  Unemployment rate         / M1    : gen=0.5319 true=0.4700 sig:ns/ns match=True val=True
+  Unemployment rate         / M2    : gen=0.4431 true=0.5400 sig:ns/ns match=True val=True
+  Unemployment rate         / CPBILL: gen=0.0233 true=0.0490 sig:**/** match=True val=True
+  Unemployment rate         / TERM  : gen=0.4783 true=0.5300 sig:ns/ns match=True val=True
+  Unemployment rate         / FUNDS : gen=0.2955 true=0.2800 sig:ns/ns match=True val=True
+  Housing starts            / M1    : gen=0.4684 true=0.5600 sig:ns/ns match=True val=True
+  Housing starts            / M2    : gen=0.1851 true=0.2300 sig:ns/ns match=True val=True
+  Housing starts            / CPBILL: gen=0.1198 true=0.2100 sig:ns/ns match=True val=False
+  Housing starts            / TERM  : gen=0.3189 true=0.3800 sig:ns/ns match=True val=True
+  Housing starts            / FUNDS : gen=0.2563 true=0.5500 sig:ns/ns match=True val=False
+  Personal income           / M1    : gen=0.2952 true=0.4000 sig:ns/ns match=True val=True
+  Personal income           / M2    : gen=0.1626 true=0.2900 sig:ns/ns match=True val=False
+  Personal income           / CPBILL: gen=0.0102 true=0.0200 sig:**/** match=True val=True
+  Personal income           / TERM  : gen=0.0470 true=0.3700 sig:**/ns match=False val=False
+  Personal income           / FUNDS : gen=0.2972 true=0.7600 sig:ns/ns match=True val=False
+  Retail sales              / M1    : gen=0.5852 true=0.5900 sig:ns/ns match=True val=True
+  Retail sales              / M2    : gen=0.0251 true=0.1600 sig:**/ns match=False val=False
+  Retail sales              / CPBILL: gen=0.4189 true=0.4800 sig:ns/ns match=True val=True
+  Retail sales              / TERM  : gen=0.7512 true=0.9600 sig:ns/ns match=True val=True
+  Retail sales              / FUNDS : gen=0.1273 true=0.4100 sig:ns/ns match=True val=False
+  Consumption               / M1    : gen=0.7663 true=0.9900 sig:ns/ns match=True val=True
+  Consumption               / M2    : gen=0.0981 true=0.5300 sig:*/ns match=False val=False
+  Consumption               / CPBILL: gen=0.0801 true=0.0210 sig:*/** match=False val=False
+  Consumption               / TERM  : gen=0.6126 true=0.7800 sig:ns/ns match=True val=True
+  Consumption               / FUNDS : gen=0.3355 true=0.4100 sig:ns/ns match=True val=True
+  Durable-goods orders      / M1    : gen=0.3694 true=0.6000 sig:ns/ns match=True val=False
+  Durable-goods orders      / M2    : gen=0.4161 true=0.5200 sig:ns/ns match=True val=True
+  Durable-goods orders      / CPBILL: gen=0.5517 true=0.0210 sig:ns/** match=False val=False
+  Durable-goods orders      / TERM  : gen=0.6803 true=0.9600 sig:ns/ns match=True val=True
+  Durable-goods orders      / FUNDS : gen=0.3423 true=0.3900 sig:ns/ns match=True val=True

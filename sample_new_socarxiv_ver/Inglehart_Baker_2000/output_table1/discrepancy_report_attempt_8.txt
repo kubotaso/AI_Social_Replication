@@ -1,0 +1,31 @@
+Discrepancy Report - Attempt 8
+Score: 69/100 (DOWN from best of 75)
+
+Key issues:
+1. Autonomy index loading is WORSE (0.66 nation, 0.45 individual) compared to attempt 7 (0.70/0.49).
+   - This attempt uses 4-item autonomy with 3-item rescaling for EVS, but the rescaling formula
+     (auto3 + 1) / 3 * 4 - 2 may be introducing noise.
+   - Attempt 7 used 5-item autonomy (obedience+faith-independence-determination-imagination)
+     with simple mean imputation for missing countries, which gave better results.
+
+2. N=66 instead of 65. The script excludes only MNE but doesn't check if something else changed.
+
+3. Ordering still fails - autonomy_idx (0.66) is far below F120 (0.89) at nation level.
+
+4. Variance explained: 39.8/30.9 vs paper's 44/26. Dim1 too low, dim2 too high.
+
+5. F118 individual dropped to 0.47 (from 0.52 in attempt 7), a MISS.
+
+Analysis of what went wrong:
+- The 4-item autonomy construction is worse than the 5-item version used in attempt 7.
+- The paper's imputation method doesn't help when the fundamental autonomy construction is wrong.
+- The 3-item rescaling for EVS countries (which lack determination/A032) introduces distortion.
+
+Plan for attempt 9:
+- Go back to the 5-item autonomy approach from attempt 7 (best so far)
+- Try using ONLY obedience as the autonomy proxy (simpler, might correlate better)
+- OR try a different approach: use the 5-item index but with a better handling of missing A032
+  for EVS countries (e.g., impute A032 at individual level using correlation with other items)
+- Try standardizing all items before PCA (z-scores at country level)
+- Try using pairwise correlation for individual level (paper mentions "pairwise deletion")
+- Check if we should be using S002VS=2 only (wave 3 only) instead of waves 2 and 3

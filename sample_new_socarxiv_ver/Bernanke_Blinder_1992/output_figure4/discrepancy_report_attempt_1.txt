@@ -1,0 +1,56 @@
+Discrepancy Report -- Figure 4, Attempt 1
+==========================================
+
+Score: 30/100 (manual assessment; automated score was 67 but inflated due to shape checks passing while values are completely wrong)
+
+MAJOR ISSUES:
+1. ALL IRF values are far too large in magnitude:
+   - Unemployment: reaches +54 at month 24 (should be +0.17)
+   - Deposits: reaches -2.2 at month 12 (should be -0.80)
+   - Securities: reaches -2.0 at month 8 (should be -0.83)
+   - Loans: reaches -3.4 at month 24 (should be -1.35)
+
+2. The scaling factor of 100 is applied on top of already over-large IRF values.
+   The bank variables are about 2.5-3x too large, and unemployment is about 300x too large.
+
+3. The funds_rate innovation std dev is 0.3375, close to the paper's 0.31. So the
+   model is roughly correct but something about the IRF extraction is wrong.
+
+ANALYSIS:
+- The raw IRF from statsmodels for a 1-std-dev orthogonalized shock to funds_rate
+  gives the response in the same units as each variable.
+- For unemployment (in %-points), the raw response at month 24 is ~0.54 %-pts.
+  Multiply by 100 gives 54. But the paper shows 0.17 on the x10^-2 scale.
+  So the paper's value of 0.17 means 0.17 * 10^-2 = 0.0017 %-pts.
+  My raw value is 0.54, which is 300x too large.
+
+- For bank variables (in log levels), the raw response at month 12 for deposits
+  is about -0.021. Multiply by 100 gives -2.1. Paper shows -0.8 on the x10^-2 scale.
+  So the paper expects -0.008 in raw log-point terms. My raw is -0.021, about 2.6x too large.
+
+HYPOTHESIS:
+The issue might be related to how the orthogonalized IRFs are computed. The paper may
+be using unit shocks (1 basis point or 1% shock) rather than 1-std-dev shocks, or
+the Choleski decomposition might be different from what statsmodels implements.
+
+Alternatively, there might be an issue with the variable definitions - perhaps the
+bank variables need to be in different units, or the VAR needs to be estimated differently.
+
+POSSIBLE FIXES FOR ATTEMPT 2:
+1. Don't multiply by 100 - just use the raw IRF values directly. The x10^-2 label
+   on the y-axis already implies the multiplication.
+   - Raw deposits at month 12: -0.021. On x10^-2 axis this would be -2.1 (still too large)
+   - So this alone doesn't fix it.
+
+2. Try using orth=False (non-orthogonalized IRFs) or manually implementing the
+   Choleski decomposition to match the paper.
+
+3. Check if the paper uses a different shock normalization (e.g., 1 basis point
+   shock scaled by 31 for the figure).
+
+4. Look more carefully at variable definitions - maybe bank_investments is not
+   the right variable for securities, or maybe the CPI deflation needs different
+   treatment.
+
+5. The deposits variable might be wrong - using checkable deposits instead of
+   total deposits may change the magnitude.

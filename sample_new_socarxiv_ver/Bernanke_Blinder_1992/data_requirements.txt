@@ -1,0 +1,210 @@
+Data Requirements for Bernanke and Blinder (1992) Replication
+================================================================
+
+Paper: "The Federal Funds Rate and the Channels of Monetary Transmission"
+Authors: Ben S. Bernanke and Alan S. Blinder
+Source: American Economic Review, 82(4), 901-921, September 1992
+
+Data Frequency: Monthly (primary), Weekly (Section III only)
+All data seasonally adjusted except interest rates.
+Original source: DRI (Data Resources, Inc.) database.
+
+MONTHLY DATA SERIES
+===================
+
+1. Industrial Production Index (log levels)
+   - DRI code: JQIND
+   - FRED: INDPRO
+   - Units: Index, SA
+
+2. Capacity Utilization, Manufacturing (log levels)
+   - DRI code: UCAPFRBM
+   - FRED: CUMFNS (manufacturing)
+   - Units: Percent, SA
+
+3. Employment (Nonfarm Payrolls) (log levels)
+   - DRI code: EEA
+   - FRED: PAYEMS
+   - Units: Thousands, SA
+
+4. Housing Starts (log levels)
+   - DRI code: HUSTS
+   - FRED: HOUST
+   - Units: Thousands of units, SAAR
+
+5. Retail Sales, Real (1982 dollars) (log levels)
+   - DRI code: STR82
+   - FRED: RSAFS (nominal), deflated by CPI
+   - Units: Millions of dollars, SA
+
+6. Personal Income, Real (1982 dollars) (log levels)
+   - DRI code: YP82
+   - FRED: PI (nominal), deflated by CPI
+   - Units: Billions of dollars, SA
+
+7. New Orders for Durable Goods, Real (1982 dollars) (log levels)
+   - DRI code: OMD82
+   - FRED: DGORDER (nominal), deflated by CPI
+   - Units: Millions of dollars, SA
+
+8. Personal Consumption Expenditures (log levels)
+   - DRI code: C
+   - FRED: PCE (nominal), deflated by CPI
+   - Units: Billions of dollars, SA
+
+9. Consumer Price Index
+   - FRED: CPIAUCSL
+   - Units: Index (1982-84=100), SA
+   - Used in log levels for VAR estimation
+
+10. M1 Money Supply (log levels)
+    - DRI code: MNY1
+    - FRED: M1SL
+    - Units: Billions of dollars, SA
+
+11. M2 Money Supply (log levels)
+    - DRI code: MNY2
+    - FRED: M2SL
+    - Units: Billions of dollars, SA
+
+12. Federal Funds Rate (levels)
+    - DRI code: RMFEDFUNDNS
+    - FRED: FEDFUNDS
+    - Units: Percent, NSA (monthly avg of daily figures)
+
+13. 3-Month Treasury Bill Rate (levels)
+    - DRI code: RMGBS3NS
+    - FRED: TB3MS
+    - Units: Percent, NSA
+
+14. 10-Year Treasury Bond Rate (levels)
+    - FRED: GS10
+    - Units: Percent, NSA
+
+15. 6-Month Commercial Paper Rate
+    - DRI code: RMCML6NS
+    - FRED: Need to find historical series. Try CP6M or WCP6M.
+    - Units: Percent, NSA
+    - Note: Data available only from 1961 (see Table 3 footnote)
+
+16. 1-Year Treasury Rate
+    - DRI code: RMGFCM@1NS
+    - FRED: GS1
+    - Units: Percent, NSA
+
+17. Unemployment Rate (Male, Ages 25-54)
+    - DRI formula: HHM25@54/(LCM25@34 + LCM35@44 + LCM45@54)
+    - FRED: LNS14000061 (unemployment rate, men 25-54)
+    - Units: Percent, SA
+
+DERIVED VARIABLES
+=================
+
+- FFBOND = FUNDS - GS10 (funds rate minus 10-year bond rate)
+- CPBILL = CP6M - TB6MS (6-month commercial paper rate minus 6-month T-bill rate)
+  Note: TB6MS = 6-month T-bill rate; if unavailable, approximate from TB3MS
+- TERM = GS10 - GS1 (10-year minus 1-year Treasury rate)
+- Real variables: deflated by CPI (base 1982-84=100)
+
+BANK BALANCE-SHEET DATA (for Figure 4, Section IV)
+===================================================
+
+Source: Board of Governors, Federal Reserve System
+"Principal Assets and Liabilities of All Commercial Banks"
+Last-Wednesday-of-the-month series. All in log levels, deflated by CPI.
+
+18. Total Deposits
+    - FRED: Need historical series. Try TCDSL or H8 data
+    - Deposits = total deposits
+
+19. Total Loans
+    - FRED: Need historical series. Try TOTLL or LOANS
+    - Loans = total loans
+
+20. Securities (= Total Loans and Investments - Loans)
+    - Derived variable
+
+21. Dummy variable for June 1969 (definitional change)
+
+WEEKLY DATA (Section III only)
+==============================
+
+22. Required Reserves, adjusted
+    - DRI code: RESFRBNANS
+    - FRED: REQRESNS or similar
+
+23. Nonborrowed Reserves, adjusted
+    - DRI code: RESFRBNBANS
+    - FRED: BOGNONBR or NONBORRES
+
+24. Federal Funds Rate (weekly)
+    - DRI code: RMFEDFUNDSNS
+    - FRED: FF (daily, aggregate to weekly)
+
+SAMPLE PERIODS
+==============
+
+- Table 1A: 1959:7 - 1989:12
+- Table 1B: 1959:7 - 1979:9 (pre-Volcker)
+- Table 2A: 1959:7 - 1989:12
+- Table 2B: 1959:7 - 1979:9
+- Table 3:  1961:7 - 1989:12 (commercial paper data starts 1961)
+- Table 4A: 1961:7 - 1989:12
+- Table 4B: 1961:7 - 1989:12
+- Table 5:  1959:8 - 1979:9
+- Table 6:  1959:8 - 1979:9
+- Figure 1: 1959 - 1989
+- Figure 2: ~1959 - 1979:9 (pre-Volcker, 3-var VAR)
+- Figure 4: 1959:1 - 1978:12 (5-var VAR, bank balance sheet)
+
+MODEL SPECIFICATIONS
+====================
+
+Tables 1-2: 6-variable prediction equations
+  - Forecasted variable + CPI (log) + M1 (log) + M2 (log) + interest rate + 6 lags each
+  - Constant included
+  - Real variables and CPI in log levels
+
+Tables 3-4: 6-variable prediction equations
+  - Forecasted variable + CPI (log) + M1 (log) + M2 (log) + CPBILL + TERM + FUNDS + 6 lags each
+  - Wait, Table 3 columns are: M1, M2, CPBILL, TERM, FUNDS
+  - These are 6-variable equations (own lags + CPI + the 5 monetary/interest variables)
+
+Table 5: Modified Avery MIMIC model
+  - Latent variable y* = Xc + u, where X = 6 lags of unemployment + 6 lags of inflation
+  - Indicators Z: FFBOND, DRBOND, annualized real growth rate of nonborrowed reserves
+  - Normalization: coefficient of FFBOND in Z equation = 1
+  - Sample: 1959:8 - 1979:9
+  - Variables measured as deviations from means, no constant
+
+Table 6: IV regression of slope of reserve supply function
+  - Regress innovation in policy measure on innovation in nonborrowed reserves
+  - Instruments: innovations from 3 macro variables in 5-var VARs
+  - Sample: 1959:8 - 1979:9
+
+Figure 2: 3-variable VAR impulse responses
+  - Variables: FUNDS, unemployment rate (male 25-54), log CPI
+  - 6 lags, pre-October 1979 sample
+  - Ordering: FUNDS first (policy variable, then unemployment, then inflation)
+  - Actually footnote 28 says ordering is: policy variable, unemployment rate, inflation rate
+  - One-standard-deviation shocks
+  - Responses of FUNDS to unemployment and inflation shocks
+
+Figure 4: 5-variable VAR impulse responses
+  - Variables: FUNDS, unemployment rate, log CPI, log(bank balance sheet variable / CPI)
+  - 6 lags, sample 1959:1 - 1978:12
+  - Three separate VARs, one for each bank variable (deposits, securities, loans)
+  - Responses to a one-standard-deviation FUNDS shock
+  - Ordering: FUNDS first, then unemployment, CPI, bank variable
+  - Actually need to check ordering more carefully
+
+DATA ACQUISITION METHOD
+========================
+
+Primary method: FRED via pandas-datareader or fredapi
+All series available from FRED except possibly:
+- 6-month commercial paper rate (historical)
+- Bank balance sheet data (historical, pre-1973)
+- Weekly reserves data
+
+Will attempt FRED download first, then assess gaps.

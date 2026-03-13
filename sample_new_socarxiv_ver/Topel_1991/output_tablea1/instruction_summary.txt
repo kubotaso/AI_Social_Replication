@@ -1,0 +1,91 @@
+INSTRUCTION SUMMARY: Table A1 — Variable Definitions and Summary Statistics
+============================================================================
+
+DATA SOURCE: PSID Panel Dataset (data/psid_panel.csv)
+COMMON VARIABLES: See output_table2/instruction_summary.txt for education recoding
+
+================================================================
+TABLE A1 SPECIFIC INSTRUCTIONS
+================================================================
+
+This is a DESCRIPTIVE table — no statistical models, just sample statistics.
+
+TARGET: Compute means and standard deviations for 8 variables, plus
+sample distribution by year and the CPS wage index.
+
+TOP PANEL — Variable Statistics:
+
+1. Real wage (log):
+   log_real_wage = ln(hourly_wage) - ln(GNP_deflator[year-1]) - ln(CPS_wage_index[year])
+   + ln(GNP_deflator_base)
+
+   GNP Price Deflator for Consumption (base 1982=100):
+     1967: 33.4,  1968: 34.8,  1969: 36.7,  1970: 38.8,  1971: 40.5,
+     1972: 41.8,  1973: 44.4,  1974: 48.9,  1975: 53.6,  1976: 56.9,
+     1977: 60.6,  1978: 65.2,  1979: 72.6,  1980: 82.4,  1981: 90.9,
+     1982: 100.0
+
+   CPS Wage Index (from Murphy and Welch 1987):
+     1968: 1.000, 1969: 1.032, 1970: 1.091, 1971: 1.115, 1972: 1.113,
+     1973: 1.151, 1974: 1.167, 1975: 1.188, 1976: 1.117, 1977: 1.121,
+     1978: 1.133, 1979: 1.128, 1980: 1.128, 1981: 1.109, 1982: 1.103,
+     1983: 1.089
+
+   IMPORTANT: PSID wages refer to the PRIOR year's income.
+   Interview year 1968 → calendar year 1967 income → use GNP deflator for 1967
+   Interview year 1983 → calendar year 1982 income → use GNP deflator for 1982
+
+   Paper target: mean = 1.131, SD = 0.497
+
+2. Experience (years in labor market):
+   experience = age - education_years - 6
+   education_years: recode per year (categorical in 1968-1974, 1977-1983;
+   years in 1975-1976)
+   Paper target: mean = 20.021, SD = 11.045
+
+3. Tenure (years of current job seniority):
+   Use tenure_topel from panel
+   Paper target: mean = 9.978, SD = 8.944
+
+4. Education (years of completed schooling):
+   education_years after recoding
+   Paper target: mean = 12.645, SD = 2.809
+
+5. Married (1 if currently married, spouse present):
+   Panel column: married
+   Paper target: mean = .925, SD = .263
+
+6. Union (1 if union member):
+   Panel column: union_member
+   Paper target: mean = .344, SD = .473
+
+7. SMSA (1 if resides in SMSA):
+   Panel column: lives_in_smsa
+   Paper target: mean = .644, SD = .478
+   NOTE: Currently all zeros in panel — variable extraction may be broken
+
+8. Disabled (1 if currently reporting disability):
+   Panel column: disabled
+   Paper target: mean = .074, SD = .262
+
+BOTTOM PANEL — Sample Distribution by Year:
+
+For each survey year 1968-1983:
+  Percentage of sample = N_year / N_total
+  CPS Real Wage Index = hardcoded values (same as above)
+
+Paper target percentages:
+  1968: .052, 1969: .050, 1970: .051, 1971: .053, 1972: .057, 1973: .058,
+  1974: .060, 1975: .061, 1976: .065, 1977: .065, 1978: .069, 1979: .071,
+  1980: .073, 1981: .072, 1982: .071, 1983: .068
+
+Total N = 13,128
+
+================================================================
+SCORING NOTES (Descriptive table rubric)
+================================================================
+- Categories present (20 pts): All 8 variables + 16 years
+- Count/percentage values (40 pts): means, SDs, percentages within 2%
+- Ordering (10 pts): correct order
+- Sample size (20 pts): N ≈ 13,128
+- Column structure (10 pts): correct columns

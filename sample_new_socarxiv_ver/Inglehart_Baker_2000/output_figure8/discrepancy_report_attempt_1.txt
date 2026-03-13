@@ -1,0 +1,51 @@
+Discrepancy Report - Attempt 1
+Score: 72/100
+
+MAJOR DISCREPANCIES:
+
+1. Ex-Communist trend is WRONG direction relative to paper description:
+   - Generated: rises from -0.79 (oldest) to -0.08 (youngest) -- strong UPWARD trend
+   - Paper: starts around -1.05 (oldest), ends around -0.5 (youngest) -- still rises but stays at bottom,
+     well-separated from other groups. The Ex-Communist line in the paper stays firmly negative and well below
+     the other groups even for the youngest cohorts.
+   - Impact: The generated figure shows Ex-Communist converging with Low-income/Developing for youngest
+     cohorts, but in the paper they remain clearly at the bottom.
+
+2. Advanced industrial values too high for youngest cohorts:
+   - Generated: rises to 1.15
+   - Paper: rises to about 0.85-0.9
+   - The line goes above 1.0, which is the paper's Y-axis maximum
+
+3. Developing societies rise too much:
+   - Generated: ends at 0.22
+   - Paper: relatively flat, ends around 0.05-0.1
+
+4. Line style mismatch:
+   - Paper uses: Advanced industrial = thick solid line with label on it,
+     Ex-Communist = thick dashed line at bottom, Developing = dotted line,
+     Low-income = thin solid line
+   - Generated: Ex-Communist solid thick, Advanced dashed -- this may be swapped
+
+5. Y-axis range:
+   - Paper: -1.0 to 1.0 (0.0 marked)
+   - Generated: -1.2 to 1.2
+
+6. Label placement:
+   - Paper has labels placed directly on/near the lines (no legend box)
+   - Generated: uses a legend box in upper left
+
+ROOT CAUSES:
+- The z-score standardization is done globally across all individuals. This compresses the Ex-Communist
+  scores toward the center since there are many Ex-Communist respondents.
+- Need to use nation-level factor scores instead of individual-level z-scores, since the paper says
+  "data weighted to give each society equal weight"
+- The weighting scheme needs to ensure equal weight per SOCIETY, not per individual
+
+FIXES FOR ATTEMPT 2:
+1. Use nation-level factor scores (from the scatter plot) rather than individual-level z-scores
+2. For each country, compute the country-level mean survival/self-expression score per cohort
+3. Then average across countries within each society type (giving equal weight to each country)
+4. Match the line styles to the paper exactly (check which is solid, dashed, dotted)
+5. Place labels on the lines instead of using a legend box
+6. Set Y-axis to -1.0 to 1.0
+7. Consider whether the factor score computation or normalization is causing the wrong spread

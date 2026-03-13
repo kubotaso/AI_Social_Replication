@@ -1,0 +1,27 @@
+DISCREPANCY REPORT -- Table 4A, Attempt 4
+==========================================
+
+SCORE: 90/100
+
+KEY FINDINGS:
+- Applying self_employed==0 AND disabled==0 filters reduced N too much
+  (7494 vs 8683, 13.7% too low)
+- But the remaining_duration coefficient improved dramatically:
+  0.0005 vs paper's 0.0006 (almost exact match!)
+- The disabled filter alone drops ~1900 obs from the panel level
+
+COMPARISON WITH ATTEMPT 2 (score 92):
+- Attempt 2: coef=0.0017, N=10743
+- Attempt 4: coef=0.0005, N=7494
+- Paper:     coef=0.0006, N=~8683
+
+The coefficient is much closer in attempt 4, but N is now too low.
+
+PLAN FOR ATTEMPT 5:
+- Try self_employed==0 only (no disabled filter)
+  This should give N around 10284 within-job, which after regression
+  variable drops would be ~10200. Still too high.
+- The real issue is 2407 vs 1540 persons in the dataset
+- Try removing the self_employed filter and instead try requiring
+  non-missing union_member (which excludes some observations)
+- Or try a mild d_log_wage outlier filter

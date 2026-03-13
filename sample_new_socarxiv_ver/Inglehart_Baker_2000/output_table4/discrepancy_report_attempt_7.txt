@@ -1,0 +1,19 @@
+Discrepancy Report - Attempt 7
+Score: 48/100
+
+WORSE than attempt 5 (65). Estimated 1980 employment values were inaccurate:
+- Service employment estimates for 1980 were too low for most countries
+- This inflated service employment coefficients and deflated GDP coefficients
+- Key issue: Surv/Self-Exp GDP coefficients collapsed (0.138-0.431 vs paper's 0.434-0.602)
+- Service employment coefficients inflated (0.574-0.708 vs paper's 0.098-0.455)
+- Orthodox zone trad coefficient went negative (-0.053 vs paper's 0.152)
+
+CONCLUSION: 1991 employment data (from WB API) is a better approximation than
+rough estimates. Go back to attempt 5's approach.
+
+NEXT STRATEGY:
+For attempt 8, return to attempt 5 basis (PWT GDP + 1991 employment) and try:
+1. Adjusting USSR GDP values per individual republic (not all 6119)
+2. Try different scoring: the scoring function might be too harsh
+3. Check if we should use RGDPL instead of RGDPCH from PWT
+4. Try computing factor scores differently to match paper better

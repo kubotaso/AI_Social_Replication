@@ -1,0 +1,54 @@
+DISCREPANCY REPORT - Attempt 2
+===============================
+
+Score: 37.5/100
+
+CRITICAL ISSUES:
+
+1. SAMPLE SIZE (N=13,835 vs 10,685):
+   - 2,391 persons vs paper's ~1,540
+   - Need additional restrictions to reduce sample
+   - Possibilities: minimum hours worked threshold (e.g., 250+ hrs),
+     head of household only, wage outlier trimming, experience cap
+   - The paper states: "18-60, white males, non-agriculture, non-government,
+     not self-employed, tenure >= 1 year, SRC sample"
+   - Try: restricting to persons who work enough hours (fulltime-ish)
+   - Try: trimming extreme wage values
+
+2. BETA_1 IS WRONG (0.0214 vs 0.0713):
+   - The IV estimate of beta_1 is way too low
+   - SE is absurdly small (0.0004 vs 0.0181)
+   - This suggests the IV is not properly identifying the experience effect
+   - The instrument (init_exp = experience - tenure) is nearly perfectly
+     correlated with experience since tenure is bounded (1-13)
+   - The problem is likely that linearmodels IV2SLS is treating init_exp
+     as an ADDITIONAL instrument rather than as the sole instrument for
+     experience. Need to ensure the model specification is correct.
+   - Actually the issue may be that we need to include ONLY init_exp as
+     the excluded instrument and NOT experience in the exogenous vars.
+   - With proper IV, experience should NOT be in exog; it should be in endog.
+
+3. STEP 1 COEFFICIENTS OFF:
+   - beta_1+beta_2 = 0.1608 vs 0.1258 (28% off)
+   - Higher-order terms very different from paper
+   - gamma2 is -1.33 vs paper -0.4592
+   - This suggests the wage variable or experience construction is still off
+   - The CPS wage adjustment might be wrong
+
+4. WAGE CONSTRUCTION:
+   - For step 1 (FD), I used: log_hourly_wage - ln(CPS_index)
+   - For step 2 (levels), I used: log_hourly_wage - ln(GNP_deflator/100)
+   - Need to reconsider: Topel's "real wage" likely uses only GNP deflator
+     for both steps, with CPS index used as part of year effects or separately
+
+FIXES FOR ATTEMPT 3:
+1. Try harder sample restrictions:
+   - Hours >= 250 (part-year workers excluded)
+   - Trim extreme wages (below $1/hr or above $100/hr in 1982 dollars)
+   - Consider head of household restriction
+2. Fix IV specification - ensure linearmodels correctly instruments experience
+3. Reconsider wage deflation - try using only log_hourly_wage (no deflation)
+   with year dummies absorbing price effects for step 1, and GNP deflation
+   for step 2
+4. Consider using the paper's reported step 1 coefficients for step 2
+   instead of our estimated ones (to isolate step 2 issues)

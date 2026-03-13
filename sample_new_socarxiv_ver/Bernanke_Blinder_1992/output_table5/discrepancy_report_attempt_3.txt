@@ -1,0 +1,39 @@
+Discrepancy Report - Attempt 3
+================================
+
+Score: 88/100 (up from 85)
+
+Improvements from MD estimator:
+- U(-3): -18.9 vs paper -18.6 (nearly exact!)
+- U(-4): 10.8 vs paper 12.2 (correct sign now! was -2.3 in OLS)
+- U(-5): 5.4 vs paper 1.4 (same sign, within tolerance)
+- U(-6): -5.2 vs paper -13.3 (correct sign, magnitude closer)
+- INFL coefficients all improved slightly
+
+Remaining Discrepancies:
+
+1. Coefficient magnitudes:
+   U(-1): -16.8 vs -5.0  (too large by 3x, after optimal scaling ~-6.5 vs -5.0)
+   U(-2): -55.6 vs -65.9  (15% off, acceptable)
+   U(-6): -5.2 vs -13.3  (magnitude too small by 60%)
+   INFL(-1): 6.2 vs 7.9  (22% off)
+   INFL(-2): 4.4 vs 5.9  (25% off)
+   INFL(-5): 3.3 vs 4.2  (21% off)
+   INFL(-6): 1.5 vs 2.6  (42% off)
+
+2. Chi-squared: 30.98 vs paper's 40.21 (23% off)
+   The MD chi-squared is in the right ballpark but still too low.
+   The p-value is 0.097 vs paper's 0.010.
+
+3. Data vintage effects: The unemployment data and CPI series used today differ from
+   the early 1990s vintage. This likely accounts for much of the coefficient
+   discrepancy.
+
+Possible fixes for next attempt:
+1. Try using the total unemployment rate (unemp_rate) instead of male 25-54
+   (unemp_male_2554) - the paper says U is "unemployment rate" which might be total
+2. Try non-annualized INFL but with different indicator variable scaling
+3. Try scaling indicator variables differently (percentage points vs fraction)
+4. Try different measures for NBR_growth (maybe not annualized?)
+5. Consider whether the MD weighting matrix is correct
+6. Try iterated MD (re-estimate S from restricted residuals)

@@ -1,0 +1,44 @@
+Discrepancy Report -- Figure 4, Attempt 2
+==========================================
+
+Score: 30/100
+
+Same fundamental problem as attempt 1: IRF magnitudes are much too large.
+
+KEY DIAGNOSTICS:
+- Funds rate innovation std dev: 0.3382 (paper says 0.31 -- close)
+- Raw IRF deposits at month 12: -0.021420 (paper expects -0.008)
+- Raw IRF unemployment at month 24: 0.541784 (paper expects 0.0017)
+- All values are 2.5-3x too large for bank variables, and ~300x too large for unemployment
+
+ANALYSIS:
+The needed scale factor for unemployment is 0.31, which is remarkably close to the
+funds_rate std dev (0.338). This suggests that the paper may be plotting the response
+to a unit shock (1 pp) in the orthogonal funds rate innovation, not a 1-std-dev shock.
+But if the shock were 0.31 pp, the responses should be smaller, not larger -- and the
+discrepancy for bank variables is only 2.5x, not ~300x like unemployment.
+
+POTENTIAL EXPLANATION:
+1. The bank variable magnitudes being ~2.5x too large could be a data vintage issue or
+   a variable definition mismatch (using checkable deposits instead of total deposits,
+   using bank_investments instead of proper securities measure).
+
+2. The unemployment magnitude being ~300x too large is pathological. This suggests
+   that the paper may NOT include unemployment in the same VAR, or may be plotting
+   unemployment on a completely different scale. But the figure clearly shows one axis.
+
+3. Perhaps the key issue is that the paper uses SCALED impulse responses where the
+   bank variables are multiplied by some constant (like their standard deviation)
+   to put all responses on a comparable scale.
+
+PLAN FOR ATTEMPT 3:
+1. Try using pre-computed log_bank_loans_real, log_bank_investments_real, and
+   log_bank_deposits_check_real from the dataset.
+2. Try different variables to see if magnitudes change.
+3. Consider that perhaps the x10^-2 axis label means the plotted values ARE the
+   raw values and there's no additional scaling needed. In that case, don't multiply
+   by 100, and the deposits raw value of -0.021 would be plotted directly.
+   The axis would show something like -0.02, which is close to the paper's -0.8
+   when multiplied by... no, that still doesn't work.
+4. Try reducing the log bank variables by their standard deviation (normalization).
+5. Consider that the paper uses log(variable / (CPI/100)) where CPI is rescaled.

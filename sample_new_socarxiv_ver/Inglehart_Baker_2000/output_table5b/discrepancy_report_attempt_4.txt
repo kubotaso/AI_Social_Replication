@@ -1,0 +1,34 @@
+Discrepancy Report - Attempt 4
+Score: 62/100
+
+IMPROVEMENTS:
+- N=50 (close to 49)
+- Factor scores normalized to SD~1
+- Many coefficient values improved
+- Model 5 R²=0.76 exactly matches
+
+KEY ISSUES:
+
+1. GDP SE TOO SMALL: 0.014 vs 0.043 (Model 1)
+   Our GDP range is 1.2-31.5 ($1000s 1995PPP$)
+   Paper's GDP range likely 0.5-15 ($1000s 1980$)
+   Need to divide GDP by ~2 to approximate 1980 values
+   This would double the GDP coefficient and SE
+
+2. PROTESTANT EFFECT TOO LARGE in Model 6: 0.815 vs 0.415
+   13 Protestant countries vs 37 non-Protestant
+   Maybe too many countries classified as Protestant?
+   Paper might use narrower definition
+
+3. R² TOO HIGH: Model 1 (0.70 vs 0.63), Model 3 (0.83 vs 0.66)
+   Factor scores may capture more variance than paper's
+
+4. GDP IN MODEL 6 TOO LOW: 0.048 vs 0.144
+   Without service_sq, GDP must explain more variance
+   Paper's GDP has smaller range, so coefficient is larger
+
+FIXES FOR ATTEMPT 5:
+1. Scale GDP to approximate 1980 values: divide GNP_1995 by ~2
+2. This should double GDP coefficients and SEs to match paper better
+3. Reconsider service_sq scaling
+4. Maybe exclude one more country to get N=49

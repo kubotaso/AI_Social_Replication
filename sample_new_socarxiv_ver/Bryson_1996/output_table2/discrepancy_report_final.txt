@@ -1,0 +1,61 @@
+Final Discrepancy Report: Table 2 Replication
+Best Score: 89.6/100 (Attempt 18)
+Status: max_attempts_reached (20 attempts exhausted)
+
+BEST CONFIGURATION:
+- Old 5-item racism scale: racmost(==1), busing(==2), racdif1(==2), racdif2(==2), racdif3(==2)
+- Person-mean imputation, min 4 of 5 valid
+- Non-overlapping Hispanic/Other race coding:
+  Hispanic = ethnic in {17,22,25} AND race != 3
+  Other race = race == 3 AND ethnic NOT in {17,22,25}
+- Conservative Protestant = fund == 1
+- Income per capita = realinc / hompop
+- Occupational prestige = prestg80
+- Southern = region == 3
+
+SCORING BREAKDOWN:
+Model 1 (47.1/50):
+- Coefficients: 12.5/15 (most within 0.02, Other race has 0.034 diff)
+- N: 10/10 (645 vs 644, 0.2% off)
+- Significance: 15.0/15 (all match exactly)
+- R2: 5.0/5 (0.146/0.130 vs 0.145/0.129)
+- Variables: 5/5
+
+Model 2 (42.5/50):
+- Coefficients: 9.7/15 (Racism -0.002 vs 0.080, Black 0.103 vs 0.042)
+- N: 10/10 (600 vs 605, 0.8% off)
+- Significance: 14.4/15 (Age * vs **, only miss)
+- R2: 3.0/5 (0.130/0.113 vs 0.147/0.130)
+- Variables: 5/5
+
+REMAINING DISCREPANCIES:
+1. M2 Racism coefficient: -0.002 vs target 0.080 (diff=0.082)
+   - This is the largest single discrepancy
+   - Explored all 5 racism scale variants, different item sets, different imputation thresholds
+   - No configuration brings M2 racism above ~0.042 while maintaining M1 accuracy
+
+2. M2 Black coefficient: 0.103 vs target 0.042 (diff=0.061)
+   - Consistently ~0.10 across ALL configurations tested
+   - p-value fluctuates around 0.05-0.09 depending on exact sample
+   - Best result has p=0.0901 (ns), matching paper's non-significance
+
+3. M2 R-squared: 0.130 vs target 0.147 (diff=0.017)
+   - Alt5 scale (racdif4 instead of racdif2) gives R2=0.144 but loses M1 points
+   - The R2 gap reflects the racism and Black coefficient discrepancies
+
+WHAT WAS TRIED (20 attempts):
+- 5 different racism scale item combinations
+- 4 different imputation thresholds (min 3, 4, 5, all required)
+- 4 different Hispanic/Other race coding variants
+- 2 Conservative Protestant coding options (fund==1, denom==1)
+- 3 different income variables (realinc/hompop, income91, income91/hompop)
+- DV threshold alternatives (>=4, ==5, mean)
+- Common vs separate sample for models
+- Age capping
+- 4-item scale with scaling
+- Whites-only subsample
+
+CONCLUSION:
+The M2 discrepancy appears fundamental and may reflect differences in the original
+data extraction, a different data version, or undocumented sample restrictions in the
+paper. The best achievable score with this dataset is approximately 89-90/100.

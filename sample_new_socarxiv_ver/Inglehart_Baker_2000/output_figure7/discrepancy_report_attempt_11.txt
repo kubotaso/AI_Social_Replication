@@ -1,0 +1,40 @@
+Discrepancy Report - Attempt 11
+
+Score: 82/100 (same as best)
+
+KEY PROGRESS: Min cell size filter (n>=30) dramatically improved Low-income:
+  1907-1916: -0.693 (GT: -0.68, diff=0.013 - EXCELLENT!)
+  1917-1926: -0.693 (GT: -0.70, diff=0.007 - EXCELLENT!)
+
+But HURT Ex-Communist and Advanced industrial oldest cohort:
+  Ex-Communist 1907-1916: 0.201 vs GT -0.07 (TOO HIGH)
+  Advanced industrial 1907-1916: 0.148 vs GT -0.07 (TOO HIGH)
+
+The problem: For Ex-Communist oldest cohort, 16/19 countries are sparse (<30 obs).
+Using country overall mean for these sparse cells pushes the oldest cohort to 0.201.
+The actual elderly respondents in Ex-Communist countries are MORE TRADITIONAL than
+the country overall average, so they should be LOWER than country mean, not at country mean.
+
+For Developing 1927-1936: still too negative (-0.810 vs -0.63)
+This cohort has 9 countries with no sparse cells, but the pattern shape is wrong.
+The cohort still shows a dip pattern that the paper doesn't show.
+
+ANALYSIS: The min-cell-size filter is correct for Low-income but wrong for Ex-Communist.
+This is because:
+- Low-income: elderly have similar values to overall country (sparse data is noise)
+- Ex-Communist: elderly are genuinely MORE TRADITIONAL (data is informative)
+
+PLAN FOR ATTEMPT 12:
+Try group-SPECIFIC min cell size:
+- Low-income: min_n=30 (sparse cells use country mean)
+- Ex-Communist: min_n=5 (allow sparse cells, use actual data)
+- Advanced industrial: min_n=15
+- Developing: min_n=15
+
+This should:
+- Keep Low-income 1907-1916 near -0.69 (correct)
+- Allow Ex-Communist oldest cohort to show traditional values
+- Improve Developing oldest cohort
+
+Also: check if Developing 1927-1936 has a data quality issue with specific countries
+driving the too-negative value.

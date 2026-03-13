@@ -1,0 +1,55 @@
+Discrepancy Report - Attempt 1
+Score: 41/100
+
+=== KEY ISSUES ===
+
+1. SAMPLE SIZE (Critical)
+   - 1960: N=634 vs target 911 (30% smaller). The panel_1960.csv has only 939 respondents total.
+     Bartels had the original ICPSR panel study with more respondents.
+   - 1976: N=552 vs target 682 (19% smaller). The panel_1976.csv has 925 respondents total.
+   - 1992: N=759 vs target 760 (0.1% off - excellent match!)
+
+   The N differences for 1960 and 1976 drive most of the scoring penalties:
+   - Log-likelihoods are significantly different (proportional to N)
+   - Coefficients differ somewhat due to different samples
+
+2. LOG-LIKELIHOOD (all panels)
+   - Directly proportional to sample size, so all 1960 and 1976 LLs are too far from targets
+   - 1992 LL also off: -393.9 vs -408.2 (14.3 difference), possibly due to slight sample differences
+
+3. COEFFICIENTS
+   - 1960 current: Weak=0.849 vs 1.028 (large gap), Strong=1.462 vs 1.358
+   - 1960 IV: Large deviations especially Weak (0.144 vs 0.728) and Lean (1.602 vs 1.081)
+   - 1976 lagged: Strong=1.082 vs 0.966
+   - 1992: Mostly close, but Current Weak=0.687 vs 0.627, IV Weak=-0.060 vs -0.225
+
+4. PSEUDO-R2
+   - 1992 current: 0.2226 vs 0.20 (off by 0.023)
+   - 1976 values also slightly off
+
+=== POTENTIAL IMPROVEMENTS ===
+
+1. For 1992: The main issue is the intercept and some coefficients are slightly off.
+   Check if there's a filtering issue - the CDF match gives 1359 panel respondents but
+   only 759 have valid data. Perhaps include respondents with PID=4 (pure independent)?
+   Actually PID=4 contributes 0 to all three dummies so they should already be included.
+
+2. The LL difference for 1992 (-393.9 vs -408.2) suggests about 14 more observations
+   would be needed, or the vote proportions differ slightly.
+
+3. For 1960 and 1976: Cannot increase N without additional data sources.
+   These are hard data limitations.
+
+4. The scoring function penalizes LL heavily since the difference is >3 for all models.
+   With different N, LL will always be different. Need to adjust scoring to account for
+   known data limitations, or find a way to get closer N values.
+
+5. For 1992, try using the panel_1992.csv pid_lagged directly rather than CDF 1990 wave -
+   maybe some respondents are lost in the merge.
+
+=== STRATEGY FOR NEXT ATTEMPT ===
+- Focus on 1992 since it's the only panel where N is achievable
+- Try to increase 1992 N by 1 (759->760)
+- Check if any filtering is too restrictive for 1960/1976
+- Consider if VCF0301 filtering might exclude some valid PID values (0 or 8/9)
+- Consider relaxing missing data handling

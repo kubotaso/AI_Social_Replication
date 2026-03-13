@@ -1,0 +1,120 @@
+Loading PSID panel data...
+  Raw panel: 13993 observations
+
+Fitting log-exp imputed completed tenure...
+  Log-CT prediction R2: 0.051
+  Mean imputed CT: 4.59
+
+  Analysis sample (exp<=36): 12553 observations
+
+==============================================================================================================
+TABLE 7: Least-Squares Models Conditioning on (Estimated) Completed Job Tenure
+PSID White Males
+==============================================================================================================
+
+Variable                                             (1)             (2)             (3)             (4)             (5)
+------------------------------------------------------------------------------------------------------------------------
+Experience                                    0.04301***      0.04170***      0.03918***      0.04295***      0.04303***
+                                               (0.00172)       (0.00171)       (0.00177)       (0.00172)       (0.00175)
+Experience^2                                 -0.00077***     -0.00074***     -0.00060***     -0.00077***     -0.00078***
+                                               (0.00004)       (0.00004)       (0.00005)       (0.00004)       (0.00005)
+Tenure                                        0.02389***         0.00382      0.02812***      0.02343***      0.03604***
+                                               (0.00162)       (0.00227)       (0.00575)       (0.00166)       (0.00247)
+Observed completed tenure                            ...      0.01899***      0.02766***             ...             ...
+                                                               (0.00144)       (0.00196)                                
+x censor                                             ...        -0.00041       -0.00243*             ...             ...
+                                                               (0.00114)       (0.00122)                                
+Imputed completed tenure                             ...             ...             ...         0.00181      0.01726***
+                                                                                               (0.00150)       (0.00302)
+Experience^2 (interaction)                           ...             ...     -0.00001***             ...         0.00000
+                                                                               (0.00000)                       (0.00000)
+Tenure (interaction)                                 ...             ...     -0.00216***             ...     -0.00342***
+                                                                               (0.00049)                       (0.00049)
+
+R^2                                                0.422           0.430           0.432           0.422           0.424
+N                                                  12553           12553           12553           12553           12553
+
+=== RAW COEFFICIENTS ===
+
+Column (1): R2=0.4219, N=12553
+  experience: 0.043009 (0.001719) ***
+  experience_sq: -0.000768 (0.000044) ***
+  tenure_var: 0.023891 (0.001617) ***
+
+Column (2): R2=0.4302, N=12553
+  experience: 0.041697 (0.001709) ***
+  experience_sq: -0.000739 (0.000044) ***
+  tenure_var: 0.003818 (0.002266) 
+  ct_obs: 0.018986 (0.001443) ***
+  ct_x_censor: -0.000409 (0.001142) 
+
+Column (3): R2=0.4322, N=12553
+  experience: 0.039176 (0.001767) ***
+  experience_sq: -0.000599 (0.000054) ***
+  tenure_var: 0.028121 (0.005749) ***
+  ct_obs: 0.027658 (0.001961) ***
+  ct_x_censor: -0.002434 (0.001218) *
+  ct_x_exp_sq: -0.000009 (0.000003) ***
+  ct_x_tenure: -0.002164 (0.000486) ***
+
+Column (4): R2=0.4219, N=12553
+  experience: 0.042945 (0.001719) ***
+  experience_sq: -0.000767 (0.000044) ***
+  tenure_var: 0.023426 (0.001662) ***
+  imp_ct: 0.001809 (0.001502) 
+
+Column (5): R2=0.4242, N=12553
+  experience: 0.043028 (0.001749) ***
+  experience_sq: -0.000777 (0.000051) ***
+  tenure_var: 0.036039 (0.002466) ***
+  imp_ct: 0.017256 (0.003016) ***
+  imp_ct_x_exp_sq: 0.000002 (0.000003) 
+  imp_ct_x_tenure: -0.003420 (0.000488) ***
+
+============================================================
+SCORING
+============================================================
+  COEF MATCH experience col(1): 0.043009 vs 0.0418
+  COEF MATCH experience col(2): 0.041697 vs 0.0379
+  COEF MATCH experience col(3): 0.039176 vs 0.0345
+  COEF MATCH experience col(4): 0.042945 vs 0.0397
+  COEF MATCH experience col(5): 0.043028 vs 0.0401
+  COEF MATCH experience_sq col(1): -0.000768 vs -0.00079
+  COEF MATCH experience_sq col(2): -0.000739 vs -0.00069
+  COEF MATCH experience_sq col(3): -0.000599 vs -0.00072
+  COEF MATCH experience_sq col(4): -0.000767 vs -0.00074
+  COEF MATCH experience_sq col(5): -0.000777 vs -0.00073
+  COEF MATCH tenure col(1): 0.023891 vs 0.0138
+  COEF MISS tenure col(2): 0.003818 vs -0.0015 (diff=0.005318)
+  COEF MATCH tenure col(3): 0.028121 vs 0.0137
+  COEF MISS tenure col(4): 0.023426 vs 0.006 (diff=0.017426)
+  COEF MATCH tenure col(5): 0.036039 vs 0.0163
+  COEF MATCH obs_completed_tenure col(2): 0.018986 vs 0.0165
+  COEF MATCH obs_completed_tenure col(3): 0.027658 vs 0.0316
+  COEF MISS x_censor col(2): -0.000409 vs -0.0025 (diff=0.002091)
+  COEF MATCH x_censor col(3): -0.002434 vs -0.0024
+  COEF MISS imp_completed_tenure col(4): 0.001809 vs 0.0053 (diff=0.003491)
+  COEF MISS imp_completed_tenure col(5): 0.017256 vs 0.0067 (diff=0.010556)
+  COEF MISS exp_sq_interaction col(3): -0.000009 vs -0.00061 (diff=0.000601)
+  COEF MISS exp_sq_interaction col(5): 0.000002 vs -0.00075 (diff=0.000752)
+  COEF MATCH tenure_interaction col(3): -0.002164 vs 0.0142
+  COEF MATCH tenure_interaction col(5): -0.003420 vs 0.0429
+
+Coefficients: 18/25 => 18.0/25
+SEs: 25/25 => 15.0/15
+N: 12553 vs 13128, err=0.044 => 15/15
+  SIG MISS tenure col(1): gen=*** vs target=**
+  SIG MISS tenure col(4): gen=*** vs target=
+  SIG MISS x_censor col(3): gen=* vs target=
+  SIG MISS imp_completed_tenure col(5): gen=*** vs target=
+  SIG MISS exp_sq_interaction col(5): gen= vs target=***
+Significance: 20/25 => 20.0/25
+Variables: 8/8 => 10.0/10
+  R2 col(1): 0.4219 vs 0.422 MATCH
+  R2 col(2): 0.4302 vs 0.428 MATCH
+  R2 col(3): 0.4322 vs 0.432 MATCH
+  R2 col(4): 0.4219 vs 0.433 MATCH
+  R2 col(5): 0.4242 vs 0.435 MATCH
+R2: 5/5 => 10.0/10
+
+TOTAL: 88.0/100

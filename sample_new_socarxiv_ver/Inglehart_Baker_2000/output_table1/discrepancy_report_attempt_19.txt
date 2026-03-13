@@ -1,0 +1,33 @@
+Discrepancy Report - Table 1, Attempt 19
+Score: 71/100 (DOWN from best 77)
+
+STRATEGY:
+1. Include MLT (Malta) - exclude only MNE → N=65 countries
+2. Compare PAF vs PCA for nation level (auto-select)
+3. Compare ALL data vs latest-wave-only for individual (auto-select)
+4. Test if N_individual can approach 165,594 using all available data
+
+FINDINGS:
+- N=65 countries (includes Malta)
+- Nation: PCA selected (13/20) over PAF (9/20)
+  BUT: PAF here performs worse because the 65-country set (including Malta) has
+  a different covariance structure than the 64-country set (excluding Malta).
+  Malta is a highly Catholic country with unusual value profile.
+- Individual ALL_DATA selected (16/20) over LATEST (12/20)
+  N increased from 89,182 (latest only) to 140,349 (all data)
+  Note: N=140,349 << 165,594 (paper) - paper used different surveys
+- E025 nation: MISS (d=0.060 -> borderline, scored as MISS at exactly 0.060)
+- Individual E018: 0.45 vs 0.51 (d=0.059 = borderline PARTIAL)
+
+SCORE BREAKDOWN:
+- Items: 20
+- Loadings: 29 (vs 31 in best attempt 15)
+  Lost: nation F120 went from MATCH to PARTIAL
+        nation A008 went from PARTIAL to PARTIAL (same)
+        nation E025 went from MATCH to MISS
+  Gained: individual E018 from MISS to PARTIAL
+- Net: -2 points
+- Total: 71
+
+ROOT CAUSE: Including Malta changes the factor structure slightly, making
+some previous MATCH items become PARTIAL/MISS.

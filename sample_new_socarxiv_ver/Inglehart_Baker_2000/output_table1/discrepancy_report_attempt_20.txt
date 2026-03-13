@@ -1,0 +1,44 @@
+Discrepancy Report - Table 1, Attempt 20
+Score: 73/100 (PLATEAU - below best 77; 20 attempts exhausted)
+Status: max_attempts_reached
+
+STRATEGY:
+Attempt 13's configuration (exclude MNE+MLT, PCA for both levels) with
+all-data individual level (not latest-wave-only).
+
+RESULT: 73/100
+- Same loading total: 31/40
+- BUT individual E018: d=0.061 = MISS (vs 0.059 PARTIAL in attempt 15)
+- Size/Var: +2 (vs +6 in attempt 15 which got N=65)
+
+COMPARISON TO BEST (attempt 15, score=77):
+Attempt 15 configuration:
+  - Exclude: MNE only (N=65 countries)
+  - Nation level: PAF (better for Y002, E025, F118, A165)
+  - Individual level: all data (140,349 individuals)
+  - Key results: A008 nation=MISS but E025 nation=MATCH, individual E018=PARTIAL (d=0.059)
+  - Score: 20(items) + 31(load) + 20(dim) + 0(order) + 6(size) = 77
+
+CEILING ANALYSIS:
+The autonomy index is the fundamental limiting factor:
+- Paper reports nation loading = 0.89 for autonomy
+- Best achievable with this dataset: ~0.67-0.70 (MISS, 4 pts lost)
+- Best achievable individual autonomy: ~0.49 (vs 0.61, MISS, 4 pts lost)
+- Ordering criterion: completely blocked by autonomy being lower than F120
+- Maximum achievable: ~82/100 (if all other loadings matched perfectly)
+- Actual ceiling with current data: 77-79/100
+
+REMAINING SYSTEMATIC DISCREPANCIES:
+1. Autonomy (nation): 0.67 vs 0.89 - ~0.22 gap - UNRESOLVABLE with current data
+2. Autonomy (individual): 0.49 vs 0.61 - ~0.12 gap - UNRESOLVABLE
+3. Ordering: 0/10 - blocked by autonomy < F120
+4. Variance explained: 35-38% vs 44% (Dim1 nation) - systematically low
+5. N_individual: 140,349 vs 165,594 - 15% gap
+
+CONCLUSIONS:
+The paper appears to use a version of the WVS/EVS data where the child qualities
+(especially obedience and religious faith vs independence) load more strongly on the
+traditional values dimension. This could be due to:
+1. Different data waves (paper used 1990-1991 WVS + 1990 EVS separately, not pooled time series)
+2. Different country coverage
+3. Possible difference in how autonomy index was computed (standardized items vs binary)

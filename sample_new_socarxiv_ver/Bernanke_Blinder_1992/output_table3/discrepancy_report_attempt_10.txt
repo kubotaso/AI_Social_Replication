@@ -1,0 +1,32 @@
+Discrepancy Report - Attempt 10
+Score: 85/100 (same total as attempt 8, but better significance matches)
+
+Key finding: Regression-based splice of CPBILL gives 41/45 significance matches
+(the best so far). The regression model is:
+  cpaper_6m = -0.4156 + 1.1135 * cpaper_6m_long  (R2 = 0.9843)
+
+This correctly accounts for both the level shift AND the slope difference
+between the two commercial paper series.
+
+Significance matches: 41/45 (91%) -- only 4 mismatches
+Value matches: 27/45 -- slightly lower than shift-based (28/45)
+Total: 85.3 (same as shift=0.26)
+
+Remaining 4 significance mismatches:
+1. Personal income / TERM: 0.054 (*) vs 0.37 (ns) -- data vintage
+2. Retail sales / M2: 0.021 (**) vs 0.16 (ns) -- data vintage
+3. Consumption / CPBILL: 0.066 (*) vs 0.021 (**) -- both sig, different level
+4. Durable goods / CPBILL: 0.529 (ns) vs 0.021 (**) -- data limitation
+
+Analysis of remaining issues:
+- PersonalInc/TERM: This TERM variable (10yr-1yr) predicts personal income
+  much more in modern data than in 1992. Likely due to revised personal
+  income data.
+- Retail/M2: M2 revisions since 1992 changed its predictive relationship
+  with retail sales.
+- Consumption/CPBILL: The regression splice gets CPBILL close (both significant)
+  but at * vs ** level.
+- DurGoods/CPBILL: Only 96 obs for this row -- fundamentally unfixable.
+
+The score appears to have plateaued at 85. Further improvements would require
+matching the paper's actual DRI data vintage, which is not available.

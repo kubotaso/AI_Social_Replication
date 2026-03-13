@@ -1,0 +1,41 @@
+Discrepancy Report: Attempt 11
+Score: 82.8/100 (below best of 88.3)
+
+APPROACH:
+- Correct 5-item scale (racmost, busing, racdif1, racdif3-flipped, racdif4)
+- Person-mean imputation, min 3 of 5 valid
+- Non-overlapping Hispanic/Other race coding
+- fund==1 Conservative Protestant
+
+TRADEOFFS vs BEST (attempt 8, old 5-item):
+Better:
+- M2 R2: 0.144 vs 0.130 (5.0 vs 3.0 pts) - +2 pts
+- M2 Racism: 0.038 vs -0.002 (closer to paper 0.080) - +0.25 pts
+- M2 Cons.Prot: 0.060 vs 0.074 (closer to paper 0.048) - +0.25 pts
+
+Worse:
+- M1 N: 660 vs 645 (8 vs 10 pts) - -2 pts
+- M2 N: 619 vs 600 (8 vs 10 pts) - -2 pts
+- M1 Racism sig: *** vs ** (paper: **) - -0.5 pts
+- M1 Black sig: ** vs *** (paper: ***) - -0.5 pts
+- M2 Black: 0.115** vs 0.103* (both wrong, 0.115 further from 0.042) - worse
+
+Net: The N penalties (-4 pts) and wrong significance levels cancel out the R2 improvement.
+
+CONCLUSION: The correct 5-item scale gets closer M2 R2 and M2 Racism but N is too high
+(more imputation = more cases included) and shifts significance thresholds unfavorably.
+
+The old 5-item scale (attempt 8) remains the best configuration.
+
+REMAINING ISSUES (all in Model 2):
+1. Racism: -0.002 vs 0.080 - fundamental data limitation
+2. Black: 0.103* vs 0.042(ns) - structural correlation with Black and DV2
+3. Age: * vs ** - borderline
+4. R2: 0.130 vs 0.147
+
+PLATEAU ASSESSMENT:
+- 5 consecutive attempts (7-11) without improving on best score of 88.3
+- Multiple strategies tried: denom==1, correct 5-item scale, different min_valid,
+  income variables, age exclusion, non-overlapping Hispanic
+- Only non-overlapping Hispanic/Other race improved over previous best
+- Model 2 issues appear to be fundamental data limitations

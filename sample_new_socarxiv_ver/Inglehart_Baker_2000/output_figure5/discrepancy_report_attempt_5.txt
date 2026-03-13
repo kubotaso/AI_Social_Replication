@@ -1,0 +1,16 @@
+Discrepancy Report - Attempt 5
+
+Score: 77/100
+
+The affine+RBF hybrid didn't help NLD because the NLD subgroup points fell within
+the RBF margin. Same results as attempt 2/4.
+
+Key insight: the RBF calibration is optimized for within-range interpolation.
+NLD subgroups have raw scores well beyond most nation-level scores (surv=2.6, 3.1)
+because NLD religious subgroups are very different from the NLD overall average
+(which includes ~50% non-religious Dutch).
+
+ATTEMPT 6 STRATEGY:
+Use purely affine calibration to get proper extrapolation for NLD.
+Or alternatively, force affine for all subgroup points.
+Compare affine-only results to find which approach gets closest overall.

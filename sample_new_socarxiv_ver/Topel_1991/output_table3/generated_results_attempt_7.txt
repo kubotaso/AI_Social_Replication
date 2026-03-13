@@ -1,0 +1,14 @@
+Attempt 7 - Score: 79.3
+
+Best spec: heads+sons (pnum in {1,3,170,171}), GNP-deflated wages
+N = 11,408 (6.8% off paper's 10,685)
+beta_1: 0.0794 (0.0083) [Paper: 0.0713 (0.0181)]
+beta_2: 0.0464 (0.0079) [Paper: 0.0545 (0.0079)]
+beta_2 SE matches paper exactly!
+
+Key finding: wage variable (GNP/CPS/Both) makes NO difference to IV coefficient.
+This is because year dummies absorb all price level effects.
+
+Gradient analysis: d(beta_1)/d(b1b2) = 0.512
+Total SE = sqrt(boot_se^2 + 0.512^2 * 0.0161^2) = 0.0083
+Paper SE = 0.0181 suggests additional variance sources not captured.

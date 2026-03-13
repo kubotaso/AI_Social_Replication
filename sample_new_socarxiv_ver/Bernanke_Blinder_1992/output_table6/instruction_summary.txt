@@ -1,0 +1,136 @@
+Instruction Summary for Table 6 — Variable Mapping and Procedure
+=================================================================
+
+Dataset: bb1992_data.csv
+
+========================================================================
+VARIABLE MAPPING
+========================================================================
+
+Policy indicators (dependent variables in IV regression):
+  - FUNDS  → funds_rate (federal funds rate, levels)
+  - FFBOND → ffbond (federal funds rate minus 10-year Treasury bond rate)
+
+Nonborrowed reserves (endogenous regressor in IV regression):
+  - NBR → log_nonborrowed_reserves_real
+    (log of real nonborrowed reserves)
+    Construction: log(nonborrowed_reserves / (cpi / cpi_base))
+    Note: Check dataset for pre-constructed column; if not available,
+    compute from nonborrowed_reserves and cpi columns.
+
+------------------------------------------------------------------------
+Instrument Set A:
+------------------------------------------------------------------------
+  - Industrial production  → log_industrial_production
+  - Capacity utilization   → log_capacity_utilization
+  - Employment             → log_employment
+
+------------------------------------------------------------------------
+Instrument Set B:
+------------------------------------------------------------------------
+  - Unemployment rate      → unemp_male_2554
+  - Housing starts         → log_housing_starts
+  - Real personal income   → log_personal_income_real
+
+------------------------------------------------------------------------
+Instrument Set C:
+------------------------------------------------------------------------
+  - Real retail sales           → log_retail_sales_real
+  - Real consumer expenditures  → log_consumption_real
+  - Real durable goods orders   → log_durable_goods_real
+    WARNING: log_durable_goods_real may be MISSING from the dataset.
+    If missing, may need to skip Set C or use a proxy variable.
+    Check dataset columns before proceeding.
+
+------------------------------------------------------------------------
+Personal-income revisions:
+------------------------------------------------------------------------
+  NOT AVAILABLE in our dataset. This requires original preliminary vs.
+  revised personal income data from Peter Rathjens. SKIP this row.
+
+========================================================================
+PROCEDURE
+========================================================================
+
+For each instrument set (A, B, C) and each policy indicator (FUNDS, FFBOND):
+
+Step 1: Construct the 5-variable VAR
+  Variables: [macro1, macro2, macro3, log_NBR_real, policy_indicator]
+  Lags: 6
+  Sample: 1959-08 to 1979-09
+  All variables in levels (logs where indicated above).
+
+Step 2: Estimate the VAR
+  Use statsmodels.tsa.api.VAR with maxlags=6.
+
+Step 3: Extract residuals (innovations)
+  Get the residual series for all 5 variables from the fitted VAR.
+
+Step 4: Run IV / 2SLS regression
+  Dependent variable: innovation in policy indicator (FUNDS or FFBOND)
+  Endogenous regressor: innovation in log_NBR_real
+  Instruments: innovations in macro1, macro2, macro3
+
+  Implementation options:
+    a) Use statsmodels.sandbox.regression.gmm.IV2SLS
+    b) Use linearmodels.iv.IV2SLS (if installed)
+    c) Manual 2SLS:
+       First stage: regress innovation(NBR) on innovation(macro1),
+         innovation(macro2), innovation(macro3)
+       Second stage: regress innovation(policy) on fitted values from
+         first stage
+       Compute correct 2SLS standard errors (using original residuals
+         from second stage, not fitted-value residuals)
+
+Step 5: Record coefficient on NBR innovation and its standard error.
+
+========================================================================
+SAMPLE PERIOD
+========================================================================
+
+Sets A, B, C: 1959-08-01 to 1979-09-01
+Personal-income revisions: 1969-02-01 to 1979-09-01 (SKIP)
+
+Note: The effective estimation sample will be shorter by 6 months due
+to 6 lags in the VAR. The VAR residuals will start from approximately
+1960-02.
+
+========================================================================
+OUTPUT FORMAT
+========================================================================
+
+Present results as a table with rows for each instrument set and
+columns for FUNDS and FFBOND. Report coefficient and standard error
+(in parentheses) for each cell.
+
+Example format:
+                        FUNDS       FFBOND
+Set A                  coeff       coeff
+                       (SE)        (SE)
+
+Set B                  coeff       coeff
+                       (SE)        (SE)
+
+Set C                  coeff       coeff
+                       (SE)        (SE)
+
+========================================================================
+NOTES
+========================================================================
+
+1. The paper uses the pre-October 1979 sample only (before Volcker's
+   shift to reserves targeting), so the sample ends at 1979:9.
+
+2. All slopes should be negative and insignificant — this validates
+   the use of the funds rate as the policy indicator.
+
+3. If Set C cannot be replicated due to missing durable goods orders
+   data, note this in the output and replicate Sets A and B only.
+
+4. The IV regression is run on VAR innovations (residuals), not on
+   the raw data. This is critical — running IV on raw data will give
+   completely different results.
+
+5. The constant term in the IV regression is expected (innovations
+   should be mean-zero, so the constant should be near zero, but
+   include it for completeness).

@@ -1,0 +1,64 @@
+Discrepancy Report - Attempt 1
+================================
+
+Score: 70/100
+
+Key Discrepancies:
+
+1. COEFFICIENT MAGNITUDES (major issue):
+   Paper vs Generated (MIMIC):
+   U(-1): -5.0 vs -8.0  (wrong magnitude)
+   U(-2): -65.9 vs -53.0  (wrong magnitude, but same sign)
+   U(-3): -18.6 vs -26.6  (wrong magnitude)
+   U(-4): 12.2 vs -2.3   (WRONG SIGN - paper positive, we got negative)
+   U(-5): 1.4 vs 8.0     (same sign but magnitude off)
+   U(-6): -13.3 vs -0.9  (same sign but magnitude way off)
+   INFL(-1): 7.9 vs 65.2  (magnitude off by ~8x!)
+   INFL(-2): 5.9 vs 49.4  (magnitude off by ~8x!)
+   INFL(-3): 4.2 vs 43.2  (magnitude off by ~10x!)
+   INFL(-4): 4.6 vs 50.6  (magnitude off by ~11x!)
+   INFL(-5): 4.2 vs 30.2  (magnitude off by ~7x!)
+   INFL(-6): 2.6 vs 12.5  (magnitude off by ~5x!)
+
+   The INFL coefficients are systematically too large by a factor of ~8-10x.
+   This strongly suggests a SCALING ISSUE with the inflation variable.
+
+2. SCALING ANALYSIS:
+   - Current INFL = diff(log_cpi) which gives monthly log changes ~0.002-0.01
+   - The paper says "measured in decimals"
+   - But these already ARE in decimal form
+   - The paper's coefficients show U coefficients ~5-66 and INFL coefficients ~3-8
+   - Our U coefficients ~1-53 and INFL coefficients ~12-65
+   - The ratio suggests our INFL variable may need to be SCALED UP
+   - Actually looking more carefully: the paper's INFL coefficients (3-8) are much
+     smaller than U coefficients (5-66), whereas ours show INFL >> U
+   - This means the INFL variable has TOO MUCH variation relative to U
+   - Or possibly the indicator variables need different scaling
+
+   - Alternative: The paper uses "the inflation rate" which might be an annualized
+     rate (multiply monthly by 12) or a percentage change rather than log change.
+   - If INFL = 12 * diff(log_cpi), then it would be ~0.024-0.12 (annualized)
+   - This would make the INFL coefficients about 12x smaller, giving ~5.4 for INFL(-1)
+     which is much closer to 7.9!
+
+3. CHI-SQUARED STATISTIC:
+   Paper: 40.21 (p=0.010) with df=22
+   Generated (Wald-type): 14.96 (p=0.864)
+   Generated (LR-type): 51.16 (p=0.000)
+   Neither matches. The MIMIC model isn't converging properly - the restricted
+   model is actually giving a WORSE fit than unrestricted (LR stat positive).
+
+4. MIMIC vs OLS:
+   The MIMIC coefficients are essentially identical to OLS, suggesting the
+   optimization is not properly utilizing the cross-equation restrictions.
+   The psi[0] (FFBOND measurement error) went to ~0, meaning FFBOND IS the
+   latent variable in the ML solution.
+
+FIXES FOR NEXT ATTEMPT:
+1. Use annualized inflation: INFL = 12 * diff(log_cpi)
+2. Consider using percentage-point measures for indicator variables (multiply by 100?)
+3. Improve the MIMIC ML estimation - try EM algorithm or different parameterization
+4. Re-examine the chi-squared test computation
+5. Consider whether ffbond, drbond need to be in percentage points (currently in %)
+   Actually they ARE in percentage points already since funds_rate and treasury_10y
+   are in percent.

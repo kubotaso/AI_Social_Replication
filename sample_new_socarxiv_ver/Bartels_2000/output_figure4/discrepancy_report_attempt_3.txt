@@ -1,0 +1,15 @@
+Discrepancy Report - Attempt 3
+Score: 79.8/100
+
+Tested three proportion methods. All score similarly (77-80).
+
+Persistent issues (South values extremely noisy due to small N):
+- South 1968: 1.44 vs ~1.05 (probit strong=2.35, unstable)
+- South 1988: 1.55 vs ~1.14 (probit strong=2.14, unstable)
+- Non-South 1968: 1.12 vs ~1.26 (still off)
+- Non-South 1988: 1.19 vs ~1.38 (still off)
+
+Strategy for attempt 4:
+- Try running probit on ALL white voters (combined), get single set of coefficients
+- Then compute separate weighted averages using region-specific proportions from partisans
+- This would produce more stable estimates due to larger sample sizes

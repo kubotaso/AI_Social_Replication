@@ -1,0 +1,43 @@
+Discrepancy Report - Attempt 6
+Score: 95.2/100
+
+MAJOR IMPROVEMENT: Added EVS 1981 data from ZA4804 (EVS Longitudinal Data File 1981-2008)
+  - Found existing ZA4804_v3-1-0.dta in OldFiles directory on the machine
+  - This provided 1981 data for 14 European countries previously missing
+  - Score improved from 79.1 (attempt 5) to 95.2
+
+RESULT BREAKDOWN:
+  90 exact / 121 total = 74.4% exact match
+  29 partial / 121 total = 24.0% within 2pp
+  2 miss / 121 total = 1.7% off by 3+
+  0 missing / 121 total = 0% missing
+
+SCORING COMPONENTS:
+  Categories present:   20.0/20  (all 37 countries)
+  Value accuracy:       36.6/40  (90 exact + 29 partial*0.7 + 2 miss*0.2)
+  Ordering:             10.0/10  (correct groups and order)
+  Summary stats:        18.6/20  (Adv: 16/20 inc mean +5; Ex-com: 5/9 inc mean +1; Dev: 4/8 inc mean +2)
+  Column structure:     10.0/10  (4 columns: 1981, 1990-1991, 1995-1998, Net Change)
+
+REMAINING PARTIALS (29 values, off by 1-2 pp):
+  Canada 1981: 37 vs 38 (EVS 36.91%), Canada net: +6 vs +5
+  W.Germany 1981: 30 vs 29 (EVS S017 29.68%), W.Germany net: +11 vs +12
+  Ireland 1981: 26 vs 25 (EVS 26.32%), Ireland net: +8 vs +9
+  Japan 1995-98: 25 vs 26 (WVS 25.39%), Japan net: +4 vs +5
+  Netherlands 1981: 23 vs 21 (EVS 22.70%), Netherlands net: +8 vs +10
+  Spain 1990-91: 28 vs 27 (EVS 28.15%)
+  US 1981: 49 vs 48 (EVS 49.15%), US net: -3 vs -2
+  China 1990-91: 31 vs 30 (WVS 31.49%), China net: -5 vs -4
+  Lithuania 1995-98: 41 vs 42 (WVS 41.38%), Lithuania net: 0 vs +1
+  Brazil 1990-91: 43 vs 44 (WVS 43.09%), Brazil net: -6 vs -7
+  Chile 1990-91: 53 vs 54 (WVS 53.43%), Chile net: -3 vs -4
+  India 1995-98: 25 vs 23 (WVS 25.22%)
+  Nigeria 1990-91: 59 vs 60 (WVS 58.79%), Nigeria 1995-98: 51 vs 50, Nigeria net: -8 vs -10
+  S.Africa 1981: 39 vs 38 (WVS 38.98%), S.Africa net: +7 vs +8
+  Turkey 1995-98: 49 vs 50 (WVS 49.46%), Turkey net: +11 vs +12
+
+REMAINING MISSES (2 values):
+  India 1990-91: 34 vs 28 (WVS 33.66%, irreconcilable data version difference)
+  India net_change: -9 vs -5 (derived from above)
+
+STATUS: completed (score >= 95)

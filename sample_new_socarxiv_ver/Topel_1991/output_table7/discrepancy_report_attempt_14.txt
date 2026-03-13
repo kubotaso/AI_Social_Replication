@@ -1,0 +1,63 @@
+Discrepancy Report - Attempt 14
+Score: 88/100 (same as best, attempt 11)
+Changes: Attempted hazard-model imputation (failed with singular matrix),
+fell back to best configuration (attempt 11 code).
+
+=== SCORING BREAKDOWN ===
+Coefficients: 19/25
+  Matches: exp(1-5), esq(1-5), ten(1,3,5), ct(2,3), cen(3), imp(4), ten_int(3,5)
+  Misses (6):
+  - tenure col(2): 0.0043 vs -0.0015 (wrong sign, data limitation)
+  - tenure col(4): 0.0226 vs 0.006 (too large, data limitation)
+  - x_censor col(2): -0.0006 vs -0.0025 (too small magnitude)
+  - imp_ct col(5): 0.0249 vs 0.0067 (too large, data limitation)
+  - esq_int col(3): -0.000010 vs -0.00061 (STRUCTURAL: CT range 1-13 vs 30+)
+  - esq_int col(5): -0.000001 vs -0.00075 (STRUCTURAL: CT range 1-13 vs 30+)
+
+SEs: 25/25 (all within 0.02 tolerance)
+N: 15/15 (12553 vs 13128, 4.4% error)
+Significance: 19/25
+  Misses (6):
+  - tenure col(1): *** vs ** (t=14.85, tenure SE too small)
+  - tenure col(4): *** vs ns (t=13.52, tenure SE too small)
+  - x_censor col(3): * vs ns (t=2.11, marginally significant)
+  - imp_ct col(4): ** vs ns (t=3.02, imputed CT too precise)
+  - imp_ct col(5): *** vs ns (t=8.01, imputed CT too precise)
+  - esq_int col(5): ns vs *** (t=0.34, STRUCTURAL: CT range too small)
+Variables: 8/8 = 10/10
+R-squared: 5/5 = 10/10
+
+=== EXPLORATION SUMMARY (THIS SESSION) ===
+Explored 7 additional strategies since attempt 13:
+
+1. HC1/HC3 robust SEs: sig=18/25 (worse, lost esq_int col(3) from *** to **)
+2. Person/job clustering: sig=19/25 (same, different misses cancel out)
+3. Tenure starting at 0: sig=19/25 (identical to base)
+4. exp=age-ed-5 with different cutoffs: all converge to 88
+5. Grid search (3 exp offsets x 7 cutoffs): best is always 88
+6. Log-exp imputed CT: coef=18, sig=20 -> still 88 (trades 1 coef for 1 sig)
+7. Quantile regression imputed CT: coef=18, sig=20 -> still 88 (same trade-off)
+8. Heckman-style imputation: SE too small, makes things worse
+9. All-predicted CT (no observed substitution): SE too large
+10. WLS with person weights: R2 drops, worse
+11. Hazard model imputation: singular matrix error
+12. Dropping disability + various imp CT predictors: all give 88
+13. CPS-only and GNP-only deflation: R2 fails, score 78
+14. Tenure-1, year dummy base change, alt education: 88 or worse
+
+=== PLATEAU DECLARATION ===
+After 14 attempts (best score 88 achieved at attempt 11, maintained for 4
+consecutive attempts 11-14), and exhaustive exploration of 20+ strategy variants,
+the score of 88 is confirmed as the maximum achievable.
+
+The remaining 12 points are lost to:
+- 4 STRUCTURAL points (esq_int interactions in cols 3,5: coefficient + significance)
+  due to CT range 1-13 years vs paper's likely 30+ years
+- 8 DATA-LIMITED points (tenure and imp_ct coefficient/significance misses)
+  due to all tenure_topel starting at 1 (no pre-panel tenure variation)
+
+These limitations cannot be overcome without:
+1. Pre-panel tenure data from PSID questionnaire ("beginning date of employment")
+2. Or supplementary tenure data with larger completed tenure range
+
+STATUS: PLATEAU (best score unchanged for 4 consecutive attempts)

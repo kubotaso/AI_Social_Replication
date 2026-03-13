@@ -1,0 +1,29 @@
+Discrepancy Report - Attempt 1
+Score: 56/100
+
+MAJOR ISSUES:
+1. Factor scores are ~2x too large. The shared_factor_analysis.py computes PCA scores
+   as U[:,:2] * S[:2], which gives unnormalized scores. The paper uses scores that
+   appear to have std dev ~0.7-0.8 per dimension. Need to normalize scores to match
+   the paper's scale.
+
+2. Germany (DEU) appears as single point. Paper shows separate East/West Germany.
+   Need to split using S024 sub-national codes or WVS coding for East/West.
+
+3. Extra countries present (ALB, MNE, MLT, SLV) not in the paper's Figure 3.
+   Need to filter to only the ~65 societies shown in the paper.
+
+4. Boundary lines are drawn at coordinates matching paper's scale but data points
+   are at much larger coordinates, so boundaries don't encompass the right countries.
+
+5. Country label overlap is severe because the data spreads beyond intended range.
+
+FIX PLAN FOR NEXT ATTEMPT:
+- Normalize factor scores: divide by std to get unit variance, then scale to match
+  paper's approximate range (multiply by ~0.8)
+- OR better: use the paper's approach - standardize the nation-level means, run PCA,
+  and the resulting scores should naturally have the right scale
+- Split Germany into East/West using S024 codes
+- Filter countries to match paper's Figure 3 list
+- Redraw boundaries based on actual data positions
+- Improve label placement

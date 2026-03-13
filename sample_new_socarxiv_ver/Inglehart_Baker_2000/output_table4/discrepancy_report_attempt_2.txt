@@ -1,0 +1,33 @@
+Discrepancy Report - Attempt 2
+Score: 60/100
+
+KEY ISSUES (similar to attempt 1):
+
+1. SAMPLE SIZE: N=62 vs paper's N=49
+   - Still too many countries. Need to restrict to ~49.
+   - The paper used 1980 economic data from "World Bank, 1997" which would have had
+     missing data for many former Soviet/Yugoslav states.
+   - Countries that likely lacked 1980 WB data: ARM, AZE, BLR, EST, GEO, LTU, LVA,
+     MDA, RUS, UKR (former USSR), BIH, HRV, MKD, SRB, SVN (former Yugoslavia),
+     potentially CZE, SVK (were Czechoslovakia).
+   - Dropping ~13 such countries would bring us closer to 49.
+
+2. GDP DATA: Still using 1990+ instead of 1980
+   - GDP coefficients are systematically inflated.
+   - The 1990 GDP distribution differs from 1980 (ex-Communist collapse).
+
+3. CONFUCIAN ZONE: Major miss
+   - Confucian dummy: 0.185 vs 0.397 (paper)
+   - With 1980 data, Japan/Korea/Taiwan would have been more distinctive
+     relative to their GDP level (high secular-rational values despite
+     moderate GDP in 1980).
+
+4. SIGNIFICANCE MISMATCHES: ~25 out of 48
+   - Many driven by different N and GDP data.
+
+PROPOSED FIXES:
+1. Drop countries that lacked 1980 WB data to get N~49
+2. Use log(GDP) instead of raw GDP (paper may have used purchasing-power-parity
+   adjusted GDP in 1995 international dollars, not 2017 dollars)
+3. Use GNP per capita (NY.GNP.PCAP.PP.CD) if it better matches
+4. Scale GDP differently (divide by different factor)

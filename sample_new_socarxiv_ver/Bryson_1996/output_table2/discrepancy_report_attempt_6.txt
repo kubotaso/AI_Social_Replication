@@ -1,0 +1,51 @@
+Discrepancy Report: Attempt 6
+Score: 84.1/100
+
+APPROACH:
+- 6-item racism scale: racmost, busing, racdif1, racdif2, racdif3(flipped:2=racist), racdif4
+- Person-mean imputation (min 3 of 6 valid), rescaled to 0-5
+- Standard demographic coding
+
+MODEL 1 RESULTS:
+- N: 669 (paper: 644) - 3.9% too high, loses 2 pts vs best approach
+- R2: 0.148 (paper: 0.145) - close, within 0.005
+- Adj R2: 0.133 (paper: 0.129) - close
+- Racism: 0.126** (paper: 0.130**) - very close, within 0.005!
+- Education: -0.192*** (paper: -0.175***) - 0.017 off
+- Hispanic: -0.087* (paper: -0.058 ns) - wrongly significant
+- Other race: 0.030 (paper: -0.017) - wrong sign, 0.047 off
+- Black: -0.126** (paper: -0.132***) - sig level off (** vs ***)
+
+MODEL 2 RESULTS:
+- N: 627 (paper: 605) - 3.6% too high
+- R2: 0.143 (paper: 0.147) - close
+- Adj R2: 0.127 (paper: 0.130) - close
+- Racism: 0.036 (paper: 0.080) - off by 0.044 (both ns)
+- Black: 0.121** (paper: 0.042 ns) - MAJOR discrepancy, wrongly significant
+- Age: 0.090* (paper: 0.126**) - sig level off (* vs **)
+- Education: -0.259*** (paper: -0.242***) - off by 0.017
+
+KEY COMPARISON WITH BEST (attempt 5, score 85.5):
+- Attempt 5 used old 5-item scale (racmost, busing, racdif1, racdif2, racdif3-flipped)
+- Got N=645/600 (within 1%) vs this attempt's N=669/627 (3.9%/3.6%)
+- N matching alone costs 4 extra points in this approach
+- Model 1 racism better here (0.126 vs 0.108) but not enough to compensate
+
+PERSISTENT ISSUES:
+1. Model 2 racism coefficient consistently ~0.03 regardless of scale (paper: 0.080)
+2. Model 2 Black coefficient consistently ~0.11-0.12** (paper: 0.042 ns)
+3. These are correlated: racism should absorb variance from Black
+4. The bivariate correlation between racism and dv_remaining is only ~0.04
+
+FINDINGS FROM EXPLORATION:
+- Correct 5-item scale (alpha=0.54): racmost, busing, racdif1, racdif3(2=racist), racdif4
+- This matches paper's alpha=0.54, mean=2.65, SD=1.56 exactly
+- But doesn't improve Model 2 racism coefficient
+- racdif2 has negative correlations with racdif1, racdif4 (scale poison)
+- racdif3 in the data is reversed from standard GSS (2=racist confirmed by inter-item correlations)
+
+NEXT STEPS:
+1. Try the old 5-item approach that maximizes N matching but swap racdif2 for racdif4
+2. Try winsorizing or log-transforming income_pc
+3. Accept Model 2 limitations and optimize for total score
+4. Consider that the paper's Model 2 results may not be exactly replicable

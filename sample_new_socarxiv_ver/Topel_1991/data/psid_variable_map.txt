@@ -1,0 +1,587 @@
+PSID Variable Mapping for Topel (1991) Replication
+====================================================
+Generated from .do files in psid_raw/
+
+This document maps variable names from each PSID family file (1968-1983)
+to the constructs needed for Topel's analysis.
+
+Notes:
+- Variable names follow the PSID convention (V### for family files, ER#### for individual file)
+- Column positions are 1-based and inclusive (start-end)
+- "Year X income/wages/hours" reported in year Y refers to income EARNED in year X
+  e.g., 1969 file reports 1968 income, 1970 file reports 1969 income, etc.
+- Education coding changed across waves; see notes per year
+- Race coding: 1=White, 2=Black (earlier years); later years may vary
+
+
+================================================================================
+INDIVIDUAL FILE (ind2023er/IND2023ER.txt)
+================================================================================
+
+Key linking variables:
+  ER30001  cols 2-5     "1968 INTERVIEW NUMBER" (family ID in 1968)
+  ER30002  cols 6-8     "PERSON NUMBER 68" (person within 1968 family)
+  ER32000  cols 2057    "SEX OF INDIVIDUAL" (1=Male, 2=Female)
+
+Person ID construction: unique person = (ER30001, ER30002)
+  - ER30001 is the 1968 family interview number (1-6872)
+  - ER30002 is the person number within that family (001-099)
+
+Interview numbers by year (to link individual to family file):
+  Year  Variable    Cols        Label
+  1968  ER30001     2-5         "1968 INTERVIEW NUMBER"
+  1969  ER30020     44-47       "1969 INTERVIEW NUMBER"
+  1970  ER30043     97-100      "1970 INTERVIEW NUMBER"
+  1971  ER30067     152-155     "1971 INTERVIEW NUMBER"
+  1972  ER30091     207-210     "1972 INTERVIEW NUMBER"
+  1973  ER30117     265-268     "1973 INTERVIEW NUMBER"
+  1974  ER30138     317-320     "1974 INTERVIEW NUMBER"
+  1975  ER30160     370-373     "1975 INTERVIEW NUMBER"
+  1976  ER30188     436-439     "1976 INTERVIEW NUMBER"
+  1977  ER30217     503-506     "1977 INTERVIEW NUMBER"
+  1978  ER30246     571-574     "1978 INTERVIEW NUMBER"
+  1979  ER30283     648-651     "1979 INTERVIEW NUMBER"
+  1980  ER30313     718-721     "1980 INTERVIEW NUMBER"
+  1981  ER30343     788-791     "1981 INTERVIEW NUMBER"
+  1982  ER30373     858-861     "1982 INTERVIEW NUMBER"
+  1983  ER30399     919-922     "1983 INTERVIEW NUMBER"
+
+Relationship to Head by year:
+  Year  Variable    Cols        Label
+  1968  ER30003     9-9         "RELATIONSHIP TO HEAD 68"
+  1969  ER30022     50-50       "RELATIONSHIP TO HEAD 69"
+  1970  ER30045     103-103     "RELATIONSHIP TO HEAD 70"
+  1971  ER30069     158-158     "RELATIONSHIP TO HEAD 71"
+  1972  ER30093     213-213     "RELATIONSHIP TO HEAD 72"
+  1973  ER30119     271-271     "RELATIONSHIP TO HEAD 73"
+  1974  ER30140     323-323     "RELATIONSHIP TO HEAD 74"
+  1975  ER30162     376-376     "RELATIONSHIP TO HEAD 75"
+  1976  ER30190     442-442     "RELATIONSHIP TO HEAD 76"
+  1977  ER30219     509-509     "RELATIONSHIP TO HEAD 77"
+  1978  ER30248     577-577     "RELATIONSHIP TO HEAD 78"
+  1979  ER30285     654-654     "RELATIONSHIP TO HEAD 79"
+  1980  ER30315     724-724     "RELATIONSHIP TO HEAD 80"
+  1981  ER30345     794-794     "RELATIONSHIP TO HEAD 81"
+  1982  ER30375     864-864     "RELATIONSHIP TO HEAD 82"
+  1983  ER30401     925-926     "RELATIONSHIP TO HEAD 83"
+
+  Coding (1968-1982, 1 digit): 1=Head, 2=Wife/"Wife", 3=Son/Daughter, etc.
+  Coding (1983+, 2 digits): 10=Head, 20=Legal wife, etc.
+
+Individual Weight by year:
+  Year  Variable    Cols        Label
+  1968  ER30019     40-43       "INDIVIDUAL WEIGHT 68"
+  1969  ER30042     93-96       "INDIVIDUAL WEIGHT 69"
+  1970  ER30066     148-151     "INDIVIDUAL WEIGHT 70"
+  1971  ER30090     203-206     "INDIVIDUAL WEIGHT 71"
+  1972  ER30116     261-264     "INDIVIDUAL WEIGHT 72"
+  1973  ER30137     313-316     "INDIVIDUAL WEIGHT 73"
+  1974  ER30159     366-369     "INDIVIDUAL WEIGHT 74"
+  1975  ER30187     432-435     "INDIVIDUAL WEIGHT 75"
+  1976  ER30216     499-502     "INDIVIDUAL WEIGHT 76"
+  1977  ER30245     567-570     "INDIVIDUAL WEIGHT 77"
+  1978  ER30282     644-647     "INDIVIDUAL WEIGHT 78"
+  1979  ER30312     714-717     "INDIVIDUAL WEIGHT 79"
+  1980  ER30342     784-787     "INDIVIDUAL WEIGHT 80"
+  1981  ER30372     854-857     "INDIVIDUAL WEIGHT 81"
+  1982  ER30398     915-918     "INDIVIDUAL WEIGHT 82"
+  1983  ER30428     988-991     "INDIVIDUAL WEIGHT 83"
+
+
+================================================================================
+FAMILY FILES BY YEAR
+================================================================================
+
+--- 1968 (fam1968/FAM1968.txt) ---
+4802 rows, 447 columns
+
+  Interview Number:  V2       cols 2-6       "INTERVIEW NUMBER 68"
+  Age of Head:       V117     cols 283-284   "AGE OF HEAD"
+  Sex of Head:       V119     cols 287-287   "SEX OF HEAD" (1=Male, 2=Female)
+  Race:              V181     cols 362-362   "RACE" (1=White, 2=Negro, 3=Puerto Rican/Mexican/Cuban, 7=Other)
+  Education Head:    V313     cols 521-521   "HEADS EDUCATION" (0-8 bracket coding)
+  Marital Status:    V239     cols 438-438   "MARITAL STATUS" (1=Married, 2=Single, 3=Widowed, 4=Divorced/Separated, 5=Separated)
+  Labor Income Head: V74      cols 183-187   "HDS LABOR INCOME" (dollars)
+  Head Wages:        V251     cols 457-457   "HDS WAGES" (bracket code)
+  Hourly Earnings:   V337     cols 608-612   "HEAD HOURLY EARN" (cents)
+  Annual Hours Head: V47      cols 114-117   "YRLY HEADS HRS"
+  Self-Employed:     V198     cols 388-388   "SELF-EMPLOYED" (1=Yes, 5=No)
+  Occupation:        V197_A   cols 382-384   "OCCUPATION OF HEAD 68" (3-digit Census code)
+  Industry:          V197_B   cols 385-387   "INDUSTRY OF HEAD 68" (3-digit Census code)
+  Union:             V294     cols 501-501   "UNION AND DUES"
+  State:             V93      cols 245-246   "STATE (68)"
+  Region:            V361     cols 642-642   "REGION NOW"
+  SMSA:              V188     cols 369-371   "NEAREST SMSA"
+  Disability:        V216     cols 409-409   "DISABILITY"
+  SRC/SEO Sample:    V92      cols 242-244   "SRC PR SAMPL UN"
+  Employment Status: -- not separate var; use Self-Employed
+  Govt Employee:     -- not available in 1968
+
+  Notes:
+  - Education (V313): 0=0-5 grades, 1=6-8 grades, 2=9-11 grades, 3=12 grades,
+    4=some college, 5=college degree, 6=advanced degree, 9=NA
+  - Hourly earnings (V337) is in cents, divide by 100 for dollars
+
+
+--- 1969 (fam1969/FAM1969.txt) ---
+4460 rows, 584 columns
+
+  Interview Number:  V442     cols 2-5       "1969 INT NUMBER"
+  Age of Head:       V1008    cols 1060-1061  "AGE OF HEAD"
+  Sex of Head:       V1010    cols 1063-1063  "SEX OF HEAD"
+  Race:              V801     cols 577-577   "RACE" (1=White, 2=Negro, 3=PR/Mex/Cuban, 7=Other)
+  Education Head:    V794     cols 570-570   "EDUCATION OF HEAD"
+  Marital Status:    V607     cols 347-347   "MARITAL STATUS"
+  Labor Income Head: V514     cols 185-189   "LABOR INC HEAD"
+  Hourly Earnings:   V871     cols 725-729   "HEADS HRLY EARN" (cents)
+  Annual Hours Head: V465     cols 62-65     "HRS HEAD WORKED"
+  Self-Employed:     V641     cols 393-393   "SELF-EMPLOYED HEAD"
+  Occupation:        V640_A   cols 387-389   "OCCUPATION OF HEAD 69"
+  Industry:          V640_B   cols 390-392   "INDUSTRY OF HEAD 69"
+  Union:             V766     cols 537-537   "UNION MEMBER"
+  State:             V537     cols 258-259   "STATE NOW"
+  Region:            V876     cols 738-738   "CURRENT REGION"
+  SMSA:              V808     cols 584-586   "NEAREST SMSA"
+  Disability:        V743     cols 514-514   "DISAB LIM KIND WRK"
+  Employment Status: V639     cols 385-385   "EMPLOYMENT STATUS"
+  SRC/SEO Sample:    V536     cols 255-257   "PSU ORIG SRC/CPS"
+
+
+--- 1970 (fam1970/FAM1970.txt) ---
+4645 rows, 602 columns
+
+  Interview Number:  V1102    cols 2-5       "1970 INT #" (the 1970 interview number)
+  Age of Head:       V1239    cols 343-344   "AGE OF HEAD"
+  Sex of Head:       V1240    cols 345-345   "SEX OF HEAD"
+  Race:              V1490    cols 678-678   "RACE"
+  Education Head:    V1485    cols 673-673   "EDUCATION OF HEAD"
+  Marital Status:    V1365    cols 524-524   "MARITAL STATUS"
+  Labor Income Head: V1196    cols 214-218   "LABOR INC HEAD"
+  Head Wages:        V1191    cols 205-209   "HEAD WAGES"
+  Hourly Earnings:   V1567    cols 848-852   "HEADS AVG HRLY ERN" (cents)
+  Annual Hours Head: V1138    cols 76-79     "HRS HEAD WORKED"
+  Self-Employed:     V1280    cols 394-394   "SELF EMPLOYED HEAD"
+  Occupation:        V1279_A  cols 388-390   "OCCUPATION OF HEAD 70"
+  Industry:          V1279_B  cols 391-393   "INDUSTRY OF HEAD 70"
+  Union:             V1434    cols 607-607   "UNION MEMBER"
+  State:             V1103    cols 6-7       "STATE NOW"
+  Region:            V1572    cols 861-861   "CURRENT REGION"
+  SMSA:              V1497    cols 685-687   "NEAREST SMSA"
+  Disability:        V1409    cols 579-579   "DISAB LIM KIND WRK"
+  Employment Status: V1278    cols 386-386   "EMPLOYMENT STATUS"
+
+  Note: V1230 = "1968 INTERVIEW#" (cols 314-317), V1233 = "1969 INTERVIEW #" (cols 322-325)
+
+
+--- 1971 (fam1971/FAM1971.txt) ---
+5346 rows, 555 columns
+
+  Interview Number:  V1802    cols 2-5       "1971 INT #" (from first few vars, V1802)
+  Age of Head:       V1942    cols 347-348   "AGE OF HEAD"
+  Sex of Head:       V1943    cols 349-349   "SEX OF HEAD"
+  Race:              V2202    cols 695-695   "RACE"
+  Education Head:    V2197    cols 690-690   "EDUCATION OF HEAD"
+  Marital Status:    V2072    cols 535-535   "MARITAL STATUS"
+  Labor Income Head: V1897    cols 213-217   "LABOR INC HEAD"
+  Head Wages:        V1892    cols 204-208   "HEAD WAGES"
+  Hourly Earnings:   V2279    cols 866-870   "HEADS AVG HRLY ERN" (cents)
+  Annual Hours Head: V1839    cols 76-79     "HRS HEAD WORKED"
+  Self-Employed:     V1986    cols 402-402   "SELF EMPLOYED HEAD"
+  Occupation:        V1984_A  cols 394-396   "OCCUPATION OF HEAD 71"
+  Industry:          V1985_A  cols 399-401   "INDUSTRY OF HEAD 71"
+  Union:             V2145    cols 623-623   "UNION MEMBER"
+  State:             V1803    cols 6-7       "STATE NOW"
+  Region:            V2284    cols 879-879   "CURRENT REGION"
+  SMSA:              V2209    cols 702-704   "SMSA CODE"
+  Disability:        V2121    cols 596-596   "DISAB LIM KIND WRK"
+  Employment Status: V1983    cols 392-392   "EMPLOYMENT STATUS"
+
+  Note: V1932 = "1968 INTERVIEW#", V1933 = "1969 INTERVIEW#", V1934 = "1970 INTERVIEW#"
+
+
+--- 1972 (fam1972/FAM1972.txt) ---
+5060 rows, 589 columns
+
+  Interview Number:  V2402    cols 2-5       "1972 INT #" (from first vars)
+  Age of Head:       V2542    cols 350-351   "AGE OF HEAD"
+  Sex of Head:       V2543    cols 352-352   "SEX OF HEAD"
+  Race:              V2828    cols 728-728   "RACE"
+  Education Head:    V2823    cols 723-723   "EDUCATION OF HEAD"
+  Marital Status:    V2670    cols 538-538   "MARITAL STATUS"
+  Labor Income Head: V2498    cols 216-220   "LABOR INC HEAD"
+  Head Wages:        V2493    cols 207-211   "HEAD WAGES"
+  Hourly Earnings:   V2906    cols 899-903   "HEADS AVG HRLY ERN" (cents)
+  Annual Hours Head: V2439    cols 77-80     "HRS HEAD WORKED"
+  Self-Employed:     V2584    cols 404-404   "SELF EMPLOYED HEAD"
+  Occupation:        V2582_A  cols 396-398   "OCCUPATION OF HEAD 72"
+  Industry:          V2583_A  cols 401-403   "INDUSTRY OF HEAD 72"
+  Union:             V2787    cols 671-671   "UNION MEMBER"
+  State:             V2403    cols 6-7       "STATE NOW"
+  Region:            V2911    cols 912-912   "CURRENT REGION"
+  SMSA:              V2835    cols 735-737   "NEAREST SMSA"
+  Disability:        V2718    cols 599-599   "DISAB LIM KIND WRK"
+  Employment Status: V2581    cols 394-394   "EMPLOYMENT STATUS"
+  SRC/SEO Sample:    V2969    cols 997-997   "SPLIT SAMPLE"
+
+
+--- 1973 (fam1973/FAM1973.txt) ---
+5285 rows, 316 columns
+
+  Interview Number:  V3002    cols 2-5       "1973 INT #"
+  Age of Head:       V3095    cols 235-236   "AGE OF HEAD"
+  Sex of Head:       V3096    cols 237-237   "SEX OF HEAD"
+  Race:              V3300    cols 562-562   "RACE (FROM 1972 INT)"
+  Education Head:    V3241    cols 466-466   "EDUCATION-HEAD"
+  Marital Status:    V3181    cols 373-373   "MARITAL STATUS-HD"
+  Labor Income Head: V3051    cols 105-109   "HDS TOT LABOR Y"
+  Hourly Earnings:   V3275    cols 520-524   "HDS AVG HRLY ERN" (cents)
+  Annual Hours Head: V3027    cols 55-58     "HDS ANN WORK HRS"
+  Self-Employed:     -- embedded in Employment Status V3114
+  Occupation:        V3115_A  cols 260-262   "OCCUPATION OF HEAD 73"
+  Industry:          V3116_A  cols 265-267   "INDUSTRY OF HEAD 73"
+  State:             V3003    cols 6-7       "STATE NOW"
+  Region:            V3279    cols 532-532   "CURRENT REGION"
+  SMSA:              V3250    cols 475-477   "NEAREST SMSA"
+  Employment Status: V3114    cols 258-258   "EMPLOYMENT STATUS"
+
+  Notes:
+  - No direct union or disability variable in 1973 file
+  - V3052 (cols 106-106) = "ACC HDS LABOR INC" (accuracy code)
+
+
+--- 1974 (fam1974/FAM1974.txt) ---
+5517 rows, 337 columns
+
+  Interview Number:  V3402    cols 2-5       "1974 ID NUMBER"
+  Age of Head:       V3508    cols 269-270   "AGE OF HEAD"
+  Sex of Head:       V3509    cols 271-271   "SEX OF HEAD"
+  Race:              V3720    cols 613-613   "RACE"
+  Education Head:    V3663    cols 519-519   "EDUCATION-HEAD"
+  Marital Status:    V3598    cols 421-421   "MARITAL STATUS"
+  Labor Income Head: V3463    cols 131-135   "TOT LABOR INC-HD"
+  Head Wages:        V3458    cols 122-126   "ANN WAGE-HEAD"
+  Hourly Earnings:   V3695    cols 571-575   "HDS AVG HRLY EARN" (cents)
+  Annual Hours Head: V3423    cols 49-52     "ANN WRK HRS-HD"
+  Self-Employed:     V3532    cols 310-310   "WTR SELF-EMPLD (E)"
+  Occupation:        V3530_A  cols 302-304   "OCCUPATION OF HEAD 74"
+  Industry:          V3531_A  cols 307-309   "INDUSTRY OF HEAD 74"
+  State:             V3403    cols 6-7       "CURRENT STATE"
+  Region:            V3699    cols 583-583   "CURRENT REGION"
+  SMSA:              V3672    cols 528-530   "NEAREST SMSA"
+  Employment Status: V3528    cols 297-297   "EMPLOYMENT STATUS"
+
+  Notes:
+  - No direct union or disability variable in 1974 file
+
+
+--- 1975 (fam1975/FAM1975.txt) ---
+5725 rows, 438 columns
+
+  Interview Number:  V3802    cols 2-5       "1975 INT #"
+  Age of Head:       V3921    cols 317-318   "AGE OF HEAD"
+  Sex of Head:       V3922    cols 319-319   "SEX OF HEAD"
+  Race:              V4204    cols 730-730   "RACE"
+  Education Head:    V4198    cols 722-722   "HEAD EDUCATION BKT"
+  Marital Status:    -- not found (use V4204 race? check codebook)
+  Labor Income Head: V3863    cols 127-131   "HEAD LABOR Y"
+  Head Wages:        V3858    cols 119-123   "HEAD WAGES"
+  Hourly Earnings:   V4174    cols 684-688   "HDS AVG HRLY EARN" (cents)
+  Annual Hours Head: V3823    cols 45-48     "HRS HD WORKED"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        V3968_A  cols 377-379   "OCCUPATION OF HEAD 75"
+  Industry:          V3969_A  cols 382-384   "INDUSTRY OF HEAD 75"
+  Union:             V4087    cols 558-558   "WTR LABOR UNION-HD"
+  State:             V3803    cols 6-7       "STATE NOW"
+  Region:            V4178    cols 696-696   "CURRENT REGION"
+  SMSA:              V3933    cols 337-339   "NEAREST SMSA"
+  Employment Status: V3967    cols 375-375   "EMPLOYMENT STATUS"
+  Govt Employee:     V3971    cols 386-386   "EMP BY GOVT? (E)"
+  SRC/SEO Sample:    V4205    cols 731-731   "SPLIT SAMPLE VAR"
+
+  Notes:
+  - V3864 (cols 133-133) = "ACC HD LABOR Y" (accuracy code for labor income)
+
+
+--- 1976 (fam1976/FAM1976.txt) ---
+5862 rows, 825 columns
+
+  Interview Number:  V4302    cols 2-5       "1976 ID NUMBER"
+  Age of Head:       V4436    cols 409-410   "AGE OF HEAD"
+  Sex of Head:       V4437    cols 411-411   "SEX OF HEAD"
+  Race:              V5096    cols 1472-1472  "RACE"
+  Education Head:    V5074    cols 1438-1438  "HEAD EDUCATION BKT"
+  Marital Status:    V4603    cols 662-662   "MARITAL STATUS G1"
+  Labor Income Head: V5031    cols 1395-1399  "HEAD TOTAL LABOR Y"
+  Head Wages:        V4373    cols 247-252   "ANNUAL WAGES H8"
+  Hourly Earnings:   V5050    cols 1404-1405  "HD AVG HOURLY EARN"
+  Annual Hours Head: V4332    cols 225-228   "ANN WORK HOURS"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        V4459_A  cols 443-445   "OCCUPATION OF HEAD 76"
+  Industry:          V4460_A  cols 448-450   "INDUSTRY OF HEAD 76"
+  Union:             V4478    cols 472-472   "JOB COV BY UNION CON D22"
+  Union (belong):    V4479    cols 473-473   "BELONG TO THAT UNION D23"
+  State:             V4303    cols 6-7       "STATE NOW"
+  Region:            V5054    cols 1412-1412  "CURRENT REGION"
+  SMSA:              -- V4303 state, check code for metro indicator
+  Employment Status: V4458    cols 440-440   "HD EMPLOYMENT STATUS D1"
+  Tenure:            V4488    cols 485-486   "HOW LONG PRES POSIT D32"
+  Tenure (months):   V4871    cols 1120-1121  "# MOS THIS POSITION D32"
+  Mo Started Job:    V4489    cols 487-488   "WHAT MO START JOB D33"
+  Same Employer:     V4652    cols 739-739   "WAS IT THE SAME JOB J12"
+  SRC/SEO Sample:    V5097    cols 1473-1473  "SPLIT SAMPLE VAR"
+
+  Notes:
+  - V5050: hourly earnings; note column width is only 2, might be in dollars not cents
+  - V4332: annual work hours for head
+  - V4871: months in this position (complementary to V4488)
+
+
+--- 1977 (fam1977/FAM1977.txt) ---
+6007 rows, 487 columns
+
+  Interview Number:  V5202    cols 2-5       "1977 INT #"
+  Age of Head:       V5350    cols 448-449   "AGE OF HEAD"
+  Sex of Head:       V5351    cols 450-450   "SEX OF HEAD"
+  Race:              V5662    cols 934-934   "RACE (FROM 1972 DATA)"
+  Education Head:    V5647    cols 917-917   "EDUCATION OF HEAD"
+  Marital Status:    V5650    cols 922-922   "MARITAL STATUS"
+  Labor Income Head: V5627    cols 868-872   "TOT 1976 LABOR INCM HEAD"
+  Head Wages:        V5283    cols 192-196   "HEAD 1976 WAGES"
+  Hourly Earnings:   -- derived from wages/hours or use constructed variable
+  Annual Hours Head: V5232    cols 161-164   "HD ANN WRK HRS IN 76"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        V5374_A  cols 482-484   "OCCUPATION OF HEAD 77"
+  Industry:          V5375_A  cols 487-489   "INDUSTRY OF HEAD 77"
+  Union:             V5559    cols 770-770   "WTR LABOR UNION H52"
+  State:             -- V5203 (see below)
+  Region:            -- (not found explicitly, check codebook)
+  SMSA:              V5206    cols 10-10     "SIZE LGST PLACE SMSA 77"
+  Employment Status: V5373    cols 479-479   "EMPLOYMENT STATUS D1"
+  Months with Empl:  V5384    cols 499-501   "# MO WKD EMPLR(OTR-E) D13"
+  Months with Empl:  V5392    cols 510-512   "# MOS WKD EMPLR(B-E) D21"
+  Mo Started Job:    V5398    cols 522-523   "MO STARTED JOB(E) D27"
+  Govt Employee:     V5377    cols 491-491   "WRK FOR GOVT? (OTR)(E) D6"
+  SRC/SEO Sample:    V5663    cols 935-935   "SPLIT SAMPLE FILTER"
+
+
+--- 1978 (fam1978/FAM1978.txt) ---
+6154 rows, 526 columns
+
+  Interview Number:  V5702    cols 2-5       "1978 INT #"
+  Age of Head:       V5850    cols 427-428   "AGE OF HEAD"
+  Sex of Head:       V5851    cols 429-429   "SEX OF HEAD"
+  Race:              V6209    cols 967-967   "RACE (FROM 1972)"
+  Education Head:    V6194    cols 950-950   "EDUCATION 1978 HEAD"
+  Marital Status:    V6197    cols 955-955   "MARITAL STATUS"
+  Labor Income Head: -- derived (V5782 wages + V5787 other labor income)
+  Head Wages:        V5782    cols 182-186   "HEAD 1977 WAGES"
+  Hourly Earnings:   V6178    cols 920-924   "HEAD 77 AVG HRLY EARNING" (cents)
+  Annual Hours Head: V5731    cols 164-167   "HD ANN WRK HRS IN 77"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        V5873_A  cols 460-462   "OCCUPATION OF HEAD 78"
+  Industry:          V5874_A  cols 465-467   "INDUSTRY OF HEAD 78"
+  Union:             V6101    cols 798-798   "H64 BELONG LABOR UNION"
+  State:             -- (check first few vars)
+  SMSA:              V5706    cols 10-10     "SIZE LGST CTY SMSA 78"
+  Employment Status: V5872    cols 457-457   "D1 EMPLOYMENT STATUS"
+  Same Employer:     V5940    cols 578-578   "D72 WRK SAME EMPL?"
+  Mo Started Job:    V5889    cols 486-487   "D19 MO STARTED JOB (E)"
+  Govt Employee:     V5876    cols 469-469   "D6 WRK FOR GOVT (OT-E)"
+  SRC/SEO Sample:    V6210    cols 968-968   "SPLIT SAMPLE FILTER"
+
+
+--- 1979 (fam1979/FAM1979.txt) ---
+6373 rows, 520 columns
+
+  Interview Number:  V6302    cols 2-5       "1979 INT #"
+  Age of Head:       V6462    cols 491-492   "AGE OF HEAD"
+  Sex of Head:       V6463    cols 493-493   "SEX OF HEAD"
+  Race:              V6802    cols 1038-1038  "RACE (FROM 1972)"
+  Education Head:    V6787    cols 1021-1021  "EDUCATION 1979 HEAD"
+  Marital Status:    V6790    cols 1026-1026  "MARITAL STATUS"
+  Labor Income Head: V6767    cols 984-988   "TOT 1978 HEAD LABOR Y"
+  Head Wages:        V6391    cols 222-226   "HEAD 1978 WAGES"
+  Hourly Earnings:   V6771    cols 991-995   "HEAD 78 AVG HRLY EARNING" (cents)
+  Annual Hours Head: V6336    cols 202-205   "HD ANN WRK HRS IN 78"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        V6497_A  cols 537-539   "OCCUPATION OF HEAD 79"
+  Industry:          V6498_A  cols 542-544   "INDUSTRY OF HEAD 79"
+  Union:             V6707    cols 887-887   "K75 UNION MEMBER-HD"
+  State:             V6303    cols 6-7       "CURRENT STATE"
+  SMSA:              V6306    cols 10-10     "SIZE LGST CTY SMSA 1979"
+  Employment Status: -- check
+  Mo Started Job:    V6500    cols 548-549   "C11 MO START JOB (HD-E)"
+  Same Employer:     -- not available directly in 1979
+  Govt Employee:     V6494    cols 532-532   "C3 WORK FOR GOVT (HD-E)"
+  SRC/SEO Sample:    V6803    cols 1039-1039  "SPLIT SAMPLE FILTER"
+
+
+--- 1980 (fam1980/FAM1980.txt) ---
+6533 rows, 562 columns
+
+  Interview Number:  V6902    cols 2-5       "1980 INTERVIEW NUMBER"
+  Age of Head:       V7067    cols 491-492   "AGE OF HEAD"
+  Sex of Head:       V7068    cols 493-493   "SEX OF HEAD"
+  Race:              V7447    cols 1102-1102  "RACE (FROM 1972)"
+  Education Head:    V7433    cols 1088-1088  "EDUCATION 1980 HEAD"
+  Marital Status:    V7435    cols 1090-1090  "MARITAL STATUS 1980"
+  Labor Income Head: V7413    cols 1039-1043  "TOT HD LABOR $ Y 79"
+  Head Wages:        V6981    cols 185-189   "HEAD 1979 WAGES"
+  Hourly Earnings:   V7417    cols 1058-1062  "HEAD 79 AVG HRLY EARNING" (cents)
+  Annual Hours Head: V6934    cols 175-178   "HD ANN WRK HRS IN 79"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        V7100_A  cols 535-537   "OCCUPATION OF HEAD 80"
+  Industry:          V7101_A  cols 540-542   "INDUSTRY OF HEAD 80"
+  Union:             V7340    cols 910-910   "K109 UNION MEMBER-HD"
+  State:             V6903    cols 6-7       "CURRENT STATE"
+  SMSA:              V6906    cols 10-10     "SIZE LGST CTY SMSA 1980"
+  Employment Status: -- check
+  Mo Started Job:    V7103    cols 546-547   "C11 MO START JOB (HD-E)"
+  Same Employer:     -- not available directly in 1980
+  Govt Employee:     V7097    cols 530-530   "C3 WORK FOR GOVT (HD-E)"
+  SRC/SEO Sample:    V7448    cols 1103-1103  "SPLIT SAMPLE FILTER"
+
+
+--- 1981 (fam1981/FAM1981.txt) ---
+6742 rows, 612 columns
+
+  Interview Number:  V7502    cols 2-5       "1981 INTERVIEW NUMBER"
+  Age of Head:       V7658    cols 478-479   "AGE OF 1981 HEAD"
+  Sex of Head:       V7659    cols 480-480   "SEX OF 1981 HEAD"
+  Race:              V8099    cols 1219-1219  "RACE (FROM 1972)"
+  Education Head:    V8085    cols 1205-1205  "EDUCATION 1981 HEAD"
+  Marital Status:    V8087    cols 1207-1207  "MARITAL STATUS 1981"
+  Labor Income Head: V8066    cols 1161-1165  "TOT HD LABOR $ $ Y 80"
+  Head Wages:        V7573    cols 169-173   "HEAD 1980 WAGES"
+  Hourly Earnings:   V8069    cols 1175-1179  "HEAD 80 AVG HRLY EARNING" (cents)
+  Annual Hours Head: V7530    cols 119-122   "HD ANN WRK HRS IN 1980"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        -- check (V7706_A?)
+  Industry:          -- check
+  Union:             V7971    cols 1001-1001  "K54 UNION MEMBER?-HD"
+  State:             V7503    cols 6-7       "CURRENT STATE"
+  SMSA:              V7506    cols 10-10     "SIZE LGST CITY/SMSA-1981"
+  Employment Status: V7706    cols 553-553   "C1 EMPLMT STATUS-HEAD"
+  Same Employer:     V7779    cols 689-689   "C77 RET SAME EMPLR(H-E)"
+  Same Job:          V7780    cols 690-690   "C78 RET SAME JOB?(HD-E)"
+  Same Empl (unemp): V7852    cols 813-813   "D55 RET SAME EMPLR(H-U)"
+  Mo Started Job:    V7726    cols 601-602   "C22 MO START JOB (HD-E)"
+  Govt Employee:     V7708    cols 555-555   "C3 WORK FOR GOVT?(HD-E)"
+  SRC/SEO Sample:    V8100    cols 1220-1220  "SPLIT SAMPLE FILTER"
+
+
+--- 1982 (fam1982/FAM1982.txt) ---
+6918 rows, 540 columns
+
+  Interview Number:  V8202    cols 2-5       "1982 INTERVIEW NUMBER"
+  Age of Head:       V8352    cols 455-456   "AGE OF 1982 HEAD"
+  Sex of Head:       V8353    cols 457-457   "SEX OF 1982 HEAD"
+  Race:              V8723    cols 1076-1076  "RACE (FROM 1972)"
+  Education Head:    V8709    cols 1062-1062  "EDUCATION 1982 HEAD"
+  Marital Status:    V8711    cols 1064-1064  "MARITAL STATUS 1982"
+  Labor Income Head: V8690    cols 1018-1022  "TOT HD LABOR $ $ Y 81"
+  Head Wages:        V8265    cols 146-150   "HEAD 1981 WAGES"
+  Hourly Earnings:   V8693    cols 1032-1036  "HEAD 81 AVG HRLY EARNING" (cents)
+  Annual Hours Head: V8228    cols 118-121   "HD ANN WRK HRS IN 1981"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        -- check
+  Industry:          -- check
+  Union:             V8377    cols 489-489   "C4 IS JOB NOW UNION(H-E)"
+  State:             V8203    cols 6-7       "CURRENT STATE"
+  SMSA:              V8206    cols 10-10     "SIZE LGST CITY/SMSA-1982"
+  Employment Status: V8374    cols 486-486   "C1 EMPLMT STATUS-HEAD"
+  Same Employer:     V8444    cols 615-615   "C71 RET SAME EMPLR(H-E)"
+  Same Job:          V8445    cols 616-616   "C72 RET SAME JOB?(HD-E)"
+  Same Empl (unemp): V8516    cols 729-729   "D53 RET SAME EMPLR(H-U)"
+  Govt Employee:     V8376    cols 488-488   "C3 WORK FOR GOVT?(HD-E)"
+  SRC/SEO Sample:    V8724    cols 1077-1077  "SPLIT SAMPLE FILTER"
+
+
+--- 1983 (fam1983/FAM1983.txt) ---
+7114 rows, 634 columns
+
+  Interview Number:  V8802    cols 2-5       "1983 INTERVIEW NUMBER"
+  Age of Head:       V8961    cols 502-503   "AGE OF 1983 HEAD"
+  Sex of Head:       V8962    cols 504-504   "SEX OF 1983 HEAD"
+  Race:              V9408    cols 1259-1259  "RACE (FROM 1972)"
+  Education Head:    V9395    cols 1246-1246  "EDUCATION 1983 HEAD"
+  Marital Status:    V9419    cols 1281-1281  "MARITAL STATUS 1983"
+  Labor Income Head: -- check (V9376?)
+  Head Wages:        V8873    cols 172-177   "HEAD 1982 WAGES"
+  Hourly Earnings:   V9379    cols 1215-1219  "HEAD 82 AVG HRLY EARNING" (cents)
+  Annual Hours Head: V8830    cols 130-133   "HD ANN WRK HRS IN 1982"
+  Self-Employed:     -- embedded in employment status
+  Occupation:        -- check
+  Industry:          -- check
+  Union:             V9008    cols 578-578   "C4 IS JOB NOW UNION(H-E)"
+  State:             V8803    cols 6-7       "CURRENT STATE"
+  SMSA:              V8806    cols 10-10     "SIZE LGST CITY/SMSA-1983"
+  Employment Status: V9005    cols 575-575   "C1 EMPLMT STATUS-HEAD"
+  Same Employer:     V9075    cols 704-704   "C72 RET SAME EMPLR(H-E)"
+  Same Job:          V9076    cols 705-705   "C73 RET SAME JOB?(HD-E)"
+  Same Empl (unemp): V9159    cols 839-839   "D61 RET SAME EMPLR(H-U)"
+  Govt Employee:     V9007    cols 577-577   "C3 WORK FOR GOVT?(HD-E)"
+  SRC/SEO Sample:    V9409    cols 1260-1260  "SPLIT SAMPLE FILTER"
+
+
+================================================================================
+VARIABLE CODING NOTES
+================================================================================
+
+Education Coding:
+  1968 (V313): Bracket coded (0=0-5 grades, 1=6-8, 2=9-11, 3=12, 4=some coll, 5=BA, 6=adv deg, 9=NA)
+  1969-1974: Similar bracket coding
+  1975-1983: Bracket coded (0=0-5, 1=6-8, 2=9-11, 3=12, 4=12+non-acad, 5=some coll, 6=BA, 7=adv deg, 9=NA)
+  To convert to approximate years:
+    0 -> 3 years (midpoint of 0-5)
+    1 -> 7 years (midpoint of 6-8)
+    2 -> 10 years (midpoint of 9-11)
+    3 -> 12 years
+    4 -> 13 years (some college)  -- or 12 for non-academic
+    5 -> 14 years (some college) or 16 (BA)
+    6 -> 16 years (BA) or 17 (advanced)
+    7 -> 17 years (advanced degree)
+
+Employment Status:
+  1=Working now, 2=Temp laid off, 3=Looking for work, 4=Retired, 5=Disabled,
+  6=Keeping house, 7=Student, 8=Other
+  Self-employed determined from separate question when available
+
+Race:
+  Pre-1972: 1=White, 2=Negro, 3=PR/Mex/Cuban, 7=Other
+  1972+: Race carried forward from 1972 interview
+  1=White, 2=Black, 3=American Indian, 4=Asian, 5=Latino, 7=Other
+
+Self-Employment:
+  In some years a direct variable exists (1=Self-employed, 5=Not)
+  In other years, must use Employment Status or check for separate employer type variable
+
+Union Membership:
+  Coding varies by year; typically 1=Yes, 5=No or 1=Yes, 0=No
+  Some years ask about union coverage vs. membership separately
+
+Same Employer / Job Change:
+  Available in: 1976 (partial), 1978, 1981, 1982, 1983
+  Coding typically: 1=Yes (same employer), 5=No (different employer), 0=Inap
+  For years without this variable, must infer from:
+    - Month started current job (if available)
+    - Occupation/industry changes
+    - These inferences are imperfect
+
+State Codes:
+  PSID uses Census/FIPS state codes (2-digit)
+
+SMSA/Metro:
+  Variable indicates size of largest city in SMSA/MSA
+  0 = not in SMSA, 1-9 = various size categories
+
+SRC/SEO (Sample identification):
+  SRC = Survey Research Center sample (national probability/random)
+  SEO = Survey of Economic Opportunity oversample (poverty oversample)
+  Latino/Immigrant supplement added in 1990+
+  For Topel: use SRC sample only (exclude SEO/poverty oversample)
+  Coding varies: often embedded in interview number ranges
+    - SRC: interview numbers 1-2930 (1968) or similar ranges
+    - SEO: interview numbers 5001+ (1968) or similar
+  Later years have explicit "SPLIT SAMPLE" variable:
+    1=SRC cross-section, 2=SEO/Census, etc.

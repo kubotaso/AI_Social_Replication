@@ -1,0 +1,41 @@
+Discrepancy Report - Table 2, Attempt 9
+Score: 69.3/100 (DOWN from best 72.3)
+
+STRATEGY:
+1. Use D054 for "Make parents proud" (was MISSING before) -> gives 0.86 vs paper 0.81
+2. Use D066 for "Woman earns more" -> D066 pct12 gives 0.51 (CLOSE to 0.53!)
+3. Use E116 for army rule (1=Very good, 4=Very bad), pct<=2 -> 0.64 vs 0.43 (TOO HIGH)
+4. Test seldom discusses politics E023>=2 vs ==3
+
+REGRESSIONS FROM ATTEMPT 7:
+1. Stricter limits: -0.03 (WRONG SIGN) vs attempt 7's 0.21
+   Root cause: pct agree (<=2) of G007_01 gives negative correlation; need inv_mean
+2. Seldom discusses politics: best_match chose ge2=0.04 vs attempt 7's 0.49
+   Root cause: the ge2 coding (>=2) covers "occasionally+never" and is nearly 100%,
+   giving no country-level variance; ==3 gives -0.23 (wrong sign???)
+3. Army rule E116: 0.64 vs paper's 0.43 - E116 may code different question from paper
+4. Clear guidelines: NaN (only 14 countries in wave 2, corr = NaN)
+
+IMPROVEMENTS FROM ATTEMPT 7:
+1. "Make parents proud" (D054): 0.86 vs paper 0.81 - NOW PRESENT (was MISSING)
+   diff=0.05 MODERATE - gains items present score
+2. "Woman earns more" D066 pct12: 0.51 vs 0.53 - NOW CLOSE (was 0.79 FAR)
+3. Dimension correct: still 1 wrong sign (stricter limits = -0.03)
+
+SCORE BREAKDOWN (69.3):
+Items present: 23/24 = 19.2/20
+Value accuracy: 19.2/40 (8 close, 7 moderate) - slightly worse
+Dimension: 16/20 (1 wrong sign for stricter limits)
+Ordering: 7.5/10 (down from 7.1)
+Sample: 7.5/10
+
+CRITICAL ISSUES FOR ATTEMPT 10:
+1. "Seldom discusses politics" - E023 coding is key
+   The fact that E023==3 gives -0.23 is VERY suspicious (should be ~0.57)
+   This means "never discusses politics" NEGATIVELY correlates with traditional values?
+   This could be because E023==3 is very rare and correlated with modern/secular societies.
+   Solution: Try different coding or check if E023 scale direction changed between waves.
+2. "Stricter limits": use G007_01 inv_mean (6-G007_01) not pct agree
+   The pct<=2 gives -0.03 but inv_mean gave 0.21 in earlier attempts
+3. Army rule: E116 pct<=2=0.64 too high; E114 (strong leader)=0.21 too low
+   Try E116 pct==1 only? Or E116 inv mean? Or different threshold?

@@ -1,0 +1,36 @@
+DISCREPANCY REPORT - ATTEMPT 2
+Score: 38/100
+
+Key issues persist from attempt 1. Fixed the 2SLS SE issue (beta_1 SE now reasonable for BC_Union: 0.0359 vs 0.0338).
+
+REMAINING ISSUES:
+
+1. SAMPLE SIZES: Still wrong. P/S=5959 (need 4946), BC_NU=1788 (need 2642), BC_U=2360 (need 2741).
+   Root cause analysis:
+   - The paper's N=4946+2642+2741=10329 is close to full sample N~10685
+   - Our total: 5959+1788+2360=10107 (close to paper's total)
+   - But distribution across groups is wrong
+   - P/S is too high by ~1000, BC groups too low
+   - May need different occupation classification
+   - Possibly some P/S workers should be in BC group (maybe code 4 = sales/clerical should NOT be P/S)
+
+2. STEP 1 beta_1+beta_2 for BC groups way too high:
+   - BC_NU: 0.2471 vs 0.1520
+   - BC_Union: 0.1783 vs 0.0992
+   - The SE is also too large: 0.0977 vs 0.0311
+   - This suggests the within-job sample is too small or noisy
+   - Within-job obs: BC_NU=1184, BC_U=1807
+   - With small within-job samples, the quartic polynomial is overfitting
+
+3. HIGHER-ORDER TENURE TERMS too large:
+   - gamma2 for BC_NU: -2.86 (should be around -0.46 from full sample)
+   - These large polynomial coefficients cause cumulative returns to diverge
+
+4. CUMULATIVE RETURNS collapse at higher tenure due to quartic overfitting
+
+PLAN FOR ATTEMPT 3:
+- Try different occupation groupings to fix sample sizes
+- Consider NOT including code 4 (clerical/sales) in Professional/Service
+- Use the FULL sample's higher-order terms instead of subsample-specific ones
+  (the paper may use common gamma terms from full sample)
+- Fix beta_2 SE computation

@@ -1,0 +1,28 @@
+Discrepancy Report - Attempt 2
+Score: 68.4/100
+
+KEY FINDING: S017 (equilibrated weight) significantly improves WVS matches:
+- Australia W3: 44.3 rounds to 44 (match! was 45)
+- Argentina W1: 29.9 rounds to 30 (match! was 29)
+- Mexico W1: 31.7 rounds to 32 (match! was 31)
+- SA W2: 56.6 rounds to 57 (match! was 58)
+- SA W3: 46.1 rounds to 46 (match! was 51)
+- Switzerland W2: 43.9 rounds to 44 (match! was 45)
+- Switzerland W3: 42.7 rounds to 43 (match! was 45)
+
+But S017 makes Turkey W3 worse: 47.4 vs paper 50
+
+For EVS data, weight_g gives:
+- Canada: 43.4 -> 43 (match!)
+- USA: 48.4 -> 48 (match!)
+But ruins:
+- Italy: 47.2 -> 47 (was 48, match)
+- East Germany: 37.9 -> 38 (was 40, match)
+
+STRATEGY FOR ATTEMPT 3:
+1. Use S017 weighting for ALL WVS data (clear improvement)
+2. Use weight_g for EVS data (net improvement: CAN + USA gained, ITA + E-Germany lost)
+   OR use unweighted EVS with case-by-case exceptions
+3. Still 23 missing 1981 European values - cannot fix without EVS 1981 data
+
+India W2 remains problematic (33.7% vs paper 28%) - cannot fix with weighting.

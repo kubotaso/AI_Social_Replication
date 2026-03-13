@@ -1,0 +1,70 @@
+DISCREPANCY REPORT -- Table 4A, Attempt 1
+==========================================
+
+SCORE: 85/100
+
+SCORING BREAKDOWN:
+  Coefficient signs and magnitudes (25 pts): 21/25
+    - remaining_duration: -0.0039 vs 0.0006 -- WITHIN 0.05 tolerance but WRONG SIGN (-4 pts)
+    - t+1: 0.0039 vs -0.012 -- within 0.05, signs both near zero (MATCH)
+    - t+2: 0.0033 vs -0.015 -- within 0.05, signs both near zero (MATCH)
+    - t+3: 0.0202 vs 0.013 -- within 0.05 (MATCH)
+    - t+4: 0.0101 vs 0.012 -- within 0.05 (MATCH)
+    - t+5: 0.0045 vs 0.020 -- within 0.05 (MATCH)
+    - t+6: 0.0033 vs 0.004 -- within 0.05 (MATCH)
+
+  Standard errors (15 pts): 15/15
+    All SEs within 0.02 tolerance
+
+  Sample size (15 pts): 15/15
+    N=8326 vs ~8683 (4.1% diff, within 5%)
+
+  Significance levels (25 pts): 21/25
+    - remaining_duration: t=2.29, significant at 5% -- paper says insig -- MISS (-4 pts)
+    - All 6 dummy coefficients: insignificant -- MATCH
+
+  All variables present (10 pts): 10/10
+  R-squared (10 pts): 10/10 (not reported in paper)
+
+KEY DISCREPANCIES:
+
+1. REMAINING DURATION COEFFICIENT (Row 1):
+   Generated: -0.0039 (0.0017)  Paper: 0.0006 (0.0010)
+   - Wrong sign (negative vs positive)
+   - Statistically significant in our output (t=2.29) but not in paper
+   - SE is larger than paper's (0.0017 vs 0.0010)
+   - This is the most important coefficient in the table
+
+2. ROW 2 COEFFICIENTS (t+1 through t+6):
+   Most are in the right ballpark and all are insignificant as expected.
+   - t+1: 0.0039 vs -0.012 -- both near zero, our sign is positive
+   - t+2: 0.0033 vs -0.015 -- both near zero, our sign is positive
+   - t+5: 0.0045 vs 0.020 -- ours is lower magnitude
+   But all within 0.05 tolerance and all insignificant.
+
+3. SCORING FUNCTION BUG:
+   The score_against_ground_truth() function had a parsing bug (IndexError).
+   Need to fix the output format or parsing.
+
+POSSIBLE CAUSES FOR ROW 1 DISCREPANCY:
+1. Sample selection: N=8326 vs ~8683 suggests slight sample differences
+2. Remaining duration construction: should remaining_duration be based on
+   max_tenure minus current_tenure rather than max_year minus current_year?
+   These should be equivalent for consecutive observations.
+3. Censoring: The censor dummy may need different treatment. Perhaps Topel
+   defines censoring differently (e.g., not just last_year >= 1983 but
+   specifically that the person is still in the same job in 1983).
+4. Excluded observations: observations where remaining_duration = 0 (the
+   very last within-job observation, which IS a first-difference) might need
+   different treatment.
+5. The interaction term remaining_dur_x_censor might be absorbing the effect
+   incorrectly.
+
+PLAN FOR ATTEMPT 2:
+1. Fix the scoring function
+2. Try remaining_duration based on tenure (max_tenure - current_tenure)
+3. Try different censoring definitions
+4. Verify that the first-difference construction matches Table 2 exactly
+5. Investigate whether observations with remaining_duration = 0 should be excluded
+   (if the "remaining duration" conceptually means "how many more years the worker
+   stays after the current wage growth period")

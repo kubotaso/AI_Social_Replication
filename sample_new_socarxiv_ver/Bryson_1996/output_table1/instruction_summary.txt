@@ -1,0 +1,62 @@
+Instruction Summary: Table 1 Variable Mapping and Construction
+
+DATASET: gss1993_clean.csv
+
+DEPENDENT VARIABLE:
+- Musical exclusiveness = count of music genre variables (18 total) where value >= 4 (dislike=4, dislike very much=5)
+- Music genre columns: latin, jazz, blues, musicals, oldies, classicl, reggae, bigband, newage, opera, blugrass, folk, moodeasy, conrock, rap, hvymetal, country, gospel
+- Values 1-5 are valid; NA = "don't know" or "no answer" → treat as missing
+- LISTWISE deletion: exclude any respondent with ANY missing genre rating
+- Paper reports 912 valid cases for the exclusiveness scale (mean=5.78, SD=3.76)
+
+INDEPENDENT VARIABLES:
+
+1. Education (educ): Years of schooling. Use as-is.
+
+2. Household income per capita: realinc / hompop
+   - realinc = family income in constant dollars
+   - hompop = number of persons in household
+   - Divide realinc by hompop to get per-capita income
+
+3. Occupational prestige (prestg80): Hodge/Siegel/Rossi occupational prestige score. Use as-is.
+
+4. Female: sex == 2 → 1 (female), sex == 1 → 0 (male)
+
+5. Age (age): Years. Use as-is.
+
+6. Black: race == 2 → 1, else 0
+
+7. Hispanic: ethnic in (17, 22, 25) → 1, else 0
+   - 17 = Mexican, 22 = Puerto Rican, 25 = Spanish
+
+8. Other race: race == 3 → 1, else 0
+
+9. Conservative Protestant: fund == 1 → 1, else 0
+   - fund: 1=fundamentalist, 2=moderate, 3=liberal
+   - Alternative: use denom codes for Baptist (1) and other conservative denominations
+
+10. No religion: relig == 4 → 1, else 0
+    - relig: 1=Protestant, 2=Catholic, 3=Jewish, 4=None, 5=Other
+
+11. Southern: region == 3 → 1, else 0
+    - region: 1=Northeast, 2=Midwest, 3=South, 4=West
+
+12. Political intolerance: Sum of intolerant responses across 15 items
+    - spk* vars (spkath, spkrac, spkcom, spkmil, spkhomo): intolerant if value == 2 (not allowed)
+    - col* vars (colath, colrac, colcom, colmil, colhomo): intolerant if value == 5 (should NOT be allowed to teach)
+    - lib* vars (libath, librac, libcom, libmil, libhomo): intolerant if value == 1 (remove book)
+    - Range 0-15, paper reports mean=5.24, SD=4.72
+
+STATISTICAL METHOD:
+- OLS regression with STANDARDIZED coefficients (standardize all variables before regression, or extract beta weights)
+- Three nested models:
+  - SES Model: education, household_income_pc, occupational_prestige
+  - Demographic Model: SES vars + female, age, black, hispanic, other_race, conservative_protestant, no_religion, southern
+  - Political Intolerance Model: Demographic vars + political_intolerance
+- Report standardized coefficients (betas), R², Adjusted R², N, and the unstandardized constant
+
+MISSING DATA:
+- Listwise deletion within each model
+- Music exclusiveness requires all 18 genres rated (1-5)
+- Each model's N depends on missingness of its predictors
+- Paper reports: SES Model N=787, Demographic N=756, Pol.Intol. N=503

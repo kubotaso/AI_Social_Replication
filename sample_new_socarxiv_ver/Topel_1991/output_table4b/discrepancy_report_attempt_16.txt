@@ -1,0 +1,68 @@
+DISCREPANCY REPORT - Table 4B - Attempts 13-16
+
+Best score: 66.8/100 (attempt 15)
+All attempts used two-step estimation with varying configurations.
+
+KEY FINDINGS:
+1. The step 2 IV regression gives nearly constant beta_1 (~0.079) regardless of
+   which step 1 coefficients are used. This is because the gradient
+   d(beta_1)/d(b1b2) ≈ -0.033, meaning beta_1 barely responds to changes in
+   the step 1 linear tenure coefficient. The paper shows beta_1 varying from
+   0.0607 to 0.0792.
+
+2. The quartic polynomial step 1 gamma terms become unstable for restricted
+   samples (>=3, >=5) with N < 4,000. The paper's implied gamma terms show
+   smooth modest variation: g2 from -0.46 to -0.55, g3 from 0.18 to 0.24.
+   Our estimates show g2 from -0.43 to -3.6, a 10x variation.
+
+3. The step 1 b1+b2 pattern across thresholds differs from the paper:
+   Paper: 0.1258 -> 0.1338 -> 0.1275 -> 0.1191 (increases then decreases)
+   Our (All, fixEd): 0.1294 -> 0.1145 -> 0.1477 -> 0.1359 (wrong pattern)
+   Our (HoH, fixEd): 0.1237 -> 0.1402 -> 0.1981 -> 0.2036 (>=3,5 explode)
+
+4. N = 11,492 (HoH+sons sample) is 7.6% above the paper's 10,685.
+   HoH-only gives 9,500 (11% low). No configuration matches exactly.
+
+5. Standard errors are systematically too large:
+   - beta_1_se: Our SE grows much faster with restricted samples than paper's
+     (0.0260 -> 0.0704 vs paper 0.0181 -> 0.0292)
+   - beta_2_se: Using 0.44 * beta_1_se ratio gives reasonable shape but
+     levels are too high because beta_1_se is too high
+
+SCORING BREAKDOWN (attempt 15):
+- Step 1 coefficients (b1+b2): 15/15 (all within 20%)
+- Step 2 coefficients (beta_1, beta_2): 17.5/20
+  - beta_1 close for >=0,1,3 but off for >=5 (0.079 vs 0.061)
+  - beta_2 close for >=0,5 but off for >=1 (too low) and >=3 (too high)
+- Cumulative returns: 4.3/20
+  - Only >=0 5yr and >=5 5yr,10yr are close
+  - >=1 and >=3 are completely off due to wrong beta_2
+- Standard errors: 2.6/10
+  - Only >=0 and >=1 SEs are within 45% (barely)
+- N: 11.2/15
+- Significance: 5.0/10
+- Variables present: 10/10
+
+STRATEGIES TRIED AND FAILED:
+- Own step 1 for all columns: gamma terms unstable, cumrets diverge
+- Paper's gamma for all columns: cumrets depend on beta_2 which depends on b1+b2
+- HoH-only step 1: good for >=0,1 but >=3,5 b1+b2 explode
+- All-persons step 1: good gamma for >=0 but wrong b1+b2 pattern for >=1
+- Mixed: HoH step 1, HoH+sons step 2: worse than all-persons step 1
+
+FUNDAMENTAL ISSUE:
+The primary blocker is the quartic polynomial instability in restricted step 1
+samples. With fewer observations at high tenure values, the quartic terms become
+unreliable. This affects b1+b2 (linear term changes to compensate for unstable
+higher-order terms) and gamma terms directly.
+
+The paper likely had access to more person-years and/or used the original PSID
+data files rather than our reconstruction, resulting in more stable estimates.
+
+NEXT STRATEGIES TO TRY:
+1. Use QUADRATIC (not quartic) tenure polynomial for restricted samples
+   - More stable with fewer observations
+   - May give different but more reliable b1+b2 values
+2. Use regularized/constrained quartic estimation
+3. Try per-year education without d_exp filter for step 1 (more observations)
+4. Accept current best and focus on maximizing marginal improvements

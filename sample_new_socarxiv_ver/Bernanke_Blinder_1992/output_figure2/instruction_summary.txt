@@ -1,0 +1,74 @@
+Instruction Summary for Figure 2 — Bernanke and Blinder (1992)
+
+=== VARIABLE MAPPING ===
+
+Paper variable         | Dataset column      | Units / Notes
+-----------------------|--------------------|--------------------------
+FUNDS (federal funds   | funds_rate         | Percent (monthly average)
+rate)                  |                    |
+Unemployment rate      | unemp_male_2554    | Percent (male, age 25-54)
+(male 25-54)           |                    |
+Inflation (log CPI)    | log_cpi            | Log of CPI index level
+
+=== DATA TRANSFORMATIONS ===
+
+- funds_rate: use in levels (no transformation)
+- unemp_male_2554: use in levels (no transformation)
+- log_cpi: compute as np.log(cpi) if dataset contains CPI in levels;
+  if dataset already contains log_cpi, use directly.
+  The paper uses log CPI (not CPI inflation rate) as the variable in the VAR.
+
+=== VAR SPECIFICATION ===
+
+- Model: unrestricted VAR
+- Number of lags: 6
+- Variable ordering for Choleski decomposition: [funds_rate, unemp_male_2554, log_cpi]
+  (FUNDS first, unemployment second, inflation/log CPI third)
+- Sample period: approximately 1959:7 to 1979:9 (pre-Volcker, pre-October 1979)
+  Trim data to end no later than September 1979.
+  Start date should allow for 6 lags of monthly data.
+- Constant included (default in statsmodels VAR)
+
+=== IMPULSE RESPONSES TO COMPUTE ===
+
+1. Response of FUNDS (funds_rate) to a one-standard-deviation orthogonalized shock in log_cpi
+   → This is the "Response to Inflation" curve
+2. Response of FUNDS (funds_rate) to a one-standard-deviation orthogonalized shock in unemp_male_2554
+   → This is the "Response to Unemployment" curve
+
+- Use Choleski decomposition (orthogonalized IRFs)
+- Horizon: 24 months (0 to 24)
+- Shocks are one-standard-deviation in magnitude
+
+=== PLOTTING INSTRUCTIONS ===
+
+- Plot both IRFs on the same panel/axes
+- X-axis: "HORIZON (MONTHS)", range 0 to 24
+- Y-axis: response of FUNDS in percentage points, range approximately -0.3 to 0.5
+- Label one curve "Response to Inflation" and the other "Response to Unemployment"
+- Title: "Responses of Funds Rate to Inflation and Unemployment Shocks"
+- Use clean line-plot style
+- No confidence bands required (not shown in original)
+
+=== IMPLEMENTATION NOTES ===
+
+- Use statsmodels.tsa.api.VAR for estimation
+- Use model.irf(24) to compute impulse responses
+- The orthogonalized IRF method in statsmodels uses the Choleski decomposition
+  of the residual covariance matrix, with ordering determined by the column
+  order of the input DataFrame
+- Ensure the DataFrame columns are ordered as: [funds_rate, unemp_male_2554, log_cpi]
+  to match the Choleski ordering specified in the paper
+- After fitting, extract:
+  irf_obj = results.irf(24)
+  response_funds_to_inflation = irf_obj.irfs[:, 0, 2]  # response of var 0 (FUNDS) to shock in var 2 (log_cpi)
+  response_funds_to_unemp = irf_obj.irfs[:, 0, 1]      # response of var 0 (FUNDS) to shock in var 1 (unemp)
+
+=== DATASET ===
+
+Dataset file: bb1992_data.csv
+
+=== OUTPUT ===
+
+Save figure as: output_figure2/generated_results_attempt_N.jpg
+(Replace N with the current attempt number)

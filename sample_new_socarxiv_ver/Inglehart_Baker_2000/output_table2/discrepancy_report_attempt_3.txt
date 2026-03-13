@@ -1,0 +1,50 @@
+Discrepancy Report - Attempt 3 (Score: 61.2/100)
+
+IMPROVEMENTS:
+- EVS harmonization fixed Comfort from religion: 0.73 vs paper 0.72 (CLOSE!)
+- No more wrong signs (dim_score = 20/20)
+- 3 items now CLOSE (Hell, Comfort, Family)
+- Ordering improved (rho ~0.65)
+
+REMAINING ISSUES:
+
+1. CHURCH ATTENDANCE: 0.44 vs 0.75 (diff=0.31)
+   - Using F028 <=3 for "at least monthly"
+   - This is the biggest single discrepancy now
+   - Possible issue: F028 coding might differ between WVS versions
+   - The problem could be that many ex-Communist countries have very low church attendance
+     but also low traditional values -> this is consistent, so corr should be high
+   - Alternative: the paper might use a different variable or coding for church attendance
+   - TRY: Use F028 mean (inverted) instead of binary threshold
+   - TRY: Check if EVS has different church attendance coding
+
+2. RELIGION VERY IMPORTANT: 0.78 vs 0.89 (diff=0.11)
+   - This is using % saying A006==1 (very important)
+   - The gap might be because A006 is "importance of religion in life" (1-4)
+     while the paper might use the 1-10 "God importance" (F063) for this item too
+   - TRY: Use F063 mean (or % saying 9-10) for "religion very important"
+   - Actually the paper clearly says "religion is very important" which is the 1-4 scale
+
+3. EUTHANASIA: 0.76/0.79 vs 0.66 (too high)
+   - Our correlation is HIGHER than the paper's
+   - This might be because our factor scores overweight the euthanasia-related items
+
+4. WOMAN EARNS MORE: 0.77 vs 0.53 (too high)
+   - D054==1 (agree) might be too broad
+   - The paper might use different coding for D054
+
+5. MISSING ITEMS (6): Make parents proud (0.81), Stricter limits (0.63),
+   Parents duty (0.60), Clear guidelines (0.56), Own preferences (0.56),
+   Environmental (0.56)
+
+6. FAVORABLE ARMY RULE: 0.21 vs 0.43 (diff=0.22)
+   - E114 <=2 (very good or fairly good)
+   - Might try different threshold
+
+PLAN FOR ATTEMPT 4:
+1. Try using inverted F028 mean for church attendance
+2. Try F063 or different measure for "religion very important"
+3. Check D054 coding more carefully
+4. Improve factor analysis - consider using only WVS data (no EVS) for factor scores
+   to better match paper's 65 societies
+5. Try to include F024 (clear guidelines) even with limited countries

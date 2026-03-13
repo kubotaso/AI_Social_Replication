@@ -1,0 +1,53 @@
+Discrepancy Report - Attempt 6
+Score: 53.0/100 (up from 44.9 in attempt 5)
+
+MAJOR IMPROVEMENT:
+- Expanded 1960 data by frequency weights (VCF0009x ranges 1-4).
+  This gave N=932 (target 911, 2.3% off) vs N=736 (19.2% off) before.
+- All three panels now have N within 5% of targets.
+- 1960 R2 values now within 0.02 of targets (0.41 vs 0.41, 0.36 vs 0.36)
+
+SCORE BREAKDOWN:
+  Coefficients:     8.1/30 (still limited by sample composition differences)
+  Std errors:      14.4/20 (good)
+  Sample size:     15.0/15 (PERFECT - all panels within 5%)
+  Variables:       10.0/10 (perfect)
+  Log-likelihood:   0.0/10 (all LLs still off by >9)
+  Pseudo-R2:        5.4/15 (improved - 1960 R2 now matches well)
+
+REMAINING ISSUES:
+
+1. Log-likelihood (0/10 points):
+   - 1960 current: -382.4 vs -372.7 (diff=9.7)
+   - 1960 lagged: -414.4 vs -403.9 (diff=10.5)
+   - 1976 current: -335.7 vs -358.2 (diff=22.5)
+   - 1976 lagged: -344.9 vs -371.3 (diff=26.4)
+   - 1992 current: -393.9 vs -408.2 (diff=14.3)
+   - 1992 lagged: -403.9 vs -416.2 (diff=12.3)
+   Despite matching N, the LL values indicate different sample composition.
+   Row-expansion duplicates existing respondents, which doesn't change LL
+   per observation. The actual respondents differ from Bartels' original data.
+
+2. Coefficients (8.1/30 points):
+   Key discrepancies remain:
+   - 1960 current weak: 0.841 vs 1.028 (diff=0.187)
+   - 1960 current strong: 1.489 vs 1.358 (diff=0.131)
+   - 1960 current lean: 0.990 vs 0.855 (diff=0.135)
+   - 1960 IV weak: 0.205 vs 0.728 (diff=0.523)
+   - 1976 lagged strong: 1.118 vs 0.966 (diff=0.152)
+   - 1976 IV strong: 1.315 vs 1.123 (diff=0.192)
+   - 1992 IV weak: -0.088 vs -0.225 (diff=0.137)
+   - 1992 IV lean: 1.610 vs 1.824 (diff=0.214)
+
+3. Some R2 values still off:
+   - 1976 current: 0.2551 vs 0.24 (within tolerance via sliding scale)
+   - 1976 lagged: 0.2348 vs 0.21 (diff=0.0248)
+   - 1992 current: 0.2226 vs 0.20 (diff=0.0226)
+
+WHAT COULD FURTHER IMPROVE:
+1. Try expanding weights for 1976 as well (check if VCF0009x > 1 for 1976)
+   - Already checked: all weights are 1.0 for 1976, so expansion has no effect
+2. The coefficient discrepancies are fundamental data composition issues
+3. LL cannot be improved without different data
+4. Could try using 3 directional dummies for IV (matches lagged LL/R2)
+   instead of 6 PID dummies - might gain on R2 but lose on coefficients

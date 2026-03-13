@@ -1,0 +1,41 @@
+DISCREPANCY REPORT - ATTEMPT 10 (retry_12)
+Score: 67/100 (same as best)
+
+APPROACH:
+- Used FULL panel (psid_panel_full.csv) with 1970 data (14 waves vs paper's 16)
+- Tenure reconstruction from max reported tenure
+- Education fixed, d_exp==1 filter, drop persons exp<1
+- 2-SD outlier trim on d_log_wage
+- CPS wage index deflation (though absorbed by year dummies)
+
+WHY SAME SCORE AS BEST:
+- Gained 11 pts on significance (17.2 vs 6.2) - more obs improves precision
+- Lost 10 pts on sample_size (5 vs 15) - N=10,412 is 20% over target
+- Net: approximately same total score
+
+KEY LEARNINGS:
+1. Full panel has too many persons (2,116 vs 1,540). Extra 1970 data adds
+   observations but doesn't bring us closer to the paper's sample.
+2. The paper's data was pre-processed by Altonji & Sicherman with unknown
+   additional restrictions that reduce to 1,540 persons.
+3. Significance matching is MUCH better with more data (17.2/25 vs 6.2/25)
+   because more observations = smaller SEs = easier to match significance stars.
+
+STRATEGY FOR NEXT ATTEMPTS:
+The tradeoff is clear:
+- Regular panel (psid_panel.csv) + 2-SD trim: N=8,682 (exact), but poor significance
+- Full panel: good significance, but N way too high
+
+Options to try:
+1. Use regular panel + 2-SD trim (N~8,682) BUT try to improve coefficients:
+   - Try tenure_topel-1 (simpler, no reconstruction) with 2-SD trim
+   - The SE matching was 15/15 before with this approach (attempt 6)
+   - Focus on getting the other dimensions right
+
+2. Try to reduce full panel N by applying additional restrictions:
+   - Minimum hours worked
+   - Exclude disabled
+   - Require tenure >= 1 year
+
+3. Accept that polynomial coefficients are fundamentally limited by data and
+   maximize all other scoring dimensions.

@@ -1,0 +1,33 @@
+Discrepancy Report - Attempt 4
+Score: 73/100 (up from 72)
+
+Progress: Dimension assignment now perfect (20/20). Rescaled 3-item autonomy for EVS countries.
+Still blocked by autonomy_idx (0.67 vs 0.89 nation, 0.45 vs 0.61 individual).
+
+Key issues:
+1. Autonomy index loading stubbornly low despite trying:
+   - 4-item difference (obedience+faith-independence-determination): 0.66
+   - 3-item difference: 0.70
+   - Obedience only: 0.69
+   - Ratio: 0.67
+   - None approaches paper's 0.89
+
+2. Ordering: 0/10 - items not in descending order within dimensions.
+   - Nation trad: god(0.91) > auto(0.67) > F120(0.86) is wrong (F120 > auto)
+   - This is because the autonomy loading is too low
+
+3. Variance explained still off:
+   - Nation dim1: 39% vs 44%
+   - This is partly because autonomy loads lower
+
+HYPOTHESIS: The paper may have used a different factor extraction method.
+- I'm using PCA (eigendecomposition of correlation matrix)
+- The paper says "factor analysis with varimax rotation" which often means
+  Principal Axis Factoring (PAF) or Maximum Likelihood, not PCA
+- PAF tends to give higher loadings for items that share more common variance
+
+PLAN FOR ATTEMPT 5:
+1. Try Principal Axis Factoring (PAF) instead of PCA
+2. PAF iteratively estimates communalities, which may give different loadings
+3. Also try: use the 3-item autonomy (without A032) for ALL countries,
+   since EVS countries lack A032 and the rescaling might introduce noise

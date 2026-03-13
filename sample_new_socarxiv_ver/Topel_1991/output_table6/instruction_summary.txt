@@ -1,0 +1,87 @@
+INSTRUCTION SUMMARY: Table 6 — Measurement Error and Alternative IVs
+=====================================================================
+
+DATA SOURCE: PSID Panel Dataset (data/psid_panel.csv)
+COMMON VARIABLES: See output_table2/instruction_summary.txt and output_table3/instruction_summary.txt
+
+================================================================
+TABLE 6 SPECIFIC INSTRUCTIONS
+================================================================
+
+Same two-step procedure as Table 3, with variations in:
+  1. Tenure data quality (original vs panel-corrected)
+  2. Experience data quality (original vs corrected)
+  3. Instrument set composition
+
+FOUR SPECIFICATIONS:
+
+Column (1): Original tenure data, instruments = (X, T-T_bar, Time)
+  - Use raw/original tenure data (not the panel-corrected tenure_topel)
+  - Instruments for second-step IV: experience, tenure deviation from
+    job-spell mean, and year dummies
+  - T_bar = mean tenure over all years of the job spell
+
+Column (2): Corrected tenure data, instruments = (X, T-T_bar, Time)
+  - Use panel-corrected tenure (tenure_topel)
+  - Same instruments as column (1)
+
+Column (3): Corrected tenure data, instruments = (X^c, T-T_bar, Time)
+  - Use panel-corrected tenure
+  - Also correct experience for measurement error:
+    X^c = age - education_years - 6 (recomputed with corrected education)
+  - Instruments: corrected experience, tenure deviation, year dummies
+
+Column (4): Corrected tenure data, instruments = (X^c, T-T_bar)
+  - Drop calendar time from instrument set
+  - Only use corrected experience and tenure deviation as instruments
+
+TENURE CORRECTION:
+  The "original" tenure data in Column (1) uses PSID-reported tenure directly,
+  which has measurement error (inconsistent year-to-year changes, interval
+  recording, etc.).
+
+  The "corrected" tenure data (Columns 2-4) uses the reconstructed tenure
+  (tenure_topel) that starts at 0 for new jobs and increments by 1 each year.
+
+EXPERIENCE CORRECTION:
+  Corrected experience (X^c) = age - education_years - 6
+  This addresses measurement error in reported education/experience.
+
+INSTRUMENTS IN SECOND STEP:
+  The second-step regression is:
+    w*_it = alpha * X_it + controls + error
+  instrumented by different combinations:
+
+  X = current total labor market experience
+  T-T_bar = current tenure minus average tenure over the job spell
+  Time = year dummies
+
+  The IV regression uses these as instruments for current experience.
+
+SECOND-STEP PROCEDURE:
+  Same as Table 3 for all columns. The difference is which data (original
+  vs corrected) is used and which instruments are employed.
+
+TOP PANEL: Report beta_2 for each column.
+BOTTOM PANEL: Cumulative returns at 5, 10, 15, 20 years.
+
+================================================================
+PRACTICAL NOTES
+================================================================
+
+For this replication, the distinction between "original" and "corrected"
+tenure may be subtle since we only have tenure_topel (reconstructed).
+The key variation is in the instrument set.
+
+Column (1) might use a noisier version of tenure if available, or simply
+use tenure_topel for all columns and focus on varying the instruments.
+
+The main practical difference is Column (4) which drops year dummies from
+the instrument set — this should produce noticeably different results.
+
+================================================================
+SCORING NOTES
+================================================================
+Key values:
+- 4 beta_2 main effects + SEs
+- 16 cumulative returns + SEs

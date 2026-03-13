@@ -1,0 +1,17 @@
+DISCREPANCY REPORT - Attempt 9
+Score: 75.3 (DOWN from 79.3 in attempt 7)
+
+The SE calculation is inconsistent between attempts 7 and 9:
+- Attempt 7: gradient = 0.512, SE = 0.0083
+- Attempt 9: gradient = -0.033, SE = 0.0010
+
+The difference is likely due to how the perturbed model is set up.
+In attempt 7, the bootstrap SE was 0.0010 and the b1b2 gradient
+contributed sqrt(0.512^2 * 0.0161^2) = 0.0082 additional variance.
+
+Need to revert to attempt 7's specific implementation for SE.
+
+Key insight: OLS quadratic tenure gives reasonable 5yr (0.234, paper 0.231)
+and 10yr (0.304, paper 0.300) but fails at 15/20yr because quadratic
+turns down. Paper's OLS likely uses quartic with different estimation
+that gives better-behaved higher-order terms.

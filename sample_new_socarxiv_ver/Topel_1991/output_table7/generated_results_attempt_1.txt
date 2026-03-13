@@ -1,0 +1,51 @@
+Table 7 Attempt 1 Results (RUNTIME ERROR in scoring function)
+
+Analysis completed but scoring function had a bug (KeyError: 'experience_se_sq_se').
+Raw results from analysis:
+
+Column (1): Baseline OLS
+  R^2 = 0.2809 (target: 0.422)
+  N = 12956
+  experience: coef=0.041520, se=0.001547 (target: .0418, SE .0013)
+  experience_sq: coef=-0.000532, se=0.000027 (target: -.00079, SE .00003)
+  tenure_var: coef=0.026890, se=0.001710 (target: .0138, SE .0052)
+
+Column (2): Restricted with observed completed tenure
+  R^2 = 0.2918 (target: 0.428)
+  experience: coef=0.038700, se=0.001548 (target: .0379)
+  experience_sq: coef=-0.000473, se=0.000027 (target: -.00069)
+  tenure_var: coef=0.005793, se=0.002360 (target: -.0015)
+  completed_tenure_obs: coef=0.018723, se=0.001926 (target: .0165)
+  obs_ct_x_censor: coef=0.000538, se=0.001079 (target: -.0025)
+
+Column (3): Unrestricted with observed completed tenure
+  R^2 = 0.2938 (target: 0.432)
+  experience: coef=0.037716, se=0.001556 (target: .0345)
+  experience_sq: coef=-0.000428, se=0.000030 (target: -.00072)
+  tenure_var: coef=0.031831, se=0.005920 (target: .0137)
+  completed_tenure_obs: coef=0.025613, se=0.002336 (target: .0316)
+  obs_ct_x_exp_sq: coef=-0.000004, se=0.000002 (target: -.00061)
+  obs_ct_x_tenure: coef=-0.002359, se=0.000509 (target: .0142)
+
+Column (4): Restricted with imputed completed tenure
+  R^2 = 0.2814 (target: 0.433)
+  experience: coef=0.041310, se=0.001548 (target: .0397)
+  experience_sq: coef=-0.000530, se=0.000027 (target: -.00074)
+  tenure_var: coef=0.024968, se=0.001819 (target: .0060)
+  imputed_completed_tenure: coef=0.004818, se=0.001553 (target: .0053)
+
+Column (5): Unrestricted with imputed completed tenure
+  R^2 = 0.2861 (target: 0.435)
+  experience: coef=0.039734, se=0.001575 (target: .0401)
+  experience_sq: coef=-0.000514, se=0.000031 (target: -.00073)
+  tenure_var: coef=0.046065, se=0.002935 (target: .0163)
+  imputed_completed_tenure: coef=0.022507, se=0.002965 (target: .0067)
+  imp_ct_x_exp_sq: coef=0.000003, se=0.000002 (target: -.00075)
+  imp_ct_x_tenure: coef=-0.004453, se=0.000486 (target: .0429)
+
+KEY ISSUES:
+1. R-squared too low (0.28 vs 0.42): ~0.14 gap
+2. Experience^2 coefficient too small (-0.00053 vs -0.00079)
+3. Tenure coefficient too high in col 1 (0.027 vs 0.014)
+4. Tenure interaction has wrong sign in cols 3,5 (negative vs positive)
+5. Scoring function has KeyError bug

@@ -1,0 +1,59 @@
+Discrepancy Report - Table 6, Attempt 3
+Score: 82/100
+
+IMPROVEMENTS FROM ATTEMPT 2 (80->82):
+- Fixed Germany East/West split: used X048WVS region codes (states 12-16=East, 1-10=West)
+  instead of G006 (which is "national pride", NOT region)
+- Fixed wave 1 denominator: included -2 values for Hungary, Japan, Mexico, South Africa, South Korea
+  (these countries' -2 codes appear to represent non-attenders rather than true missing)
+
+REMAINING ISSUES:
+
+1. Brazil 1995-1998: gen=75 vs paper=54 (diff=21) -- LARGEST
+   - WVS wave 3 Brazil has very different F028 distribution than wave 2
+   - Wave 2 (8-point): balanced distribution, 50% monthly
+   - Wave 3 (6-point, missing vals 5,7): highly skewed toward attendance, 75% monthly
+   - This may be a different questionnaire version or sampling issue
+   - The paper may have used an older WVS version with different coding
+
+2. Hungary 1990-1991: gen=23 vs paper=34 (diff=11)
+   - EVS gives 23%, paper says 34%
+   - The WVS wave 2 does NOT have Hungary (only waves 1 and 3)
+   - So EVS is the only source for Hungary 1990
+   - Check: maybe Hungary in EVS had different F063 coding
+   - Or the paper used a different data source for Hungary 1990
+
+3. West Germany 1990-1991: gen=28 vs paper=33 (diff=5)
+   - EVS has no region variable to split East/West Germany
+   - Using combined EVS German rate (28%) as West Germany proxy is inaccurate
+   - True West Germany should be higher than combined since East is lower
+   - If East=20 and combined=28, then: 0.8*West + 0.2*20 = 28 -> West=30
+   - Still not 33. The EVS combined rate may differ from pure West Germany
+
+4. East Germany 1990-1991: MISSING
+   - No region variable in EVS data to split
+   - Could estimate: if combined=28 and West=33(paper), East=(28-0.8*33)/0.2=4
+   - But that gives 4 vs paper=20, so the combined EVS rate is unreliable for splitting
+
+5. Italy 1990-1991: gen=51 vs paper=47 (diff=4)
+   - EVS Italy gives 51% attendance
+   - Paper says 47%. May be a different data version or sample restriction
+
+6. South Korea 1990-1991: gen=64 vs paper=60 (diff=4)
+   - WVS wave 2 South Korea gives 64%
+   - Paper says 60%. Moderate discrepancy
+
+7. 14 MISSING cells (1981 European data):
+   - Belgium, Canada, France, GB, Iceland, Ireland, Italy, Netherlands,
+     N.Ireland, Norway, Spain, Sweden, USA, W.Germany for 1981
+   - These require EVS Wave 1 (1981) data which is not in our dataset
+   - The current EVS file only has wave 2 (1990-1991)
+   - Score ceiling with 15 missing: ~81% of categories present
+
+FIX PLAN FOR ATTEMPT 4:
+1. Try to find EVS Wave 1 (1981) data or accept missing 1981 European data
+2. For Hungary 1990, try using WVS wave 2 data instead of EVS (wait, WVS doesn't have Hungary W2)
+3. For Germany 1990 East/West split, try estimating from combined rate
+   using population proportions (West ~80%, East ~20%)
+4. For Brazil W3, investigate if there's a coding issue with the 6-point scale
+5. For Italy, try checking if EVS F028 gives a different result than F063

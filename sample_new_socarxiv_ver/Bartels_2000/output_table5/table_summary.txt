@@ -1,0 +1,120 @@
+Table 5: Current versus Lagged Party Identification and Congressional Votes
+Source: Bartels (2000), Table 5, p. 45
+
+=== STRUCTURE ===
+Three panels (1960, 1976, 1992). Each panel has 3 rows:
+- Row 1: Current party ID (same model as Table 1 structure, but for congressional vote, panel respondents only)
+- Row 2: Lagged party ID (party ID from 2 years earlier, same model)
+- Row 3: IV estimates (using lagged party ID as instrument for current party ID)
+
+Dependent variable: Major-party congressional (House) vote
+Sample: Major-party congressional voters only, panel respondents only.
+
+=== PANEL DATA SOURCES ===
+Same panel studies as Table 4:
+- 1960: Panel from 1956-58-60 study, lagged party ID from 1958
+- 1976: Panel from 1972-74-76 study, lagged party ID from 1974
+- 1992: Panel from 1990-91-92 study, lagged party ID from 1990
+
+=== MODEL SPECIFICATION ===
+Same probit model structure as Tables 1 and 4:
+  Vote = f(Strong partisan, Weak partisan, Leaning partisan, Intercept)
+where party ID variables are coded directionally (positive = Republican direction).
+The only difference from Table 4 is the dependent variable: congressional vote
+instead of presidential vote.
+
+=== COLUMNS ===
+For each row: Strong partisan | Weak partisan | Leaning partisan | Intercept | Log-likelihood | Pseudo-R2
+Values shown as coefficient(standard error)
+
+=== GROUND TRUTH VALUES ===
+
+--- 1960 Panel (N=911) ---
+
+Current party ID:
+  Strong partisan:  1.358 (0.094)
+  Weak partisan:    1.028 (0.083)
+  Leaning partisan: 0.855 (0.131)
+  Intercept:        0.035 (0.053)
+  Log-likelihood:   -372.7
+  Pseudo-R2:        0.41
+
+Lagged party ID (from 1958):
+  Strong partisan:  1.363 (0.092)
+  Weak partisan:    0.842 (0.078)
+  Leaning partisan: 0.564 (0.125)
+  Intercept:        0.068 (0.051)
+  Log-likelihood:   -403.9
+  Pseudo-R2:        0.36
+
+IV estimates:
+  Strong partisan:  1.715 (0.173)
+  Weak partisan:    0.728 (0.239)
+  Leaning partisan: 1.081 (0.696)
+  Intercept:        0.032 (0.057)
+  Log-likelihood:   -403.9
+  Pseudo-R2:        0.36
+
+--- 1976 Panel (N=682) ---
+
+Current party ID:
+  Strong partisan:  1.087 (0.105)
+  Weak partisan:    0.624 (0.086)
+  Leaning partisan: 0.622 (0.110)
+  Intercept:        -0.123 (0.054)
+  Log-likelihood:   -358.2
+  Pseudo-R2:        0.24
+
+Lagged party ID (from 1974):
+  Strong partisan:  0.966 (0.104)
+  Weak partisan:    0.738 (0.089)
+  Leaning partisan: 0.486 (0.109)
+  Intercept:        -0.063 (0.053)
+  Log-likelihood:   -371.3
+  Pseudo-R2:        0.21
+
+IV estimates:
+  Strong partisan:  1.123 (0.178)
+  Weak partisan:    0.745 (0.251)
+  Leaning partisan: 0.725 (0.438)
+  Intercept:        -0.102 (0.055)
+  Log-likelihood:   -371.3
+  Pseudo-R2:        0.21
+
+--- 1992 Panel (N=760) ---
+
+Current party ID:
+  Strong partisan:  0.975 (0.094)
+  Weak partisan:    0.627 (0.084)
+  Leaning partisan: 0.472 (0.098)
+  Intercept:        -0.211 (0.051)
+  Log-likelihood:   -408.2
+  Pseudo-R2:        0.20
+
+Lagged party ID (from 1990):
+  Strong partisan:  1.061 (0.100)
+  Weak partisan:    0.404 (0.077)
+  Leaning partisan: 0.519 (0.101)
+  Intercept:        -0.168 (0.051)
+  Log-likelihood:   -416.2
+  Pseudo-R2:        0.19
+
+IV estimates:
+  Strong partisan:  1.516 (0.180)
+  Weak partisan:    -0.225 (0.268)
+  Leaning partisan: 1.824 (0.513)
+  Intercept:        -0.125 (0.053)
+  Log-likelihood:   -416.2
+  Pseudo-R2:        0.19
+
+=== NOTES ===
+- Same panel respondent restriction as Table 4 (footnote 16).
+- IV estimation uses lagged party ID variables as instruments for current
+  party ID variables in a probit framework.
+- The lagged and IV rows share the same log-likelihood and pseudo-R2 values
+  within each panel year.
+- N values represent the number of panel respondents who voted for a
+  major-party congressional candidate and have valid data on all variables.
+- Note the 1992 IV estimate for Weak partisan is negative (-0.225), which is
+  unusual and may reflect instability in the IV estimates due to weak instruments
+  or small sample effects.

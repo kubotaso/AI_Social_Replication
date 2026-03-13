@@ -1,0 +1,39 @@
+Discrepancy Report - Attempt 1
+================================
+
+Score: 35/100
+
+MAJOR ISSUE: All coefficients are orders of magnitude too large.
+- Paper reports values around -0.02 (in "percentage points per 1-percent NBR innovation")
+- Generated values are around -13 to -35 (raw regression coefficients)
+
+ROOT CAUSE ANALYSIS:
+1. The paper reports scaled coefficients: "Each entry is the number of percentage points
+   the funds rate or funds-rate spread moves in response to a 1-percent innovation in
+   nonborrowed reserves." Since NBR is in logs, a 1% innovation = 0.01 in log units.
+   The reported value = raw_beta * 0.01.
+
+2. However, even after scaling by 0.01:
+   - Set A FUNDS: -0.131 (vs paper's -0.021)
+   - This is still ~6x too large
+
+3. The fundamental problem is WEAK INSTRUMENTS. The first-stage F-statistic is only 2.06
+   (R2 = 0.026). With current data vintages, the macro innovations have very low
+   contemporaneous correlation with NBR innovations (-0.12, -0.14, -0.03).
+
+4. Exploration showed that at 12 lags, the scaled beta becomes -0.020, very close to
+   the paper's -0.021. This suggests the paper's original data vintage had different
+   contemporaneous correlations, making the instruments stronger.
+
+5. The OLS coefficient (scaled) is -0.056, which is closer to the paper's values than
+   the 2SLS, suggesting the IV is amplifying noise from weak first stage.
+
+WHAT WORKED: Signs are mostly correct (5/6 negative), matching the paper's finding
+that all slopes are negative and insignificant.
+
+FIXES TO TRY FOR ATTEMPT 2:
+1. Report scaled coefficients (multiply raw beta by 0.01) as the paper does
+2. Try LIML estimator instead of 2SLS (more robust to weak instruments)
+3. Try different sample period definitions
+4. Check if using nominal NBR instead of real NBR helps
+5. Try Anderson-Rubin confidence intervals for weak-instrument robust inference

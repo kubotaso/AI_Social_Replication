@@ -1,0 +1,31 @@
+DISCREPANCY REPORT - Attempt 3
+Score: 50/100
+
+CORE ISSUE: The IV regression is not properly identifying beta_1.
+
+Our beta_1 = 0.010 vs Topel's 0.0713. This makes beta_2 = 0.123 instead of 0.0545.
+
+The problem is that initial_experience is a near-perfect predictor of current
+experience (F-stat > 200,000), so the IV essentially gives OLS results.
+OLS produces a very low coefficient on experience because it's picking up
+the cross-sectional correlation where high-experience workers have lower
+wages relative to what the true experience profile would suggest.
+
+POSSIBLE FIXES:
+1. The second-step regression might need person fixed effects or job-level
+   controls to properly identify beta_1
+2. The adjusted wage formula might be wrong - maybe should NOT subtract
+   the delta (experience polynomial) terms, since those are what we're
+   trying to estimate
+3. Need to understand that w* = log_wage - gamma(T) - delta(X), not
+   w* = log_wage - beta_hat*T - gamma(T) - delta(X)
+4. Actually, re-reading Topel: w* = log_wage - beta_hat*T - gamma(T) only
+   (subtract tenure effects, NOT experience effects)
+   Then regress w* on X + X^2 + X^3 + X^4 + controls
+   And beta_1 is the coefficient on linear X from the IV regression
+
+APPROACH FOR ATTEMPT 4:
+- Subtract only tenure polynomial from log_wage (not experience polynomial)
+- Regress on full experience polynomial + controls
+- IV experience polynomial with initial experience polynomial
+- This should give the proper experience profile beta_1

@@ -1,0 +1,125 @@
+INSTRUCTION SUMMARY: Table 3 — Two-Step Estimates of Experience and Tenure Effects
+===================================================================================
+
+DATA SOURCE: PSID Panel Dataset
+FILE: data/psid_panel.csv (main panel) and data/psid_panel_full.csv (if available)
+COMMON VARIABLE MAP: See output_table2/instruction_summary.txt for PSID variable
+construction details (education recoding, CPS wage index, experience formula).
+
+================================================================
+GNP PRICE DEFLATOR FOR CONSUMPTION EXPENDITURE
+================================================================
+Required for converting nominal wages to real wages (in addition to CPS wage index).
+Approximate values (base 1982=100):
+  1967: 33.4,  1968: 34.8,  1969: 36.7,  1970: 38.8,  1971: 40.5,
+  1972: 41.8,  1973: 44.4,  1974: 48.9,  1975: 53.6,  1976: 56.9,
+  1977: 60.6,  1978: 65.2,  1979: 72.6,  1980: 82.4,  1981: 90.9,
+  1982: 100.0
+
+Note: PSID interview year Y reports income for year Y-1. So for interview
+year 1968, use the 1967 deflator. For interview year 1983, use 1982 deflator.
+
+Real wage construction:
+  hourly_wage_real = hourly_wage_nominal / (GNP_deflator[year-1] / GNP_deflator[base_year])
+  Then: log_real_wage = ln(hourly_wage_real) - ln(CPS_wage_index[year])
+  Or equivalently: log_real_wage = ln(hourly_wage_nominal) - ln(GNP_deflator[year-1])
+                                   - ln(CPS_wage_index[year]) + ln(GNP_deflator[base_year])
+
+================================================================
+SAMPLE RESTRICTIONS (Appendix pp. 173-174)
+================================================================
+1. White males only (already filtered in panel)
+2. Ages 18-60 at survey date
+3. Positive earnings in previous calendar year
+4. Not self-employed at any time during the job
+5. Not employed in agriculture
+6. Not employed by government
+7. SRC (random) sample only — exclude poverty/SEO subsample (ER30001 > 2930)
+8. Persons from Alaska and Hawaii excluded
+9. Current job tenure >= 1 year
+10. Jobs with ambiguous tenure sequences deleted
+
+================================================================
+TABLE 3 SPECIFIC INSTRUCTIONS
+================================================================
+
+TWO-STEP ESTIMATION PROCEDURE:
+
+STEP 1 (from Table 2, Model 3):
+  Use within-job first-differenced wage data to estimate:
+    d_log_wage = const + beta_hat * d_tenure + gamma2 * d_tenure^2
+                 + gamma3 * d_tenure^3 + gamma4 * d_tenure^4
+                 + delta2 * d_exp^2 + delta3 * d_exp^3 + delta4 * d_exp^4
+                 + year_dummies + error
+
+  This gives an estimate of (beta_1 + beta_2) as the coefficient on d_tenure,
+  plus higher-order terms gamma and delta.
+
+STEP 2 (this table):
+  Construct the adjusted wage:
+    w*_it = log_real_wage_it - beta_hat * T_it - [gamma2*T^2 + gamma3*T^3 + gamma4*T^4]
+            - [delta2*X^2 + delta3*X^3 + delta4*X^4]
+
+  where beta_hat is the first-step estimate of the linear tenure effect,
+  and the gamma/delta terms are the higher-order polynomial terms from step 1.
+
+  Then regress w*_it on X_it (current experience) using X_i0 (initial experience
+  at the start of the job) as an instrument.
+
+  Second-step controls:
+    - Years of completed schooling (education_years)
+    - Marital status (married)
+    - Residence in SMSA (lives_in_smsa)
+    - Union membership (union_member)
+    - Disability status (disabled)
+    - Eight census region dummies
+    - Year dummies
+
+  IV regression: instrument current experience with initial experience
+  (experience at the start of the current job spell).
+
+  X_i0 = experience when worker started the current job = experience - tenure
+
+  The IV coefficient on experience gives beta_1.
+  Then: beta_2 = (beta_1 + beta_2)_step1 - beta_1_step2
+
+CUMULATIVE RETURNS CALCULATION:
+  Return at T years = beta_2 * T + gamma2 * T^2 + gamma3 * T^3 + gamma4 * T^4
+  where gamma terms are from step 1 (Table 2, Model 3), converted from scaled form:
+    gamma2 = -.4592/100 = -.004592
+    gamma3 = .1846/1000 = .0001846
+    gamma4 = -.0245/10000 = -.00000245
+
+  Standard errors for cumulative returns should be computed via delta method
+  or bootstrap.
+
+COLUMN (4) — OLS Bias b1+b2:
+  This is the coefficient on tenure (linear) from a standard cross-sectional
+  OLS regression of log wages on experience, tenure, and controls.
+  The bias = OLS_tenure_coef - IV_tenure_coef.
+
+OLS CUMULATIVE RETURNS:
+  Same formula as two-step but using OLS estimates of the tenure polynomial
+  from a cross-sectional regression.
+
+================================================================
+VARIABLE MAPPING (Panel columns -> Paper variables)
+================================================================
+person_id       -> individual identifier
+job_id          -> job spell identifier
+year            -> survey year (1968-1983)
+age             -> current age
+education_clean -> education (needs per-year recoding; see Table 2 instructions)
+log_hourly_wage -> ln(nominal hourly wage) = ln(labor_inc / hours)
+tenure_topel    -> reconstructed job tenure (years)
+married         -> 1 if married
+union_member    -> 1 if union member
+disabled        -> 1 if disabled
+lives_in_smsa   -> 1 if SMSA (NOTE: currently all zeros in panel — may need fix)
+region_ne, region_nc, region_south, region_west -> census region dummies
+
+Derived variables:
+  education_years -> recoded education (see Table 2 instructions for per-year coding)
+  experience = age - education_years - 6 (capped at 0)
+  initial_experience = experience - tenure_topel
+  log_real_wage = log_hourly_wage - ln(GNP_deflator) - ln(CPS_wage_index)

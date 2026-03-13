@@ -1,0 +1,68 @@
+Instruction Summary for Table 4 — Variable Mapping and Replication Instructions
+
+Dataset: bb1992_data.csv
+
+Variable Mapping (paper name -> dataset column):
+
+VAR variables (common to all rows):
+  M1          -> log_m1       (log of M1 money supply)
+  M2          -> log_m2       (log of M2 money supply)
+  CPBILL      -> cpbill_long  (commercial paper - Treasury bill spread, 6-month)
+  TERM        -> term         (10-year Treasury bond rate minus funds rate)
+  FUNDS       -> funds_rate   (federal funds rate)
+  CPI         -> log_cpi      (log of CPI)
+
+Forecasted variables (one per row, each row is a separate VAR):
+  Industrial production  -> log_ip        (log industrial production index)
+  Capacity utilization   -> cap_util      (capacity utilization rate, level)
+  Employment             -> log_emp       (log payroll employment)
+  Unemployment rate      -> unemp_rate    (unemployment rate, level)
+  Housing starts         -> log_houst     (log housing starts)
+  Personal income        -> log_real_pi   (log real personal income)
+  Retail sales           -> log_retail    (log retail sales)
+  Consumption            -> log_consump   (log personal consumption expenditures)
+  Durable-goods orders   -> log_dur_orders (log durable goods orders)
+
+Data transformations:
+- Variables prefixed with "log_" are already in log form in the dataset
+- First differences are taken for log variables before VAR estimation
+  (i.e., use growth rates: d(log_ip), d(log_m1), d(log_m2), d(log_cpi), etc.)
+- Level variables (cap_util, unemp_rate, funds_rate, cpbill_long, term) enter the VAR in levels
+- Drop NaN rows resulting from differencing before estimation
+
+Model specification:
+- Model: unrestricted VAR
+- Lags: 6
+- Estimation: OLS (equation by equation, as in statsmodels VAR)
+- Decomposition: Choleski (orthogonalized) variance decomposition at horizon = 24 months
+
+Choleski orderings:
+  Panel A: [log_m1, log_m2, cpbill_long, term, funds_rate, forecasted_var, log_cpi]
+  Panel B: [log_m1, log_m2, funds_rate, term, cpbill_long, forecasted_var, log_cpi]
+
+  Note: For differenced variables, the ordering uses the differenced version
+  (e.g., d_log_m1 instead of log_m1). The ordering label refers to the
+  economic concept; use whatever column name results from differencing.
+
+Sample period: 1961-07-01 to 1989-12-01 (both panels use the same sample)
+
+Implementation notes:
+1. For each forecasted variable, construct a 7-variable VAR with the ordering above.
+2. Estimate with 6 lags.
+3. Compute the forecast error variance decomposition (FEVD) at horizon 24.
+4. Report the percentage of forecast error variance of the forecasted variable
+   attributed to each of the 7 variables in the VAR.
+5. Rows should sum to approximately 100% (within rounding tolerance).
+6. The Choleski ordering matters enormously. The difference between Panels A and B
+   is solely the swap of FUNDS and CPBILL in positions 3 and 5.
+7. OWN, M1, M2, and CPI contributions should be identical across panels because
+   their relative ordering does not change.
+8. Only CPBILL, TERM, and FUNDS contributions change between panels.
+
+Key interpretation (from the paper):
+- When FUNDS is ordered after CPBILL (Panel A), FUNDS gets relatively little
+  explanatory power, and CPBILL/TERM get more.
+- When FUNDS is ordered before CPBILL (Panel B), FUNDS absorbs much of the
+  predictive power, while CPBILL/TERM lose power.
+- This demonstrates that FUNDS contains independent information about monetary
+  policy beyond what is captured by interest rate spreads.

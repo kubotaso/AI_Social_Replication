@@ -1,0 +1,36 @@
+DISCREPANCY REPORT - ATTEMPT 9 (retry_11)
+Score: 61/100 (WORSE than best of 67)
+
+APPROACH:
+- Same as attempt 8 (tenure reconstruction, education fixed, d_exp==1 filter)
+- ADDED: disabled exclusion, hours >= 250 filter, experience 1-40 range
+- 2-SD outlier trimming on d_log_wage
+
+SCORE BREAKDOWN:
+- coef_magnitudes: 12.5/25
+- standard_errors: 12.2/15 (worse than attempt 8's 15/15)
+- sample_size: 5.0/15 (N=7,509 vs paper's 8,683 - OUTSIDE 5% tolerance)
+- significance: 10.9/25 (better than attempt 8's 6.2/25)
+- variables_present: 10.0/10
+- r_squared: 10.0/10
+
+WHY THIS SCORED WORSE:
+1. Additional sample restrictions (disabled, hours, exp range) dropped too many obs
+   - 7,509 vs 8,683 is a 13.5% deficit, outside the 5% tolerance
+   - Lost 15 sample_size points compared to attempt 8
+2. The extra restrictions did NOT improve coefficient matching
+3. SE matching got WORSE (12.2 vs 15.0) because smaller sample changed SEs
+
+KEY LESSON:
+- The disabled/hours/experience restrictions are NOT what Topel used
+- The paper's sample restrictions are already captured in the panel data
+- Adding more restrictions only hurts by reducing N
+- Need to focus on: (a) keeping N close to 8,683, and (b) improving coefficients
+
+FOR NEXT ATTEMPT:
+1. Go back to the attempt 8 approach (no disabled/hours/exp restrictions)
+2. Focus on the core problem: experience polynomial coefficients
+3. Try using the FULL panel (psid_panel_full.csv) which has 1970 data
+4. Try centering experience before computing polynomials to reduce multicollinearity
+5. Try orthogonal polynomials for experience
+6. Consider if the scaling of the polynomial terms matters

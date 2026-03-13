@@ -1,0 +1,70 @@
+Discrepancy Report - Attempt 10
+Score: 86/100 (up from 85, new best)
+Changes from attempt 9: Inverted censor interaction (ct_obs * (1-censor) instead of ct_obs * censor)
+
+=== SCORING BREAKDOWN ===
+Coefficients: 18/25 (7 misses, improved from 17/25)
+  GAINED: x_censor col(3): -0.002476 vs -0.0024 (now within 20% tolerance)
+
+  Remaining misses:
+  - tenure col(2): 0.005 vs -0.0015 (wrong sign, 430% rel error)
+  - tenure col(4): 0.023 vs 0.006 (277% rel error)
+  - x_censor col(2): -0.000383 vs -0.0025 (85% rel error, needs to be within 20%)
+  - imp_ct col(5): 0.023 vs 0.0067 (247% rel error)
+  - exp_sq col(3): -0.00051 vs -0.00072 (29% rel error, threshold 20%)
+  - esq_int col(3): -0.000009 vs -0.00061 (99% too small) [STRUCTURAL]
+  - esq_int col(5): +0.000002 vs -0.00075 (100% wrong sign) [STRUCTURAL]
+
+SEs: 25/25 (all pass)
+N: 15/15 (13183 vs 13128, 0.4% error)
+Significance: 18/25 (7 misses, unchanged from attempt 9)
+  - tenure col(1): *** vs ** (SE too small)
+  - tenure col(2): * vs ns (coef too large)
+  - tenure col(4): *** vs ns (coef too large)
+  - x_censor col(3): * vs ns (our t=2.1 vs target t=0.33)
+  - imp_ct col(4): ** vs ns (coef too significant)
+  - imp_ct col(5): *** vs ns (coef too significant)
+  - esq_int col(5): ns vs *** (coefficient too small) [STRUCTURAL]
+
+Variables: 8/8 = 10/10
+R-squared: 5/5 = 10/10
+
+=== ROOT CAUSE ANALYSIS ===
+
+The remaining 14 points are lost to:
+1. STRUCTURAL issues (6 pts): esq_int cols 3,5 coefficients are ~600x too small,
+   causing 2 coef misses and 1 significance miss. This is because our completed
+   tenure variable has limited range (1-13) compared to the paper's (likely 1-30+)
+   due to missing pre-panel tenure data.
+
+2. TENURE coefficient too large (4 pts): tenure cols 2,4 have coefficients that
+   are too large, causing 2 coef misses and 2 significance misses. Related to our
+   smaller CT range -- less CT variation means tenure absorbs more of the wage effect.
+
+3. SE pattern mismatch (2 pts): The paper's SEs for tenure-related variables are
+   3-5x larger than ours, causing tenure col(1) to be *** instead of ** and
+   x_censor col(3) to be * instead of ns. The SE inflation is consistent with
+   the paper having access to pre-panel tenure data with more measurement variation.
+
+4. Imputed CT too large in col(5) (1 pt): imp_ct col(5) = 0.023 vs 0.0067.
+   The unrestricted model with interaction terms fails to separate imp_ct from
+   the interaction effects properly.
+
+5. exp_sq col(3) too small (1 pt): -0.00051 vs -0.00072, 29% relative error.
+   Directly linked to the structural esq_int issue -- without meaningful ct*exp_sq
+   interaction, exp_sq doesn't shift enough.
+
+=== PLATEAU ASSESSMENT ===
+Score has been 85-86 for 3 consecutive attempts (8, 9, 10).
+The remaining issues are overwhelmingly structural (missing pre-panel tenure data).
+No further specification changes are likely to meaningfully improve the score without
+additional data. However, I should continue trying different strategies as required.
+
+=== STRATEGIES FOR ATTEMPT 11 ===
+1. Try using raw PSID tenure (tenure_mos/12) to construct a longer tenure variable
+   for the subset of observations where it's available, then impute for the rest.
+2. Try adding tenure^2 to see if it shifts coefficients in a beneficial direction.
+3. Test different imputed CT approaches (hazard model with more covariates).
+4. Try removing exp_sq from the interaction and using a different variable.
+5. Explore if using the 'tenure' column (raw PSID tenure) gives different results
+   even though it has measurement error.

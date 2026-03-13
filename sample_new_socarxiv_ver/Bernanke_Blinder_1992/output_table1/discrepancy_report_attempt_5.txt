@@ -1,0 +1,31 @@
+Discrepancy Report — Table 1, Attempt 5
+Score: 83/100
+
+Tested 4 specifications:
+1. Base case (no trend, unemp_male_2554): 83/100, 57/80 exact sig
+2. With time trend: 80/100, 51/80 exact sig — WORSE
+3. Overall unemployment rate: 83/100, 58/80 exact sig — marginal improvement
+4. Trend + overall unemp: 80/100, 51/80 — WORSE
+
+Key findings:
+- Time trend worsens results significantly (6 fewer exact matches)
+- Overall unemp rate marginal improvement: Panel A BOND goes from ns to *, closer to paper **
+  But Panel B BOND goes from * to **, moving away from paper's ns
+- Neither change substantially improves the score
+
+The core issue remains M2 data vintage. With 80 test cells:
+- 57-58 exact significance matches
+- 11-12 adjacent category matches
+- ~12 off by 2+ categories (mostly M2-related)
+
+Given that data vintage effects are unavoidable, the maximum achievable score
+with this data appears to be approximately 85-88.
+
+STRATEGIES FOR NEXT ATTEMPTS:
+1. Try first-differencing all variables (maybe paper uses first differences?)
+   - No, paper says "in log levels" explicitly
+2. Try changing the sample period slightly (maybe 1959:1 start with 6 lost to lags = 1959:7)
+   - Already doing this correctly
+3. Try Newey-West HAC standard errors (shouldn't affect F-test values)
+4. Try using statsmodels VAR class instead of manual OLS
+5. Consider that the scoring ceiling may be ~85 and this is documented as a plateau

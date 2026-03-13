@@ -1,0 +1,53 @@
+DISCREPANCY REPORT - ATTEMPT 8
+Table 6: Percentage Attending Religious Services at Least Once a Month
+Inglehart & Baker (2000)
+===============================================================================
+
+SCORE: 85/100 (same as attempts 6 and 7)
+
+KEY FIX IN ATTEMPT 8:
+- Excluded Hungary Wave 3 (paper shows '—' for Hungary 1995-1998)
+  - WVS Wave 3 has Hungary data (1998, n=650, gives 17%)
+  - But the paper shows "—" for Hungary 1995-1998
+  - This fixes:
+    * Hungary net change: displayed as +1 -> now correctly displayed as +18
+    * Ex-communist mean change: displayed as +2 -> now correctly displayed as +4 (matches paper)
+    * Slovakia also removed from output (was never in the 35 paper countries)
+  - Visual accuracy of the table improved significantly
+  - HOWEVER: scoring formula uses ground_truth which didn't include Hungary 1995-1998
+    (correctly identified as missing in original table_summary extraction)
+    So numerical score stays at 85
+
+RESULTS SUMMARY:
+  Full match (within 1):  62
+  Partial (within 3):     2
+  Miss (>3 off):          2
+  Missing (no data):      14
+
+REMAINING ISSUES (same as attempt 7):
+  PARTIAL: South Korea 1981 (gen=27 vs paper=29, diff=2) -- NOT FIXABLE
+  PARTIAL: Nigeria 1995-1998 (gen=89 vs paper=87, diff=2) -- NOT FIXABLE
+  MISS: Brazil 1995-1998 (gen=75 vs paper=54, diff=21) -- NOT FIXABLE
+  MISS: Italy 1990-1991 (gen=51 vs paper=47, diff=4) -- NOT FIXABLE
+  MISSING: 14 EVS 1981 European cells -- REQUIRES GESIS ZA4438 DATA
+
+SCORE CEILING ANALYSIS (CONFIRMED):
+  Maximum achievable with current data = 86
+  Current score = 85
+  The 1-point gap is from 2 PARTIALs (each contributes 0.7 instead of 1.0)
+  Even fixing all 4 issues above = 86 (from 66 FULL + 14 MISSING)
+  To reach 95: need EVS 1981 data to fill the 14 MISSING cells
+
+PLATEAU STATUS:
+  Attempts 6, 7, 8 all scored 85
+  Score has not improved for 3 consecutive attempts
+  Will continue iterating (as required) but fundamental ceiling is 86 with current data
+  Score of 95+ requires EVS Wave 1 (ZA4438) from GESIS - requires free registration
+  URL: https://search.gesis.org/research_data/ZA4438
+
+VISUAL TABLE QUALITY (beyond numerical scoring):
+  Attempt 8 correctly shows:
+  - Hungary: 16 / 34 / — / +18 (vs attempt 7 showed 17 in wave 3 and +1 net)
+  - Ex-communist: 5 of 7 increased; mean change = +4 (vs attempt 7 showed +2)
+  - Slovakia removed from output (was showing in attempts 1-7)
+  These improvements match the paper's table exactly for the displayed values

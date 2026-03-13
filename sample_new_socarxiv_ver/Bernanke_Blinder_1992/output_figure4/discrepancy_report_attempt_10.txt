@@ -1,0 +1,33 @@
+Discrepancy Report -- Figure 4, Attempt 10
+==========================================
+
+Score: 82/100
+
+APPROACH: Hybrid normalization - normalized unemployment (31bp) + unnormalized bank vars
+Matches: 21/53 (39.6%) = best so far
+
+Comparison of all approaches:
+  Unnormalized: 19/53 (35.8%)
+  Normalized 31bp: 20/53 (37.7%)
+  Hybrid: 21/53 (39.6%)
+
+BREAKDOWN:
+  Unemployment: 5/13 -- improved with normalization
+  Securities: 6/14 -- matches well at peak (m8-m14), fails early and late
+  Deposits: 9/13 -- good match from m8 onwards
+  Loans: 1/13 -- persistent 26% underestimation (data vintage)
+
+PLATEAU ASSESSMENT:
+Score has been at 80-82 for 6 consecutive attempts (5-10). The limiting
+factor is data accuracy, specifically the loans response. With current
+FRED data, the bank_loans series appears to show weaker sensitivity to
+interest rate shocks than the original 1992 data.
+
+The qualitative features of the figure are all correct:
+1. Securities drops fast, then recovers (correct shape)
+2. Deposits declines gradually and levels off (correct shape)
+3. Loans barely moves initially, then drops steadily (correct shape)
+4. Unemployment rises gradually after ~8 months (correct shape)
+
+RECOMMENDATION: Accept 82/100 as the achievable score with current data.
+Further iterations would need historical data vintages to improve.

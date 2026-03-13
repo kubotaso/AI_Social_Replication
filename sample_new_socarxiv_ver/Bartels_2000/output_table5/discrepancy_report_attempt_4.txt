@@ -1,0 +1,72 @@
+Discrepancy Report - Attempt 4
+Score: 44/100
+
+IMPROVEMENT FROM ATTEMPT 3:
+- Added VCF0706+VCF0707 union for 1960 and 1976 panels
+- 1976 N improved from 552 to 656 (target 682, 3.8% off - now within 5%)
+- 1960 N improved from 634 to 736 (target 911, still 19.2% off)
+- 1992 N unchanged at 759 (target 760, 0.1% off)
+
+MAJOR ISSUES:
+
+1. Log-likelihood values are ALL wrong (0/10 points):
+   - 1960 current: -313.9 vs -372.7 (diff=58.8) - due to N=736 vs 911
+   - 1960 lagged: -334.2 vs -403.9 (diff=69.7) - same
+   - 1976 current: -335.7 vs -358.2 (diff=22.5) - due to N=656 vs 682
+   - 1976 lagged: -344.9 vs -371.3 (diff=26.4) - same
+   - 1992 current: -393.9 vs -408.2 (diff=14.3) - despite N being close
+   - 1992 lagged: -403.9 vs -416.2 (diff=12.3) - same
+   LL values scale roughly with N, so the 1960 discrepancy is expected.
+   But 1992 has N=759 vs 760 yet LL differs by 14.3 - this suggests a
+   different sample composition, not just sample size.
+
+2. Pseudo-R2 values mostly wrong (2.1/15 points):
+   - Our R2 values are systematically HIGHER than targets for 1960/1976,
+     likely because our smaller samples have more extreme partisans.
+   - 1992: R2=0.22 vs 0.20 (higher by 0.02) - despite nearly identical N.
+
+3. Coefficient accuracy (7/30 points):
+   - 1976 current is close: Strong=1.131 vs 1.087 (0.044), Lean=0.655 vs 0.622 (0.033)
+   - 1992 current is close: Strong=0.999 vs 0.975 (0.024), Lean=0.490 vs 0.472 (0.018)
+   - 1960 coefficients are further off due to different sample composition
+   - IV estimates are most off, especially weak partisan coefficients
+
+4. Standard errors reasonable (12.8/20 points):
+   - Most SEs are within 0.02 of targets
+   - Some 1960 SEs are off due to sample size difference
+
+5. N values (12/15 points):
+   - 1976 and 1992 are within 5% threshold
+   - 1960 at 19.2% off loses all points for that panel
+
+ROOT CAUSE ANALYSIS:
+
+The fundamental problem is that the ANES Cumulative Data File (CDF) has fewer
+panel respondents for 1960 than Bartels had access to. Bartels used 911 panel
+respondents for 1960, but the CDF only yields 736 with the vote union approach
+(VCF0707 + VCF0706).
+
+For 1992, despite N being nearly exact (759 vs 760), the LL difference of 14.3
+suggests our sample has slightly different composition. This could be due to:
+- Different handling of independent/third-party leaners
+- Different coding of the House vote variable
+- Bartels may have had access to additional variables not in the CDF
+
+WHAT TO TRY NEXT:
+
+1. For 1960: Try using the original 1958-60 panel study data directly through
+   the anesr R package, which might have more respondents than the CDF.
+
+2. For 1992: The LL difference despite matching N suggests our PID or vote
+   coding differs slightly. Check if:
+   a. The 1990 PID (lagged) needs different coding
+   b. The House vote includes contested races only
+   c. There's a different way to construct the PID dummies
+
+3. For all panels: Consider whether Bartels used a different PID variable
+   (e.g., pre-election vs post-election PID measure).
+
+4. Consider whether the IV estimation approach needs refinement - the
+   current approach predicts current PID dummies from lagged PID dummies
+   via OLS, then uses fitted values in a probit. Bartels may have used
+   a different first-stage specification.

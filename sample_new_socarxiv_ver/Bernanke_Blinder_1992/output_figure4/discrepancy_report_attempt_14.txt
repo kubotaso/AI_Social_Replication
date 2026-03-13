@@ -1,0 +1,28 @@
+Discrepancy Report -- Figure 4, Attempt 14
+==========================================
+
+Score: 90/100 (same as attempt 13)
+
+APPROACH: Fine-grained search over every month from 1978:06 to 1980:12 as sample
+endpoint, combined with unemployment source (dep vs loan) and normalization choices.
+
+RESULT: 1979:12 confirmed as optimal endpoint.
+  32/53 matches (u=7/13, s=9/14, d=9/13, l=7/13)
+
+KEY FINDINGS:
+- 1979:11 with loan unemp: 31/53 (u=8, s=7, d=9, l=7) -- more unemp matches
+- 1979:12 with loan unemp: 32/53 (u=7, s=9, d=9, l=7) -- more sec matches
+- 1980:01+: Total matches start to decline due to Volcker shock effects
+- The Nov-Dec 1979 transition flips 1 unemp match for 2 sec matches
+
+LIMITATION:
+To reach 95, need data_pts=20 which requires avg_acc=0.80.
+Current avg_acc = (0.54 + 0.64 + 0.69 + 0.54)/4 = 0.60.
+Gap is 0.20 of accuracy, requiring ~10 more matches.
+
+The persistent misses are:
+- Unemployment m4-m12: response builds too fast (data vintage)
+- Securities m1-m4: initial drop too steep (data vintage)
+- Loans m12-m24: magnitude too small (data vintage: ~16-32% below paper)
+
+These are almost certainly due to data revisions since 1992.

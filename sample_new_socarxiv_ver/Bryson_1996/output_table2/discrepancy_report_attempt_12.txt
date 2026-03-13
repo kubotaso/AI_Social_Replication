@@ -1,0 +1,18 @@
+Discrepancy Report: Attempt 12
+Score: 85.2/100 (below best of 88.3)
+
+APPROACH:
+- Old 5-item racism scale, person-mean imputation, min 4 of 5
+- Hispanic = all ethnic Hispanic (any race) - includes race==3 Hispanics
+- Other race = race==3 NOT ethnic Hispanic
+- fund==1 Conservative Protestant
+
+RESULT: Hispanic becomes wrongly significant in M1 (p=0.035, *) because
+including the 27 Hispanic+race==3 respondents in the Hispanic dummy inflates
+the coefficient from -0.063 to -0.079, pushing it past significance threshold.
+
+CONFIRMED: Non-overlapping coding (Hispanic = ethnic Hispanic AND race!=3)
+from attempt 8 is the correct approach.
+
+Score: 85.2 vs 88.3 (attempt 8 best)
+Main losses: M1 Hispanic sig wrong, M1 Racism coeff further off

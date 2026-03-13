@@ -1,0 +1,43 @@
+Table 1: Party Identification and Presidential Votes, 1952-1996
+================================================================
+
+Method: Probit regression, estimated separately for each presidential election year.
+Sample: Major-party presidential voters only (voted Democrat or Republican).
+        Minor party voters (Wallace 1968, Anderson 1980, Perot 1992/1996) and
+        nonvoters are EXCLUDED.
+
+Dependent Variable: Presidential vote
+  Coded 1 = Republican, 0 = Democrat
+
+Independent Variables (all constrained equal for Democrats and Republicans):
+  "Strong" party attachment: +1 for "strong" Republicans, -1 for "strong" Democrats, 0 for all others
+  "Weak" party attachment: +1 for "weak" Republicans, -1 for "weak" Democrats, 0 for all others
+  "Leaning" attachment: +1 for Republican "leaners," -1 for Democratic "leaners," 0 for all others
+  Intercept: captures pro-Republican (positive) or anti-Republican (negative) bias
+             among "pure" independents
+
+Note: The coding uses both parts of the NES 7-point party ID scale (VCF0301):
+  1 = Strong Democrat -> Strong=-1, Weak=0, Leaning=0
+  2 = Weak Democrat -> Strong=0, Weak=-1, Leaning=0
+  3 = Independent-Democrat -> Strong=0, Weak=0, Leaning=-1
+  4 = Independent-Independent -> Strong=0, Weak=0, Leaning=0 (reference)
+  5 = Independent-Republican -> Strong=0, Weak=0, Leaning=+1
+  6 = Weak Republican -> Strong=0, Weak=+1, Leaning=0
+  7 = Strong Republican -> Strong=0, Weak=0, Leaning=0; Strong=+1
+
+GROUND TRUTH VALUES:
+
+Year  | N    | Strong  (SE)   | Weak    (SE)   | Leaners (SE)   | Intercept(SE)  | LogLik  | Pseudo-R2
+------|------|----------------|----------------|----------------|----------------|---------|----------
+1952  | 1181 | 1.600  (0.096) | 0.928  (0.077) | 0.902  (0.106) | 0.633  (0.057) | -490.1  | 0.39
+1956  | 1266 | 1.713  (0.097) | 0.941  (0.075) | 1.017  (0.118) | 0.644  (0.055) | -489.8  | 0.43
+1960  | 885  | 1.650  (0.114) | 0.822  (0.079) | 1.189  (0.153) | 0.208  (0.057) | -345.9  | 0.44
+1964  | 1111 | 1.470  (0.094) | 0.548  (0.067) | 0.981  (0.122) | -0.339 (0.048) | -448.9  | 0.36
+1968  | 911  | 1.770  (0.121) | 0.881  (0.080) | 0.935  (0.120) | 0.442  (0.059) | -363.9  | 0.42
+1972  | 1587 | 1.221  (0.079) | 0.603  (0.058) | 0.727  (0.078) | 0.589  (0.040) | -789.0  | 0.24
+1976  | 1322 | 1.565  (0.102) | 0.745  (0.062) | 0.877  (0.088) | 0.122  (0.042) | -604.3  | 0.34
+1980  | 877  | 1.602  (0.113) | 0.929  (0.086) | 0.699  (0.107) | 0.487  (0.058) | -376.3  | 0.37
+1984  | 1376 | 1.596  (0.092) | 0.975  (0.072) | 1.174  (0.096) | 0.451  (0.048) | -514.1  | 0.45
+1988  | 1195 | 1.770  (0.107) | 0.771  (0.073) | 1.095  (0.094) | 0.162  (0.048) | -440.3  | 0.47
+1992  | 1357 | 1.851  (0.109) | 0.912  (0.072) | 1.215  (0.092) | -0.113 (0.047) | -443.4  | 0.52
+1996  | 1034 | 1.946  (0.129) | 1.022  (0.083) | 0.942  (0.101) | -0.233 (0.056) | -327.3  | 0.54

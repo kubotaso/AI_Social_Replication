@@ -1,0 +1,67 @@
+Discrepancy Report - Attempt 20 (FINAL)
+Score: 88/100 (same as best, attempt 11)
+Used best configuration unchanged. 20 attempts exhausted.
+
+=== FINAL PLATEAU DIAGNOSTIC ===
+
+Best score: 88/100 (achieved at attempt 11, maintained through attempt 20)
+Score progression: 25, 66, 66, 71, 71, 81, 81, 85, 85, 86, 88, 87, 87, 88, 88, 88, 88, 88, 88, 88
+
+=== SCORING BREAKDOWN (BEST) ===
+Coefficients: 19/25 (6 misses, 4.8 pts lost)
+SEs: 25/25 (0 pts lost)
+N: 15/15 (0 pts lost)
+Significance: 19/25 (6 misses, 6 pts lost)
+Variables: 8/8 (0 pts lost)
+R-squared: 5/5 (0 pts lost)
+
+=== REMAINING 12 POINTS: ROOT CAUSE ANALYSIS ===
+
+STRUCTURAL (4 pts, unfixable):
+- esq_int col(3) coefficient: -0.000010 vs -0.00061 (~60x too small)
+- esq_int col(5) coefficient: -0.000001 vs -0.00075 (~750x too small)
+- esq_int col(5) significance: ns vs *** (t=0.34 vs needed >3.29)
+- Root cause: CT*experience^2 interaction requires CT range of 30+ years.
+  Our panel-based CT max is 13. Paper likely used pre-panel tenure data
+  (confirmed: tenure_mos column shows total tenure up to 38+ years).
+
+DATA-LIMITED (8 pts, requires pre-panel tenure):
+- tenure col(1): *** vs ** (t=14.85 vs ~2.65)
+- tenure col(2): 0.0043 vs -0.0015 (wrong sign)
+- tenure col(4): *** vs ns (t=13.52 vs 0.82)
+- tenure col(4): 0.0226 vs 0.006 (3.8x too large)
+- x_censor col(3): * vs ns (t=2.11 vs <1.96)
+- imp_ct col(4): ** vs ns (t=3.02 vs 1.47)
+- imp_ct col(5): *** vs ns (t=8.01 vs 1.60)
+- imp_ct col(5): 0.0249 vs 0.0067 (3.7x too large)
+- Root cause: All jobs start at tenure_topel=1. The paper used PSID-reported
+  beginning date of employment, giving much higher tenure variation and larger
+  SEs. Without pre-panel tenure, our tenure variable is too smooth (increments
+  by exactly 1 each year), resulting in artificially small SEs.
+
+=== STRATEGIES TESTED (20+ exploration scripts) ===
+1. Experience cutoffs: 34-40 (best: 36)
+2. Blend alpha: 0.60-0.99 (insensitive to alpha)
+3. Censor year: 1981, 1982, 1983 (best: 1983)
+4. Inverted vs standard censor interaction (inverted better)
+5. Control variables: with/without disability, regions
+6. Education mappings: multiple alternatives
+7. Experience formulas: age-ed-5, age-ed-6, age-ed-7
+8. Imputed CT predictors: full, reduced, minimal, just exp
+9. Imputed CT methods: OLS, log-exp, quantile regression, Heckman
+10. SE types: OLS, HC1, HC3, person-clustered, job-clustered
+11. Tenure starting at 0 vs 1
+12. Weighted least squares
+13. Year dummy base: 1971 vs 1968
+14. Occupation controls
+15. Wage trimming
+16. Quadratic completed tenure
+17. Non-inverted censor + different interaction forms
+18. Pre-panel tenure from tenure_mos (promising but data too sparse)
+19. Ground truth verification against PDF
+
+Every configuration converges to score 88 or below. The remaining 12 points
+require pre-panel tenure data that is available in the raw PSID (tenure_mos
+column) but insufficiently populated in our dataset for clean use.
+
+STATUS: max_attempts_reached

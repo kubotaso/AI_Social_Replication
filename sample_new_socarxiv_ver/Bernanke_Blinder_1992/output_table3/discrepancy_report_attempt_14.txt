@@ -1,0 +1,26 @@
+Discrepancy Report - Attempt 14
+Score: 86.0/100 (no change from attempts 11-13)
+
+Exhaustive CPBILL construction search found no improvement.
+Tested: 4 overlap periods x 5 deltas, ratio splice, offset splice,
+25 scale factors, hybrid splice, 2 shift values, T-bill 3m mixing.
+All yield 85.3-86.0. The ceiling is 86.0 with 41/45 sig, 28/45 val.
+
+The 4 significance mismatches are completely invariant to CPBILL construction:
+1. Personal income / TERM: 0.048-0.050 (**) vs 0.37 (ns)
+2. Retail sales / M2: 0.019-0.020 (**) vs 0.16 (ns)
+3. Consumption / CPBILL: 0.071-0.074 (*) vs 0.021 (**)
+4. Durable goods / CPBILL: 0.529 (ns) vs 0.021 (**)
+
+Diagnosis:
+- #1 and #2 are data vintage issues (TERM and M2 have stronger predictive
+  power in modern data than in 1992 data)
+- #3 is marginal (both are "significant" at 10%, just at different levels)
+- #4 is a data limitation (only 96 obs)
+
+These are fundamentally unfixable with available FRED data. The DRI database
+used by BB1992 is no longer available, and the FRED data vintages differ
+significantly from the 1992 vintages for M2, personal income, retail sales,
+and consumption.
+
+Score has plateaued at 86 for 4 consecutive attempts (11-14).

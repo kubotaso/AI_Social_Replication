@@ -1,0 +1,63 @@
+Instruction Summary: Table 2 Variable Mapping and Construction
+
+DATASET: gss1993_clean.csv
+
+DEPENDENT VARIABLES:
+
+DV1: Dislike of 6 minority-associated genres
+- Count of ratings >= 4 (dislike or dislike very much) across: rap, reggae, blues, jazz, gospel, latin
+- These 6 genres are "disproportionately liked by Hispanic or Black respondents"
+- Range: 0-6
+
+DV2: Dislike of 12 remaining genres
+- Count of ratings >= 4 across: musicals, oldies, classicl, bigband, newage, opera, blugrass, folk, moodeasy, conrock, hvymetal, country
+- Range: 0-12
+
+For both DVs: listwise deletion on the respective genre subset (require all 6 or all 12 to be valid 1-5)
+
+INDEPENDENT VARIABLES:
+
+1. Racism score: Sum of 5 dichotomous racism items, all coded in racist direction
+   Items (from paper):
+   (1) racmost: "object to school where more than half children are Black" → racist if value == 1
+   (2) busing: "oppose busing" → racist if value == 2
+   (3) racdif1: "differences NOT due to discrimination" → racist if value == 2
+   (4) racdif2: "NOT because lack education chance" → racist if value == 2
+   (5) racdif3: "because lack motivation/will power" → racist if value == 1
+   Range: 0-5, paper reports mean=2.65, SD=1.56, alpha=.54
+   NOTE: If scale stats don't match well, try alternative items or coding adjustments
+
+2. Education (educ): Years of schooling
+
+3. Household income per capita: realinc / hompop
+
+4. Occupational prestige (prestg80)
+
+5. Female: sex == 2 → 1, else 0
+
+6. Age (age)
+
+7. Black: race == 2 → 1, else 0
+
+8. Hispanic: ethnic in (17, 22, 25) → 1, else 0
+
+9. Other race: race == 3 → 1, else 0
+
+10. Conservative Protestant: fund == 1 → 1, else 0
+
+11. No religion: relig == 4 → 1, else 0
+
+12. Southern: region == 3 → 1, else 0
+
+STATISTICAL METHOD:
+- OLS with STANDARDIZED coefficients
+- Two separate regressions with same predictors but different DVs
+- Constant is UNSTANDARDIZED
+- Report: standardized betas, significance, R², Adj R², N
+
+MISSING DATA:
+- Listwise deletion within each model
+- DV requires all relevant genre ratings valid
+- Racism scale requires all 5 items valid
+- Paper: Model 1 N=644, Model 2 N=605
+  (Different N because different genre subsets may have different missing patterns)

@@ -1,0 +1,37 @@
+Discrepancy Report: Attempt 7
+Score: 81.2/100
+
+APPROACH:
+- Correct 5-item racism scale: racmost, busing, racdif1, racdif3(flipped=2), racdif4
+- This scale gives alpha=0.54 matching the paper exactly
+- racdif2 was removed (confirmed by factor analysis match)
+- NAs treated as 0, require 3+ of 5 items valid
+- N=660/619 (paper: 644/605) - about 2.5% too high
+
+MODEL 1 RESULTS:
+- Racism: 0.150*** (paper: 0.130**) - close but slightly too high and sig too strong
+- Education: -0.192*** (paper: -0.175***) - off by 0.017
+- Age: 0.167*** (paper: 0.163***) - excellent
+- Female: -0.059 (paper: -0.057) - excellent
+- Conservative Protestant: 0.059 (paper: 0.063) - excellent
+- No religion: 0.056 (paper: 0.057) - excellent
+- R2: 0.154 (paper: 0.145) - slightly high
+
+MODEL 2 RESULTS:
+- Racism: 0.031 (paper: 0.080) - still too low
+- Black: 0.113** (paper: 0.042) - way too high and significant vs non-significant
+- R2: 0.144 (paper: 0.147) - very close
+- Adj R2: 0.127 (paper: 0.130) - close
+
+KEY FINDING: The correct racism scale (alpha=0.54) uses racmost+busing+racdif1+racdif3(flipped)+racdif4.
+This was confirmed by matching the paper's reported alpha exactly.
+
+PERSISTENT ISSUES:
+1. Model 2 racism coefficient consistently near 0 (paper shows 0.080)
+2. Model 2 Black coefficient consistently too high (~0.1 vs paper's 0.042)
+3. These two issues may be related: racism should absorb some Black variance,
+   but in our data racism doesn't predict DV2 well
+
+NEXT STEPS:
+- Try the racdif4 scale with 4+ items (lower N but maybe better coefficients)
+- Try combined approach: best N matching from original scale + corrected racism items

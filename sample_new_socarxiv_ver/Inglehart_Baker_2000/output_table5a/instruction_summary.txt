@@ -1,0 +1,28 @@
+Variable Mapping for Table 5a
+
+DV: Traditional/Secular-Rational factor score from Table 1 (nation-level).
+
+IVs:
+1. Real GDP per capita, 1980 (in $1,000s U.S.): World Bank NY.GDP.PCAP.PP.KD, year ~1980, divide by 1000.
+2. % employed in industrial sector, 1980: World Bank SL.IND.EMPL.ZS, year ~1980.
+3. % enrolled in education: World Bank enrollment rates (SE.PRM.ENRR + SE.SEC.ENRR + SE.TER.ENRR), year ~1980. May be combined or use total.
+4. % employed in service sector, 1980: World Bank SL.SRV.EMPL.ZS, year ~1980.
+5. Ex-Communist dummy (=1): See Table 4 zone assignments.
+6. Historically Catholic dummy (=1): France, Belgium, Italy, Spain, Portugal, Austria, Ireland, Poland, Croatia, Slovenia, Hungary, Czech Republic, Slovakia, Latin American countries, Philippines.
+7. Historically Confucian dummy (=1): Japan, South Korea, Taiwan, China.
+
+MODEL SPECIFICATIONS:
+- Model 1: GDP + Industrial
+- Model 2: GDP + Industrial + Education enrollment + Service sector + Education (N=46 due to missing education data)
+- Model 3: GDP + Industrial + Ex-Communist
+- Model 4: GDP + Industrial + Catholic
+- Model 5: GDP + Industrial + Confucian
+- Model 6: GDP + Industrial + Ex-Communist + Catholic + Confucian
+
+PROCEDURE:
+1. Compute factor scores, merge with World Bank data.
+2. Run OLS for each model specification.
+3. Report unstandardized coefficients, standard errors, Adjusted R².
+4. Use .venv/bin/python with statsmodels OLS.
+
+NOTE: These are UNSTANDARDIZED coefficients (not standardized like Table 4).

@@ -1,0 +1,22 @@
+Discrepancy Report - Attempt 4
+Score: 83/100
+
+IMPROVEMENTS:
+- Boundary control points refined
+- Communist boundary shape improved
+
+REMAINING ISSUES:
+1. Protestant boundary still too circular/wide. In original it's narrow and tall.
+   Need to make it narrower in x direction (about 1.0-1.2 wide instead of 1.8).
+2. Catholic boundary shape still not matching the original's narrow diagonal strip.
+3. Data positions unchanged - same Procrustes alignment.
+
+FIX PLAN FOR ATTEMPT 5:
+- Draw boundaries using convex hull / offset around paper positions of zone countries
+- Protestant zone countries from paper: SWE, NOR, DNK, DEW, FIN, CHE, NLD, ISL,
+  GBR, CAN, NZL, AUS, NIR, IRL, USA (NOT N.Ireland/Ireland in Fig3 - they're outside)
+  Actually looking at the paper, the Protestant boundary DOES include N.Ireland, Ireland,
+  USA - they're at the bottom of the Protestant zone.
+- Make Protestant boundary narrower (x range ~0.6 to 2.3)
+- Make Catholic boundary a narrower strip
+- Adjust Confucian sub-boundary within Communist zone

@@ -1,0 +1,43 @@
+Discrepancy Report - Attempt 8
+Score: 43/100
+
+WORSE than attempt 5 (65). Dropping successor state employment data brought N to 47
+(close to paper's 49) but worsened all GDP coefficients.
+
+KEY PROBLEMS:
+1. GDP coefficients are systematically TOO HIGH:
+   - All 16 GDP coefficients (8 zones x 2 DVs) are inflated
+   - Average GDP coeff: 0.53 vs paper average: 0.39
+   - With fewer countries (47 vs 62), GDP becomes even more dominant
+   - Root cause: the GDP data scale/source may be WRONG
+
+2. Service employment coefficients are TOO LOW:
+   - Average srv coeff: 0.10 vs paper average: 0.28
+   - This is because GDP is absorbing variance that should go to service employment
+
+3. Zone coefficients mixed:
+   - Some improved (Orthodox trad matches perfectly: 0.151 vs 0.152)
+   - Others worsened (Confucian trad: 0.222 vs 0.397)
+
+CRITICAL INSIGHT FROM PAPER RE-READ:
+The paper says (Figure 2 note): "GNP per capita is based on the World Bank's
+Purchasing Power Parity estimates as of 1995, in U.S. dollars (World Bank 1997:214-15)."
+
+Table 4 labels the variable "Real GDP per capita, 1980" but the paper may actually be
+using 1995 GNP PPP from the World Bank, NOT 1980 GDP from PWT. Evidence:
+- WB has NY.GNP.PCAP.PP.CD for 1995 (59 countries with data)
+- WB has NO 1980 GNP PPP data at all
+- The 1995 values ($1,230 - $31,520) match the economic zones in Figure 2
+  ($2,000, $5,000, $15,000 boundaries)
+- PWT 1980 values ($882 - $15,295 in 1985 intl $) are a different scale
+- WB employment data is also available for 1995 (all 61 countries)
+
+NEXT STRATEGY (Attempt 9):
+1. Use 1995 GNP per capita PPP (current intl $) from WB instead of 1980 PWT RGDPCH
+2. Use 1995 employment data from WB instead of 1991
+3. Keep all countries with complete data (expect ~49-55)
+4. This should:
+   - Provide the correct GDP scale and values
+   - Better match the paper's actual data source
+   - Naturally produce N closer to 49 (some countries may lack 1995 GNP data)
+   - Reduce the GDP dominance problem

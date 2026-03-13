@@ -1,0 +1,103 @@
+Discrepancy Report - Table 2, Attempt 17
+Score: 83.9/100 (same as attempt 16, no improvement)
+
+SCORE BREAKDOWN:
+- Items present: 20.0/20 (all 24)
+- Value accuracy: 28.3/40 (12 close, 10 moderate)
+- Dimension: 20.0/20
+- Ordering: 8.5/10
+- Sample: 7.0/10 (slightly lower, 7.1 was attempt 16 due to rounding)
+TOTAL: 83.9/100
+
+DIAGNOSIS: Attempt 17 was essentially a copy of attempt 16 with minor additions
+(checking G007_01 in wave 3 and all-waves). The G007_01 stricter limits variable
+was NOT present in wave 3 data (only wave 2 has it), confirming it's intractable.
+
+REMAINING FAR ISSUES (deeply problematic):
+1. Stricter limits G007_01: 0.21 vs 0.63 (FAR, only 14 countries in wave 2)
+   - G007_01 NOT in wave 3 - confirmed intractable with available data
+   - This item contributes 0 points to value accuracy (should contribute 1.67 pts)
+2. Own preferences E143: 0.23 vs 0.56 (FAR)
+   - E143 is not the correct variable for this concept
+
+MODERATE ITEMS (diff 0.05-0.09) - 10 items, need to improve any to CLOSE:
+- Believes in Heaven: 0.83 vs 0.88 (diff=0.05) - try wave 2 only
+- Make parents proud: 0.86 vs 0.81 (diff=0.05) - try pct1 instead of pct12
+- Comfort from religion: 0.77 vs 0.72 (diff=0.05) - try wave 2 only
+- Work very important: 0.70 vs 0.65 (diff=0.05) - try mean (not pct), or wave 2
+- Suicide: 0.69 vs 0.61 (diff=0.08) - try different computation
+- Seldom discusses politics: 0.49 vs 0.57 (diff=0.08) - try pct4 (seldom only)
+- Left-right mean: 0.49 vs 0.57 (diff=0.08) - try pct right (>5), or wave 2
+- Love/respect parents: 0.58 vs 0.49 (diff=0.09) - currently wave 2 gives 0.58
+- Environmental problems: 0.47 vs 0.56 (diff=0.09) - try B008 or different cutoffs
+- Ideal children mean: 0.32 vs 0.41 (diff=0.09) - try different cap thresholds
+
+PLAN FOR ATTEMPT 18 - Deep Exploration:
+The key insight is that we need to either:
+A) Move some MODERATE items to CLOSE (each converts 1.67 pts -> 3.33 pts)
+B) Find the correct variable for "own preferences" (currently FAR at 0.23)
+C) Increase sample score by using all-waves data without sacrificing accuracy
+
+SPECIFIC STRATEGIES FOR ATTEMPT 18:
+
+1. SUICIDE: Currently 0.69 (wave 3 inv mean). Paper says 0.61.
+   - The paper uses ALL waves 1990-98 (latest survey per country).
+   - Try: Use "latest per country" from combined waves 2+3 for suicide.
+   - Since wave 2 gives -0.01 and wave 3 gives 0.69, the "latest per country"
+     should select wave 3 for countries with wave 3, wave 2 for others.
+   - This was done via `df` (latest per country) in earlier attempts, giving 0.46.
+   - Alternative: try mean of all years (not latest) to get a broader sample.
+
+2. WORK VERY IMPORTANT: 0.70 vs 0.65 (diff=0.05)
+   - A005: 1-4 scale. Currently pct1 (very important).
+   - Alternatively, try the INVERSE MEAN: since 1=very important, 4=not important,
+     inverting gives: high value = work very important.
+   - inv_mean = 5 - mean(A005). If most people say "very important" (value=1),
+     inv_mean = 5-1 = 4. This should correlate positively.
+   - Also try wave 2 only for work.
+
+3. ENVIRONMENTAL PROBLEMS: 0.47 vs 0.56 (diff=0.09)
+   - B009: "can be solved without international agreements"
+   - Try B008 if available (different env question)
+   - Also try pct1+pct2 combined ("strongly agree"+"agree")
+   - Also try computing via a standardized approach (z-score based)
+
+4. MAKE PARENTS PROUD: 0.86 vs 0.81 (diff=0.05)
+   - D054: Scale 1=very important, 4=not at all important
+   - Currently pct <=2 (pct1+pct2), gives 0.86
+   - Try: mean alone (higher mean = less important -> invert for traditional values)
+     Or: inv mean = 5 - mean. Or: pct1 only.
+   - The paper likely uses the % responding "important" or "very important".
+   - If pct <=2 gives 0.86 but paper has 0.81, maybe the question is different.
+
+5. IDEAL CHILDREN: 0.32 vs 0.41 (diff=0.09)
+   - D017 = ideal number of children. Currently mean with cap at 20.
+   - Try: cap at 8 (very high value suggests traditional societies)
+   - Also try median instead of mean for outlier robustness.
+
+6. SELDOM POLITICS / LEFT-RIGHT: Both 0.49 vs 0.57 (diff=0.08)
+   - E023: 1=Very interested...4=Not at all. Currently pct3+4.
+   - Try: pct4 only ("not at all"), or wave 2, or mean
+   - E033: 1-10 left-right. Currently mean. Try pct6+, or wave 2 only.
+
+7. LOVE/RESPECT PARENTS: 0.58 vs 0.49 (diff=0.09)
+   - A025: 1=must always love, 2=depends on behavior. Currently wave 2 (N=17), 0.58.
+   - Wave 2 gives 0.58 - OVERSHOOTS by 0.09.
+   - Try: wave 3 only, or combine wave 2+3 (might average to ~0.54-0.55)
+   - Or: try the question differently (use mean instead of pct1)
+
+8. BELIEVES IN HEAVEN: 0.83 vs 0.88 (diff=0.05)
+   - F054: binary (1=yes, 2=no). Currently pct1 over all waves.
+   - Try wave 2 only (different country mix might push higher).
+
+9. COMFORT FROM RELIGION: 0.77 vs 0.72 (diff=0.05)
+   - F050: binary. Currently all waves gives 0.77.
+   - Try: use wave 2 only - if sample changes, correlation might be lower.
+   - In EVS data this is coded differently.
+
+ESTIMATED MAXIMUM ACHIEVABLE SCORE:
+- Current: 83.9/100
+- If 2 MODERATE items become CLOSE: +3.33 pts -> ~87
+- If Stricter limits fixed: +2.50 pts -> ~89 (intractable)
+- If own preferences fixed: +2.50 pts -> ~91 (intractable)
+- Theoretical ceiling: ~89-90 given data constraints

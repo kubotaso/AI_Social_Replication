@@ -1,0 +1,63 @@
+Discrepancy Report - Attempt 1
+Score: 91.5/100
+
+SUMMARY:
+Most years replicate exactly or nearly exactly. Three years have notable discrepancies:
+1974, 1992, and 1996.
+
+DETAILED DISCREPANCIES:
+
+1. YEAR 1974: N mismatch (gen=739, paper=798, diff=7.4%)
+   - 59 voters have missing VCF0902 in the 2019 CDF vintage
+   - Bartels used an earlier data vintage (~1995) that apparently had more complete incumbency data for 1974
+   - This N difference cascades into coefficient and LL differences:
+     - Strong: gen=1.235 vs true=1.138 (diff=0.097)
+     - Const: gen=-0.090 vs true=-0.168 (diff=0.078)
+     - LL: gen=-321.0 vs true=-355.2 (diff=34.2)
+   - FIX: This is a data vintage issue. Cannot be fully resolved without the original data file.
+     Possible mitigation: try including all non-null VCF0902 values (not just valid codes).
+
+2. YEAR 1992: N mismatch (gen=1326, paper=1370, diff=3.2%)
+   - 44 cases have VCF0902=85, which was excluded by our valid_inc_codes filter
+   - VCF0902 code 85 likely represents an open seat category in the 1992 redistricting year
+   - Including code 85 as open seat (incumbency=0) should bring N to 1370
+   - FIX: Include VCF0902 codes 80-89 as open seat (incumbency=0) or use all non-null VCF0902
+
+3. YEAR 1996: Coefficient differences
+   - Strong: gen=1.560 vs true=1.503 (diff=0.057)
+   - Weak: gen=0.800 vs true=0.865 (diff=0.065)
+   - Leaner: gen=0.801 vs true=0.874 (diff=0.073)
+   - Inc: gen=0.715 vs true=0.742 (diff=0.027)
+   - N matches perfectly (1031)
+   - LL: gen=-380.2 vs true=-373.4 (diff=6.8)
+   - R2: gen=0.47 vs true=0.48
+   - Despite matching N, coefficients differ. This suggests a coding difference in
+     VCF0301 or VCF0902 for 1996 between data vintages.
+   - FIX: Investigate VCF0902 coding for 1996 more carefully. Try alternative incumbency mappings.
+
+4. YEAR 1982: Minor discrepancies
+   - LL: gen=-267.5 vs true=-265.7 (diff=1.8) - slightly outside 1.0 threshold
+   - Weak: gen=0.772 vs true=0.786 (diff=0.014, within 0.05)
+   - N matches (712). Small differences likely due to data vintage.
+
+5. YEAR 1976: Minor discrepancies
+   - N: gen=1076 vs true=1079 (diff=0.3%, within 5%)
+   - LL: gen=-478.9 vs true=-482.0 (diff=3.1)
+   - Despite N being close, LL differs by 3.1
+
+SCORING BREAKDOWN:
+- Coefficients within 0.05: 60/65 = 27.7/30
+  Lost points: 1974 strong, 1974 const, 1996 strong, 1996 weak, 1996 leaner
+- SEs within 0.02: 65/65 = 20.0/20 (all pass)
+- N within 5%: 12/13 = 13.8/15 (1974 fails at 7.4%)
+- Variables present: 10/10
+- LL within 1.0: 8/13 = 6.2/10 (1974, 1976, 1982, 1992, 1996 fail)
+- R2 within 0.02: 12/13 = 13.8/15 (1974 fails)
+
+STRATEGY FOR ATTEMPT 2:
+1. Include all non-null VCF0902 values, not just the standard codes.
+   For any VCF0902 code not in dem_inc or rep_inc lists, treat as open seat (0).
+   This should fix 1992 (adding code 85 as open seat).
+2. For 1974, try including respondents even with null VCF0902, treating them as open seats.
+   This is speculative but could recover the missing 59 cases.
+3. Re-examine 1996 coding carefully.

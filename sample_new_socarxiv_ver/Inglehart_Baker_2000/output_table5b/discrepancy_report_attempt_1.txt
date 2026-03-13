@@ -1,0 +1,46 @@
+Discrepancy Report - Attempt 1
+Score: 42/100
+
+MAJOR ISSUES:
+
+1. TOO MANY COUNTRIES (N=58 vs expected 49)
+   - Need to identify and restrict to the exact 49 countries used in the paper
+   - Countries like ALB, MLT, MNE, SLV, TWN have no WB data and get dropped
+   - Even after dropping those, N=58 is too high
+   - Need to check which countries were in the WVS waves 2-3 that the paper used
+   - Some countries may need to be excluded: NIR (part of GBR?), DEU (West Germany?)
+
+2. GDP SCALING PROBLEM
+   - Our GDP is in constant 2017 international $ (range ~2K to 64K)
+   - Paper uses "Real GDP per capita, 1980 (in $1,000s U.S.)" (range roughly 1-25K in 1980 $)
+   - Coefficient of 0.049 vs expected 0.090 - our GDP values are ~3-4x too high
+   - Need to rescale GDP to approximate 1980 US$ values (divide by ~3-4?)
+   - Or accept that coefficients will differ and focus on getting the R² and sig right
+
+3. SERVICE SECTOR SQUARED SCALING
+   - Our service_sq = (service_pct)^2 / 100
+   - Paper coefficient 0.042 for service_sq vs our 0.065
+   - Need to check if paper uses (service_pct/10)^2 or some other scaling
+   - The standard error of 0.015 matches, suggesting we're close on this
+
+4. EDUCATION DATA NEARLY ABSENT
+   - Only 10 countries have education data → Model 2 is broken
+   - Need to find/construct education data for more countries
+   - Paper has N=46 for Model 2, so 3 countries lack education data
+   - Could try using combined enrollment (primary+secondary+tertiary) or GER
+
+5. EX-COMMUNIST COEFFICIENT TOO LARGE
+   - Getting -1.517 vs expected -0.920 (Model 3)
+   - This may be because we have more ex-communist countries or the factor scores are scaled differently
+   - Factor score scale affects all coefficients
+
+6. PROTESTANT COEFFICIENT TOO LARGE
+   - Getting 0.966 vs expected 0.672 (Model 3)
+   - May need to adjust which countries are classified as "Historically Protestant"
+
+FIXES FOR NEXT ATTEMPT:
+1. Restrict to ~49 countries matching the paper's sample
+2. Rescale GDP to better approximate 1980 values
+3. Find or construct education enrollment data
+4. Review Protestant country list
+5. Check factor score computation and scaling

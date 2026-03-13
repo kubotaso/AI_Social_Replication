@@ -1,0 +1,28 @@
+Variable mapping:
+
+Causal variables (X):
+- U (unemployment rate) → unemp_male_2554 / 100 (convert to decimal)
+- INFL (inflation rate) → Compute as change in log CPI: diff(log_cpi), which gives monthly inflation rate in decimal form
+
+Indicator variables (Z):
+- FFBOND → ffbond (= funds_rate - treasury_10y, already in dataset)
+- DRBOND → Need discount rate. If not available, this is the spread between discount rate and long-term bond rate. May need to approximate or find the discount rate series.
+  FRED series for discount rate: INTDSRUSM193N or similar. If unavailable, try to omit or approximate.
+- Annualized real growth rate of nonborrowed reserves → 12 * diff(log_nonborrowed_reserves_real)
+  (annualized monthly growth rate of real nonborrowed reserves)
+
+Model: MIMIC model estimated by maximum likelihood
+- y* = Xc + u (measurement equation linking latent variable to causes)
+- Z = y*b' + v (structural equation linking indicators to latent variable)
+- Normalization: set loading of FFBOND = 1
+- No constant (variables as deviations from means)
+- Can be estimated using statsmodels or scipy optimization
+
+Sample: 1959-08-01 to 1979-09-01
+
+IMPORTANT NOTE: The discount rate may need to be downloaded separately from FRED.
+Try FRED series: INTDSRUSM193N (Discount Rate for United States) or MDISCRT.
+
+Alternative approach: Since the MIMIC model is complex, an OLS regression of FFBOND on lagged U and INFL can approximate the reaction function coefficients (since FFBOND loading is normalized to 1, its projection gives similar results).
+
+Dataset: bb1992_data.csv

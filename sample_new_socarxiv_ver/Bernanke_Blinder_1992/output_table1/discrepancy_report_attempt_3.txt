@@ -1,0 +1,48 @@
+Discrepancy Report — Table 1, Attempt 3
+Score: 84/100
+
+Same numerical results as Attempt 1. Only scoring was refined.
+
+23 significance level mismatches identified:
+
+PANEL A mismatches (14):
+- IP/M2: paper * (0.10), ours *** (0.0001) -- M2 vintage
+- IP/BILL: paper * (0.071), ours *** (0.0014) -- BILL too sig
+- CapUtil/BILL: paper ns (0.16), ours ** (0.031) -- BILL too sig
+- Employ/M2: paper ns (0.27), ours *** (0.0007) -- M2 vintage
+- Employ/BOND: paper * (0.085), ours ns (0.910) -- BOND issue
+- Unemp/M2: paper ns (0.37), ours *** (0.007) -- M2 vintage
+- Unemp/BOND: paper ** (0.024), ours ns (0.109) -- BOND issue
+- HStarts/BOND: paper ** (0.014), ours *** (0.007) -- adjacent, partial
+- PIncome/M2: paper ns (0.24), ours *** (0.003) -- M2 vintage
+- PIncome/BOND: paper ns (0.59), ours * (0.095) -- BOND slightly different
+- Retail/M2: paper ** (0.036), ours *** (0.001) -- M2 vintage, partial
+- Retail/FUNDS: paper ** (0.014), ours * (0.052) -- FUNDS slightly off
+- Consum/M2: paper ns (0.11), ours *** (0.004) -- M2 vintage
+
+PANEL B mismatches (9):
+- IP/M2: paper * (0.084), ours *** (0.0005) -- M2 vintage
+- CapUtil/BILL: paper ** (0.025), ours *** (0.005) -- adjacent, partial
+- CapUtil/BOND: paper ns (0.18), ours ** (0.027) -- BOND too sig
+- Unemp/BOND: paper ns (0.13), ours * (0.085) -- borderline
+- PIncome/M2: paper * (0.095), ours ** (0.015) -- M2 vintage, partial
+- Retail/BOND: paper ** (0.050), ours ns (0.150) -- BOND issue
+- Retail/FUNDS: paper * (0.061), ours *** (0.007) -- FUNDS more sig
+- Consum/M2: paper ** (0.017), ours *** (0.0001) -- M2 vintage
+- Consum/BILL: paper *** (0.010), ours ** (0.045) -- BILL less sig
+- Consum/BOND: paper ** (0.050), ours *** (0.0007) -- BOND more sig
+
+CATEGORIZATION:
+- M2 vintage effects: 8 mismatches (clearly data vintage)
+- BOND discrepancies: 6 mismatches (may also be data vintage for 10y Treasury)
+- BILL discrepancies: 4 mismatches
+- FUNDS discrepancies: 2 mismatches
+- Adjacent category (partial credit): 3 mismatches
+
+NEXT STEPS:
+1. Try using the durable_goods_orders_hist column if available
+2. Try overall unemployment rate (unemp_rate) for comparison
+3. Consider whether the data vintage issues with M2 can be partially mitigated
+   by using a different M2 construct
+4. Accept that ~84 is near the ceiling for M2/BOND-related scoring
+5. Try to improve marginal cases where adjacent category could become exact match

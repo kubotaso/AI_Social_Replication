@@ -1,0 +1,34 @@
+Discrepancy Report - Attempt 8 (Score: 72.2/100)
+
+No improvement over attempt 7 (72.3). Tried several changes:
+1. F028 <=4 threshold (minor improvement to church attendance 0.74->0.76 but same score)
+2. Bartlett regression factor scores: gave 71.3, slightly worse
+3. B008 instead of B009 for environmental: MUCH worse (0.08 vs 0.47) - B009 is correct
+4. E143 for own preferences: wrong sign (-0.05) - cannot use
+5. G007_01 inverted/pct: wrong sign - original coding was better
+
+Key findings:
+- B009 (not B008) is the environmental variable that maps to paper's item
+- E143 does NOT correspond to "own preferences vs understanding"
+- The factor scoring method doesn't matter much (Z*Lambda, Bartlett similar)
+- The 7 FAR items are structural: the factor is inherently religion-heavy
+
+REMAINING 7 FAR ITEMS (unchanged):
+1. Euthanasia: 0.79 vs 0.66 (too high)
+2. Stricter limits: 0.21 vs 0.63 (only 14 countries, unreliable)
+3. Suicide: 0.47 vs 0.61 (too low)
+4. Divorce: 0.41 vs 0.57 (too low)
+5. Woman earns more: 0.79 vs 0.53 (too high)
+6. Love/respect parents: 0.68 vs 0.49 (too high)
+7. Favorable army rule: 0.21 vs 0.43 (too low)
+
+PLAN FOR ATTEMPT 9:
+The FAR items split into two groups:
+- TOO HIGH (euthanasia, woman, love/respect): correlated with religion factor
+- TOO LOW (suicide, divorce, army, stricter limits): not captured by factor
+
+Strategy: Try MIXED factor score approach:
+1. Compute 5-item first PC from just the traditional items (not all 10)
+2. This should give a "purer" traditional dimension less dominated by God importance
+3. The 5-item PC should better capture secular-social attitudes (divorce, suicide)
+4. Alternative: try iterated principal axis factoring instead of PCA

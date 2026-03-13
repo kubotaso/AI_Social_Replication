@@ -1,0 +1,132 @@
+Factor score calibration: paper = 0.5373 * ours + -0.0892
+================================================================================
+Table 5b: Regression of Survival/Self-Expression Values
+================================================================================
+
+N=49
+GDP: 48, Service: 49, Education: 9
+Surv/SelfExp: mean=0.174 std=0.911 min=-1.609 max=2.054
+GDP range: 0.6 to 21.3
+
+  SWE: surv=2.054 gdp=13.5
+  NOR: surv=1.466 gdp=19.0
+  USA: surv=1.150 gdp=14.8
+  JPN: surv=0.435 gdp=11.8
+  RUS: surv=-1.609 gdp=9.9
+  NGA: surv=-0.914 gdp=1.8
+  IND: surv=-0.373 gdp=0.7
+  BGR: surv=-1.156 gdp=5.0
+
+Model 1 (N=48):
+  Adj R² = 0.61
+  gdp_pc                   :    0.070**   (0.024)
+  service_sq               :    0.030**   (0.009)
+
+Model 2 (N=8):
+  Adj R² = 0.60
+  gdp_pc                   :    0.142     (0.090)
+  service_sq               :   -0.013     (0.036)
+  service_pct              :    0.001     (0.027)
+  education                :    0.010     (0.009)
+
+Model 3 (N=48):
+  Adj R² = 0.79
+  gdp_pc                   :    0.052*    (0.020)
+  service_sq               :    0.008     (0.008)
+  ex_communist             :   -0.713***  (0.172)
+  hist_protestant          :    0.820***  (0.197)
+
+Model 4 (N=48):
+  Adj R² = 0.71
+  gdp_pc                   :    0.089***  (0.021)
+  service_sq               :    0.013     (0.009)
+  ex_communist             :   -0.816***  (0.199)
+
+Model 5 (N=48):
+  Adj R² = 0.71
+  gdp_pc                   :    0.030     (0.023)
+  service_sq               :    0.022**   (0.008)
+  hist_protestant          :    0.939***  (0.228)
+
+Model 6 (N=48):
+  Adj R² = 0.85
+  gdp_pc                   :    0.067***  (0.014)
+  ex_communist             :   -0.431**   (0.151)
+  hist_protestant          :    0.824***  (0.163)
+  hist_orthodox            :   -0.994***  (0.221)
+
+================================================================================
+SCORING: 67/100
+================================================================================
+  Model 1 gdp_pc: 0.070 vs 0.090 MATCH
+  Model 1 service_sq: 0.030 vs 0.042 MATCH
+  Model 1 gdp_pc SE: 0.024 vs 0.043 MATCH
+  Model 1 service_sq SE: 0.009 vs 0.015 MATCH
+  Model 1 N: 48 vs 49 MATCH
+  Model 1 gdp_pc sig: '**' vs '*' MISS
+  Model 1 service_sq sig: '**' vs '**' MATCH
+  Model 1 R²: 0.61 vs 0.63 MATCH
+  Model 2 gdp_pc: 0.142 vs 0.095 MATCH
+  Model 2 service_sq: -0.013 vs 0.011 MATCH
+  Model 2 service_pct: 0.001 vs -0.054 PARTIAL
+  Model 2 education: 0.010 vs -0.005 MATCH
+  Model 2 gdp_pc SE: 0.090 vs 0.046 PARTIAL
+  Model 2 service_sq SE: 0.036 vs 0.000 PARTIAL
+  Model 2 service_pct SE: 0.027 vs 0.039 MATCH
+  Model 2 education SE: 0.009 vs 0.012 MATCH
+  Model 2 N: 8 vs 46 MISS
+  Model 2 gdp_pc sig: '' vs '*' MISS
+  Model 2 service_sq sig: '' vs '*' MISS
+  Model 2 service_pct sig: '' vs '' MATCH
+  Model 2 education sig: '' vs '' MATCH
+  Model 2 R²: 0.60 vs 0.63 PARTIAL
+  Model 3 gdp_pc: 0.052 vs 0.056 MATCH
+  Model 3 service_sq: 0.008 vs 0.035 MATCH
+  Model 3 ex_communist: -0.713 vs -0.920 MISS
+  Model 3 hist_protestant: 0.820 vs 0.672 PARTIAL
+  Model 3 gdp_pc SE: 0.020 vs 0.043 PARTIAL
+  Model 3 service_sq SE: 0.008 vs 0.015 MATCH
+  Model 3 ex_communist SE: 0.172 vs 0.204 PARTIAL
+  Model 3 hist_protestant SE: 0.197 vs 0.279 MISS
+  Model 3 N: 48 vs 49 MATCH
+  Model 3 gdp_pc sig: '*' vs '' MISS
+  Model 3 service_sq sig: '' vs '*' MISS
+  Model 3 ex_communist sig: '***' vs '***' MATCH
+  Model 3 hist_protestant sig: '***' vs '*' MISS
+  Model 3 R²: 0.79 vs 0.66 MISS
+  Model 4 gdp_pc: 0.089 vs 0.120 MATCH
+  Model 4 service_sq: 0.013 vs 0.019 MATCH
+  Model 4 ex_communist: -0.816 vs -0.883 PARTIAL
+  Model 4 gdp_pc SE: 0.021 vs 0.037 MATCH
+  Model 4 service_sq SE: 0.009 vs 0.014 MATCH
+  Model 4 ex_communist SE: 0.199 vs 0.197 MATCH
+  Model 4 N: 48 vs 49 MATCH
+  Model 4 gdp_pc sig: '***' vs '**' MISS
+  Model 4 service_sq sig: '' vs '' MATCH
+  Model 4 ex_communist sig: '***' vs '***' MATCH
+  Model 4 R²: 0.71 vs 0.74 PARTIAL
+  Model 5 gdp_pc: 0.030 vs 0.098 PARTIAL
+  Model 5 service_sq: 0.022 vs 0.018 MATCH
+  Model 5 hist_protestant: 0.939 vs 0.509 MISS
+  Model 5 gdp_pc SE: 0.023 vs 0.037 MATCH
+  Model 5 service_sq SE: 0.008 vs 0.013 MATCH
+  Model 5 hist_protestant SE: 0.228 vs 0.237 MATCH
+  Model 5 N: 48 vs 49 MATCH
+  Model 5 gdp_pc sig: '' vs '**' MISS
+  Model 5 service_sq sig: '**' vs '' MISS
+  Model 5 hist_protestant sig: '***' vs '*' MISS
+  Model 5 R²: 0.71 vs 0.76 PARTIAL
+  Model 6 gdp_pc: 0.067 vs 0.144 PARTIAL
+  Model 6 ex_communist: -0.431 vs -0.411 MATCH
+  Model 6 hist_protestant: 0.824 vs 0.415 MISS
+  Model 6 hist_orthodox: -0.994 vs -1.182 MISS
+  Model 6 gdp_pc SE: 0.014 vs 0.017 MATCH
+  Model 6 ex_communist SE: 0.151 vs 0.188 PARTIAL
+  Model 6 hist_protestant SE: 0.163 vs 0.175 MATCH
+  Model 6 hist_orthodox SE: 0.221 vs 0.240 MATCH
+  Model 6 N: 48 vs 49 MATCH
+  Model 6 gdp_pc sig: '***' vs '***' MATCH
+  Model 6 ex_communist sig: '**' vs '*' MISS
+  Model 6 hist_protestant sig: '***' vs '**' MISS
+  Model 6 hist_orthodox sig: '***' vs '***' MATCH
+  Model 6 R²: 0.85 vs 0.84 MATCH

@@ -1,0 +1,49 @@
+Discrepancy Report - Attempt 7
+
+Score: 71/100
+Close matches: 22/58 (position error < 0.3)
+Average position error: 0.467
+
+KEY ISSUES:
+
+1. Missing EVS 1981 data:
+   - Paper shows "81" starting positions for many Western European countries (Sweden, Norway,
+     France, Belgium, Italy, Netherlands, Ireland, N.Ireland, Iceland, Canada, etc.)
+   - We only have EVS 1990 data, so initial positions are from 1990, not 1981
+   - This accounts for ~6 missing countries (only EVS 1990, no WVS wave 3)
+   - Also explains large init errors for countries like Sweden (paper: 81, ours: 90)
+
+2. Countries with largest errors:
+   - West Germany init: 1.26 (paper position ~(-0.3, 0.6), ours ~(0.93, 0.88))
+     - WVS wave 3 DEU data is unified Germany, inflating secular-rational score
+   - U.S.A init: 1.11 (paper position ~(0.6, -1.0), ours ~(1.61, -0.55))
+     - Paper has "81" start, we have "90" start; USA was more survival-oriented in 1981
+   - China: 0.99 init error - paper has Chinese 1990 at (-1.0, 1.8), we get (-0.19, 1.23)
+     - Significant discrepancy in x-axis position for China
+   - Spain init: 1.10 - paper "Spain 81", we have "Spain 90"
+   - Sweden init: 0.84 - paper "Sweden 81", we have "Sweden 90"
+   - Hungary init: 0.92 - paper "Hungary 81", we have "Hungary 82" (close year)
+
+3. Final positions are generally better (avg ~0.37 error) vs initial positions (avg ~0.56)
+   - This confirms the initial position errors are largely due to different starting years
+
+4. Scale and direction are correct - the affine calibration using 20 anchor points works well
+
+5. 32 arrows vs paper's 38 - missing ~6 countries:
+   - France (only EVS 1990, no WVS wave 3)
+   - Belgium (only EVS 1990)
+   - Italy (only EVS 1990)
+   - Netherlands (only EVS 1990)
+   - Ireland (only EVS 1990)
+   - N. Ireland (only EVS 1990)
+   - Iceland (only EVS 1990)
+   - Canada (only EVS 1990)
+   - East Germany (can't separate from unified DEU in wave 3)
+
+FIXES FOR NEXT ATTEMPT:
+1. Try to include more anchor points in calibration, specifically for initial positions
+2. Try using a 2D affine transformation (rotation + scale + translation) instead of
+   separate x/y linear transforms
+3. Improve label positioning to reduce overlap
+4. Better handle the Germany case
+5. Consider showing single-point countries as dots (not arrows) to get more data on the plot

@@ -1,0 +1,150 @@
+INSTRUCTION SUMMARY: Table 1 — Variable Mapping and Construction
+================================================================
+
+DATA SOURCE: IPUMS CPS Displaced Workers Survey
+FILE: data/cps_dws.csv
+CODEBOOK: data/cps_dws_codebook.txt
+
+================================================================
+SAMPLE SELECTION
+================================================================
+
+1. SEX == 1 (Male)
+2. AGE >= 20 AND AGE <= 60
+3. DWREAS in [1, 2, 3] — Economic reasons for displacement:
+   1 = Plant or company closed down or moved
+   2 = Insufficient work
+   3 = Position or shift abolished
+   (Paper says "layoffs or plant closings" — includes all economic reasons)
+4. EMPSTAT in [10, 12] — Currently employed
+   10 = At work
+   12 = Has job, not at work last week
+5. Valid earnings data for Row 1 (log wage change):
+   DWWEEKL > 0 AND DWWEEKL < 9000 (prior job weekly earnings, valid)
+   DWWEEKC > 0 AND DWWEEKC < 9000 (current job weekly earnings, valid)
+   Values of 9999.98/9999.99 = NIU/missing, negative values = invalid
+6. Valid DWYEARS for tenure bins: DWYEARS < 99 (99.99 = NIU)
+7. Valid DWWKSUN for Row 3: DWWKSUN < 999 (999 = NIU)
+
+Target sample size: 4,367 men (paper)
+Note: Exact N may not match because the IPUMS extract may differ from
+the original CPS supplement files used by Topel. The paper combines
+January 1984 and January 1986 supplements.
+
+================================================================
+VARIABLE MAPPING
+================================================================
+
+Paper Variable          -> Dataset Column    -> Construction
+-------------------------------------------------------------------------
+Prior job seniority     -> DWYEARS           -> Continuous years on lost job
+                                               Binned: 0-5, 6-10, 11-20, 21+
+                                               99.99 = NIU (exclude)
+
+Weekly earnings (prior) -> DWWEEKL           -> Nominal weekly earnings on lost job
+                                               Values > 0 and < 9000 are valid
+                                               Negative values and 9999.98 = invalid/NIU
+
+Weekly earnings (current)-> DWWEEKC          -> Nominal weekly earnings on current job
+                                                Values > 0 and < 9000 are valid
+                                                9999.99 = NIU
+
+Log wage change         -> computed          -> log(DWWEEKC_deflated) - log(DWWEEKL_deflated)
+                                               MUST deflate both to same base year using
+                                               GNP price deflator for consumption expenditure
+
+Reason for displacement -> DWREAS            -> 1 = Plant closing (used for Row 2 pct)
+                                               2 = Insufficient work (layoff)
+                                               3 = Position abolished (layoff)
+                                               For Row 2: plant_closing = (DWREAS == 1)
+
+Weeks unemployed        -> DWWKSUN           -> Weeks without work since displacement
+                                               999 = NIU (exclude for Row 3)
+
+Survey year             -> YEAR              -> 1984 or 1986
+
+Supplement weight       -> DWSUPPWT          -> Use for weighted means/SEs
+
+Age                     -> AGE               -> Integer age
+
+Sex                     -> SEX               -> 1 = Male, 2 = Female
+
+Employment status       -> EMPSTAT           -> 10 = At work, 12 = Has job
+                                               20+ = not employed
+
+Years since displacement-> DWLASTWRK         -> 0 = this year, 1 = last year, etc.
+                                               Used to determine when displacement occurred
+                                               (needed for deflator year calculation)
+
+================================================================
+DEFLATION PROCEDURE
+================================================================
+
+The paper says "Nominal data deflated by GNP price deflator for consumption
+expenditure." Both prior and current earnings must be expressed in the same
+real terms.
+
+The prior job earnings (DWWEEKL) are from the year the worker was displaced.
+The current earnings (DWWEEKC) are from the survey date (January 1984 or 1986).
+
+To compute real wage change:
+  displacement_year = YEAR - DWLASTWRK
+  log_real_change = log(DWWEEKC / deflator[YEAR]) - log(DWWEEKL / deflator[displacement_year])
+                  = log(DWWEEKC/DWWEEKL) + log(deflator[displacement_year] / deflator[YEAR])
+
+GNP Price Deflator for Personal Consumption Expenditure (base year 1982=100):
+  1978: 72.2
+  1979: 78.6
+  1980: 85.7
+  1981: 94.0
+  1982: 100.0
+  1983: 103.9
+  1984: 107.7
+  1985: 110.9
+  1986: 113.8
+
+These are approximate values from the BEA NIPA tables. The exact values used
+by Topel may differ slightly. The key is that inflation was high in 1979-1982,
+making the deflation adjustment significant for workers displaced several years
+before the survey.
+
+================================================================
+ROW-BY-ROW COMPUTATION
+================================================================
+
+Row 1: Average change in log weekly wage
+  - Compute log(real_current_weekly) - log(real_prior_weekly)
+  - Requires valid DWWEEKL and DWWEEKC
+  - Report mean and SE = std / sqrt(N) by seniority bin
+  - Use DWSUPPWT for weighted statistics
+
+Row 2: Percentage displaced by plant closing
+  - plant_closing = (DWREAS == 1)
+  - Report proportion and SE = sqrt(p*(1-p)/N) by seniority bin
+  - Use DWSUPPWT for weighted statistics
+
+Row 3: Weeks unemployed since displacement
+  - Use DWWKSUN (weeks without work)
+  - Report mean and SE = std / sqrt(N) by seniority bin
+  - Use DWSUPPWT for weighted statistics
+
+Seniority bins based on DWYEARS:
+  0-5:   DWYEARS >= 0 AND DWYEARS <= 5
+  6-10:  DWYEARS >= 6 AND DWYEARS <= 10
+  11-20: DWYEARS >= 11 AND DWYEARS <= 20
+  21+:   DWYEARS >= 21
+
+Total: all valid observations
+
+================================================================
+NOTES
+================================================================
+
+- The paper pools January 1984 and January 1986 DWS supplements
+- Standard errors are SEs of the mean: SE = s / sqrt(n)
+- Use DWSUPPWT for weighted means; if weighted SEs don't match,
+  try unweighted as the paper may not use weights for this table
+- The exact sample size of 4,367 may be difficult to match exactly
+  due to differences between original CPS supplement files and IPUMS coding
+- Log wage change should be negative (wage loss upon displacement)
+  and should be more negative for higher-seniority workers

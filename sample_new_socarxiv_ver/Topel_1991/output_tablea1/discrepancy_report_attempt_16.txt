@@ -1,0 +1,45 @@
+Discrepancy Report - Attempt 16
+Score: 78/100
+Strategy: Attempt 7 base + 1970 data with backward tenure extrapolation
+
+KEY FINDINGS:
+1. N = 13,769 (paper: 13,128) - within 5% (4.9%), barely passes N threshold
+2. Unique persons = 2,367 (paper: 1,540) - 54% too many persons
+3. Missing 1968 and 1969 years entirely
+4. Year distribution still heavily skewed toward 1973-1975
+
+REMAINING DISCREPANCIES:
+1. Experience mean: 19.616 vs 20.021 (miss by 0.405)
+2. Experience SD: 11.912 vs 11.045 (miss by 0.867)
+3. Tenure mean: 9.672 vs 9.978 (miss by 0.306)
+4. Tenure SD: 8.500 vs 8.944 (miss by 0.444)
+5. Education mean: 12.487 vs 12.645 (within tolerance)
+6. Married mean: 0.904 vs 0.925 (miss by 0.021)
+7. Married SD: 0.294 vs 0.263 (miss by 0.031)
+8. SMSA: 0.000 vs 0.644 (unfixable - restricted geographic data)
+9. Year distribution: 1973 at 8.4% vs 5.8%, 1974 at 9.5% vs 6.0%, 1975 at 8.4% vs 6.1%
+
+ANALYSIS:
+- Adding only 1970 kept N within 5% (13,769 vs 13,128 = 4.9%)
+- But the year distribution is still badly skewed - too many obs in 1973-1975 relative to paper
+- The person count (2,367) is much higher than paper's 1,540 - suggesting the paper uses a more restrictive panel selection
+- The paper says "1,540 persons" which is far fewer than our 2,367 unique persons
+- This suggests a BALANCED PANEL or stronger continuity requirement
+
+WHAT TO TRY NEXT (attempt 17):
+1. The paper reports N=13,128 with only 1,540 persons over 16 years (1968-1983)
+   - Average obs per person = 13,128/1,540 = 8.5 years per person
+   - Our average = 13,769/2,367 = 5.8 years per person
+   - The paper's persons appear much more frequently, suggesting a balanced/continuous panel requirement
+2. Try requiring persons to appear in at least 5 consecutive years to reduce unique persons
+3. Try adding 1968-1969 data AND requiring minimum appearances (which would keep N in range while reducing persons)
+4. The year distribution skew (1973-1975 over-represented) suggests the panel has too many short-tenure entrants in those years
+5. Consider: require persons to have at least 2 consecutive wage observations (already done?)
+   or require persons to appear in the panel for at least N years
+
+SCORING NOTES:
+- Categories: 18.8/20 (all 8 vars present, 14/16 years present, missing 1968 and 1969)
+- Values: 19.2/40 (23/48 values within tolerance)
+- Ordering: 10/10
+- N: 20/20 (within 5%)
+- Structure: 10/10

@@ -1,0 +1,45 @@
+Discrepancy Report - Attempt 2
+Score: 58/100 (improved from 49)
+
+IMPROVEMENTS:
+- God importance now loads on traditional dimension (0.70 nation) but still lower than paper (0.91)
+- Autonomy index constructed as composite but loading (0.69) still lower than paper (0.89)
+- Survival dimension items improved
+- Individual N improved from 89K to 140K
+
+REMAINING ISSUES:
+
+1. God importance variable mixing issue
+   - For EVS data: F063 in the EVS file is NOT the God importance variable (IRL F063 mean = 2.31)
+   - For EVS data: A006 IS the God importance 1-10 scale (IRL A006 mean = 7.93)
+   - For WVS data: F063 IS the God importance 1-10 scale (NGA F063 mean = 9.66)
+   - For WVS data: A006 is a 1-4 scale (something else)
+   - My code used F063 first, which grabs the wrong value for EVS countries
+   - FIX: Tag data source (EVS vs WVS) during loading. Use A006 for EVS rows, F063 for WVS rows.
+   - Alternative: Check if row has A006 > 4 → use A006; else use F063
+
+2. god_important loading still too low (0.70 vs 0.91)
+   - Partly due to the F063/A006 mixing issue above
+   - Fixing the variable should bring the loading up significantly
+
+3. autonomy_idx loading (0.69 vs 0.89)
+   - The composite index (-2 to +2) might need different treatment
+   - Consider whether the paper standardized it differently
+
+4. Individual-level N (140K vs 165K)
+   - Still missing ~25K respondents
+   - Paper may use additional data not in our dataset
+   - Or we're dropping too many rows via missing data handling
+
+5. Variance explained still off
+   - Nation dim1: 35.3% vs paper 44%
+   - Will likely improve with correct god_important
+
+6. Ordering wrong in all 4 checks
+   - E018 > G006 in trad (should be G006 > E018)
+   - Need to ensure loadings match paper ordering
+
+FIXES FOR ATTEMPT 3:
+1. Fix god_important: Use A006 for EVS, F063 for WVS. Identify source by checking A006 range.
+2. Verify autonomy_idx construction matches paper
+3. Investigate N discrepancy

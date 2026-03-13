@@ -1,0 +1,68 @@
+Discrepancy Report - Attempt 4
+Score: 95.4/100
+
+APPROACH:
+Two key improvements over previous attempts:
+1. Used major-party voters only (VCF0706 in {1,2}) instead of all voters (VCF0706 in {1,2,3,4}).
+   This excludes third-party voters (Wallace 1968, Anderson 1980, Perot 1992/1996) who have
+   systematically lower partisan identification, diluting the voter proportion.
+2. Used VCF0305 in {3,4} as the identifier definition instead of VCF0301 in {1,2,6,7}.
+   VCF0305 captures party strength including for respondents coded as "apolitical" who
+   may be NA in VCF0301 but have valid VCF0305 values.
+3. Denominator: VCF0305 not NA (includes apoliticals in denominator as non-identifiers).
+
+VOTER VALUES COMPARISON:
+Year  Generated  Ground_truth  Difference  Status
+1952  0.7691     0.77          0.001       MATCH (<=0.02)
+1956  0.7571     0.75          0.007       MATCH (<=0.02)
+1960  0.7925     0.79          0.003       MATCH (<=0.02)
+1964  0.8020     0.80          0.002       MATCH (<=0.02)
+1968  0.7431     0.75          0.007       MATCH (<=0.02)
+1972  0.6974     0.70          0.003       MATCH (<=0.02)
+1976  0.6752     0.68          0.005       MATCH (<=0.02)
+1980  0.7081     0.71          0.002       MATCH (<=0.02)
+1984  0.6910     0.71          0.019       MATCH (<=0.02)
+1988  0.6991     0.70          0.001       MATCH (<=0.02)
+1992  0.6903     0.70          0.010       MATCH (<=0.02)
+1996  0.7512     0.75          0.001       MATCH (<=0.02)
+
+All 12 voter values now match within 0.02 tolerance!
+
+NONVOTER VALUES COMPARISON:
+Year  Generated  Ground_truth  Difference  Status
+1952  0.6707     0.68          0.009       MATCH (<=0.02)
+1956  0.6484     0.66          0.012       MATCH (<=0.02)
+1960  0.6474     0.64          0.007       MATCH (<=0.02)
+1964  0.6761     0.64          0.036       PARTIAL (0.02-0.04)
+1968  0.6106     0.63          0.019       MATCH (<=0.02)
+1972  0.5455     0.55          0.005       MATCH (<=0.02)
+1976  0.5430     0.56          0.017       MATCH (<=0.02)
+1980  0.5281     0.57          0.042       PARTIAL (0.04-0.06)
+1984  0.5234     0.56          0.037       PARTIAL (0.02-0.04)
+1988  0.5028     0.54          0.037       PARTIAL (0.02-0.04)
+1992  0.4757     0.51          0.034       PARTIAL (0.02-0.04)
+1996  0.5364     0.53          0.006       MATCH (<=0.02)
+
+7 of 12 nonvoter values match within 0.02; 4 partial within 0.04; 1 partial within 0.06.
+
+REMAINING DISCREPANCIES:
+1. 1964 nonvoters: 0.676 vs 0.64 (diff 0.036)
+   - This may be a ground truth reading imprecision issue; the 1964 nonvoter dot
+     in the original could be slightly higher than 0.64.
+2. 1980-1992 nonvoters: systematically 0.03-0.04 lower than paper
+   - Likely a data vintage issue between 2019 CDF and Bartels' earlier version.
+   - The direction is consistent: our values are always lower.
+
+VISUAL ASSESSMENT:
+- Plot type: Correct (line plot with two series) -- 15/15
+- Axes: Y 0.0-1.0 with 0.1 increments, X showing 1956-1996 at 8-year intervals -- 15/15
+- Visual elements: Filled circles/solid line for voters, open circles/dashed line
+  for nonvoters, legend in lower-left with proper styling -- 15/15
+- Layout: Appropriate aspect ratio, font sizes, tick marks on all sides -- 15/15
+
+CONCLUSION:
+Score of 95.4 exceeds the 95 threshold. The replication is essentially correct.
+The key methodological finding was that "voters" in Bartels' Figure 2 refers to
+major-party (Democrat/Republican) voters only, excluding third-party voters.
+This dramatically improved the fit for years with significant third-party candidates
+(1968 Wallace, 1980 Anderson, 1992/1996 Perot).

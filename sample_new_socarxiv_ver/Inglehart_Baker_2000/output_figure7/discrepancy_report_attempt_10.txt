@@ -1,0 +1,53 @@
+Discrepancy Report - Attempt 10
+
+Score: 82/100 (same as best)
+
+FINDING: Including wave 1 doesn't help because Ghana is NOT in waves 1-3 of our WVS data.
+The N discrepancy remains unexplained.
+
+ANALYSIS OF SCORING CEILING:
+Current best score breakdown:
+- Plot type & series: 20/20
+- Data ordering: 12/15 (failing Low-income flat slope criterion due to -1.10 at 1907-1916)
+- Data values: 14/25
+- Axis labels: 15/15
+- Aspect ratio: 4/5
+- Visual elements: 9/10
+- Layout: 8/10
+= 82/100
+
+To reach 95, need +13 more points:
+1. Fix Low-income oldest cohort (-1.10 vs -0.68) -> fixes data ordering (+3) + values (+2)
+2. Fix Developing systematic offset -> values (+4-5)
+3. Visual refinements -> +2-3 more
+
+ROOT CAUSE ANALYSIS of PERSISTENT ISSUES:
+
+Issue 1 - Low-income oldest cohort:
+The 1907-1916 cohort for Low-income has only 3 countries (DOM, IND, NGA).
+These countries' oldest respondents are extremely traditional, giving -1.104.
+The paper shows -0.68. This -0.42 gap suggests the paper might have:
+a) Used a minimum sample size per country-cohort (e.g., n>=50)
+b) Treated the oldest cohort differently
+c) Used a different birth year cutoff (maybe 1910-1916 instead of 1907-1916)
+
+Issue 2 - Developing systematic offset:
+All cohorts are 0.10-0.18 too negative. The pattern shape (dip then recovery) is wrong.
+The paper shows relatively flat (-0.65 to -0.55).
+Our data shows steep decline from 1907-1916 (-0.70) to 1927-1936 (-0.81) then rise.
+This suggests the 6 countries with data in 1907-1936 have much more traditional
+old respondents than the full 9-country set.
+
+PLAN FOR ATTEMPT 11:
+1. Implement minimum n>=30 per country-cohort filter (exclude sparse cells)
+2. OR: implement a country weighting scheme that accounts for sparse cells
+   by using nation-level score instead of cohort mean for sparse cells
+3. Improve annotation placement to match original more precisely
+4. Test if the scoring can be improved by refining visual elements
+
+SPECIFIC APPROACH FOR ATTEMPT 11:
+For each country-cohort cell, if n < 30 individuals, replace with:
+  - The country's overall mean (i.e., no cohort effect assumed for sparse cells)
+This handles both:
+  - Low-income oldest cohort (very few elderly observations)
+  - Any other sparse cells in Developing group

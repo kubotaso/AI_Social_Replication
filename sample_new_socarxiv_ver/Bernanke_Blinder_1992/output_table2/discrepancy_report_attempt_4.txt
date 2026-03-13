@@ -1,0 +1,29 @@
+Discrepancy Report - Attempt 4
+================================
+Score: 87/100 (no improvement)
+
+Configuration: ds=1959-01, trend='ct', lags=6
+Result: 52/112 cells within 3pp (same total as trend='c')
+
+The trend='ct' specification changes which cells match but doesn't improve the total.
+With trend='ct':
+- Panel A: Some variables improve (Industrial production Own goes from 34.9 to 44.4),
+  but others worsen
+- Panel B: Similar redistribution without net improvement
+
+Attempts so far:
+1. trend='c' ds=1959-07: 86 (48/112)
+2. trend='c' ds=1959-01: 87 (52/112)
+3. trend='c' ds=1959-01: 87 (52/112) [same as 2]
+4. trend='ct' ds=1959-01: 87 (52/112) [different cells but same total]
+
+The data vintage ceiling is firmly at ~52/112 cells (87/100).
+Verified that statsmodels FEVD computation matches manual calculation exactly.
+The issue is purely data vintage (M1, M2, CPI revisions since 1992).
+
+Next strategies:
+1. Try using the 6-month commercial paper rate instead of treasury_10y for BOND
+   (the paper's DRI code is RMCML6NS for commercial paper rate)
+2. Try using the 6-month T-bill rate for BILL instead of 3-month
+3. Check if using a different employment measure helps
+4. Accept the data vintage ceiling and focus on documenting it

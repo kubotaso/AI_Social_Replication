@@ -1,0 +1,87 @@
+Data Inspection Report - Bernanke and Blinder (1992)
+====================================================
+Date: 2026-03-07
+
+Dataset file: bb1992_data.csv
+Shape: 528 rows x 68 columns
+Date range: 1947-01 to 1990-12 (monthly)
+
+KEY VARIABLE COVERAGE
+=====================
+
+Tables 1-2 (1959:7-1989:12, 366 obs needed):
+  log_industrial_production: 366 obs - FULL
+  log_capacity_utilization: 366 obs - FULL
+  log_employment: 366 obs - FULL
+  unemp_male_2554: 366 obs - FULL
+  log_housing_starts: 366 obs - FULL
+  log_personal_income_real: 366 obs - FULL
+  log_retail_sales_real: 366 obs - FULL
+  log_consumption_real: 366 obs - FULL
+  log_durable_goods_real: MISSING (FRED lacks historical series 1959-1989)
+  log_cpi: 366 obs - FULL
+  log_m1: 366 obs - FULL
+  log_m2: 366 obs - FULL
+  funds_rate: 366 obs - FULL
+  tbill_3m (BILL): 366 obs - FULL
+  treasury_10y (BOND): 366 obs - FULL
+
+Tables 3-4 (1961:7-1989:12, 342 obs needed):
+  All Table 1-2 variables: FULL
+  cpbill_long (CPBILL): 342 obs - FULL (using H0RIFSPPFM06NM - 6m finance paper)
+  term (TERM): 342 obs - FULL
+
+Table 5-6 (1959:8-1979:9):
+  unemp_male_2554: FULL
+  log_cpi: FULL
+  funds_rate: FULL
+  ffbond: FULL
+  nonborrowed_reserves: FULL
+
+Figure 1 (1959-1989):
+  funds_rate: FULL
+  ffbond: FULL
+
+Figure 2 (pre-1979, 3-var VAR):
+  funds_rate: FULL
+  unemp_male_2554: FULL
+  log_cpi: FULL
+
+Figure 4 (1959:1-1978:12, 5-var VAR):
+  funds_rate: FULL
+  unemp_male_2554: FULL
+  log_cpi: FULL
+  log_bank_loans_real: FULL (using FRED LOANS deflated by CPI)
+  log_bank_investments_real: FULL (using FRED INVEST)
+  log_bank_deposits_check_real: FULL (using FRED TCDSL)
+
+KNOWN ISSUES
+============
+
+1. Durable goods orders: No FRED series covers 1959-1989 for manufacturing
+   new orders of durable goods. Historical NBER series M0684CUSM144NNBR ends
+   June 1969. Modern DGORDER starts February 1992. This affects one row
+   (durable-goods orders) in Tables 1 and 2.
+
+2. CPBILL approximation: Using H0RIFSPPFM06NM (6-month finance paper placed
+   directly) instead of DRI's RMCML6NS (prime commercial paper, 6 months).
+   These are closely related but not identical. The finance paper rate was a
+   discount rate, while the DRI series was a dealer offering rate. Small
+   differences in levels but spreads should be similar.
+
+3. Bank balance-sheet data: Using FRED series LOANS (bank loans and leases)
+   and INVEST (investment securities) rather than the paper's original Fed
+   Banking and Monetary Statistics data. The FRED H.8 series begins 1973;
+   the LOANS and INVEST series go back to 1947 but definitions may differ
+   slightly from the paper's "Principal Assets and Liabilities" table.
+
+4. Data vintage: All series are current vintage (as of 2026), while the paper
+   used data available circa 1990-1991. Revisions to industrial production,
+   employment, income, and monetary aggregates may cause point estimates to
+   differ.
+
+5. Retail sales: Using FRED RSALES instead of DRI STR82 (real retail sales
+   in 1982 dollars). We deflate RSALES by CPI to get real values.
+
+ASSESSMENT: Data is sufficient for replication of all 9 targets, with durable
+goods orders as the one gap (affects 1 row in 2 tables). Proceed to Step 2.

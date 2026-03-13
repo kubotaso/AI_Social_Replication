@@ -1,0 +1,46 @@
+Discrepancy Report - Attempt 1 - Score: 54/100
+
+MAJOR ISSUES:
+
+1. GENRE ORDER IS REVERSED
+   - My order goes from Latin/Salsa (most negative coeff, -0.43) to Gospel (least negative, -0.13)
+   - Paper order goes from Latin/Salsa (least negative, -0.13) to Gospel (most negative, -0.48)
+   - The coefficients themselves are INVERTED relative to the paper's values per genre
+   - Latin/Salsa should have coeff ~-0.13 but I get -0.43
+   - Gospel should have coeff ~-0.48 but I get -0.13
+
+2. ROOT CAUSE ANALYSIS:
+   - The tolerance measure may need to be defined differently
+   - Currently: tolerance = count of OTHER 17 genres rated < 4 (not disliked)
+   - This means high tolerance = many genres NOT disliked
+   - Genres that most people dislike (like heavy metal, rap) have low variance in DV
+   - The pattern suggests my tolerance score is correct conceptually but the relationship between genre characteristics and coefficient magnitude is inverted
+
+   HYPOTHESIS: The issue might be that the paper uses an "exclusiveness" score (count of dislikes) rather than a "tolerance" score (count of non-dislikes). If tolerance = number of genres DISLIKED (excluding current), then:
+   - For genres many people dislike (like heavy metal), even people with many dislikes (high exclusiveness) still dislike it, so the coefficient is small
+   - For genres few people dislike (like Latin), having high exclusiveness strongly predicts disliking it
+   - Wait, that's what I already see...
+
+   ALTERNATIVE HYPOTHESIS: The sorting should be ascending (least negative first = closest to 0) which means Latin/Salsa at -0.13 would be first. But my Latin/Salsa is -0.43 which is most negative. The COEFFICIENTS THEMSELVES are mapped to the wrong genres.
+
+   POSSIBLE FIX: The issue might be in how tolerance interacts differently with popular vs unpopular genres. Let me check if using the EXCLUSIVENESS score (count of OTHER genres disliked, i.e., 17 - tolerance) reverses the pattern. Since logistic regression is linear, using exclusiveness = 17 - tolerance would just negate the coefficient sign. So using exclusiveness as IV would give POSITIVE coefficients, and sorting ascending would put Gospel first (smallest positive = least affected by exclusiveness). That doesn't help.
+
+   ACTUAL FIX NEEDED: Re-examine whether the sample restriction is wrong. N=892 vs paper's implied ~912 suggests some respondents are being dropped incorrectly. Also, the mean education values don't match the paper well (my values cluster 12.5-14.1, paper shows 12.2-14.7 - wider spread in paper).
+
+   KEY INSIGHT: Perhaps I should use the FULL sample for mean education of fans (not restricted to those with all 18 genres valid). The instruction says "Use the full sample (or at least those with valid education data), not restricted to the 912 with all genres valid."
+
+3. SAMPLE SIZE
+   - Got N=892, paper implies ~912
+   - May need to not require valid educ for the genre analysis sample (only need educ as IV in regression, can be missing for some?)
+   - Actually, regressions need educ, so all regression respondents need valid educ
+   - The difference might be in how I filter the genre ratings
+
+4. MEAN EDUCATION VALUES
+   - My values cluster more tightly (12.48-14.09) than paper (12.2-14.7)
+   - This suggests different fan samples or different education coding
+
+PLAN FOR ATTEMPT 2:
+- Check if genres rated 0 or with special codes should be treated differently
+- Try NOT requiring educ for the main sample (only for regressions)
+- Investigate why coefficients seem assigned to wrong genres
+- The core issue is that my coefficient ranking perfectly mirrors but inverts the paper's ranking

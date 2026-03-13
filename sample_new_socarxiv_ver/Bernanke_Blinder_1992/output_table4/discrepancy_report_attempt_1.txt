@@ -1,0 +1,20 @@
+Discrepancy Report - Attempt 1
+Score: 0/100
+
+Issue: Runtime error in all VAR estimations.
+Root cause: FEVD decomp array indexing was wrong.
+- Used: fevd.decomp[horizon-1, own_idx, :] (assumed shape (horizon, n_vars, n_vars))
+- Correct: fevd.decomp[own_idx, horizon-1, :] (actual shape is (n_vars, horizon, n_vars))
+
+Quick test with corrected indexing shows IP decomposition:
+  M1=5.2, M2=6.7, CPBILL=7.6, TERM=10.2, FUNDS=3.8, OWN=64.0, CPI=2.5
+Paper values for IP Panel A:
+  M1=13.5, M2=19.6, CPBILL=10.7, TERM=11.3, FUNDS=6.6, OWN=34.3, CPI=4.0
+
+The OWN share (64.0 vs 34.3) is way too high, and M1/M2 shares are too low.
+This suggests the data or specification is different from the paper.
+
+Fixes for next attempt:
+1. Fix the FEVD indexing bug
+2. Investigate whether the sample period or variable transformations are causing the large discrepancies
+3. Consider whether the paper uses levels for some log variables instead of differences

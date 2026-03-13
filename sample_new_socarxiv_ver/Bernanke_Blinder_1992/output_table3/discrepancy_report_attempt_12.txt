@@ -1,0 +1,26 @@
+Discrepancy Report - Attempt 12
+Score: 86.0/100 (no improvement over attempt 11)
+Configuration: Multi-strategy search
+
+All alternative strategies tested perform worse than the baseline:
+- Alternative TERM (10yr-3mo): drops to 76 (6 fewer sig matches)
+- Shorter sample: slightly worse or equal
+- cpbill_long only: drops to 79
+- CP-3mo spread: drops to 80
+
+The 4 persistent significance mismatches remain:
+1. Personal income / TERM: 0.048 vs 0.37 (data vintage)
+2. Retail sales / M2: 0.020 vs 0.16 (M2 revision)
+3. Consumption / CPBILL: 0.074 vs 0.021 (CPBILL splice)
+4. Durable goods / CPBILL: 0.529 vs 0.021 (96 obs)
+
+The value mismatches (17 cells) are all ns-vs-ns where the absolute
+p-values differ due to data vintage but qualitative conclusions match.
+
+New strategies to try:
+1. HAC (Newey-West) standard errors for F-tests
+2. Different lag lengths (try 4 or 8 instead of 6)
+3. Remove CPI from the equation (unlikely, but test)
+4. Use unemp_rate instead of unemp_male_2554
+5. Try smoothing or transforming CPBILL differently
+6. Try constructing M2 from components

@@ -1,0 +1,41 @@
+Discrepancy Report - Attempt 7
+Score: 85.6/100 (F_table1_coefs approach)
+
+Approach used: Full-sample probit (all voters, all races, all regions) with
+region-specific white voter proportions (pure independents in denominator).
+
+Key findings:
+- F_table1_coefs scored 85.6, best so far
+- E_sep_fullpid (separate probits, full-PID proportions): 77.6
+- G_sep_partisan_voters (separate probits, partisan-only props): 80.6
+- H_sep_105b (VCF0105b race variable): 77.6 (identical to E - no difference)
+- I_table1_fullpid (Table 1 probit, all-respondent props): 81.8
+
+VCF0105b vs VCF0105a: Identical results (H=E), suggesting no difference in
+white classification for 1952-1996 presidential voters.
+
+Problem with F_table1_coefs: Two lines are too close together.
+The NS-S gap in original figure is 0.1-0.35 but F gives gaps of <0.10 for most years.
+South 1952: computed 1.23 vs ground truth 0.99 (off by 0.24).
+Non-South systematically too low for 1952-1968 and 1988.
+
+Root cause: Using same probit coefficients for both regions means only proportions
+can drive the gap. Proportion differences are small.
+
+The separate probit approach gives the correct qualitative pattern (NS above S)
+but the quantitative values are noisy, especially for South with ~200 voters/year.
+
+Strategies for attempt 8:
+1. Try separate probits but with White South probit run on slightly larger sample
+   (maybe include border states or relax race criterion slightly)
+2. Try a POOLED probit with region interactions: probit on all white voters, with
+   strong*south, weak*south, lean*south interaction terms, then compute separate
+   averages for each region using the interaction-adjusted coefficients
+3. Re-examine whether the "electorate" in Bartels refers to registered voters,
+   the full ANES sample, or just the voting subsample
+4. Try the separate probit approach but adjust proportions to come from the
+   FULL anes sample (all respondents, not just those with valid VCF0704a)
+5. Also try: FULL-sample probit (Table 1) but with proportions from the
+   full sample of white respondents in each region (including non-voters and
+   those without valid vote data) -- this differs from I which included only
+   PID respondents

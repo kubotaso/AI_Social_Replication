@@ -1,0 +1,47 @@
+Discrepancy Report - Table 3, Attempt 5
+Score: 58/100
+
+MAIN ISSUES:
+
+1. MISSING DATA ITEMS (contribute ~10 points loss):
+   - Opposes economic aid (G008): Variable not in dataset
+   - Has not recycled (B003): Only 13 wave-2 countries, wrong sign (-0.23 vs +0.76)
+   - Prostitution (F125): Only 12 wave-2 countries, wrong sign (-0.11 vs +0.69)
+
+2. EVS COUNTRIES MISSING (~14 countries for most items):
+   - EVS dataset only has factor analysis variables, not the additional items
+   - Missing: AUT, BEL, CAN, CHE, DNK, FRA, GBR, IRL, ISL, ITA, NLD, PRT, NIR
+   - This reduces n from 66 to ~52-53 per item
+   - These are mostly Protestant Europe / English-speaking countries = high self-expression
+   - Missing them removes important extreme data points, reducing correlations
+
+3. SYSTEMATICALLY LOW CORRELATIONS:
+   Most correlations are 0.05-0.20 below paper values. Root causes:
+   a) Missing extreme countries (self-expression end)
+   b) WVS harmonized dataset uses different variable codings than original
+   c) Factor scores may differ from paper's original
+
+4. SPECIFIC ITEM ISSUES:
+   - D022 (Child needs both parents): r=+0.05 vs +0.73. Variable appears constant across countries.
+     The 0/1 coding in WVS integrated may not capture the original question properly.
+   - D058 (University for boy): r=+0.30 vs +0.67. Using (5-mean) gives positive but too low.
+   - E019 (Technology emphasis): r=+0.05 vs +0.78. Almost all respondents (87-96%) choose "more emphasis"
+     leaving almost no cross-country variation.
+   - B002 (Environmental meeting): r=-0.04 vs +0.75. Wrong sign.
+   - E015 (Science helps): r=+0.33 vs +0.60. Using mean gives positive but too low.
+
+5. ITEMS WITH APPROXIMATELY CORRECT VALUES (within 0.10):
+   - Job motivation (+0.72 vs +0.74) CLOSE
+   - Government provision (+0.66 vs +0.68) CLOSE
+   - Hard work (+0.63 vs +0.65) CLOSE
+   - Strong leader (+0.55 vs +0.58) CLOSE
+   - Govt ownership increase (+0.56 vs +0.55) CLOSE
+   - Men better leaders (+0.80 vs +0.86) PARTIAL
+   - Must love parents (+0.79 vs +0.71) PARTIAL
+
+STRATEGY FOR NEXT ATTEMPT:
+1. For items only available in wave 2 (B003, F125), merge wave 2 item data with wave 3 factor scores
+2. For D022, try completely different variable coding or skip
+3. For E019 and B002, try different transformations
+4. For outgroup index, use A124_03 (homosexuals) + A124_06 (immigrants) + A124_07 (AIDS) - all three
+5. Accept that some items cannot be replicated with available data and focus on maximizing partial scores

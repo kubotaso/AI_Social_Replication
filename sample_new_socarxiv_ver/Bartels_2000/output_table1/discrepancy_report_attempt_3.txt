@@ -1,0 +1,15 @@
+Discrepancy Report - Table 1, Attempt 3
+========================================
+Score: 91.6/100
+
+Strategy: Ran probit in R (glm with probit link). Results identical to Python.
+Confirmed the issue is data vintage (2019 CDF vs 1995 CDF), not software.
+
+Also checked: individual year datasets for 1952 and 1960 not available in anesr
+(only from 1968 onward). Source variables (V520237, V600091) not in CDF.
+Cannot recover original party ID coding for the ~3-80 respondents per year that
+have NA in VCF0301 in the 2019 version but had valid values in the 1995 version.
+
+Maximum achievable score with current data: ~91-92
+Bottleneck: Log-likelihood component (3.3/10 points) due to N differences
+causing LL to shift by 1-16 units across years.

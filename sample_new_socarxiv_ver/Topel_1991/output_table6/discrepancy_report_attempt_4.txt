@@ -1,0 +1,16 @@
+DISCREPANCY REPORT - Attempt 4
+Score: 50/100
+
+ISSUES:
+1. Manual 2SLS implementation is computing wrong values
+   - beta_1 is NEGATIVE (-0.036), which is impossible for experience return
+   - First-stage F-stat is negative, indicating numerical issues
+   - The projection matrix approach has a bug
+
+2. Columns 1 and 2 are identical (same spec)
+
+FIXES:
+1. Use linearmodels.iv.IV2SLS for proper 2SLS
+2. Differentiate columns 1 and 2 by using different tenure data in step 1
+3. Since manual 2SLS keeps failing, use the well-tested library implementation
+4. Consider that the adjusted wage formula might need revision

@@ -1,0 +1,104 @@
+TABLE 2: Models of Annual Within-Job Wage Growth, PSID White Males, 1968-83
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983
+Sample: White males
+Dependent variable: Change in log real wage (first difference); Mean = .026
+Number of observations: N = 8,683
+
+Sample restrictions:
+  - White males
+  - Within-job observations (consecutive years on the same job)
+  - First-differenced data (change in log real wage from year t-1 to t)
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: Regression table (OLS on first-differenced data)
+Layout: 3 model columns
+
+The dependent variable is the annual change in log real wage.
+Independent variables are changes in tenure and experience polynomials.
+
+This is the FIRST STEP of Topel's two-step estimator. By first-differencing,
+person fixed effects and job-match effects are eliminated. The coefficients
+estimate (beta_1 + beta_2) for tenure terms (the combined effect of experience
+and tenure within a job) and pure experience effects for the higher-order
+experience terms.
+
+==============================================================================
+GROUND-TRUTH VALUES (standard errors in parentheses)
+==============================================================================
+
+Model (1):
+  Delta Tenure (linear):                    .1242 (.0161)
+  Delta Experience^2 (x10^2):              -.6051 (.1430)
+  Delta Experience^3 (x10^3):               .1460 (.0482)
+  Delta Experience^4 (x10^4):               .0131 (.0054)
+  R^2:                                      .022
+  Standard error of regression:             .218
+
+Model (2):
+  Delta Tenure (linear):                    .1265 (.0162)
+  Delta Tenure^2 (x10^2):                  -.0518 (.0178)
+  Delta Experience^2 (x10^2):              -.6144 (.1430)
+  Delta Experience^3 (x10^3):               .1620 (.0485)
+  Delta Experience^4 (x10^4):               .0151 (.0055)
+  R^2:                                      .023
+  Standard error of regression:             .218
+
+Model (3):
+  Delta Tenure (linear):                    .1258 (.0162)
+  Delta Tenure^2 (x10^2):                  -.4592 (.1080)
+  Delta Tenure^3 (x10^3):                   .1846 (.0526)
+  Delta Tenure^4 (x10^4):                  -.0245 (.0079)
+  Delta Experience^2 (x10^2):              -.4067 (.1546)
+  Delta Experience^3 (x10^3):               .0989 (.0517)
+  Delta Experience^4 (x10^4):               .0089 (.0058)
+  R^2:                                      .025
+  Standard error of regression:             .218
+
+==============================================================================
+BOTTOM PANEL: Predicted Within-Job Wage Growth
+==============================================================================
+
+Predicted within-job wage growth by years of job tenure
+(for workers with 10 years of labor market experience)
+Based on Model (3) estimates
+
+Tenure (years):     1      2      3      4      5      6      7      8      9     10
+Wage growth (%): .068   .060   .052   .046   .041   .037   .033   .030   .028   .026
+
+==============================================================================
+NOTES
+==============================================================================
+
+- All models include year dummies (15 time period indicators for 1969-1983)
+- The coefficients on Delta Tenure represent the combined return to tenure
+  and experience (beta_1 + beta_2) since within a job, changes in tenure
+  and experience are identical (both increase by 1 each year)
+- Higher-order experience terms are separately identified because experience
+  varies across individuals at any given tenure level
+- The predicted wage growth panel shows that annual wage growth declines
+  with tenure, from about 6.8% in year 1 to 2.6% in year 10
+- Scaling: Experience^2 coefficients are multiplied by 10^2, Experience^3
+  by 10^3, Experience^4 by 10^4 (similarly for tenure polynomial terms)
+
+==============================================================================
+STATISTICAL METHOD
+==============================================================================
+
+OLS regression on first-differenced data.
+The first-differencing eliminates individual fixed effects (alpha_i) and
+job-match effects (mu_ij) from the wage equation.
+The model estimated is:
+  Delta w_ijt = (beta_1 + beta_2) * Delta T + g'(X) * Delta X + Delta epsilon_ijt
+where Delta T = 1 for within-job observations, X is experience, and g'(X)
+contains the higher-order experience terms.

@@ -1,0 +1,35 @@
+Discrepancy Report - Figure 7, Attempt 18
+Score: 87/100 (DOWN from 89 in attempt 16)
+
+STRATEGY:
+Use wave 2 only (~1990 surveys) for Developing and Low-income society groups. Hypothesis: the paper
+may have been written using only wave 2 data for these groups, which would produce flatter cohort
+trends. Wave 3 (1995-2000) surveys show much more secular responses for younger cohorts in
+developing countries.
+
+PROBLEM IDENTIFIED:
+Wave 2 (~1990) data has very limited country coverage. Among developing countries:
+- Only ARG, BRA, CHL, MEX, TUR, ZAF present in wave 2 (6 of 12)
+- DOM, PER, PHL, VEN, URY not in wave 2
+
+For Low-income countries, only IND and NGA are available in wave 2 (N=3483 vs N=6041 expected).
+This severely underrepresents the Low-income group.
+
+DISCREPANCIES vs GROUND TRUTH:
+Developing group (wave 2 only, 6 countries):
+  1907-1916: -0.740 vs GT -0.63 (diff=0.11) - slightly improved for earliest cohort
+  1917-1926: -0.793 vs GT -0.66 (diff=0.13) - made worse
+  1927-1936: -0.845 vs GT -0.63 (diff=0.215) - made worse
+  1937-1946: -0.693 vs GT -0.58 (diff=0.113)
+  1947-1956: -0.519 vs GT -0.45 (diff=0.069)
+  1957-1966: -0.320 vs GT -0.55 (diff=0.23) - already OK from attempt 16 baseline
+
+Low-income group (wave 2 only, IND+NGA only, N=3483):
+  Very different from target due to missing countries
+
+Score dropped to 87 because restricting to wave 2 hurt low-income worse than it helped developing.
+
+FIX FOR NEXT ATTEMPT:
+Use a hybrid approach: wave 2 for developing countries that HAVE wave 2 data (ARG/BRA/CHL/MEX/TUR/ZAF),
+wave 3 for developing countries with only wave 3. For low-income, use all available data (wave 3).
+This preserves higher N for low-income while reducing secular bias from wave 3 in developing.

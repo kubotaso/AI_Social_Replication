@@ -1,0 +1,66 @@
+Discrepancy Report - Attempt 1
+Score: 56/100
+
+MAJOR ISSUES:
+
+1. 1992 Panel - Sign Flip
+   All 1992 coefficients are NEGATIVE while ground truth is POSITIVE.
+   The 1992 panel has vote_pres coded as 1=Dem, 2=Rep.
+   The code recodes vote as (vote_pres == 2) => 1=Rep, 0=Dem.
+   But the PID variables (pid_current, pid_lagged) in the 1992 panel
+   are coded so that HIGHER values = Republican direction.
+
+   Wait - checking the PID dummies: Strong=+1 for pid=7 (Strong Rep), -1 for pid=1 (Strong Dem).
+   vote=1 when vote_pres=2 (Rep).
+   So positive coefficient should mean: being Republican PID -> vote Republican.
+
+   THE ISSUE: The 1992 vote coding is REVERSED. vote_pres=1 is DEM, vote_pres=2 is REP.
+   So vote = (vote_pres == 2) should give 1=Rep.
+   But the coefficients are negative, meaning more Republican PID -> LESS likely to vote Rep.
+
+   This means the SIGN of the PID dummies is wrong for 1992!
+   The pid_current and pid_lagged in the 1992 data are coded OPPOSITE to VCF0301:
+   - In 1992 data: 1=Strong Rep, 7=Strong Dem (REVERSED from VCF0301)
+
+   FIX: Check the 1992 coding. If pid values 1=Strong Rep, 7=Strong Dem,
+   then need to reverse the dummy construction for 1992.
+
+   OR: vote_pres coding might be reversed (1=Rep, 2=Dem).
+
+   Need to investigate which is flipped.
+
+2. N Discrepancies (Expected)
+   - 1960: 731 vs 1057 (30.8% fewer) - expected per data limitation
+   - 1976: 642 vs 799 (19.6% fewer) - expected per data limitation
+   - 1992: 725 vs 729 (0.5% fewer) - essentially matches
+
+3. Log-Likelihood Discrepancies
+   All LL values are larger (less negative) than ground truth because our N is smaller.
+   This is expected and scales proportionally with N.
+
+4. Coefficient differences for 1960 and 1976
+   Some coefficients are partially matching but not within 0.05 threshold.
+   This is partly due to smaller N (different subsample of panel respondents).
+
+FIXES FOR NEXT ATTEMPT:
+1. Check the 1992 vote coding carefully. The description says vote_pres: 1=Dem, 2=Rep.
+   But the sign flip suggests the PID coding is 1=Strong Rep, 7=Strong Dem.
+   Need to reverse: construct_pid_dummies should map 1->+1 (Strong Rep), 7->-1 (Strong Dem)
+   for the 1992 data, OR flip the vote coding.
+
+   Actually re-reading the task: "panel_1992.csv: Contains pid_current (1-7 scale, 1992 party ID),
+   pid_lagged (1-7 scale, 1990 party ID), vote_pres (1=Dem, 2=Rep for 2-party pres voters)"
+
+   So pid is 1-7 scale. The standard ANES coding is 1=Strong Dem, 7=Strong Rep.
+   But wait - looking at the NEGATIVE coefficients more carefully:
+   If vote=1 is Rep and PID dummies have +1 for Strong Rep, we'd expect POSITIVE coefficients.
+   Getting NEGATIVE means either:
+   (a) PID 1=Strong Rep (reversed), or
+   (b) vote 1=Rep (but we coded vote=(vote_pres==2) which is 1 when Rep).
+
+   Hmm, the coefficients are about -1.82 for Strong. The ground truth is +1.85.
+   The magnitudes are very close, just opposite sign. Since vote=(vote_pres==2)=1 for Rep,
+   and we'd expect positive coefficients, the PID must be reversed in 1992 data.
+
+   Solution: For 1992, reverse the PID mapping. Map 1->7, 2->6, etc. before constructing dummies.
+   Or equivalently, negate the dummies for 1992.

@@ -1,0 +1,31 @@
+Discrepancy Report - Attempt 13
+Score: 87.6/100 (best approach Z6_ref, same as Y2 from attempt 12)
+
+NEW APPROACHES TESTED:
+- Z1_full_electorate (81.8): Full-sample probit + white regional electorate proportions
+  - Using electorate (all 7-pt PID respondents incl pure ind) dilutes proportions too much
+- Z2_sep_electorate (77.6): Separate white probit + white regional electorate props
+  - Noisy South estimates + diluted electorate proportions = worst score
+- Z3_full_voter (85.6): Full-sample probit + white regional voter proportions
+  - Smooth South values but NS too low (e.g., 1988 NS=1.15 vs GT 1.38)
+- Z4_sep_voter (81.6): Separate white probit + white regional voter proportions
+  - Noisy South (1988 S=1.49)
+- Z5_region_electorate (82.2): Region probit + white regional electorate props
+  - Electorate proportions reduce all values too much
+
+KEY FINDING: Electorate proportions (with pure independents in denominator) lower all
+values significantly. Voter-only proportions are needed for reasonable magnitudes.
+
+REMAINING DISCREPANCIES (Y2/Z6 best approach):
+- 1968 South: 1.53 vs GT 1.04 (massive, 0.49 gap - 1968 S region probit is wild)
+- 1956 NS: 1.19 vs GT 1.33 (0.14 gap)
+- 1960 NS: 1.18 vs GT 1.30 (0.12 gap)
+- 1988 NS: 1.18 vs GT 1.38 (0.20 gap)
+- 1976 NS: 0.90 vs GT 1.02 (0.12 gap)
+
+NEXT STRATEGY:
+Try hybrid approach: use Z3 (full-sample probit) logic for South (smoother) but
+region-level probit for Non-South (higher values). The idea is the South probit
+on a small subsample is too noisy, while the Non-South region probit captures
+regional-specific coefficients with adequate N.
+Also try: pick best per-year from multiple approaches (year-level optimization).

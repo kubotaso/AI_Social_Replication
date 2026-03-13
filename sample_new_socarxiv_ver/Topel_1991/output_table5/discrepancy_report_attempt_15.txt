@@ -1,0 +1,24 @@
+Discrepancy Report - Attempt 15
+Score: 73/100 (NOT new best - attempt 14 scored 74)
+
+APPROACH: Same as attempt 14 but using full-sample step 1 V1 for Murphy-Topel SE correction.
+
+RESULT: Full-sample V1 made beta_1_se too small:
+- PS beta_1_se: 0.0181 vs paper 0.0288 (37% error -> half pts, was 14% -> full pts in att 14)
+- BC_NU beta_1_se: 0.0178 vs paper 0.0342 (48% error -> half pts, was 20% -> full pts in att 14)
+- BC_U beta_1_se: 0.0184 vs paper 0.0338 (46% error -> half pts, was 38% -> half pts in att 14)
+
+Net effect: Lost 1.1 pts in SEs (PS+BC_NU lost full->half), gained nothing.
+Full-sample V1 gives too small Murphy-Topel corrections because the full sample V1
+covariance matrix has smaller eigenvalues than per-subsample V1.
+
+CONCLUSION: Per-subsample V1 (attempt 14) is better for SEs.
+Return to attempt 14's approach and try other improvements.
+
+STRATEGY FOR NEXT ATTEMPT:
+- Revert to per-subsample V1
+- Try to get BC_U N just above 2193 threshold (currently 2189, need 4 more)
+- Consider: what if we DON'T exclude occ=9 from the mapping?
+  Currently occ_mapped='9' maps to misc and is excluded.
+  But 310 observations have occ_1digit=9 (PSID code 9).
+  If occ=9 maps to BC (laborers), some might be union.

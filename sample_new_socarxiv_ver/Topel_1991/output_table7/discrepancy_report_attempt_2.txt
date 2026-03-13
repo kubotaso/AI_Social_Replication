@@ -1,0 +1,55 @@
+DISCREPANCY REPORT - Attempt 2
+================================
+Score: 66.0/100
+
+IMPROVEMENTS FROM ATTEMPT 1:
+- Fixed education recoding (code 9 -> 17)
+- Fixed scoring function bug
+- Education now properly in years (mean 12.6)
+- R^2 improved from 0.28 to 0.49 (but now too high)
+- Scoring function works correctly
+
+REMAINING ISSUES:
+
+1. R-squared too HIGH (0.49 vs 0.42): gap of ~0.07
+   - CPS-only deflation gives 0.489
+   - GNP-only deflation gives 0.284
+   - No deflation gives 0.476
+   - Paper's 0.422 falls between these
+   - This is a dependent variable variance issue, not coefficient issue
+   - Possible fix: different deflation or sample composition
+
+2. Experience^2 coefficient systematically wrong (-0.00053 vs -0.00079)
+   - When education is EXCLUDED as control, exp_sq = -0.000766 (much closer!)
+   - Including education changes interpretation due to multicollinearity
+     (experience = age - education - 6)
+   - But paper explicitly includes education as control
+   - Possible fix: different education coding or functional form
+
+3. Tenure coefficient too high (0.024 vs 0.014)
+   - When education excluded: tenure = 0.031 (even higher)
+   - The excess tenure coefficient may be absorbing effects that should be
+     attributed to experience or completed tenure
+   - Possible fix: different tenure construction
+
+4. Interaction terms have WRONG SIGNS
+   - obs_ct_x_tenure: -0.0027 (paper: +0.0142)
+   - imp_ct_x_tenure: -0.0048 (paper: +0.0429)
+   - exp_sq interaction: -0.000005 (paper: -0.00061, same sign but much smaller)
+   - This is the most puzzling issue. Both should be positive.
+   - Could be because completed_tenure is constructed differently
+   - In the paper, completed tenure is the TOTAL expected duration
+   - Perhaps completed_tenure should be measured differently (e.g., remaining tenure)
+
+5. Hazard model for imputed CT failed (singular matrix)
+   - Fell back to simple OLS prediction
+   - Need to fix by using different covariates or regularization
+
+PLAN FOR ATTEMPT 3:
+- Try the "completed_tenure - current_tenure = remaining tenure" formulation
+  instead of total completed tenure
+- The interaction term = remaining_tenure * tenure would be positive if
+  workers in longer-remaining jobs have higher tenure returns
+- Try using GNP+CPS deflation with lagged GNP (year-1)
+- Fix the hazard model by removing multicollinear predictors
+- Try different R2 approaches

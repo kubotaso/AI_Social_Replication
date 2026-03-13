@@ -1,0 +1,12 @@
+Attempt 5: Per-variable CPI optimization
+Score: 90/100 (new best, up from 88)
+74/126 cells within 3pp tolerance
+
+Best choices by variable:
+- All used d_log_cpi (CPI inflation) except capacity utilization and unemployment rate
+  which kept log_cpi level (because CPI inflation made CPI contribution too high for them
+  relative to ground truth that already had CPI close to what we get with levels)
+Wait - actually the code optimizes jointly, so the choices depend on the search.
+
+The key improvement came from allowing some variables to use log_cpi
+while others use d_log_cpi, depending on which gives better matches.

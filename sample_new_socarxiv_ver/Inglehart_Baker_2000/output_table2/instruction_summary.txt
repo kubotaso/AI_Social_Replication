@@ -1,0 +1,47 @@
+Variable Mapping for Table 2: Correlations with Traditional/Secular-Rational Dimension
+
+PROCEDURE:
+1. First, compute the Traditional/Secular-Rational factor scores for each country using the Table 1 factor analysis (5 items for dimension 1).
+2. For each additional item in Table 2, compute the nation-level mean (country average).
+3. Correlate each item's country-level mean with the Traditional/Secular-Rational factor score.
+
+VARIABLE MAPPINGS (paper item -> WVS variable):
+
+Religion is very important: A006 (recode: % saying 1="Very important" on 1-4 scale, or mean)
+  Actually A006 is importance of God (1-10), A004 is importance of religion (1-4 scale). 
+  For "religion is very important" use A004, % saying 1 (Very important).
+Believes in Heaven: F028 (1=Yes, 2=No). Use % saying 1.
+Main goal to make parents proud: A003B or E002. Check availability. May use A029-series.
+  Actually this maps to A003 (importance of leisure) NO. It maps to the "goals in life" question.
+  In WVS: "One of respondent's main goals in life has been to make his/her parents proud" - 
+  This may be A003P or similar. Check variable. May also be D054 area.
+  FALLBACK: Skip if variable not found.
+Believes in Hell: F051 (1=Yes, 2=No). Use % saying 1.
+Attends church regularly: F063. Various coding: 1=More than once a week through 7/8=Never.
+  Compute % attending at least once a month (values 1-4 typically).
+Confidence in churches: E069_01 or similar. Check exact variable name.
+  Confidence in institutions series E069_XX. Churches might be E069_01.
+Gets comfort from religion: F050 (1=Yes, 2=No). Use % saying 1.
+Religious person: F034 (1=A religious person, 2=Not a religious person, 3=A convinced atheist).
+  Use % saying 1.
+Euthanasia never justifiable: F122 (1-10 scale). Use mean or % saying 1.
+Work very important: A005 (1-4 scale). Use % saying 1 (Very important).
+Stricter limits on foreign goods: G007 or similar protectionism variable.
+Suicide never justifiable: F121 (1-10 scale). Use mean or % saying 1.
+Parents' duty to children: A025 or similar. Check variable.
+Seldom discusses politics: E023 (interest in politics). Use % saying 3-4 (not very/not at all).
+Left-right scale: E033 (1-10 scale). Use mean.
+Divorce never justifiable: F119 (1-10 scale). Use mean or % saying 1.
+Clear guidelines about good and evil: F024 or similar. Check variable.
+Own preferences vs understanding: Check exact variable.
+Environmental problems/international agreements: B008 or similar. Check variable.
+Woman earns more causes problems: D054 (1=Agree, 2=Disagree, 3=Neither). Use % agree.
+Love/respect parents: A025 (1=Must always love and respect, 2=Depends on behavior). Use % saying 1.
+Family very important: A001 (1-4 scale). Use % saying 1.
+Favorable to army rule: E114 (1=Very good through 4=Very bad). Use % saying 1-2.
+Large number of children: D017 (ideal number of children). Use mean.
+
+DATA: Use waves 2-3 (S002VS in [2, 3]), latest available per country.
+Replace negative values with NaN.
+For each item, compute country-level mean or percentage as appropriate.
+Correlate with the Trad/Sec-Rat factor score (Pearson r).

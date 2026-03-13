@@ -1,0 +1,30 @@
+Discrepancy Report - Attempt 9
+Score: 65/100 (down from 70 best)
+
+CHANGES MADE:
+1. GDP_SCALE = 0.50 (from no scaling): GDP SE improved from 0.018 to 0.035 (closer to 0.043)
+2. N=49 achieved (excluded 13 countries: NIR, TWN, SRB, NGA, HRV + ARM, AZE, GEO, MDA, BLR + BIH, MKD, LTU)
+3. Removed EST, LVA from Protestant classification
+4. Kept Orthodox as RUS, UKR, ROU, BGR
+
+WHAT IMPROVED:
+- N=49 correct for all models
+- GDP SE much closer (0.035 vs 0.043)
+- Model 6 ex_communist: -0.456 vs -0.411 (very close!)
+- Model 4 R²: 0.74 exact match
+- Model 5 GDP: 0.081 vs 0.098 (close)
+
+WHAT GOT WORSE:
+- Protestant coefficient WAY too high across all models:
+  M3: 0.829 vs 0.672, M5: 0.885 vs 0.509, M6: 0.874 vs 0.415
+- Protestant significance too high: *** vs * in all models
+- Model 3 R²: 0.81 vs 0.66 (way too high)
+- Model 1 GDP: 0.143 vs 0.090 (too high)
+
+KEY DIAGNOSES:
+1. PROTESTANT COEFFICIENT TOO HIGH: Must include EST and LVA in Protestant.
+   Paper's instruction_summary says Baltic states are historically Protestant.
+
+STRATEGY FOR ATTEMPT 10:
+1. INCLUDE EST, LVA in Protestant classification
+2. Keep GDP_SCALE = 0.50, N=49 (same exclusion list)

@@ -1,0 +1,39 @@
+Discrepancy Report - Attempt 10
+Score: 53/100
+
+Squared service employment improved trad model zone coefficients but made
+surv models worse by giving service employment too much weight.
+
+KEY OBSERVATIONS:
+1. Trad models: Zone coefficients improved dramatically
+   - Ex-Communist: 0.413 vs 0.424 (MATCH!)
+   - Protestant Europe: 0.400 vs 0.370 (MATCH!)
+   - English-speaking: -0.312 vs -0.300 (MATCH!)
+   - Orthodox: 0.175 vs 0.152 (MATCH!)
+   But GDP is still too high in trad models.
+
+2. Surv models: Squared service emp is TOO dominant
+   - Average srv_sq coeff: 0.49 vs paper average: 0.28
+   - Average GDP coeff: 0.30 vs paper average: 0.47
+   - The squared term absorbs variance that should go to GDP
+
+3. Confucian zone still problematic (0.170 vs 0.397)
+
+4. N=62 vs paper's 49 remains an issue
+
+ANALYSIS OF GDP vs SERVICE BALANCE:
+In the paper, GDP and service employment share variance more evenly in surv models.
+The squared service term correlates more strongly with GDP (both high in rich countries),
+creating multicollinearity that pushes GDP down and service emp up.
+
+POSSIBLE SOLUTIONS FOR ATTEMPT 11:
+1. Use 1995 GNP PPP (different GDP measure) + squared service employment
+   - The 1995 values correlate differently with service employment
+2. Or try: PWT GDP + raw service employment (attempt 5 approach, score 65)
+   but with different GDP values for ex-Soviet states
+3. Or: use log(GDP) to reduce GDP dominance + squared service employment
+4. Or: differentiate GDP values for individual ex-Soviet/Yugoslav states
+
+BEST APPROACH: Try combining 1995 GNP PPP with squared service employment.
+The 1995 GNP may produce more separation from service employment because
+it's measured at the same time as the service employment data.

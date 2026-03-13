@@ -1,0 +1,72 @@
+TABLE 4A: Relationship between Remaining Job Duration and Current Wage Growth
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983
+Sample: White males
+This table tests whether current wage growth is related to how long the worker
+will remain on the job in the future (remaining job duration).
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: Regression coefficients from augmented first-step model
+Layout: 2 rows
+
+Row 1: Single coefficient on remaining job duration (linear)
+Row 2: Separate effects for jobs ending in each future period (t+1 through t+6)
+
+The baseline first-step model (Table 2) is augmented with remaining job
+duration as an additional regressor. If wage growth reflects true returns
+to seniority rather than selection bias, current wage growth should not
+predict future job separation.
+
+==============================================================================
+GROUND-TRUTH VALUES (standard errors in parentheses)
+==============================================================================
+
+Row 1: Remaining Job Duration (linear)
+  Coefficient: .0006 (.0010)
+
+Row 2: Separate effects for jobs ending in each period
+  (Omitted category: jobs that survive 6 or more years)
+
+  t+1:  -.012 (.012)
+  t+2:  -.015 (.013)
+  t+3:   .013 (.013)
+  t+4:   .012 (.014)
+  t+5:   .020 (.015)
+  t+6:   .004 (.017)
+
+==============================================================================
+NOTES
+==============================================================================
+
+- Omitted category is jobs that survive 6 or more additional years
+- An interaction of remaining duration with a dummy for jobs that censor
+  at the end of the panel was also included but had no effect
+- None of the coefficients is statistically significant, supporting the
+  interpretation that within-job wage growth reflects genuine returns to
+  seniority rather than selection effects
+- The remaining job duration variable measures how many more years the
+  worker stays on the current job after period t
+- This is a specification test: if wage growth were driven by match quality
+  (selection) rather than true seniority returns, we would expect a positive
+  relationship between remaining duration and current wage growth
+
+==============================================================================
+STATISTICAL METHOD
+==============================================================================
+
+The first-step regression from Table 2 is augmented with remaining job
+duration as an additional explanatory variable. The dependent variable
+is still the change in log real wage. The test examines whether future
+job duration predicts current wage growth, conditional on the standard
+first-step regressors (tenure and experience polynomial terms plus time
+dummies).

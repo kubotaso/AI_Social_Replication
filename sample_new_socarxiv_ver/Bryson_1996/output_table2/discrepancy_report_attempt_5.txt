@@ -1,0 +1,49 @@
+Discrepancy Report: Attempt 5
+Score: 85.5/100
+
+APPROACH:
+- Racism scale: 5 items (racmost, busing, racdif1, racdif2, racdif3) with racdif3 FLIPPED (2=racist)
+- Person-mean imputation for missing items (require 4+ of 5 valid)
+- Income per capita = realinc / hompop
+- Standard demographic coding (ethnic NAs as non-Hispanic, fund NAs as non-conservative Protestant)
+
+MODEL 1 RESULTS (Dislike of 6 Minority Genres):
+- N: 645 (paper: 644) - EXCELLENT
+- R2: 0.149 (paper: 0.145) - GOOD
+- Adj R2: 0.132 (paper: 0.129) - GOOD
+- Racism: 0.108** (paper: 0.130**) - significance MATCHES, coeff close but 0.022 off
+- Education: -0.191*** (paper: -0.175***) - sig matches, coeff 0.016 off
+- Most other coefficients within 0.03
+
+Key discrepancies Model 1:
+- Hispanic: -0.087* (paper: -0.058 ns) - overestimated and wrongly significant
+- Other race: 0.020 (paper: -0.017) - wrong sign
+- Age: 0.187*** (paper: 0.163***) - 0.024 off
+
+MODEL 2 RESULTS (Dislike of 12 Remaining Genres):
+- N: 600 (paper: 605) - close but 5 short
+- R2: 0.130 (paper: 0.147) - OFF by 0.017
+- Adj R2: 0.113 (paper: 0.130) - OFF by 0.017
+- Racism: -0.001 (paper: 0.080 ns) - WRONG - nearly zero vs paper's 0.080
+- Black: 0.103* (paper: 0.042 ns) - too high and wrongly significant
+- Age: 0.102* (paper: 0.126**) - significance level wrong
+
+Key discrepancies Model 2:
+- Racism coefficient nearly zero (-0.001 vs 0.080) - this is the biggest issue
+- Black coefficient too high (0.103 vs 0.042)
+- R2 too low (0.130 vs 0.147)
+
+POSSIBLE CAUSES:
+1. The person-mean imputation may be attenuating the racism coefficient differently in Model 2
+   due to different sample composition
+2. The 5-case N difference in Model 2 (600 vs 605) may indicate genre coding differences
+3. The Black coefficient discrepancy may be related to the racism scale issue
+   (racism absorbs some variance from Black in the paper)
+4. R2 gap in Model 2 suggests a predictor is measured differently
+
+NEXT STEPS:
+1. Try different racism scale approaches for Model 2 specifically
+2. Check if DV2 coding is correct (all 12 genres identified properly)
+3. Try using racdif3 in ORIGINAL direction for Model 2 (maybe it matters differently)
+4. Check if income_pc should be constructed differently
+5. Try requiring all 5 racism items valid (will lower N but may improve coefficients)

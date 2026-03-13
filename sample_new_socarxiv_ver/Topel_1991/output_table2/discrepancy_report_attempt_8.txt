@@ -1,0 +1,72 @@
+DISCREPANCY REPORT - ATTEMPT 8 (retry_10)
+Score: 67/100
+
+APPROACH:
+- Education fixed per person (1975/1976 preferred, else mode of mapped values)
+- Experience = age - education_fixed - 6; filter d_exp == 1
+- Tenure RECONSTRUCTED: for in-progress jobs, use max reported tenure_mos
+  to gauge initial tenure (Topel's method from p.174 of paper)
+- Drop persons whose experience ever < 1
+- +-2 fixed outlier trim on d_log_wage
+
+SCORE BREAKDOWN:
+- coef_magnitudes: 10.9/25 (7/16 coefficients within 0.05)
+- standard_errors: 15.0/15 (all 16 SEs within 0.02)
+- sample_size: 15.0/15 (N=8,968 vs paper's 8,683, within 5%)
+- significance: 6.2/25 (4/16 significance levels match)
+- variables_present: 10.0/10 (all variables present)
+- r_squared: 10.0/10 (all 3 R^2 values within 0.02)
+
+WHAT MATCHES WELL:
+1. Delta Tenure coefficient (linear): 0.1212 vs 0.1242 (diff=0.003) - MATCH
+2. All standard errors are within tolerance
+3. N is within 5% of paper
+4. R^2 values are within tolerance (0.011 vs 0.022 - within 0.02)
+5. All 7 variables present in all 3 models
+
+WHAT DOESN'T MATCH:
+1. Experience polynomial coefficients (all 3 models):
+   - d_exp_sq: -0.1856 vs -0.6051 (Model 1) -- magnitude too small by 69%
+   - d_exp_cu: 0.0143 vs 0.1460 -- magnitude too small by 90%
+   - d_exp_qu: 0.0004 vs 0.0131 -- essentially zero vs positive
+
+2. Tenure polynomial coefficients (Model 3):
+   - d_tenure_sq: -0.2240 vs -0.4592 -- about half the magnitude
+   - d_tenure_cu: 0.1173 vs 0.1846 -- about 64% of paper value
+   - d_tenure_qu: -0.0168 vs -0.0245 -- about 69% of paper value
+
+3. Significance levels: Many coefficients are not significant in our
+   results but are significant in the paper, due to smaller magnitudes.
+
+4. SE of regression: 0.277 vs 0.218 -- our data has more wage variation
+
+ROOT CAUSE ANALYSIS:
+
+The fundamental issue is that our PSID data covers 1971-1983 (13 waves)
+while the paper uses 1968-1983 (16 waves). The paper's data was
+"kindly supplied by Joe Altonji and Nachum Sicherman" (footnote 10, p.154),
+suggesting pre-processed data with potentially different sample selections.
+
+Specific impacts:
+1. Missing 1968-1970 data means:
+   - Fewer total observations (we have 2,407 persons vs paper's 1,540)
+   - Different experience distribution (more persons enter mid-career)
+   - Missing low-tenure/high-growth early career observations
+
+2. Experience polynomial coefficients are FUNDAMENTALLY affected by the
+   experience distribution. With VIF > 500 for d_exp_cu, the individual
+   polynomial coefficients are not well-identified in our data. Small
+   changes in sample composition cause large changes in coefficients.
+
+3. The paper likely has:
+   - More observations at low experience levels (young workers entering 1968)
+   - Stricter sample restrictions (1,540 vs our 1,951 persons)
+   - Better initial tenure calibration from more years of reported data
+
+POSSIBLE IMPROVEMENTS FOR NEXT ATTEMPT:
+1. Try to restrict to fewer persons to match the paper's 1,540 persons
+2. Try tighter experience bounds (e.g., experience 2-35)
+3. Try using the full panel (psid_panel_full.csv) which has 1970
+4. Try a different outlier approach (percentile-based or SD-based)
+5. Consider if there are additional sample restrictions from the paper
+   we haven't implemented (e.g., Alaska/Hawaii exclusion, age 18-60)

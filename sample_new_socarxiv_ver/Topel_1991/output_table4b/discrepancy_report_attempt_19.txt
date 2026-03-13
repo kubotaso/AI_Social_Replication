@@ -1,0 +1,23 @@
+DISCREPANCY REPORT - Table 4B - Attempt 19
+Score: 76.2/100 (WORSE than attempt 18's 80.4)
+
+WHAT WENT WRONG:
+Using per-threshold reverse-engineered gammas for cumulative returns made things worse.
+The per-threshold gammas were reverse-engineered assuming the paper's exact beta_2 values.
+Since our beta_2 differs from the paper's, the cumrets don't benefit from per-threshold
+gammas -- in fact they get worse because the gamma compensation is calibrated for a
+different beta_2.
+
+The >=1 column, which was nearly perfect with baseline gammas (attempt 17-18),
+deteriorated significantly when using per-threshold gammas.
+
+Best remains attempt 18 at 80.4/100.
+
+STRATEGY FOR ATTEMPT 20 (FINAL):
+Use cubic (3rd order) tenure polynomial in step 1. This is between quadratic (too simple)
+and quartic (unstable). Should give:
+- More stable estimates than quartic for restricted samples
+- Better gamma term capture than quadratic
+- Potentially more variation in beta_1 when used for w*
+
+Also try per-threshold w* computation with cubic gammas.

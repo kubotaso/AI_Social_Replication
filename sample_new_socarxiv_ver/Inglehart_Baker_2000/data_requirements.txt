@@ -1,0 +1,94 @@
+Data Requirements for Inglehart & Baker (2000) Replication
+==========================================================
+
+1. PRIMARY DATASET: World Values Survey (WVS) Longitudinal Data
+   - Source: World Values Survey Association (www.worldvaluessurvey.org)
+   - Waves needed: Wave 1 (1981-1982), Wave 2 (1990-1991), Wave 3 (1995-1998)
+   - Also includes European Values Survey (EVS) 1990 data for 15 European societies
+   - 65 societies total
+   - Individual-level microdata needed (not aggregated)
+   - Total N approximately 165,594 (nation-level analysis uses N=65)
+
+   Required WVS Variables:
+   ----------------------
+   Traditional vs. Secular-Rational Dimension (5 items):
+   - A006: Importance of God in respondent's life (10-point scale)
+   - A042: Child qualities: obedience vs independence/determination
+   - F120: Justifiability of abortion (1-10 scale)
+   - G006: National pride
+   - E018: Respect for authority
+
+   Survival vs. Self-Expression Dimension (5 items):
+   - Y002: Materialist/Postmaterialist values (4-item index)
+   - A008: Feeling of happiness
+   - E025/E026: Petition signing / Would not sign petition
+   - F118: Justifiability of homosexuality (1-10 scale)
+   - A165: Interpersonal trust (most people can be trusted vs. can't be too careful)
+
+   Additional variables for Tables 2 & 3 (correlations):
+   - A001: Importance of family
+   - A002: Importance of friends
+   - A003: Importance of leisure
+   - A004: Importance of religion
+   - A005: Importance of work
+   - A029-A042: Child qualities (various)
+   - A165: Interpersonal trust
+   - C001-C002: Job motivation items
+   - D054: Woman earning more than husband
+   - D057-D059: Gender role items
+   - E012-E015: Political action items
+   - E023: Interest in politics
+   - E035-E042: Confidence in institutions
+   - E114-E117: Democracy/government items
+   - F028: Believe in heaven
+   - F051: Believe in hell
+   - F034: Religious person
+   - F063: Church attendance
+   - F050: Comfort from religion
+   - F114-F121: Justifiability items (various)
+   - G007: Protectionism
+   - S002: Survey wave identifier
+   - S003: Country code
+   - S020: Year of survey
+   - X001: Sex
+   - X002: Age / year of birth
+   - X003: Age
+   - X007: Marital status
+   - X025: Education level
+
+   For Table 4 (cultural zone regressions):
+   - Country-level factor scores on both dimensions
+   - Cultural zone classifications (9 zones based on Huntington)
+
+   For Tables 5a & 5b (modernization regressions):
+   - Country-level factor scores
+   - External economic/structural data (see below)
+
+   For Table 6 (church attendance):
+   - F063: Church attendance frequency, by country and wave
+
+   For Table 7 (importance of God):
+   - A006: Importance of God (% rating "10"), by country and wave
+
+   For Table 8 (meaning of life):
+   - F063 or similar: "Often think about meaning and purpose of life", by country and wave
+
+   For Figures 7 & 8 (birth cohort analysis):
+   - X003: Age or X002: Year of birth
+   - Factor scores computed at individual level
+   - Society type classification (4 groups)
+
+2. SUPPLEMENTARY DATA: Economic and Structural Indicators
+   - Source: Penn World Tables / World Bank
+   - Real GDP per capita, 1980 (in $1,000s U.S., PPP estimates)
+   - GNP per capita, 1995 (World Bank PPP, U.S. dollars) - for Figure 2 & 4
+   - Percentage employed in industrial sector, 1980
+   - Percentage employed in service sector, 1980
+   - Percentage enrolled in primary, secondary, and tertiary education
+   - Life expectancy at birth, 1995 (for cohort analysis)
+
+   These will be obtained via World Bank API (wbgapi Python package).
+
+3. STATUS:
+   - WVS data: MANUAL DOWNLOAD REQUIRED (see data_acquisition_instructions.md)
+   - World Bank data: Will be downloaded programmatically

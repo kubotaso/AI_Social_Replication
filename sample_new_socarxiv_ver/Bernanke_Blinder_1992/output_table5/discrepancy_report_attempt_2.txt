@@ -1,0 +1,58 @@
+Discrepancy Report - Attempt 2
+================================
+
+Score: 85/100 (up from 70)
+
+Improvements:
+- Annualized INFL = 12 * diff(log_cpi) fixed the inflation coefficient magnitudes
+- INFL(-1): 5.4 vs 7.9 (reasonable, ~30% off instead of 800%)
+- INFL(-3): 3.6 vs 4.2 (good match)
+- INFL(-4): 4.2 vs 4.6 (good match)
+
+Remaining Discrepancies:
+
+1. MIMIC = OLS (critical):
+   The ML optimization converges to a solution where psi[0]=0 (FFBOND has zero
+   measurement error), meaning FFBOND IS the latent variable. This makes the MIMIC
+   model degenerate to OLS of FFBOND on X. The true MIMIC should impose the
+   rank-1 restriction on the reduced form coefficient matrix, which changes the
+   coefficients.
+
+2. Coefficient discrepancies (after scaling):
+   U(-1): -8.0 vs -5.0  (60% off)
+   U(-2): -53.0 vs -65.9  (20% off)
+   U(-3): -26.6 vs -18.6  (43% off)
+   U(-4): -2.3 vs 12.2   (WRONG SIGN!)
+   U(-5): 8.0 vs 1.4     (large difference)
+   U(-6): -0.9 vs -13.3  (93% off)
+   INFL(-1): 5.4 vs 7.9  (31% off)
+   INFL(-2): 4.1 vs 5.9  (30% off)
+   INFL(-5): 2.5 vs 4.2  (40% off)
+   INFL(-6): 1.0 vs 2.6  (62% off)
+
+3. Chi-squared: Neither GOF (14.96) nor LR (51.16) matches paper (40.21)
+
+Root Cause Analysis:
+- The MIMIC model should produce DIFFERENT coefficients from OLS because the
+  cross-equation restrictions pool information from all 3 indicator equations.
+- The current optimization is stuck at the OLS solution.
+- Need to properly implement the MIMIC model, perhaps using:
+  (a) Two-step estimation: first estimate b from reduced form, then GLS
+  (b) EM algorithm
+  (c) Minimum distance estimator that directly imposes rank-1 on C
+  (d) Use the relationship between restricted and unrestricted reduced forms
+
+4. Data vintage effects:
+   The U coefficients show the biggest discrepancies, suggesting the unemployment
+   data may differ most from the vintage the authors used. This is expected for
+   male 25-54 unemployment rate which has been revised.
+
+FIXES FOR NEXT ATTEMPT:
+1. Implement minimum distance (MD) estimator:
+   - Estimate unrestricted reduced form C_hat and Sigma_hat
+   - Find c, b that minimize (vec(C_hat) - vec(c*b'))'W(vec(C_hat) - vec(c*b'))
+   - where W is the optimal weighting matrix
+   - The chi-squared test falls out naturally
+2. The MD approach directly tests the rank-1 restriction and should give the correct
+   chi-squared statistic.
+3. Try different measures of unemployment rate (total vs male 25-54)

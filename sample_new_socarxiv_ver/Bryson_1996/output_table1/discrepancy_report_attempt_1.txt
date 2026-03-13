@@ -1,0 +1,29 @@
+Discrepancy Report - Attempt 1
+Score: 79/100
+
+MAJOR ISSUES:
+
+1. Sample Size (N) - Demographic Model: paper=756, generated=623 (17.6% off)
+   - Root cause: The `ethnic` variable has 358 NAs (22% of sample). When ethnic is NA, hispanic is set to NA, causing listwise deletion to drop those cases.
+   - Fix: Treat missing ethnic as non-Hispanic (code as 0 instead of NA).
+
+2. Sample Size (N) - Political Intolerance Model: paper=503, generated=353 (29.8% off)
+   - Root cause: Two compounding issues: (a) ethnic NAs dropping cases as above, (b) requiring all 15 tolerance items to be non-missing is too strict. The GSS 1993 has substantial missingness on tolerance items (~580 NA per item due to split-ballot design).
+   - Fix: Treat missing ethnic as non-Hispanic AND relax the tolerance item requirement.
+
+3. Significance mismatches (5 of 26):
+   - Demographic/age: paper=*** gen=** (borderline, likely improves with larger N)
+   - Demographic/southern: paper=** gen=* (borderline)
+   - Pol.Intol/age: paper=* gen='' (N too small reduces power)
+   - Pol.Intol/southern: paper=** gen='' (N too small)
+   - Pol.Intol/pol_intol: paper=*** gen=** (N too small)
+
+4. Two coefficient sign mismatches (minor, both near zero):
+   - Demographic/prestige: paper=-0.006 gen=0.007 (diff=0.013, both near zero)
+   - Demographic/other_race: paper=0.005 gen=-0.008 (diff=0.013, both near zero)
+
+STRATEGY FOR NEXT ATTEMPT:
+- Treat missing ethnic as non-Hispanic (0)
+- Treat missing fund as non-conservative Protestant (0)
+- This should increase Demographic N closer to 756
+- Consider relaxing tolerance item requirement for Political Intolerance Model

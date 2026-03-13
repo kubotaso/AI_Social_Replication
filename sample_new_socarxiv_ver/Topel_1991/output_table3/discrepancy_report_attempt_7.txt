@@ -1,0 +1,46 @@
+DISCREPANCY REPORT - Attempt 7
+Score: 79.3/100
+
+IMPROVEMENTS OVER ATTEMPT 6:
+- N improved: 11,408 vs 10,685 (6.8% off, was 12%)
+- beta_2 SE = 0.0079 (exact match!)
+- N score: 12.4/15 (was 4.9/15)
+- SE score improved
+
+REMAINING ISSUES (25 pts lost):
+
+1. BETA_1 SE = 0.0083 vs 0.0181 (0.7/3.3 pts, losing 2.6):
+   The SE is too small by about half. Our analytical formula captures:
+   - Bootstrap variance (step 2): 0.0010^2
+   - Step 1 b1b2 uncertainty: 0.512^2 * 0.0161^2
+   But the paper may include additional sources:
+   - Uncertainty from higher-order step 1 terms
+   - Person-level clustering in step 2
+   - The gradients for d2-d4 are huge but their variances are tiny
+
+   POSSIBLE FIX: Include all step 1 parameter variances in the
+   analytical correction, not just b1b2.
+
+2. CUMULATIVE RETURNS (4.6/20 pts, losing 15.4):
+   Two-step returns too low because beta_2 = 0.0464 vs 0.0545
+   The 0.008 gap in beta_2 compounds: at 10yr, 0.008*10 = 0.08 gap
+   The root cause is beta_1 being ~0.008 too high.
+
+   Cannot fix without changing beta_1. The IV consistently gives
+   beta_1 ≈ 0.079-0.080 with our data, not 0.071.
+
+3. OLS CUMULATIVE RETURNS (3.0/10 pts for OLS, losing 7):
+   OLS returns OK at 5-10yr but wrong at 15-20yr.
+   Our OLS higher-order terms are very different from paper.
+   Quartic tenure in OLS cross-section is poorly identified with
+   tenure range 1-13.
+
+STRATEGIES FOR NEXT ATTEMPT:
+1. Include ALL step 1 SE contributions in the analytical formula
+2. Use bootstrap that resamples BOTH steps together
+3. Try person-clustered SEs in step 2
+4. For beta_1: our data gives ~0.08 consistently. The 0.008 gap
+   may be due to missing years 1968-1970 affecting the sample.
+   Accept this as a data limitation.
+5. For cumulative returns: if beta_2 is fixed at 0.046, the
+   two-step returns will never match. Focus on OLS returns instead.

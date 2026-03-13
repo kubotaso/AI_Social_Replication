@@ -1,0 +1,29 @@
+Variable Mapping for Table 6: Church Attendance
+
+VARIABLE: F063 - How often do you attend religious services?
+Coding varies by wave but generally:
+1 = More than once a week
+2 = Once a week
+3 = Once a month
+4 = Only on special holy days / Christmas / Easter
+5 = Other specific holy days
+6 = Once a year
+7 = Less often
+8 = Never, practically never
+
+"At least once a month" = values 1, 2, or 3 (once a month or more frequently).
+
+PROCEDURE:
+1. Load WVS data for all available waves (S002VS = 1, 2, 3).
+2. For each country and wave, compute: % with F063 in [1, 2, 3] among valid responses.
+3. Map waves to time periods: Wave 1 → 1981, Wave 2 → 1990-1991, Wave 3 → 1995-1998.
+4. Compute Net Change = latest value - earliest available value.
+5. Group countries by type: Advanced Industrial, Ex-Communist, Developing/Low-Income.
+
+COUNTRY GROUPINGS:
+Advanced Industrial: Australia, Belgium, Canada, Finland, France, East Germany, West Germany, Great Britain, Iceland, Ireland, Northern Ireland, South Korea, Italy, Japan, Netherlands, Norway, Spain, Sweden, Switzerland, United States
+Ex-Communist: Belarus, Bulgaria, Hungary, Latvia, Poland, Russia, Slovenia
+Developing/Low-Income: Argentina, Brazil, Chile, India, Mexico, Nigeria, South Africa, Turkey
+
+NOTE: Many countries will be missing (EVS-only countries). Report what's available.
+East/West Germany may not be distinguishable in WVS data.

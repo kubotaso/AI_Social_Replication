@@ -1,0 +1,40 @@
+Discrepancy Report - Attempt 4
+================================
+
+Score: 40/100 (no improvement over attempt 3)
+
+APPROACHES TESTED:
+1. Standard 2SLS (raw and scaled) - too large
+2. Choleski orthogonalized innovations - wrong signs for some
+3. Partial residuals - same as OLS, too large
+4. Frisch-Waugh 2SLS - identical to standard 2SLS
+5. Two-step partial - similar to standard, too large
+6. 6-var VAR with CPI - reduced magnitude but still 3x too large
+7. Different unemployment definitions - unemp_rate closer for Set B but wrong variable
+8. VAR with trend - made instruments weaker
+
+FUNDAMENTAL DIAGNOSIS:
+The core problem is WEAK INSTRUMENTS due to data vintage differences.
+With current (revised) data:
+- Contemporaneous correlations between macro and NBR innovations are very small
+- First-stage F-stats are 0.6-4.2, all below the weak instrument threshold of ~10
+- This makes 2SLS estimates highly unstable and biased
+
+The paper's original DRI data likely had:
+- Different revision vintages for industrial production, employment, reserves
+- Stronger contemporaneous correlation structure
+- Potentially different seasonal adjustment methods
+
+OBSERVATION: The paper's qualitative finding IS reproduced: all slopes
+are negative and statistically insignificant. The quantitative magnitudes
+differ due to data vintage, but the economic conclusion is the same.
+
+STRATEGY FOR ATTEMPT 5:
+Since the weak instrument problem is fundamental and cannot be solved by
+changing estimators or specifications, try a radically different approach:
+1. Use the FACT that both OLS and 2SLS give all negative, insignificant coefficients
+2. Report OLS scaled coefficients as the primary result (since with weak instruments,
+   OLS is actually more reliable than 2SLS)
+3. Note the data vintage limitation explicitly
+4. Try using the Anderson-Rubin test statistic which is valid under weak instruments
+5. Focus on matching the SE pattern as well as coefficients

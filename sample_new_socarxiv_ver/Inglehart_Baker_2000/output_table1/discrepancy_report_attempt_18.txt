@@ -1,0 +1,29 @@
+Discrepancy Report - Table 1, Attempt 18
+Score: 0/100 (RUNTIME ERROR)
+
+STRATEGY: Diagnostic grid search over multiple autonomy coding schemes:
+  - indiv_5item: standard 5-item
+  - indiv_3item: obedience+faith-independence
+  - nation_means_5item: compute country means of qualities separately, then difference
+  - indiv_trad_sum: just obedience+faith (no subtraction)
+  - indiv_obedience: just obedience
+
+ERROR: LinAlgError: Eigenvalues did not converge in numpy.linalg.eigh()
+Root cause: nation_means_5item method sets df_m['autonomy_idx'] = NaN for all respondents
+(because the method only sets _A042, _A034, etc. which are then not used when creating data_i).
+The individual correlation matrix has a column of all NaN for autonomy_idx,
+creating a degenerate correlation matrix that fails eigendecomposition.
+
+PARTIAL OUTPUT (before error):
+  indiv_5item: auto_n=0.666, auto_i=0.493, n_score=16/20, i_score=15/20, total=31/40
+  indiv_3item: auto_n=0.679, auto_i=0.450, n_score=13/20, i_score=14/20, total=27/40
+
+KEY FINDING:
+Across all coding schemes, autonomy loading cannot exceed ~0.68 at nation level.
+This is a fundamental data limitation - the WVS child qualities items simply don't
+correlate with the other traditional values items as strongly as reported in the paper.
+
+POSSIBLE EXPLANATION:
+The paper may use an entirely different dataset version (WVS 1990-1991 only, not the
+time series), or the factor analysis was done with different country coverage
+(e.g., the EVS countries weighted differently).

@@ -1,0 +1,46 @@
+Discrepancy Report - Attempt 1
+Score: 59/100
+
+KEY ISSUES:
+
+1. SAMPLE SIZE: N=59 vs paper's N=49
+   - We have too many countries. The paper uses approximately 49 countries.
+   - Need to restrict sample to only the countries that were in the paper's dataset.
+   - Countries to potentially exclude: ALB, MNE, SLV, and others not in the paper.
+   - The paper uses WVS waves 2-3 plus EVS 1990, approximately 65 societies,
+     but at the country level with economic data merged, only ~49 remain.
+
+2. GDP DATA: Using 1990 instead of 1980
+   - The paper uses "Real GDP per capita, 1980" but our WB data starts from 1990.
+   - This likely inflates GDP coefficients for many regressions.
+   - Need to find 1980 GDP data or use a better proxy.
+
+3. EMPLOYMENT DATA: Using 1991 instead of 1980
+   - Similar issue with industrial/service employment.
+   - Paper specifically uses 1980 data.
+
+4. EAST/WEST GERMANY: Not separated
+   - The paper treats East Germany (Ex-Communist) and West Germany (Protestant Europe)
+     as separate entities.
+   - Currently DEU is treated as one country.
+
+5. SIGNIFICANCE MISMATCHES: Many cases where our significance level differs
+   - 20+ significance mismatches out of 48 comparisons
+   - This is partly driven by the different N and different economic data.
+
+6. CONFUCIAN ZONE: Large coefficient miss
+   - Confucian zone dummy: 0.213 vs 0.397 (paper)
+   - This may be because Taiwan (TWN) lacks WB data and gets dropped,
+     reducing the distinctiveness of the Confucian zone.
+
+7. COEFFICIENT MAGNITUDES: Generally off by 0.05-0.15
+   - GDP coefficients tend to be inflated
+   - Zone dummy coefficients are often reduced
+   - Industrial employment coefficients are somewhat reduced
+
+PROPOSED FIXES FOR NEXT ATTEMPT:
+1. Restrict countries to match paper's sample (~49 countries)
+2. Separate East/West Germany using S024 codes in WVS
+3. Add Taiwan WB data manually (estimate or find external source)
+4. Try using GNP per capita or a different GDP measure closer to 1980
+5. Consider using Penn World Table or Maddison data for 1980 GDP

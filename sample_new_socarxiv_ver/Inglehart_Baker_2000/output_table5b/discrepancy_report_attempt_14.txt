@@ -1,0 +1,77 @@
+Discrepancy Report - Attempt 14
+Score: 70/100 (same as best)
+
+CHANGES MADE:
+- Added SRB, MKD to sample AND Orthodox classification
+- Expanded Orthodox from 4 (RUS, UKR, ROU, BGR) to 6 (+ SRB, MKD)
+- Removed SVN from sample to compensate for added SRB+MKD
+- N=49 achieved for M1 and most models (SRB has no service data, drops in M1-M5)
+- M6 N=50 (SRB has no service data issue resolved since M6 doesn't use service)
+
+IMPROVEMENTS vs attempt 13:
+- M3 ex_communist: -0.910 vs -0.920 MATCH (was -0.874 PARTIAL before)
+- M3 N: 49 vs 49 MATCH (was 50 MATCH before - now exact)
+- M1 N: 49 vs 49 MATCH (now exact)
+- M4 N: 49 MATCH
+
+PERSISTENT ISSUES:
+1. Orthodox coefficient still too weak: M6 Orthodox = -0.726 vs -1.182
+   - Adding SRB and MKD barely moved it (-0.745 in attempt 13 to -0.726)
+   - Both SRB (-0.811) and MKD (-1.041) have moderate-low surv scores, but so do all
+     Communist countries. The problem is collinearity: all 6 Orthodox are also Communist.
+   - Communist coefficient absorbs most of the "ex-Communist" low score signal
+   - The weak Orthodox coefficient suggests paper has a different Orthodox set
+
+2. Model 3 R² too high: 0.77 vs 0.66
+   - Persistent issue: with PWT GDP, all ex-Soviet/Yugoslav countries have IDENTICAL GDP
+   - This creates a near-perfect separation: Communist countries cluster at GDP={1.0, 3.7, 3.9, 5.6, 6.1}
+   - The ex_communist dummy explains almost ALL the variance for those countries
+   - This makes R² too high because GDP loses its independent role
+
+3. Model 5 R² too low: 0.65 vs 0.76
+   - Protestant coefficient 0.411 (not significant) vs 0.509 (*)
+   - Suggests our Protestant countries' self-expression scores are not high enough
+     relative to non-Protestant, OR the service_sq variable is absorbing too much variance
+
+4. GDP significance wrong:
+   - M1: *** vs * (paper has modest significance for GDP in basic model)
+   - M3: ** vs '' (paper has no significance for GDP when Communist is included)
+   - The problem is our GDP variable (PWT) has too small SEs due to tight clustering of
+     ex-Communist countries at {3.7, 3.9, 5.6, 6.1}
+
+5. Service_sq significance wrong:
+   - M1: '' vs ** (paper has service sector significantly predicting self-expression)
+   - M3: '' vs * (same issue)
+   - Our service_sq coefficient is 0.020 vs 0.042 - too small
+   - Root cause: when all Communist countries cluster at low service AND low self-expression,
+     it creates a reverse pattern that weakens the service sector effect
+
+KEY INSIGHT ON COLLINEARITY:
+The fundamental problem is that in our data:
+- Orthodox countries = {BGR, MKD, ROU, RUS, SRB, UKR} all have low surv_selfexp scores
+- Ex-Communist countries = {BGR, CHN, CZE, EST, HUN, LVA, MKD, POL, ROU, RUS, SRB, SVK, UKR}
+  - The overlap: BGR, MKD, ROU, RUS, SRB, UKR are both Communist AND Orthodox
+  - Only EST, LVA are Communist-and-NOT-Orthodox (they're also Protestant)
+  - Only CHN, CZE, HUN, POL, SVK are Communist-and-NOT-Orthodox-NOT-Protestant
+- In M6, when both Communist AND Orthodox dummies are in the model:
+  - Communist captures the CHN, CZE, HUN, POL, SVK, EST, LVA signal
+  - Orthodox should capture the ADDITIONAL Orthodox effect beyond Communist
+  - But all Orthodox are also Communist -> collinearity weakens Orthodox coefficient
+  - Paper apparently gets Orthodox = -1.182 which implies much larger additional effect
+
+POSSIBLE SOLUTION:
+The paper may have a different factor score for these Orthodox countries. Their surv_selfexp
+scores might be much lower in the paper's original analysis. If RUS, UKR score more
+negatively (e.g., -2.0 to -2.5 instead of -1.5 to -1.6), the Orthodox coefficient
+would be much larger in magnitude.
+
+Or: The paper may define Orthodox as ONLY non-Communist Orthodox countries (which in the
+1990s would be small) - but that contradicts the instruction_summary.
+
+STRATEGY FOR ATTEMPT 15:
+Focus on the factor scores themselves. The key problem might be that our Survival/Self-Expression
+factor scores for Communist Orthodox countries are not negative enough.
+1. Try using ONLY WVS Wave 3 data (not combined WVS+EVS) to get different factor scores
+2. Try using WVS Wave 2 data only (earlier period, closer to paper's era)
+3. Try not normalizing the factor scores (using raw PCA scores)
+4. Try using the ZA4460 dataset directly for factor analysis instead of WVS Time Series

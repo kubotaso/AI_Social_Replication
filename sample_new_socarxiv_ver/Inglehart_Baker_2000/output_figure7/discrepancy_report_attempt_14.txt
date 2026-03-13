@@ -1,0 +1,55 @@
+Discrepancy Report - Attempt 14
+
+Score: 88/100 (NEW BEST, up from 85)
+
+KEY IMPROVEMENTS:
+- Aspect ratio: +5/5 (was 4/5)
+- Visual elements: +10/10 (was 9/10)
+- Layout: +9/10 (was 8/10)
+- Data ordering: 15/15 (maintained)
+
+REMAINING DATA VALUE ISSUES:
+1. Ex-Communist 1907-1916: -0.144 (GT: -0.07, diff=0.074 -> partial credit 0.25)
+2. Advanced industrial 1907-1916: 0.056 (GT: -0.07, diff=0.126 -> partial credit 0.25)
+3. Developing 1917-1926: -0.800 (GT: -0.63, diff=0.170 -> miss)
+4. Developing 1927-1936: -0.810 (GT: -0.63, diff=0.180 -> miss)
+5. Developing 1937-1946: -0.734 (GT: -0.58, diff=0.154 -> partial credit 0.25)
+
+ANALYSIS OF DEVELOPING GROUP SYSTEMATIC OFFSET:
+The 0.15-0.18 offset in Developing 1917-1946 suggests that:
+- The 1917-1946 cohort in Developing countries is genuinely more traditional in our data
+- The paper's data shows a flatter pattern
+
+This could be due to:
+a) Different variable construction (our F120/G006/etc may have different ranges in dev countries)
+b) The paper used a different standardization (e.g., standardized within country groups separately)
+c) Different sample composition - the WVS wave 3 Developing countries in 1995-1997 may have
+   had a cohort effect that differs from the paper
+
+SCORING TO REACH 95:
+Current: 20+15+14+15+5+10+9 = 88/100
+Need: 95
+Gap: 7 more points needed
+
+Options:
+A) Improve data values from 14→21 (+7)
+   This would require fixing Developing 1917-1936 (each is worth 0.89 pts if fixed)
+   And the Ex-Communist/Advanced industrial oldest cohort (worth ~0.25-0.5 pts each)
+   Very hard with current data
+
+B) Improve layout from 9→10 (+1)
+   + Fix at least 3 Developing or Low-income cohort values (+6)
+   = 95
+
+PLAN FOR ATTEMPT 15:
+1. Try DIFFERENT standardization: standardize using only the 4-group countries
+   (exclude countries not in any of the 4 groups from the z-standardization base)
+   This might shift all values to be more consistent with paper expectations
+
+2. For Developing: try excluding South Africa from the group
+   ZAF has N=2,935 (largest in group) and z=-0.781 (very traditional)
+   The paper includes ZAF but if it's driving the dip...
+   Actually the paper explicitly lists ZAF, so cannot exclude it.
+
+3. Try different approach: Z-standardize WITHIN each wave rather than globally.
+   If we standardize using only wave 3 data, the global mean/std would be different.

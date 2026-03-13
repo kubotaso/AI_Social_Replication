@@ -1,0 +1,13 @@
+DISCREPANCY REPORT - Attempt 5
+Score: 42/100
+
+ISSUE: Numerical instability in 2SLS projection matrix approach.
+The P_Z = Z(Z'Z)^{-1}Z' computation for 12790x12790 matrix causes precision loss.
+
+SOLUTION: Use the debug script approach that worked:
+1. First stage OLS: exp = f(initial_exp, T_dev, controls, year_dummies) -> get exp_hat
+2. Second stage OLS: w_star = f(exp_hat, exp2, exp3, exp4, controls, year_dummies)
+3. Correct SEs by using actual X (not X_hat) in residual computation
+4. Use np.linalg.lstsq instead of matrix inversion
+5. w_star = log_wage - beta_hat*T - gamma(T) ONLY (don't subtract delta)
+6. This gave beta_1 = 0.047, beta_2 = 0.079 in debug (right ballpark)

@@ -1,0 +1,49 @@
+Table 7 Attempt 2 Results
+Score: 66.0/100
+
+Column (1): Baseline OLS
+  R^2 = 0.4893 (target: 0.422)
+  N = 13922
+  experience: 0.035637, se=0.001274 (target: .0418/.0013)
+  experience_sq: -0.000531, se=0.000028 (target: -.00079/.00003)
+  tenure: 0.024015, se=0.001521 (target: .0138/.0052)
+
+Column (2): Restricted observed completed tenure
+  R^2 = 0.4964 (target: 0.428)
+  experience: 0.033079, se=0.001278 (target: .0379/.0014)
+  experience_sq: -0.000463, se=0.000028 (target: -.00069/.000032)
+  tenure: 0.003781, se=0.002169 (target: -.0015/.0015)
+  completed_tenure_obs: 0.018707, se=0.001907 (target: .0165/.0016)
+  obs_ct_x_censor: 0.000294, se=0.001066 (target: -.0025/.0073)
+
+Column (3): Unrestricted observed completed tenure
+  R^2 = 0.4984 (target: 0.432)
+  experience: 0.032432, se=0.001280 (target: .0345/.0015)
+  experience_sq: -0.000412, se=0.000032 (target: -.00072/.000069)
+  tenure: 0.033895, se=0.005408 (target: .0137/.0038)
+  completed_tenure_obs: 0.025583, se=0.002184 (target: .0316/.0022)
+  obs_ct_x_exp_sq: -0.000005, se=0.000002 (target: -.00061/.000036)
+  obs_ct_x_tenure: -0.002714, se=0.000456 (target: .0142/.0033)
+
+Column (4): Restricted imputed completed tenure
+  R^2 = 0.4897 (target: 0.433)
+  experience: 0.035404, se=0.001276 (target: .0397/.0013)
+  experience_sq: -0.000529, se=0.000028 (target: -.00074/.000030)
+  tenure: 0.022471, se=0.001598 (target: .0060/.0073)
+  imputed_completed_tenure: 0.004837, se=0.001535 (target: .0053/.0036)
+
+Column (5): Unrestricted imputed completed tenure
+  R^2 = 0.4934 (target: 0.435)
+  experience: 0.034320, se=0.001296 (target: .0401/.0014)
+  experience_sq: -0.000530, se=0.000034 (target: -.00073/.000069)
+  tenure: 0.045127, se=0.002763 (target: .0163/.0038)
+  imputed_completed_tenure: 0.023107, se=0.002829 (target: .0067/.0042)
+  imp_ct_x_exp_sq: 0.000006, se=0.000003 (target: -.00075/.000033)
+  imp_ct_x_tenure: -0.004821, se=0.000480 (target: .0429/.0016)
+
+KEY ISSUES:
+1. R^2 too high (~0.49 vs 0.42): deflation method matters
+2. Experience^2 wrong (-0.00053 vs -0.00079)
+3. Tenure too high (0.024 vs 0.014)
+4. Interactions wrong sign: obs_ct_x_tenure=-0.0027 (should be +0.0142)
+5. Imputed CT too high and interactions wrong

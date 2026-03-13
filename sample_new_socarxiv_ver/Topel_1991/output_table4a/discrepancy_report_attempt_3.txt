@@ -1,0 +1,28 @@
+DISCREPANCY REPORT -- Table 4A, Attempt 3
+==========================================
+
+SCORE: 92/100 (same as attempt 2 - identical results)
+
+No change in results despite attempt to add d_tenure==1 filter.
+The d_tenure filter removed 0 additional observations because the
+prev_year consecutive-year filter already ensured d_tenure==1.
+
+REMAINING ISSUE: N = 10743 vs Table 2's N = 8683 (24% high)
+This is a dataset-level issue: the panel has 2407 persons vs paper's 1540.
+
+The discrepancy in N does NOT affect the coefficient matching:
+- All 7 coefficients within 0.05 tolerance
+- All 7 SEs within 0.02 tolerance
+- All 7 significance levels match (all insignificant)
+
+The N issue is NOT specific to Table 4A - it affects all tables equally.
+The paper does not explicitly report N for Table 4A.
+
+PLAN FOR ATTEMPT 4:
+Try to reduce N by:
+1. Apply a stricter wage growth outlier filter (e.g., |d_log_wage| < 1.5 or < 1.0)
+2. Try requiring minimum hours worked (drop obs where hours < 250)
+3. Try requiring positive wages and dropping very low hourly wages
+4. Explore if there are observations with missing data that should be excluded
+5. Consider whether the Table 2 first-step model includes only observations
+   with tenure >= 2 (since first differences require two consecutive observations)

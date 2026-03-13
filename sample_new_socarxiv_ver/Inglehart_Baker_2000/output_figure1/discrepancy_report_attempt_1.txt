@@ -1,0 +1,43 @@
+Discrepancy Report - Attempt 1
+Score: 62.9/100
+
+CRITICAL ISSUES:
+
+1. SCALE MISMATCH (biggest problem):
+   - Computed scores range from about -3.5 to +4.0 on both axes
+   - Paper scores range from about -2.0 to +2.0
+   - The factor scores need to be rescaled. The paper likely uses standardized factor scores
+     (z-scores with mean=0, SD=1 across countries) or a different normalization.
+   - Solution: Normalize factor scores to have approximately the same range as the paper.
+     Try dividing by the standard deviation of the scores, or use proper factor score
+     computation (regression method) instead of simple PCA projection.
+
+2. MISSING COUNTRIES (PAK, GHA):
+   - Pakistan is in WVS wave 3 but somehow not appearing in the factor analysis
+   - Ghana may be missing from the dataset entirely or under a different code
+   - Need to check: Is Pakistan being filtered out? Is Ghana coded differently?
+   - Solution: Debug why PAK and GHA are being dropped. May need lower threshold
+     for minimum non-missing items.
+
+3. BOUNDARY SHAPES:
+   - The zone boundaries look angular rather than smooth curves
+   - The make_smooth_closed_path function uses simple 1/3-2/3 control points which
+     creates straight-ish segments, not organic curves
+   - Need to use catmull-rom or actual spline interpolation for smoother curves
+
+4. LABEL POSITIONING:
+   - Country labels overlap significantly
+   - Need manual offset adjustments for crowded areas
+   - Some labels should be below or to the left of their points
+
+5. FIGURE STYLING:
+   - Need thicker dots (larger marker size)
+   - Font sizes need adjustment
+   - The paper uses a specific aspect ratio and font style
+
+PLAN FOR NEXT ATTEMPT:
+1. Rescale factor scores to match paper's range (~-2 to +2)
+2. Fix PAK and GHA inclusion
+3. Improve boundary smoothness using scipy interpolation
+4. Add manual label offsets for readability
+5. Match visual style more closely to original

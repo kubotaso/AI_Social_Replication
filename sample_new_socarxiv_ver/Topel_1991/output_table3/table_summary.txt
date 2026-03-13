@@ -1,0 +1,110 @@
+TABLE 3: Second-Step Estimated Main Effects of Experience (beta_1) and Tenure (beta_2)
+on Log Real Wages, and Least-Squares Bias in Wage Growth (b1+b2)
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983
+Sample: White males
+Number of observations: N = 10,685
+
+Note: N is larger than in Table 2 because the second step uses all person-year
+observations (levels), not just within-job first differences.
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: IV / Two-step estimation table
+Layout: Two panels
+
+Top panel: Main effects (4 columns)
+  Column (1): Experience effect beta_1
+  Column (2): Within-job wage growth beta_1 + beta_2 (from first step)
+  Column (3): Tenure effect beta_2 (= col 2 - col 1)
+  Column (4): Wage growth bias b1+b2 (OLS bias in within-job wage growth)
+
+Bottom panel: Estimated cumulative return to job tenure (2 rows x 4 columns)
+  Row 1: Two-step model estimates
+  Row 2: OLS estimates
+  Columns: 5 years, 10 years, 15 years, 20 years
+
+==============================================================================
+GROUND-TRUTH VALUES - TOP PANEL: Main Effects (standard errors in parentheses)
+==============================================================================
+
+                              (1)              (2)              (3)              (4)
+                         Experience     Within-Job        Tenure         Wage Growth
+                         Effect         Wage Growth       Effect         Bias
+                         beta_1         beta_1+beta_2     beta_2         b1+b2
+
+Main effect:             .0713 (.0181)  .1258 (.0161)     .0545 (.0079)  .0020 (.0004)
+
+==============================================================================
+GROUND-TRUTH VALUES - BOTTOM PANEL: Estimated Cumulative Return to Job Tenure
+(standard errors in parentheses)
+==============================================================================
+
+                         5 Years          10 Years         15 Years         20 Years
+
+Two-step model:          .1793 (.0235)    .2459 (.0341)    .2832 (.0411)    .3375 (.0438)
+OLS:                     .2313 (.0098)    .3002 (.0105)    .3203 (.0110)    .3563 (.0116)
+
+==============================================================================
+METHODOLOGY
+==============================================================================
+
+Two-step estimation procedure:
+
+Step 1 (from Table 2, Model 3):
+  First-difference the wage equation to eliminate individual and job-match
+  fixed effects. Estimate the combined effect (beta_1 + beta_2) and higher-order
+  experience/tenure terms from within-job wage changes.
+
+Step 2 (this table):
+  Using the first-step estimates of higher-order terms, construct:
+    w*_it = w_it - (beta_1_hat + beta_2_hat) * T_it - g_hat(X_it)
+  where the higher-order tenure and experience terms are subtracted from
+  the observed wage.
+
+  Then regress w*_it on experience (X_it) using initial experience (X_i0)
+  as an instrument to obtain beta_1. The instrument is valid because
+  initial experience is determined before any job-match effects.
+
+  beta_2 is recovered as: beta_2 = (beta_1 + beta_2)_step1 - beta_1_step2
+
+Second-step regressors also include:
+  - Years of completed schooling
+  - Marital status
+  - Residence in SMSA
+  - Union membership
+  - Disability
+  - Eight indicators for census region
+
+Cumulative returns calculation:
+  Based on main effect beta_2 = .0545 plus higher-order tenure terms from
+  Table 2, column 3:
+    Tenure^2 (x10^2): -.4592
+    Tenure^3 (x10^3): .1846
+    Tenure^4 (x10^4): -.0245
+
+  Cumulative return at T years = beta_2 * T + (-.4592/100) * T^2
+                                 + (.1846/1000) * T^3 + (-.0245/10000) * T^4
+
+==============================================================================
+NOTES
+==============================================================================
+
+- The experience effect beta_1 is identified using initial labor market
+  experience as an instrument for current experience
+- Column (2) comes directly from the first-step estimates (Table 2, col 3)
+- Column (3) = Column (2) - Column (1)
+- Column (4) measures the OLS bias in estimated within-job wage growth,
+  which is the difference between OLS and IV estimates of the linear
+  tenure coefficient in a standard cross-sectional wage equation
+- The two-step tenure profile is substantially lower than the OLS profile,
+  indicating that OLS overstates returns to tenure due to heterogeneity bias

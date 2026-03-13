@@ -1,0 +1,73 @@
+Instruction Summary for Table 2 Replication
+=============================================
+
+Dataset: bb1992_data.csv
+
+Variable Mapping (Paper name → Dataset column):
+------------------------------------------------
+
+Forecasted variables (the "Own" variable placed first in each VAR):
+  1. Industrial production  → log_industrial_production
+  2. Capacity utilization   → log_capacity_utilization
+  3. Employment             → log_employment
+  4. Unemployment rate      → unemp_male_2554
+  5. Housing starts         → log_housing_starts
+  6. Personal income        → log_personal_income_real
+  7. Retail sales           → log_retail_sales_real
+  8. Consumption            → log_consumption_real
+  9. Durable-goods orders   → log_durable_goods_real (MISSING - may need construction)
+
+Common VAR variables (same across all nine VARs):
+  CPI   → log_cpi
+  M1    → log_m1
+  M2    → log_m2
+  BILL  → tbill_3m
+  BOND  → treasury_10y
+  FUNDS → funds_rate
+
+Notes on variables:
+- "log_" prefix columns are already in log levels in the dataset.
+- Real variables (personal income, retail sales, consumption, durable-goods orders)
+  should be deflated by CPI before taking logs. Verify whether the dataset columns
+  already incorporate this deflation.
+- Unemployment rate (unemp_male_2554) enters in levels, not logs.
+- Interest rates (tbill_3m, treasury_10y, funds_rate) enter in levels.
+
+VAR Specification:
+------------------
+- For each forecasted variable, estimate a 7-variable VAR.
+- Variables in each VAR: [forecasted_var, log_cpi, log_m1, log_m2, tbill_3m, treasury_10y, funds_rate]
+- Number of lags: 6
+- Choleski ordering: forecasted_var is FIRST, funds_rate is LAST.
+  Full ordering: [forecasted_var, log_cpi, log_m1, log_m2, tbill_3m, treasury_10y, funds_rate]
+
+Variance Decomposition:
+-----------------------
+- Compute forecast error variance decomposition (FEVD) at horizon = 24 months.
+- Report the percentage of variance of the forecasted variable attributable to
+  each of the 7 variables.
+- Rows should sum to 100%.
+
+Sample Periods:
+---------------
+- Panel A: 1959-07 to 1989-12
+- Panel B: 1959-07 to 1979-09
+
+Implementation with statsmodels:
+--------------------------------
+1. Load bb1992_data.csv, parse dates, set DatetimeIndex with freq='MS'.
+2. For each forecasted variable and each sample period:
+   a. Select the 7 columns in Choleski order.
+   b. Subset to the sample period.
+   c. Drop any rows with NaN.
+   d. Fit VAR(6) using statsmodels.tsa.api.VAR.
+   e. Compute FEVD with 24 periods using results.fevd(24).
+   f. Extract the decomposition for the first variable (the forecasted variable)
+      at horizon index 23 (0-indexed, so the 24th period).
+   g. Report percentages (multiply by 100 if needed).
+
+Handling missing variable (durable-goods orders):
+-------------------------------------------------
+- If log_durable_goods_real is not present in the dataset, check for alternative
+  column names or attempt to construct it from available data.
+- If the variable cannot be constructed, skip that row and note it in the output.

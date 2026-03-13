@@ -1,0 +1,52 @@
+DISCREPANCY REPORT - Attempt 3
+===============================
+Score: 38.8/100
+
+CRITICAL ISSUES:
+
+1. IV ESTIMATION FUNDAMENTALLY BROKEN:
+   - beta_1 = 0.0199, SE = 0.0004 (paper: 0.0713, SE = 0.0181)
+   - First stage F = 234,242 (absurdly high)
+   - Even with paper's step 1 values, beta_1 = 0.0105 (still wrong)
+   - Problem: init_exp = experience - tenure is mechanically linked to experience
+   - The IV is NOT identifying the experience return correctly
+
+   Root cause analysis:
+   - In Topel's framework, the step 2 regression uses LEVELS data
+   - w*_it = alpha_i + beta_1 * X_it + controls + epsilon_it
+   - alpha_i (person fixed effect) is correlated with X_it (experience)
+   - The instrument init_exp = X_i0 = X_it - T_it is supposed to be
+     uncorrelated with alpha_i CONDITIONAL on the other controls
+   - But in practice, init_exp still captures individual heterogeneity
+
+   What Topel actually does:
+   - The standard error of 0.0181 suggests clustering by person
+   - Need to use person-clustered standard errors
+   - The coefficient difference (0.02 vs 0.07) suggests something deeper
+   - Perhaps the IV should use ONLY the between-person variation
+   - Or perhaps the levels regression should use person means
+
+   Alternative: Topel may use the INITIAL observation for each person
+   (or each job spell) rather than all person-year observations.
+   This would make N closer to 10,685 if there are ~10,685 unique
+   person-job combinations. But 10,685 seems too many for 2,387 persons
+   with avg 5-6 obs each... unless it's person-year after all.
+
+2. SAMPLE SIZE:
+   N = 13,754 vs 10,685. Still too large.
+   Hours >= 250 didn't help much (only removed 158 obs).
+
+3. STEP 1 COEFFICIENTS:
+   b1+b2 = 0.1542 vs 0.1258 (23% off). Still too high.
+   Higher-order coefficients very different from paper.
+   gamma2 = -1.15 vs -0.46. This is very concerning.
+
+FIXES FOR ATTEMPT 4:
+1. Use person-clustered standard errors for IV
+2. Consider cross-section approach: use person means or initial obs
+3. Reconsider the step 1 wage deflation
+4. Try using CPS wage index for BOTH steps
+5. Investigate why gamma2 differs so much (-1.15 vs -0.46)
+6. Try stricter sample restrictions for N
+7. Consider that the "real wage" in levels uses both GNP deflator
+   AND CPS wage index together

@@ -1,0 +1,27 @@
+Discrepancy Report - Attempt 2
+Score: 86/100
+
+IMPROVEMENTS FROM ATTEMPT 1:
+- Demographic Model N: 623 -> 793 (now within 5% of paper's 756)
+- All 26 coefficients now match on sign and magnitude (30/30 points)
+- Age significance in Demographic Model now matches (*** = ***)
+
+REMAINING ISSUES:
+
+1. Sample Size - Political Intolerance Model: paper=503, generated=447 (11.1% off)
+   - Requiring all 15 tolerance items still too strict
+   - Need to allow partial missing tolerance data
+
+2. Significance mismatches (5 of 26):
+   - Demographic/cons_prot: paper='' gen='*' (false positive, slightly over-significant)
+   - Demographic/southern: paper='**' gen='*' (borderline)
+   - Pol.Intol/age: paper='*' gen='' (insufficient power due to small N)
+   - Pol.Intol/southern: paper='**' gen='*' (borderline)
+   - Pol.Intol/pol_intol: paper='***' gen='**' (borderline, N too small)
+
+3. R-squared - Pol.Intol adj_r2: paper=0.148, gen=0.128 (0.020 diff, borderline)
+
+STRATEGY FOR NEXT ATTEMPT:
+- Allow respondents with >= 13 of 15 tolerance items (sum available items)
+- This should bring Model 3 N from 447 to ~509, closer to paper's 503
+- Larger N should help significance levels match better

@@ -1,0 +1,16 @@
+Attempt 12: Multi-strategy search
+Best configuration: std_delta=-0.15 (same as attempt 11)
+Score: 86.0/100, sig=41/45, val=28/45
+
+No improvement over attempt 11.
+
+Strategies tested:
+A. Standard regression splice with delta range [-0.30, 0.30]: best=86.0 at delta=-0.15
+B. Alternative TERM (10yr-3mo): 75-77, much worse
+C. Shorter sample periods: 84.7-86.0, no improvement
+D. cpbill_long only (no splice): 78.7
+E. CP minus 3-month T-bill spread: 80-81, worse
+
+Conclusion: The current specification (regression splice, delta=-0.15, TERM=10yr-1yr,
+CPBILL = cpaper-tbill_6m, sample 1961:7-1989:12) is already optimal among the
+configurations tested.

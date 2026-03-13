@@ -1,0 +1,32 @@
+DISCREPANCY REPORT - Attempt 6
+Score: 50/100
+
+PROGRESS: The approach now produces positive, reasonable beta_2 values (~0.078-0.082)
+using the corrected adjusted wage formula (subtract only tenure polynomial).
+
+REMAINING ISSUES:
+1. beta_2 values are ~2x too high (0.078-0.082 vs 0.030-0.045)
+2. Insufficient variation across columns (spread 0.004 vs target 0.015)
+3. Cumulative returns 3-4x too high
+
+ROOT CAUSES:
+1. Our beta_1 from IV is ~0.047, while Topel gets 0.07-0.10
+   This systematic difference is due to:
+   - Data starting in 1971 vs 1968 (missing early years)
+   - Sample size mismatch (12,725 vs 10,685)
+   - Possible education recoding differences
+
+2. The instruments (initial_exp, T_dev) are too correlated with experience
+   (R2 > 0.97 in first stage), making IV nearly identical to OLS
+
+STRATEGIES FOR ATTEMPT 7:
+1. Filter to tenure >= 2 to match Topel's N more closely
+2. Use GNP deflator in addition to CPS wage index
+3. Try using only person's FIRST observation per job as initial_exp
+   (not just experience - tenure)
+4. Consider that the Table 6 approach may differ from Table 3:
+   - Table 3: instruments = (X_0, year dummies)
+   - Table 6: instruments = (X_0, T-T_bar, year dummies)
+   The inclusion of T-T_bar could fundamentally change identification
+5. Consider running step 1 from our own data (not using Topel's published values)
+   since the gamma coefficients also affect cumulative returns

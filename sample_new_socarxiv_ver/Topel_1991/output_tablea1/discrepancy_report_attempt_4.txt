@@ -1,0 +1,47 @@
+DISCREPANCY REPORT - ATTEMPT 4
+================================
+Score: 76/100
+
+IMPROVEMENTS FROM ATTEMPT 3:
+- Married: 0.828 -> 0.904 (target 0.925), fixed 1975 coding bug
+- Union: 0.379 -> 0.335 (target 0.344), SD now matches
+- Disabled: 0.080 -> 0.075 (target 0.074), both mean and SD match
+- Values matched: 19 -> 22 out of 48
+
+STILL MISMATCHING:
+1. SMSA: 0.000 vs 0.644 (UNFIXABLE - data suppressed in public-use files)
+   Costs: 2 values = ~1.67 pts
+
+2. Real wage: 1.246 vs 1.131 (10.1% error)
+   - Gap of 0.115 likely due to missing 1968-1970 data
+   - Wage formula is correct (ln(w) - ln(GNP/33.4) - ln(CPS))
+   - Cannot fix without 1968-1970 data
+
+3. Experience SD: 11.898 vs 11.045 (7.7% off)
+   - Related to sample composition differences
+
+4. Married: 0.904 vs 0.925 (2.3% off, just barely outside 2% threshold)
+   - Could try different 1975 fix strategy
+   - The 1975 carry-forward gives 0.892, lower than adjacent years (0.914, 0.889)
+
+5. Year percentages: ALL off because of missing 1968-1970
+   - Without 1968-1970 data, per-year proportions will never match
+   - 16 values = 13.3 pts at stake
+
+6. Real wage SD: 0.481 vs 0.497 (3.3% off)
+
+ANALYSIS OF MAXIMUM ACHIEVABLE SCORE:
+- Categories: 18.1/20 (can't get 1968-1970)
+- Values: At best ~28/48 could match if everything fixable were fixed
+  (16 CPS always match + 5 means + 5 SDs + 2 year pcts)
+  = (28/48)*40 = 23.3
+- Ordering: 10/10
+- N: 20/20
+- Structure: 10/10
+Maximum possible: ~81
+
+PLAN FOR ATTEMPT 5:
+- Try ddof=1 for standard deviations (pandas default) instead of ddof=0
+- Investigate whether the married rate can be improved
+- Check if tenure can be improved further
+- Consider if union carry-forward is optimal

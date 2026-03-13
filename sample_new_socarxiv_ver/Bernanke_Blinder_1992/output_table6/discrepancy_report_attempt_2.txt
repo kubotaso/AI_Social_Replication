@@ -1,0 +1,41 @@
+Discrepancy Report - Attempt 2
+================================
+
+Score: 35/100
+
+ANALYSIS:
+- Scaled coefficients by 0.01 (interpreting paper's values as response to 1% NBR innovation)
+- 2SLS coefficients are still ~5-25x too large (magnitudes 0.03-0.35 vs paper's 0.007-0.021)
+- LIML makes things worse (more biased away from paper's values)
+- OLS gives all correct signs (6/6) but magnitudes are 3-10x too large
+
+ROOT CAUSE: Extreme weak instruments problem.
+- First-stage F-statistics: 0.6-3.6 (all far below Stock-Yogo threshold of ~10)
+- First-stage R2: 0.005-0.045
+- Contemporaneous correlations between macro and NBR innovations are very weak
+  with revised data (-0.03 to -0.14)
+- This is a fundamental data vintage issue: the original 1980s/90s vintage data
+  had different contemporaneous correlation structure
+
+KEY INSIGHT: The paper's results (-0.02 range) are consistent with either:
+1. Stronger instruments in original data → stable 2SLS near OLS
+2. Very weak instruments → 2SLS converging to the probability limit
+The fact that our 2SLS gives unstable, large estimates confirms weak instruments.
+
+SCALING QUESTION RESOLVED:
+- Paper reports "number of percentage points the funds rate moves in response
+  to a 1-percent innovation in nonborrowed reserves"
+- Since NBR is in log, 1% = 0.01 in log units
+- So reported coefficient = raw_beta * 0.01
+- But even with this scaling, our 2SLS values are too large
+
+FIXES TO TRY FOR ATTEMPT 3:
+1. Try k-class estimators with k < 1 (between OLS and LIML) - can sometimes help
+2. Try GMM with optimal weighting
+3. Try fuller estimator (Fuller's modified LIML)
+4. Accept data vintage limitation and use the best available method
+5. Try jackknife IV estimator (JIVE)
+6. Try using different variable ordering or including additional controls
+7. Key idea: maybe I should NOT scale by 0.01. Maybe the paper reports the RAW beta.
+   With weak instruments, 2SLS can give estimates near zero that happen to match.
+   Our instruments are too weak differently, giving -13 instead of -0.02.

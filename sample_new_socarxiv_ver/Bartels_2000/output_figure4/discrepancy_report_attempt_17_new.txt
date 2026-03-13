@@ -1,0 +1,19 @@
+Discrepancy Report - Attempt 17
+Score: 88.4/100 (with revised ground truth)
+
+Tested approaches:
+T1) Table 1 coefs + white subgroup voter props: 85.2
+T2) Table 1 coefs + white subgroup all-resp props: 81.7
+T3) Table 1 coefs + overall white voter props: 85.0 (same NS and S - no differentiation)
+W) Census South + white probit + overall white voter props: 86.8
+X) Census South + all-voter probit + overall white voter props: 88.4
+Y) Y2 reference: 88.4
+Z) Weighted probit (VCF0009z): 88.4 (identical to unweighted)
+
+Key findings:
+- Table 1 coefficients with subgroup proportions (T1) score 85.2, lower than
+  region probit. This confirms Figure 4 uses SEPARATE probits, not Table 1.
+- Census South (X) ties with Political South (Y) at 88.4 but with different
+  error patterns: Census South is better for 1952 S (0.93 vs 1.12) and 1960 NS
+  (1.25 vs 1.18) but worse for 1976 S and 1984 S.
+- Survey weights (VCF0009z) produce identical results to unweighted probit.

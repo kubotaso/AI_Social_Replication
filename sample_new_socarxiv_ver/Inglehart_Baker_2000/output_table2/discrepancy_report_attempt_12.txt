@@ -1,0 +1,72 @@
+Discrepancy Report - Table 2, Attempt 12
+Score: 76.3/100 (below best of 76.8)
+
+KEY FINDINGS:
+
+1. E116 IS IN THE DATASET:
+   - E116 pct<=2 = 0.64, E116 pct==1 = 0.65 (too high, paper wants 0.43)
+   - E116 wave 2 only: data may not be available in waves 2-3
+   - The issue is that E116 (army rule) has high N=49 countries, and the direction is
+     strongly correlated with Traditional factor. But the magnitude is too high.
+
+2. D061 IS IN DATASET BUT NO DATA FOR WAVES 2-3:
+   - D061 exists but has 0 valid rows in waves 2-3. This means the variable
+     was asked in later waves only. Cannot use for this analysis.
+
+3. E143 IS IN DATASET BUT NOT EXPLORED YET:
+   - E143 exists. Need to check if it's related to "own preferences vs understanding"
+   - This is the next priority to search.
+
+4. LOVE/RESPECT PARENTS: ALL VARIANTS GIVE |0.68|:
+   - Binary (==1): 0.68
+   - Inv mean (4-A025): 0.68
+   - NOT (>=2): -0.68
+   - Mean: -0.68
+   This is because the item has extremely low variance (most countries have ~90%+ saying 1).
+   All codings pick up the same signal. The paper value of 0.49 is lower, suggesting either:
+   a) A different question (maybe about whether you should always obey parents)
+   b) A different coding (the item in wave 2 may have been 1-3 scale vs 1-4 in wave 3)
+   c) The paper uses a different question for this item
+
+5. ARMY RULE: STUCK BETWEEN TWO EXTREMES:
+   - E114 (favorable to strong leader, no parliament/elections): 0.21 (too low)
+   - E116 (favorable to army rule): 0.64 (too high)
+   - Paper wants 0.43 = exactly between them
+   HYPOTHESIS: The paper uses a COMPOSITE of both E114 and E116 (army rule = average of both)
+   Try: (E114_binary + E116_binary) / 2 at country level
+
+6. EUTHANASIA: HARD CEILING AT 0.79-0.81:
+   All thresholds give 0.79-0.81. The item is too correlated with religious practices.
+   HYPOTHESIS: The paper's euthanasia variable (0.66) might actually be F123 (justification
+   of euthanasia based on religious belief) rather than F122 (euthanasia per se).
+
+PLAN FOR ATTEMPT 13:
+1. EXPLORE E143 - what does this variable measure? Check value distribution.
+2. TRY COMPOSITE ARMY RULE: average of E114_binary and E116_binary
+3. TRY LOVE/RESPECT PARENTS: Check if variable has different scale in wave 2 vs wave 3
+   Maybe it should be NOT (secular coding) with negative correlation treated as positive
+   Actually we want the POSITIVE correlation with Trad = should be pct==1 (traditional)
+   The paper's 0.49 is LOWER than our 0.68 - items scoring near-universally high
+   might be near-universally traditional, giving lower correlation variation.
+   NEW IDEA: Maybe the paper uses A025 MEAN (1-3 scale) where mean~1.1 across all countries,
+   but with INVERTED polarity (so secular = high score = prefer not to obey unconditionally)
+4. TRY: Explore all E-variables in waves 2-3 for potential "own preferences" variable
+5. Keep the best items from attempt 10 (score 76.8)
+
+ORDERING ANALYSIS:
+The auto-selected best items for FAR categories push euthanasia to rank 4 (0.79-0.81 → above hell at 0.76)
+but paper has euthanasia at rank 9 (0.66). This disrupts the ordering and costs ordering points.
+In attempt 10 (score 76.8), ordering was 8.3/10, but in attempts 11 and 12 it's 7.7/10.
+The difference: attempt 10 used euthanasia inv_mean=0.79 but the auto-select chose inv_mean
+(which is the same 0.79). Let me check what changed...
+
+Actually the issue is that attempts 11 and 12 rank euthanasia as 4th place in our output,
+above "believes in Heaven" (0.83). So the ordering Spearman rho is lower.
+In attempt 10, the same euthanasia=0.79 was ranked 4th. The 8.3 vs 7.7 difference
+might be from different army rule selection affecting overall rank ordering.
+
+CONCLUSION: The best strategy for attempt 13 is to keep attempt 10's exact configuration
+but try to fix the three most impactful issues:
+1. Find "own preferences" via E143 search
+2. Try composite army rule to get ~0.43
+3. Accept euthanasia at 0.79 (inv_mean) rather than 0.81 (pct_never) to improve ordering

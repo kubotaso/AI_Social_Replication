@@ -1,0 +1,90 @@
+INSTRUCTION SUMMARY: Table 2 — Variable Mapping and Construction
+================================================================
+
+DATA SOURCE: PSID Panel Dataset (constructed)
+FILE: data/psid_panel.csv (main) and data/psid_panel_full.csv (pre-tenure-restriction)
+VARIABLE MAP: psid_variable_map.txt
+
+================================================================
+COMMON PSID VARIABLE CONSTRUCTION (applies to Tables 2-7, A1)
+================================================================
+
+1. Log hourly wage (dependent variable base):
+   - hourly_wage = labor_inc / hours (already computed in panel)
+   - log_hourly_wage = ln(hourly_wage) (already computed)
+   - DEFLATION: log_real_wage = log_hourly_wage - ln(CPS_wage_index[year])
+   - CPS Wage Index values: {1968:1.000, 1969:1.032, 1970:1.091, 1971:1.115,
+     1972:1.113, 1973:1.151, 1974:1.167, 1975:1.188, 1976:1.117, 1977:1.121,
+     1978:1.133, 1979:1.128, 1980:1.128, 1981:1.109, 1982:1.103, 1983:1.089}
+
+2. Education (years of completed schooling):
+   - Panel column: education_clean
+   - CRITICAL: In early PSID waves (1968-1975), education is CATEGORICAL:
+     0=Can't read/write, 1=0-5 grades, 2=6-8 grades, 3=9-11 grades,
+     4=12 grades (HS), 5=12+nonacademic, 6=some college, 7=BA degree, 8=advanced degree
+   - MUST recode to approximate years:
+     0->0, 1->3, 2->7, 3->10, 4->12, 5->12, 6->14, 7->16, 8->17
+   - In later waves (1976+), education may already be in years (0-17)
+   - Check: if max(education) <= 8, it's categorical; if max > 8, it's years
+
+3. Experience:
+   - experience = age - education_years - 6
+   - Must use recoded education (years), not raw categorical code
+   - Ensure experience >= 0
+
+4. Tenure (reconstructed):
+   - Panel column: tenure_topel
+   - Starts at 0 for first year observed in a job, increments by 1
+   - For jobs in progress at panel start: use max reported tenure to gauge starting value
+
+5. Year dummies: year_1968 through year_1983 (already in panel)
+
+6. Region dummies: region_ne, region_nc, region_south, region_west (already in panel)
+
+================================================================
+TABLE 2 SPECIFIC INSTRUCTIONS
+================================================================
+
+Dependent variable: Change in log real wage (first difference within job)
+  d_log_real_wage = log_real_wage[t] - log_real_wage[t-1]
+  Only for consecutive within-job observations (same job_id, consecutive years)
+  Mean should be approximately .026
+
+Sample: Within-job observations only (where d_log_wage is non-missing)
+  N should be approximately 8,683
+
+Independent variables (all in FIRST-DIFFERENCED form):
+  - Delta Tenure (linear): always = 1 within a job (tenure increases by 1 each year)
+  - Delta Tenure^2 (x10^2): (tenure_t^2 - tenure_{t-1}^2) * 100
+  - Delta Tenure^3 (x10^3): difference of cubed tenure * 1000
+  - Delta Tenure^4 (x10^4): difference of quartic tenure * 10000
+  - Delta Experience^2 (x10^2): (exp_t^2 - exp_{t-1}^2) * 100
+  - Delta Experience^3 (x10^3): (exp_t^3 - exp_{t-1}^3) * 1000
+  - Delta Experience^4 (x10^4): (exp_t^4 - exp_{t-1}^4) * 10000
+  - Year dummies (15 dummies for 1969-1983; first-differenced = changes in year dummies)
+
+Note on scaling: The paper reports coefficients with polynomial terms scaled by
+powers of 10. E.g., "Delta Experience^2 (x10^2)" means the coefficient is for
+experience^2 / 100. So if raw coefficient is -0.006051, the reported value is
+-.6051 (multiplied by 100).
+
+Three models:
+  Model (1): Linear tenure + quartic experience + year dummies
+  Model (2): Quadratic tenure + quartic experience + year dummies
+  Model (3): Quartic tenure + quartic experience + year dummies
+
+Bottom panel: Predicted wage growth at tenure 1-10 for worker with 10 years experience
+  Using Model (3) coefficients.
+
+Statistical method: OLS on first-differenced data.
+
+================================================================
+SCORING NOTES
+================================================================
+
+Key values to match:
+- All coefficients and SEs in 3 models (7+9+11 = 27 coefficient-SE pairs)
+- R^2 values for 3 models (.022, .023, .025)
+- Standard error of regression (.218 for all 3)
+- Predicted wage growth values (10 values)
+- N = 8,683

@@ -1,0 +1,48 @@
+DISCREPANCY REPORT - Attempt 1
+================================
+
+Score: 25/100 (estimated; scoring function crashed)
+
+MAJOR ISSUES:
+
+1. R-squared much too low (0.28 vs 0.42 target)
+   - The R-squared gap of ~0.14 is massive
+   - Likely causes:
+     a) Education recoding may be wrong (code 9 not mapped)
+     b) Experience^2 coefficient is too small, suggesting experience is computed wrong
+     c) The wage deflation may be wrong (using both GNP and CPS when paper uses CPS only)
+   - Fix: Try CPS-only deflation (log_hourly_wage - log(CPS_index))
+
+2. Experience^2 coefficient wrong (-0.000532 vs -0.00079)
+   - If education_years is wrong (too low), experience = age - educ - 6 would be too high
+   - This would shrink the coefficient on experience^2
+   - Fix: Ensure education recoding maps code 9 -> 17
+
+3. Tenure coefficient too high in Column 1 (0.027 vs 0.014)
+   - Suggests the model is capturing both tenure and completed-tenure effects in one variable
+   - Could also be related to wrong experience/education
+   - Fix: Better variable construction
+
+4. Interaction terms have wrong sign
+   - obs_ct_x_tenure: -0.0024 (should be +0.0142)
+   - imp_ct_x_tenure: -0.0045 (should be +0.0429)
+   - This suggests the completed tenure variable may not be constructed correctly
+   - The paper says completed tenure is the total length of the job
+   - Fix: Recheck completed tenure construction
+
+5. Imputed completed tenure model has low R^2 (0.058)
+   - Need better prediction model or different approach
+   - Paper uses discrete-time proportional hazards model
+   - Fix: Use a hazard/survival model approach
+
+6. Scoring function crash
+   - KeyError in string replacement logic for SE keys
+   - Fix: Rewrite scoring function with explicit key mapping
+
+PLAN FOR ATTEMPT 2:
+- Use CPS-only deflation (no GNP deflator for this table)
+- Fix education recoding (code 9 -> 17)
+- Fix completed tenure construction to use total job spell length properly
+- Improve imputed completed tenure using logistic hazard model
+- Fix scoring function
+- Check if tenure_topel starts at 0 or 1 and adjust completed tenure accordingly

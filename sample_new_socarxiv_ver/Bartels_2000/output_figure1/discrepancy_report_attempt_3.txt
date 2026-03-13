@@ -1,0 +1,43 @@
+Discrepancy Report - Attempt 3
+Score: 88/100
+
+=== Improvements from Attempt 2 ===
+- Title no longer overlaps
+- Horizontal rule added under title
+- Serif font used
+- Better overall layout
+
+=== Remaining Visual Discrepancies ===
+
+1. WHITESPACE: Too much gap between title block and top panel, and between the two panels.
+   In the original, the title is closer to the top panel and panels are close together.
+   Fix: Adjust gridspec top/hspace parameters to bring panels closer together and closer to title.
+
+2. PANEL DIMENSIONS: The panels in the original are wider relative to their height.
+   Fix: Adjust figure dimensions and gridspec parameters.
+
+3. LEGEND DASH STYLE: The original's dashed lines use longer dashes.
+   Fix: Adjust dash pattern (dashes=(6,3) or similar).
+
+4. Y-AXIS TICK FORMAT: The 0.0 label at bottom is correct. Tick marks point inward - correct.
+
+=== Data Discrepancies (inherent) ===
+These appear to be due to different ANES cumulative file versions:
+- "Weak" identifiers consistently ~0.02-0.06 higher than original in 1958-1982
+- "Strong" identifiers ~0.02-0.04 higher in 1952-1962
+- Pure Independents ~0.02-0.03 lower in 1952
+
+These differences are systematic and likely reflect different dataset versions rather than coding errors. The trends and patterns are correct.
+
+=== Scoring Breakdown ===
+- Plot type and series: 15/15
+- Data accuracy: 33/40
+- Axis labels: 15/15
+- Visual elements: 13/15 (title and legends good, minor spacing issues)
+- Layout: 12/15 (whitespace needs reduction)
+
+=== Fixes for Next Attempt ===
+1. Reduce whitespace: set gridspec top=0.85 or higher, increase hspace slightly to reduce gap
+2. Make panels taller relative to figure height
+3. Adjust dash pattern for dashed lines
+4. Fine-tune figure dimensions to match original aspect ratio

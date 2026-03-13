@@ -1,0 +1,44 @@
+Discrepancy Report - Attempt 14
+Score: 93/100 (same as attempts 11, 12, 13)
+PLATEAU CONFIRMED: 4 consecutive attempts at 93
+
+SUMMARY:
+56 exact, 1 close, 3 miss, 17 missing (77 total cells).
+No change from attempt 13.
+
+SCORING:
+value_score = 40*(56+1*0.75)/60 = 40*56.75/60 = 37.83
+n_score = 20*60/77 = 15.58
+Total = 20+37.83+10+15.58+10 = 93.41 → 93
+
+PLATEAU STATUS:
+Attempts 11-14 all scored 93 (4 consecutive).
+After 5 consecutive same-score attempts, plateau will be formally declared.
+
+EXHAUSTIVE INVESTIGATION COMPLETED (attempts 1-14):
+All possible data approaches have been explored. The score of 93 is our
+confirmed maximum with WVS Time Series v5.0 + EVS ZA4460 + EVS CSV.
+
+REMAINING ISSUES (all confirmed unfixable):
+1. India 1990: 37 vs 44 (diff=7) - 162 fewer 10s in WVS v5.0 than needed
+   WVS v5.0: 926/2474 = 37.43%. For 44%: need 1088 10s. Cannot be fixed.
+2. East Germany 1995: 9 vs 6 (diff=3) - all G006 subsets give 8-9%
+   G006=[2,3]: 105/1176=8.93%. For 6%: need ~71 out of 1176. Cannot be fixed.
+3. South Africa 1981: 53 vs 50 (diff=3) - weights all=1.0, 825/1563=52.78%
+   For 50%: need 1650 total records, have 1563. Cannot be fixed.
+4. India 1995: 54 vs 56 (diff=2) - 1084/2010=53.93%, even ceil=54. Cannot reach 56.
+5-21. 17 missing cells: EVS 1981 unavailable, Korea F063=-4, Latvia no valid data.
+
+INVESTIGATION FINDINGS:
+- WVS wave 2 coverage: only 18 countries (missing all W. European + USA for 1990-1991)
+- EVS ZA4460 coverage: 29 countries, all 1990-1993 only, Latvia has no valid q365
+- EVS CSV coverage: matches ZA4460, Latvia has no valid A006
+- WVS wave 1 coverage: only 8 countries (ARG, AUS, FIN, HUN, JPN, KOR, MEX, ZAF)
+- All European 1981 values require GESIS ZA1307 (not available)
+- Switzerland 1990 correctly sourced from WVS wave 2 (25.86%→26, EXACT)
+- All currently-exact values verified against multiple approaches
+
+CONCLUSION:
+Score 93 is the empirical maximum with available data (WVS v5.0 + EVS ZA4460).
+To reach 95+: need EVS 1981 data (14+ cells) + fix India 1990 (7-point diff).
+The scoring formula correctly rewards 93.4% value accuracy for produced cells.

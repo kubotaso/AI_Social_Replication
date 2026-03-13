@@ -1,0 +1,45 @@
+DISCREPANCY REPORT - ATTEMPT 1
+Score: 37/100
+
+MAJOR ISSUES:
+
+1. SAMPLE SIZES OFF:
+   - Prof/Service: got 5959, need 4946 (20.5% too high)
+   - BC Nonunion: got 1788, need 2642 (32.3% too low)
+   - BC Union: got 2360, need 2741 (13.9% too low)
+
+   Root causes:
+   - Need to check if code 0 (unclassified) workers are being properly excluded
+   - Union assignment at job level may be wrong; many union observations are NaN
+   - Need to check sample restrictions more carefully (SRC sample only, age 18-60, etc.)
+   - May need to include observations where union_member is available but NaN for P/S group
+   - Prof/Service too high: may be including observations that should be excluded
+
+2. STANDARD ERRORS FOR BETA_1 WAY TOO SMALL:
+   - Got 0.0006 instead of 0.0288 for P/S
+   - The 2SLS SE correction is wrong - using X_hat'X_hat inverse gives wrong SEs
+   - Need proper IV standard errors using linearmodels IV2SLS or manual correction
+   - The formula should be: sigma^2 * (X'PzX)^{-1} where Pz is the projection matrix
+
+3. STEP 1 INTERCEPT (BETA_1+BETA_2) FOR BLUE-COLLAR GROUPS TOO HIGH:
+   - BC_Nonunion: 0.2471 vs 0.1520 (63% off)
+   - BC_Union: 0.1783 vs 0.0992 (80% off)
+   - This suggests the within-job sample is too restrictive or the differencing is wrong
+   - Higher-order polynomial terms may be absorbing too much variation in small samples
+
+4. CUMULATIVE RETURNS DIVERGE AT HIGH TENURE:
+   - Quartic terms are too large, causing negative returns at 15-20 years
+   - This is because the higher-order coefficients (gamma) are too large in magnitude
+   - Need to check scaling of tenure polynomial terms
+
+5. SE FOR BETA_2 TOO LARGE:
+   - Using sqrt(Var(beta_hat) + Var(beta_1)) gives inflated SEs
+   - Need proper computation accounting for covariance
+
+FIXES FOR ATTEMPT 2:
+a) Use linearmodels IV2SLS for proper IV standard errors
+b) Fix sample restrictions: check id_1968 for SRC sample, age restrictions
+c) Re-examine occupation classification - may need different groupings
+d) Check the union_member NaN handling - 4142 NaN values in the data
+e) Review higher-order term scaling
+f) Consider using current-year union status instead of job-level for better sample coverage

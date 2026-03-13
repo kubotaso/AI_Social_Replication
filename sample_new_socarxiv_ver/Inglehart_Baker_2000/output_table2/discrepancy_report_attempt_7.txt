@@ -1,0 +1,45 @@
+Discrepancy Report - Attempt 7 (Score: 72.3/100)
+
+SIGNIFICANT IMPROVEMENT from 66.1 to 72.3 (+6.2 points).
+
+Key changes that worked:
+1. Correlation-matrix PCA (eigendecomposition of corr matrix) instead of SVD on standardized data
+2. AUTONOMY composite (A042+A034-A029) gives better-balanced factor loadings
+3. A026 for "Parents' duty to children" - EXACT match (0.60 vs 0.60)
+4. Clear guidelines (F024) from wave 2 - close match (0.59 vs 0.56)
+5. Environmental problems (B009) added - moderate match (0.47 vs 0.56)
+6. best_match() for justifiability items to pick closest operationalization
+
+Score breakdown:
+- Items present: 18.3/20 (22/24 - missing Make parents proud, Own preferences)
+- Value accuracy: 19.2/40 (8 close, 7 moderate)
+- Dimension correct: 20.0/20 (no wrong signs)
+- Ordering: 7.1/10
+- Sample size: 7.7/10
+
+CLOSE items (8): Religion, Hell, Church, Confidence, Religious person,
+                  Parents duty, Clear guidelines, Family
+
+MODERATE items (7): Heaven, Comfort, Work, Seldom politics, Left-right,
+                     Environmental, Ideal children
+
+FAR items (7): Euthanasia (0.79 vs 0.66), Stricter limits (0.21 vs 0.63),
+               Suicide (0.47 vs 0.61), Divorce (0.41 vs 0.57),
+               Woman earns more (0.79 vs 0.53), Love/respect (0.68 vs 0.49),
+               Army rule (0.21 vs 0.43)
+
+MISSING items (2): Make parents proud, Own preferences vs understanding
+
+PLAN FOR ATTEMPT 8:
+1. Still missing 2 items (Make parents proud, Own preferences) - worth 1.7 items_present points
+2. The FAR items are the main opportunity:
+   - Euthanasia: 0.79 vs 0.66 - try % never justifiable instead of inverted mean
+   - Woman earns more: 0.79 vs 0.53 - still too high, try D054==1 only (strongly agree)
+   - Love/respect parents: 0.68 vs 0.49 - still too high
+   - Divorce: 0.41 vs 0.57 - pct never was better than inv mean but still off
+   - Suicide: 0.47 vs 0.61 - need to improve
+   - Army rule: 0.21 vs 0.43 - very low, possibly wrong variable or need different operationalization
+   - Stricter limits: 0.21 vs 0.63 - only 14 countries, might be too few to get meaningful r
+3. Core issue: factor is still somewhat religion-heavy (GOD_IMP loading 0.91)
+4. Try using E114 mean instead of % favorable for army rule
+5. Try using D054==1 (strongly agree only) instead of D054<=2 for woman earns more

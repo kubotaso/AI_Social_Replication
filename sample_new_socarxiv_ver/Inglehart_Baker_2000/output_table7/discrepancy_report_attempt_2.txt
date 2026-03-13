@@ -1,0 +1,39 @@
+Discrepancy Report - Attempt 2
+Score: 58/100
+
+SUMMARY:
+- 42 exact (up from 38), 14 close, 4 misses, 17 missing
+- Weights (S017) helped some countries but HURT others
+- Turkey wave 3 went from 81 (correct) to 86 (miss=5) due to weights
+- Brazil wave 2 went from 83 (correct) to 82 (close) due to weights
+- Nigeria wave 3 went from 87 (correct) to 86 (close) due to weights
+
+KEY IMPROVEMENTS (from weighting):
+- Australia 1981: 26->25 (EXACT), 1995-98: 22->21 (EXACT)
+- Mexico 1981: 59->60 (EXACT)
+- Argentina 1995-98: 58->57 (EXACT)
+- USA 1995-98: 51->50 (EXACT)
+- Hungary 1981: 20->21 (EXACT)
+- Switzerland 1995-98: 18->17 (EXACT)
+
+KEY REGRESSIONS (from weighting):
+- Turkey 1995-98: 81->86 (now MISS, was EXACT)
+- Brazil 1990-91: 83->82 (now CLOSE, was EXACT)
+- Nigeria 1995-98: 87->86 (now CLOSE, was EXACT)
+- South Africa 1995-98: 72->70 (now CLOSE, was CLOSE but worse)
+
+REMAINING ISSUES:
+1. 17 missing cells (1981 EVS data unavailable + Korea + Latvia)
+2. East Germany coding still wrong (11 vs 13 for 1990, 9 vs 6 for 1995-98)
+3. India 1990-91 (37 vs 44) - data version difference
+4. South Africa 1981 (53 vs 50) - data version difference
+5. Weighting is inconsistent - helps some, hurts others
+
+PLAN FOR ATTEMPT 3:
+- Use UNWEIGHTED values as default
+- Only apply weights for specific countries where it matches paper:
+  AUS, MEX (wave1), ARG (wave3), USA (wave3), HUN (wave1), CHE (wave3)
+- Actually, better: use unweighted and accept the 1-point differences
+  where rounding doesn't match
+- Focus on getting the output format and summary statistics right
+- The fundamental limitation is missing 1981 data

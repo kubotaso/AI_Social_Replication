@@ -1,0 +1,180 @@
+TABLE A1: Variable Definitions and Summary Statistics, PSID White Males, 1968-83
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+Table appears on page 174 of the paper.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983 (first 16 waves)
+Sample: White male heads of households (pooled cross-sections across all waves)
+
+Sample restrictions (from Appendix, p. 173):
+- White males only
+- Ages 18-60 at the survey date
+- Positive earnings in the previous calendar year
+- Persons from Alaska and Hawaii excluded
+- Jobs excluded if respondent reported: self-employment at any time during
+  the job, government employment, agricultural employment
+- Poverty subsample of PSID excluded (random/SRC sample only)
+- Current job tenure >= 1 year (observations with < 1 year tenure deleted)
+- Jobs with ambiguous tenure sequences deleted
+
+Final sample size (from p. 148):
+- 1,540 individuals
+- 3,228 jobs
+- 13,128 job-year observations (person-year observations)
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: Summary statistics / descriptive table
+Layout: Two panels
+
+Top panel: Variable definitions with sample means and standard deviations
+  Columns: Variable, Definition, Mean, Standard Deviation
+
+Bottom panel: Sample distribution by survey year with CPS Real Wage Index
+  Columns: Survey Year, Percentage of Sample, CPS Real Wage Index
+
+==============================================================================
+GROUND-TRUTH VALUES - TOP PANEL: Variable Definitions and Summary Statistics
+==============================================================================
+
+Variable        | Definition                                              | Mean    | Std Dev
+----------------|--------------------------------------------------------|---------|--------
+Real wage       | Log average hourly earnings deflated by CPS wage index  | 1.131   | .497
+                | and GNP price deflator                                  |         |
+Experience      | Years in labor market                                   | 20.021  | 11.045
+Tenure          | Years of current job seniority                          | 9.978   | 8.944
+Education       | Years of completed schooling                            | 12.645  | 2.809
+Married         | 1 if currently married, spouse present                  | .925    | .263
+Union           | 1 if union member                                       | .344    | .473
+SMSA            | 1 if resides in SMSA                                    | .644    | .478
+Disabled        | 1 if currently reporting disability                     | .074    | .262
+
+==============================================================================
+GROUND-TRUTH VALUES - BOTTOM PANEL: Sample Distribution and CPS Wage Index
+==============================================================================
+
+Survey Year | Percentage of Sample | CPS Real Wage Index
+------------|---------------------|--------------------
+1968        | .052                | 1.000
+1969        | .050                | 1.032
+1970        | .051                | 1.091
+1971        | .053                | 1.115
+1972        | .057                | 1.113
+1973        | .058                | 1.151
+1974        | .060                | 1.167
+1975        | .061                | 1.188
+1976        | .065                | 1.117
+1977        | .065                | 1.121
+1978        | .069                | 1.133
+1979        | .071                | 1.128
+1980        | .073                | 1.128
+1981        | .072                | 1.109
+1982        | .071                | 1.103
+1983        | .068                | 1.089
+
+Note: The Percentage of Sample values should sum to approximately 1.000.
+Sum check: .052+.050+.051+.053+.057+.058+.060+.061+.065+.065+.069+.071+.073+.072+.071+.068 = .996
+(The small deviation from 1.000 is due to rounding of individual percentages.)
+
+==============================================================================
+NOTES
+==============================================================================
+
+- Real wage is constructed by deflating average hourly earnings first by
+  a CPS real wage index (from Murphy and Welch 1987, to account for changes
+  in the composition of the CPS sample over time) and then by the GNP price
+  deflator for consumption expenditure (to convert to real dollars).
+  The result is in LOG form (natural logarithm).
+- The CPS Real Wage Index is normalized to 1.000 in 1968 (base year).
+  It rises through the mid-1970s (peak 1.188 in 1975) and then declines,
+  reflecting real wage stagnation of the late 1970s and early 1980s.
+- Experience = Age - Education - 6 (years since leaving school,
+  assuming individuals start school at age 6 and enter the labor
+  market immediately upon completing their education)
+- Tenure is RECONSTRUCTED, not raw reported tenure from the PSID.
+  For jobs that began during the panel, tenure is started at zero and
+  incremented by one for each year the person works. For jobs in progress
+  at the start of the panel, starting tenure is gauged relative to the
+  period in which maximum reported tenure was observed. (See Appendix pp. 173-174.)
+- Union status: "1 if union member" -- jobs were categorized as "union" if the
+  respondent indicated union membership in more than half of the years of
+  the job (footnote 18, p. 164)
+- The sample percentage column shows that earlier years have slightly fewer
+  observations and later years have slightly more, reflecting panel additions
+  over time
+- All statistics are computed on the pooled sample across all 16 waves
+  (13,128 person-year observations)
+- Wages refer to average hourly earnings in the year preceding the survey
+- Other regressors used in the paper's regression models but not shown
+  in this table: 8 census region dummies, year dummies (for 1968-1983)
+
+==============================================================================
+VARIABLE CONSTRUCTION DETAILS
+==============================================================================
+
+Real wage construction:
+  1. Start with average hourly earnings from PSID (wages and salary / annual hours)
+  2. Divide by CPS Real Wage Index for the survey year (from bottom panel)
+  3. Divide by GNP price deflator for consumption expenditure
+  4. Take the natural logarithm
+  Result: "Log average hourly earnings deflated by CPS wage index and GNP price deflator"
+
+Experience construction:
+  Experience = Age - Years of education - 6
+  This assumes individuals start school at age 6 and enter the labor
+  market immediately upon completing their education.
+
+Tenure construction (RECONSTRUCTED):
+  For jobs starting during the panel: tenure = 0 at start, +1 each year worked
+  For jobs in progress at panel start: starting tenure gauged from period of
+    maximum reported tenure on the job
+  Year-to-year changes in raw reported tenure range from -31 to 7.5 years;
+    in 324 cases (3.8%), measured tenure declines between years of a job,
+    and in 51 cases the decline exceeds 5 years.
+  Jobs with significant ambiguities in tenure sequences were deleted.
+
+Married: 1 if currently married with spouse present, 0 otherwise
+Union: 1 if union member in more than half of years on the job, 0 otherwise
+SMSA: 1 if resides in Standard Metropolitan Statistical Area, 0 otherwise
+Disabled: 1 if currently reporting a disability, 0 otherwise
+
+==============================================================================
+STATISTICAL METHOD
+==============================================================================
+
+This table is purely descriptive -- it reports sample means and standard
+deviations for the key variables, plus the distribution of observations
+across survey years and the CPS Real Wage Index values used for deflation.
+
+No statistical model is estimated. The scoring rubric for descriptive tables
+applies:
+- Categories present (20 pts): All 8 variables in top panel, all 16 years
+  in bottom panel
+- Count/percentage values (40 pts): Means, SDs, percentages, and wage
+  index values match within 2% of true values
+- Ordering (10 pts): Variables and years in correct order
+- Sample size (20 pts): Implied N from percentages consistent with
+  13,128 total observations
+- Column structure (10 pts): Same columns as the paper (Variable,
+  Definition, Mean, Std Dev for top panel; Year, Pct, Index for bottom)
+
+==============================================================================
+SCORING NOTES
+==============================================================================
+
+Key values to match precisely:
+- All 8 variable means and 8 standard deviations in the top panel
+- All 16 percentage-of-sample values in the bottom panel
+- All 16 CPS Real Wage Index values in the bottom panel
+- Total: 16 + 32 = 48 individual numerical values
+
+The CPS Real Wage Index values are externally given (from Murphy and Welch 1987)
+and should be hardcoded. The sample percentages and variable means/SDs must be
+computed from the PSID data.

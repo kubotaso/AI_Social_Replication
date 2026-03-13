@@ -1,0 +1,20 @@
+Discrepancy Report - Attempt 11 (with new factor scores)
+Score: 53/100
+
+PWT 1980 GDP + squared service emp + updated GOD_IMP/AUTONOMY factor scores.
+Squared service emp makes surv side worse (srv_sq too dominant, GDP too low).
+
+CRITICAL ISSUE: N=62 vs paper's 49.
+With N=62, t-values are inflated, causing *** vs ** significance mismatches.
+
+STRATEGY FOR ATTEMPT 12:
+1. Return to RAW service employment (not squared) - this gave best results
+2. Restrict to ~49 countries by only keeping those with direct PWT 1980 GDP:
+   - 45 countries with direct PWT entries
+   - Plus RUS (from USSR), CZE (from Czechoslovakia), DEU (W.Germany)
+   - Plus maybe East Germany if we can separate it
+   - DROP: ARM, AZE, BLR, EST, GEO, LVA, LTU, MDA, UKR (ex-USSR imputed)
+   - DROP: BIH, HRV, MKD, SVN, SRB (ex-Yugoslavia imputed)
+   - DROP: SVK (ex-Czechoslovakia), NIR (no PWT data)
+3. This gives 62 - 16 = 46 countries (or 49 if we add a few back)
+4. Use raw service emp (attempt 5 approach, best score 65)

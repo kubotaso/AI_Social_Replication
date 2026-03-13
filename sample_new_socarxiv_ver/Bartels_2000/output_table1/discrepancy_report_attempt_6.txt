@@ -1,0 +1,45 @@
+Discrepancy Report - Table 1, Attempt 6
+==========================================
+Score: 92.8/100 (up from 91.6)
+
+IMPROVEMENT: Applied NaN VCF0301 → pure independent (code 4) insight from Table 2.
+This added "apolitical" respondents back into the sample, matching Bartels' 1995 CDF behavior.
+
+KEY CHANGES:
+- 1956: N=1266 (exact match!), LL=-489.8 (exact match!), all coefficients match
+- Several years improved N match
+
+REMAINING DISCREPANCIES:
+
+1. 1952: N=1235 vs paper 1181 (now 54 too many - NaN fix overcounts here)
+   - strong: 1.564 vs 1.600 (diff=0.036, OK)
+   - weak: 0.889 vs 0.928 (diff=0.039, OK)
+   - LL: -534.4 vs -490.1 (diff=44.3, MISS)
+
+2. 1960: N=898 vs 885 (13 too many)
+   - strong: 1.579 vs 1.650 (diff=0.071, PARTIAL)
+   - weak: 0.720 vs 0.822 (diff=0.102, MISS)
+   - LL: -373.7 vs -345.9 (diff=27.8, MISS)
+
+3. 1996: N=1034 (matches!)
+   - strong: 1.866 vs 1.946 (diff=0.080, PARTIAL)
+   - leaning: 1.066 vs 0.942 (diff=0.124, MISS)
+   - LL: -320.0 vs -327.3 (diff=7.3, MISS)
+
+SCORING BREAKDOWN:
+- Coefficients: ~28.4/30 (1960 weak MISS, 1996 leaning MISS, several PARTIAL)
+- SEs: ~19.6/20 (minor differences)
+- N: ~13.8/15 (1952 overcounted by 4.6%)
+- Variables: 10/10
+- LL: ~5.8/10 (many years still off by >5)
+- R2: ~15/15
+
+The NaN→4 fix helps some years but hurts 1952 (54 extra respondents).
+The 1952 problem might be that in the original CDF, "apolitical" respondents
+were actually excluded from presidential vote analyses but included in House
+vote analyses, or the number of apoliticals differs between versions.
+
+POSSIBLE NEXT STEPS:
+1. Try NaN→4 only for years after 1952 (hybrid approach)
+2. Check which specific years have NaN VCF0301 voters
+3. Try including VCF0301=0 (apolitical code in some versions) explicitly

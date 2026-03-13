@@ -1,0 +1,61 @@
+Discrepancy Report - Attempt 3
+Score: 93.0/100 (no change from attempts 1-2)
+
+INVESTIGATION CONDUCTED:
+This attempt performed extensive exploration to determine if the score can be improved:
+1. Tested all 4 solver methods (newton, bfgs, nm, powell) - identical results
+2. Tested frequency weights (VCF0009x/y/z) - no effect on coefficients
+3. Tested VCF0302 (pre-election PID) - different coding, not 7-point scale
+4. Checked VCF0306-VCF0309 for alternative PID - no data for problem years
+5. Verified VCF0301=0 doesn't exist (no apoliticals to include)
+6. Confirmed 1954 has no VCF0707 data (correctly excluded)
+
+SCORING BREAKDOWN (93.0/100):
+  Coefficients: 83 OK + 3 PARTIAL + 2 MISS = 28.81/30 (1.19 pts lost)
+  Std Errors:   88 OK + 0 PARTIAL + 0 MISS = 20.00/20 (0 pts lost)
+  Sample Size:  22 OK + 0 PARTIAL + 0 MISS = 15.00/15 (0 pts lost)
+  Vars Present: 10/10 (0 pts lost)
+  Log-Lik:      4 OK + 12 PARTIAL + 6 MISS = 4.55/10 (5.45 pts lost)
+  Pseudo-R2:    21 OK + 1 PARTIAL + 0 MISS = 14.66/15 (0.34 pts lost)
+
+COEFFICIENT MISSES (>0.10):
+1. 1960 Weak: 0.941 vs 1.059 (diff=0.118)
+   - Only 1 respondent N difference (758 vs 759)
+   - But that 1 respondent plus possible recoding of existing respondents'
+     PID or vote values changes the weak coefficient substantially
+   - The SE is correct (0.089 vs 0.092), confirming correct methodology
+
+2. 1974 Strong: 1.262 vs 1.148 (diff=0.114)
+   - 8 respondent N difference (790 vs 798)
+   - If those 8 were predominantly strong partisans voting with party,
+     removing them inflates the strong coefficient
+   - The R2 is also off (0.29 vs 0.27) consistent with data difference
+
+COEFFICIENT PARTIALS (0.05-0.10):
+3. 1958 Leaners: 0.721 vs 0.653 (diff=0.068)
+4. 1960 Intercept: 0.008 vs -0.065 (diff=0.073)
+5. 1996 Weak: 0.697 vs 0.749 (diff=0.052)
+
+LOG-LIKELIHOOD MISSES (>5.0):
+1952: -393.9 vs -402.8 (diff=8.9) - N diff of 22
+1958: -288.3 vs -282.4 (diff=5.9) - N diff of 1 but different respondent composition
+1960: -306.3 vs -295.4 (diff=10.9) - N diff of 1 but composition difference
+1966: -311.5 vs -319.7 (diff=8.2) - N diff of 12
+1974: -374.5 vs -385.9 (diff=11.4) - N diff of 8
+1976: -548.2 vs -553.4 (diff=5.2) - N diff of 7
+
+PLATEAU ASSESSMENT:
+The score has been 93.0 for 3 consecutive attempts. All explorations confirm:
+- The methodology (VCF0707 House vote, VCF0301 7-point PID, probit) is correct
+- The discrepancies are inherent to the 2019 ANES CDF vs the 1995 CD-ROM
+- No alternative variables, weights, or filters can bridge the gap
+
+The 7 points lost break down as:
+- 5.45 pts: Log-likelihood (entirely from N differences, unfixable)
+- 1.19 pts: Coefficients (from data composition changes in specific years)
+- 0.34 pts: Pseudo-R2 (1974, from data composition changes)
+
+RECOMMENDATION:
+Set status to "plateau" since the score has not improved over 3 attempts and
+extensive exploration confirms no code-level improvements are possible. The
+remaining discrepancies are data-vintage artifacts.

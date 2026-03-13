@@ -1,0 +1,14 @@
+Attempt 3 - Score: 38.8
+
+Key results:
+  beta_1: 0.0199 (SE: 0.0004) [Paper: 0.0713 (0.0181)]
+  b1+b2: 0.1542 (SE: 0.0188) [Paper: 0.1258 (0.0161)]
+  beta_2: 0.1344 (SE: 0.0188) [Paper: 0.0545 (0.0079)]
+  N: 13,754 [Paper: 10,685]
+
+  Diagnostic with paper step 1: beta_1 = 0.0105 -> still wrong
+  First stage F = 234,242 -> instrument too strong
+
+Core issue: IV estimation is wrong. SE is 0.0004 vs paper 0.0181.
+The IV coefficient barely differs from OLS because init_exp is
+mechanically related to experience.

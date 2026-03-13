@@ -1,0 +1,45 @@
+INSTRUCTION SUMMARY: Table 4B — Sensitivity to Remaining Job Duration Restrictions
+===================================================================================
+
+DATA SOURCE: PSID Panel Dataset (data/psid_panel.csv)
+COMMON VARIABLES: See output_table2/instruction_summary.txt and output_table3/instruction_summary.txt
+
+================================================================
+TABLE 4B SPECIFIC INSTRUCTIONS
+================================================================
+
+This table runs the full two-step estimation (as in Table 3) but restricts
+the first-step sample to observations with minimum remaining job duration.
+
+FOUR SPECIFICATIONS:
+  Column >=0: All within-job first differences (baseline, same as Table 3)
+  Column >=1: Only obs where remaining_duration >= 1
+  Column >=3: Only obs where remaining_duration >= 3
+  Column >=5: Only obs where remaining_duration >= 5
+
+remaining_duration = (last year observed in job) - (current year)
+
+PROCEDURE FOR EACH COLUMN:
+  Step 1: Run Table 2 Model 3 regression on the RESTRICTED first-step sample
+    (only observations where remaining_duration >= threshold)
+    Extract: linear tenure coefficient (beta_1+beta_2 combined)
+             higher-order tenure and experience terms
+
+  Step 2: Use the FULL sample of wage levels (all person-year observations,
+    not restricted by remaining duration) with the first-step coefficients
+    from the restricted sample. Same IV procedure as Table 3.
+
+TOP PANEL: Report beta_1 (experience) and beta_2 (tenure) for each column.
+BOTTOM PANEL: Cumulative returns at 5, 10, 15, 20 years using each column's
+  coefficients.
+
+CRITICAL: The second step always uses the FULL sample. Only the first step
+varies across columns.
+
+================================================================
+SCORING NOTES
+================================================================
+Key values:
+- 8 coefficients + SEs in top panel (2 per column x 4 columns)
+- 16 cumulative returns + SEs in bottom panel (4 per column x 4 columns)
+- Column >=0 should match Table 3 exactly

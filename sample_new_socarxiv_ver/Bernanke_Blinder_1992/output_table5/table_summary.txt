@@ -1,0 +1,43 @@
+Table 5 — "Modified Avery Reaction Function, 1959:8-1979:9"
+
+This table presents a MIMIC (Multiple Indicators, Multiple Causes) model estimating the Fed's reaction function.
+
+The model is:
+(5) y* = Xc + u  (latent policy variable as function of causal variables)
+(6) Z = y*b' + v  (observed indicators as function of latent variable)
+
+Where:
+- y* is the unobserved latent monetary policy variable (T x 1)
+- X is the matrix of causal variables: 6 lags of unemployment rate (U) and 6 lags of inflation rate (INFL), measured in decimals. T x 12.
+- Z is the vector of observed indicators of policy: FFBOND (funds rate - 10-year bond rate), DRBOND (spread between discount rate and long-term bond rate), and annualized real growth rate of nonborrowed reserves. T x 3.
+- All variables measured as deviations from means, no constant term included.
+
+Normalization: coefficient of FFBOND in equation (6) set to unity.
+
+The table shows coefficient estimates for the reaction function (equation 5):
+
+Independent variable    Coefficient estimate
+U(-1)                   -5.0
+U(-2)                   -65.9
+U(-3)                   -18.6
+U(-4)                    12.2
+U(-5)                     1.4
+U(-6)                   -13.3
+INFL(-1)                  7.9
+INFL(-2)                  5.9
+INFL(-3)                  4.2
+INFL(-4)                  4.6
+INFL(-5)                  4.2
+INFL(-6)                  2.6
+
+Chi-squared (d.f. = 22) = 40.21 (p = 0.010)
+
+Notes:
+- U is the unemployment rate and INFL is the inflation rate, measured in decimals
+- The table reports the effects of U and INFL on a latent indicator of monetary policy
+- The chi-square statistic tests the overidentifying restrictions of the model
+- Sample period: 1959:8-1979:9
+- Indicator variables (Z): FFBOND, spread between discount rate and bond rate (DRBOND), annualized real nonborrowed reserves growth
+- The coefficient on FFBOND in Z equation normalized to 1
+
+The paper notes that the absolute magnitudes of coefficients are not meaningful (identified only up to a scaling factor). The PATTERN of response is what matters: increased unemployment loosens policy, increased inflation tightens it.

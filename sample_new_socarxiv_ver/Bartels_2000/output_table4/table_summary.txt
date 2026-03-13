@@ -1,0 +1,121 @@
+Table 4: Current versus Lagged Party Identification and Presidential Votes
+Source: Bartels (2000), Table 4, p. 44
+
+=== STRUCTURE ===
+Three panels (1960, 1976, 1992). Each panel has 3 rows:
+- Row 1: Current party ID (same model as Table 1, but panel respondents only)
+- Row 2: Lagged party ID (party ID from 2 years earlier, same model)
+- Row 3: IV estimates (using lagged party ID as instrument for current party ID)
+
+Dependent variable: Major-party presidential vote (same as Table 1)
+Sample: Major-party presidential voters only, panel respondents only.
+
+=== PANEL DATA SOURCES ===
+- 1960: Panel from 1956-58-60 study, lagged party ID from 1958
+- 1976: Panel from 1972-74-76 study, lagged party ID from 1974
+- 1992: Panel from 1990-91-92 study, lagged party ID from 1990
+
+=== MODEL SPECIFICATION ===
+Same probit model as Table 1:
+  Vote = f(Strong partisan, Weak partisan, Leaning partisan, Intercept)
+where party ID variables are coded directionally (positive = Republican direction).
+
+For each panel year, three specifications:
+1. Current party ID: uses party ID measured in the election year
+2. Lagged party ID: uses party ID measured 2 years before the election
+3. IV estimates: instrumental variables probit, using lagged party ID as instruments for current party ID
+
+=== COLUMNS ===
+For each row: Strong partisan | Weak partisan | Leaning partisan | Intercept | Log-likelihood | Pseudo-R2
+Values shown as coefficient(standard error)
+
+=== GROUND TRUTH VALUES ===
+
+--- 1960 Panel (N=1057) ---
+
+Current party ID:
+  Strong partisan:  1.634 (0.103)
+  Weak partisan:    0.866 (0.073)
+  Leaning partisan: 1.147 (0.141)
+  Intercept:        0.289 (0.054)
+  Log-likelihood:   -418.0
+  Pseudo-R2:        0.43
+
+Lagged party ID (from 1958):
+  Strong partisan:  1.250 (0.082)
+  Weak partisan:    0.804 (0.070)
+  Leaning partisan: 0.546 (0.119)
+  Intercept:        0.251 (0.048)
+  Log-likelihood:   -506.4
+  Pseudo-R2:        0.31
+
+IV estimates:
+  Strong partisan:  1.578 (0.155)
+  Weak partisan:    0.669 (0.200)
+  Leaning partisan: 1.185 (0.601)
+  Intercept:        0.227 (0.052)
+  Log-likelihood:   -506.4
+  Pseudo-R2:        0.31
+
+--- 1976 Panel (N=799) ---
+
+Current party ID:
+  Strong partisan:  1.450 (0.117)
+  Weak partisan:    0.684 (0.080)
+  Leaning partisan: 0.781 (0.109)
+  Intercept:        0.103 (0.053)
+  Log-likelihood:   -376.8
+  Pseudo-R2:        0.32
+
+Lagged party ID (from 1974):
+  Strong partisan:  1.224 (0.107)
+  Weak partisan:    0.707 (0.081)
+  Leaning partisan: 0.545 (0.104)
+  Intercept:        0.141 (0.051)
+  Log-likelihood:   -418.4
+  Pseudo-R2:        0.24
+
+IV estimates:
+  Strong partisan:  1.577 (0.188)
+  Weak partisan:    0.491 (0.243)
+  Leaning partisan: 0.848 (0.413)
+  Intercept:        0.103 (0.052)
+  Log-likelihood:   -418.4
+  Pseudo-R2:        0.24
+
+--- 1992 Panel (N=729) ---
+
+Current party ID:
+  Strong partisan:  1.853 (0.146)
+  Weak partisan:    0.948 (0.099)
+  Leaning partisan: 1.117 (0.122)
+  Intercept:        -0.073 (0.065)
+  Log-likelihood:   -236.9
+  Pseudo-R2:        0.52
+
+Lagged party ID (from 1990):
+  Strong partisan:  1.311 (0.109)
+  Weak partisan:    0.761 (0.088)
+  Leaning partisan: 0.530 (0.105)
+  Intercept:        -0.072 (0.057)
+  Log-likelihood:   -343.1
+  Pseudo-R2:        0.30
+
+IV estimates:
+  Strong partisan:  1.622 (0.176)
+  Weak partisan:    0.745 (0.284)
+  Leaning partisan: 1.092 (0.499)
+  Intercept:        -0.045 (0.059)
+  Log-likelihood:   -343.1
+  Pseudo-R2:        0.30
+
+=== NOTES ===
+- From footnote 16: "To make the comparison of current and lagged effects as
+  straightforward as possible, these estimates are based on data from panel
+  respondents only."
+- IV estimation uses lagged party ID variables as instruments for current
+  party ID variables in a probit framework.
+- The lagged and IV rows share the same log-likelihood and pseudo-R2 values
+  within each panel year, which is expected given the IV procedure.
+- N values represent the number of panel respondents who voted for a
+  major-party presidential candidate and have valid data on all variables.

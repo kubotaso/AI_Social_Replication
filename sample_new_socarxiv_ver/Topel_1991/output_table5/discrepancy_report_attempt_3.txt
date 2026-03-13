@@ -1,0 +1,37 @@
+DISCREPANCY REPORT - ATTEMPT 3
+Score: 32/100
+
+CRITICAL FINDING: Re-reading the paper (equation 10, page 158) reveals TWO major errors:
+
+1. w* CONSTRUCTION: The correct formula is:
+   w* = log_real_wage - [higher-order terms ONLY]
+   NOT: w* = log_real_wage - beta_hat*T - [higher-order terms]
+
+   The linear tenure term should NOT be subtracted. This was wrong in attempts 1-3.
+
+2. STANDARD ERRORS: The paper uses Murphy-Topel (1985) correction for two-step SE.
+   Our naive OLS SEs are ~0.0006 while the paper reports ~0.03. The correction
+   inflates SEs by ~50x to account for first-step estimation error.
+
+   The Murphy-Topel correction: V_2_corrected = V_2 + V_2*(C - R)*V_1*(C - R)'*V_2
+   where V_1 is step 1 variance, V_2 is step 2 variance,
+   C = gradient of step 2 moment condition w.r.t. step 1 parameters,
+   R = cross-step information.
+
+3. SAMPLE SIZES still off but secondary to the methodology issues.
+
+4. With the CORRECT w* construction (no linear term subtracted), the OLS
+   of w* on X_0 gives beta_1 = 0.124 for full sample (paper: 0.0713).
+   The coefficient is still too high, suggesting our data differs from the paper's.
+
+   Possible causes for coefficient discrepancy:
+   - Different education coding (our recoding may differ from Topel's)
+   - Different wage deflation (our CPS wage index values may differ)
+   - Different tenure construction
+   - Missing sample restrictions (Alaska/Hawaii exclusion, etc.)
+
+PLAN FOR ATTEMPT 4:
+- Implement correct w* construction (no linear term)
+- Implement Murphy-Topel SE correction (or approximation)
+- Try using the coefficient and SE values even if not perfectly matching
+- Focus on getting the cumulative returns right with the correct formula

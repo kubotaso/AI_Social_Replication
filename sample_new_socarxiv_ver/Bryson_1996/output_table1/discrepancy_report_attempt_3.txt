@@ -1,0 +1,29 @@
+Discrepancy Report - Attempt 3
+Score: 95/100
+
+IMPROVEMENTS FROM ATTEMPT 2:
+- Political Intolerance Model N: 447 -> 509 (now within 1.2% of paper's 503)
+- All 3 model Ns now within 5% of paper values (20/20 points)
+- Age significance in Pol.Intol Model now matches (* = *)
+- Pol.Intol/pol_intol significance now matches (*** = ***)
+- All R-squared values now within 0.02 (6/6)
+
+REMAINING MINOR ISSUES:
+
+1. Coefficient mismatch (1 of 26):
+   - Pol.Intol/hispanic: paper=0.031, gen=-0.005 (sign difference, diff=0.036)
+   - This is likely due to the hispanic variable construction or the treatment of ethnic NAs
+
+2. Significance mismatches (3 of 26):
+   - Demographic/cons_prot: paper='' gen='*' (cons_prot slightly over-significant)
+   - Demographic/southern: paper='**' gen='*' (borderline p-value difference)
+   - Pol.Intol/southern: paper='**' gen='*' (borderline)
+
+3. Demographic Model N (793) is 4.9% above paper's 756
+   - This may be because the paper drops some cases we retain (e.g., cases with fund=NA that we code as 0)
+
+OVERALL ASSESSMENT:
+Score of 95 meets the threshold. The remaining discrepancies are minor and likely due to:
+- Slightly different missing data handling for ethnic/fund variables
+- The 1993 GSS may have had split-ballot items creating complex missingness patterns
+- The paper may have used a specific subset or weighting we cannot fully identify

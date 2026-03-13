@@ -1,0 +1,73 @@
+Figure 2 — "Responses of Funds Rate to Inflation and Unemployment Shocks"
+
+Source: Bernanke and Blinder (1992), Figure 2, p. 911
+
+=== DESCRIPTION ===
+
+Figure 2 shows two impulse response functions plotted in a single panel (stacked vertically):
+1. Top curve: "Response to Inflation" — the response of the federal funds rate to a one-standard-deviation inflation shock
+2. Bottom curve: "Response to Unemployment" — the response of the federal funds rate to a one-standard-deviation unemployment shock
+
+=== MODEL SPECIFICATION ===
+
+- Model: 3-variable VAR with 6 lags
+- Variables: FUNDS (federal funds rate), unemployment rate (male 25-54), log CPI
+- Choleski ordering: [FUNDS, unemployment rate, log CPI]
+  (Footnote 28: "The ordering is: policy variable, unemployment rate, inflation rate.")
+- Sample period: pre-October 1979 (approximately 1959:7 to 1979:9)
+- Shocks: one-standard-deviation orthogonalized shocks (Choleski decomposition)
+
+=== VISUAL CHARACTERISTICS ===
+
+- X-axis: "HORIZON (MONTHS)" from about 2 to 24
+- Y-axis: ranges from approximately -0.3 to 0.5
+- Both curves plotted on the same axes
+
+Response to Inflation curve:
+- Starts at 0 at horizon 0
+- Rises steeply to a peak of approximately 0.4-0.45 at about 5-10 months
+- Then slowly decays but remains positive through month 24
+- Value at month 24 is approximately 0.2-0.3
+
+Response to Unemployment curve:
+- Starts at 0 at horizon 0
+- Drops slightly and then becomes progressively more negative
+- Reaches approximately -0.1 to -0.15 by month 24
+- Much flatter and smaller in magnitude than the inflation response
+
+=== APPROXIMATE NUMERICAL VALUES (read from figure) ===
+
+Response to Inflation (funds rate response to one-SD inflation shock):
+  Month 0:  ~0.00
+  Month 3:  ~0.20
+  Month 6:  ~0.35-0.40
+  Month 9:  ~0.40-0.45 (near peak)
+  Month 12: ~0.35-0.40
+  Month 18: ~0.30
+  Month 24: ~0.25
+
+Response to Unemployment (funds rate response to one-SD unemployment shock):
+  Month 0:  ~0.00
+  Month 3:  ~-0.02
+  Month 6:  ~-0.05
+  Month 9:  ~-0.07
+  Month 12: ~-0.10
+  Month 18: ~-0.12
+  Month 24: ~-0.13
+
+=== KEY FEATURES ===
+
+1. Inflation shocks drive up the funds rate, with peak effect at approximately 5-10 months
+2. Unemployment shocks push the funds rate in the opposite direction (negative), with somewhat longer lags and smaller magnitudes
+3. Footnote 29: "A one-standard-deviation inflation shock is a much bigger number (215 basis points, at an annual rate) than a one-standard-deviation unemployment shock (18 basis points)."
+4. The inflation response is much larger in magnitude than the unemployment response, consistent with the Fed reacting more aggressively to inflation
+5. Both responses are persistent — effects remain visible through the full 24-month horizon
+
+=== PLOT STYLE ===
+
+- Single panel figure
+- Two curves with text labels identifying each
+- "Response to Inflation" label near the top curve
+- "Response to Unemployment" label near the bottom curve
+- Clean line plot style typical of AER publications circa 1992
+- No confidence bands shown in the original figure

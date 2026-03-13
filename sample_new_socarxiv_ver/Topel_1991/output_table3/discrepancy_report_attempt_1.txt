@@ -1,0 +1,52 @@
+DISCREPANCY REPORT - Attempt 1
+===============================
+
+Score: 0 (runtime error in Step 2)
+
+ISSUES IDENTIFIED:
+
+1. RUNTIME ERROR: linearmodels IV2SLS fails with "regressors do not have full column rank"
+   - Cause: Multicollinearity among year dummies, region dummies, and controls
+   - Fix: Check for and remove collinear columns before IV regression.
+     Drop lives_in_smsa (all zeros). Check year dummy coverage.
+     Use manual 2SLS fallback or drop collinear columns.
+
+2. SAMPLE SIZE: N step2 = 13,922 vs paper 10,685
+   - We have 2,407 unique persons, paper has ~1,540
+   - Need stricter sample restrictions:
+     a. Topel starts with data from 1968-1983 but our panel starts at 1971
+     b. Need to verify age restrictions are applied properly
+     c. Education value 9 in categorical years should be treated as missing
+     d. May need additional restrictions not yet applied
+
+3. STEP 1 COEFFICIENT: beta_1+beta_2 = 0.0969 vs 0.1258
+   - The CPS wage index is being applied incorrectly. For first differences,
+     the CPS index largely cancels if both years are adjusted, but the year
+     dummies should capture time effects.
+   - Actually, for Table 2 (first differences), Topel uses CPS-adjusted wages.
+     log_real_wage = log_hourly_wage - ln(CPS_wage_index).
+     The GNP deflator is only for the levels regression in step 2.
+   - Need to verify: in first differences, the GNP deflator should not matter
+     since it cancels (both years deflated the same way), but the CPS index
+     is used for the levels specification.
+
+4. EDUCATION RECODING:
+   - Value 9 in categorical years (1971-1974, 1977-1983) has ~4-23 obs/year
+   - Should map to missing or treat as 17+ (but paper doesn't document this)
+   - Also: years 1975-1976 are in years (2-17); all others are categorical (0-9)
+   - The existing 'experience' column in the data uses raw categorical codes
+     which makes experience very wrong
+
+5. R-SQUARED: 0.006 vs 0.025
+   - This is very low, suggests something is off with the wage variable construction
+
+FIXES FOR NEXT ATTEMPT:
+1. Properly recode education for ALL years (categorical for non-1975/76, years for 1975/76)
+2. Treat education code 9 as missing
+3. Recompute experience = age - education_years - 6
+4. For step 1: use log_real_wage = log_hourly_wage - ln(CPS_wage_index[year])
+5. For step 2: use log_real_wage = log_hourly_wage - ln(GNP_deflator[year-1]/100) (no CPS)
+   OR log_real_wage includes both adjustments
+6. Fix the IV regression multicollinearity by dropping collinear columns
+7. Use manual 2SLS as fallback with proper SE correction
+8. Tighten sample restrictions to get closer to N=10,685

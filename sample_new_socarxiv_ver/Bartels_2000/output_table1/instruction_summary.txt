@@ -1,0 +1,49 @@
+Variable Mapping for Table 1
+============================
+
+Dataset: anes_cumulative.csv
+
+Year Variable: VCF0004
+  Filter to presidential election years: 1952, 1956, 1960, 1964, 1968, 1972, 1976, 1980, 1984, 1988, 1992, 1996
+
+Dependent Variable: Presidential Vote (Republican=1, Democrat=0)
+  Source: VCF0704a (2-party presidential vote)
+  VCF0704a = 1 -> vote = 0 (Democrat)
+  VCF0704a = 2 -> vote = 1 (Republican)
+  Exclude: all other values (did not vote, third party, missing)
+
+Independent Variables constructed from VCF0301 (Party ID 7-point):
+  "Strong" party attachment:
+    VCF0301 = 7 (Strong Republican) -> strong = +1
+    VCF0301 = 1 (Strong Democrat)  -> strong = -1
+    All others -> strong = 0
+
+  "Weak" party attachment:
+    VCF0301 = 6 (Weak Republican) -> weak = +1
+    VCF0301 = 2 (Weak Democrat)  -> weak = -1
+    All others -> weak = 0
+
+  Independent "Leaners":
+    VCF0301 = 5 (Independent-Republican) -> leaning = +1
+    VCF0301 = 3 (Independent-Democrat)  -> leaning = -1
+    All others -> leaning = 0
+
+  Reference category: VCF0301 = 4 (Pure Independents)
+  Intercept captures the voting tendency of pure independents.
+
+Missing Data:
+  Exclude observations where VCF0301 is missing (NA or 0)
+  Exclude observations where VCF0704a is missing (NA or 0)
+
+Model: Probit regression for each year separately
+  vote_republican ~ strong + weak + leaning
+  Use statsmodels Probit
+
+Goodness of Fit:
+  Report log-likelihood and pseudo-R-squared (McFadden)
+  Report N (number of observations in each year's model)
+
+Note: The analysis constrains the effect of partisanship to be equal for
+Democrats and Republicans (symmetric coding). The coefficients reflect
+how much each level of partisan attachment shifts vote propensity
+relative to pure independents.

@@ -1,0 +1,46 @@
+Discrepancy Report - Attempt 1 (Score: 45.9/100)
+
+CRITICAL ISSUES IDENTIFIED:
+
+1. FACTOR ANALYSIS USES WRONG VARIABLE FOR "GOD IMPORTANCE"
+   - shared_factor_analysis.py uses A006 which is "Important in life: Religion" (1-4 scale)
+   - The paper uses "God is important in respondent's life" (1-10 scale) = F063 in WVS TS V5
+   - This causes A006 to have near-zero loading (0.074 vs paper's 0.91) on the Trad/Sec-Rat factor
+   - ALL correlations are affected because factor scores are wrong
+   - FIX: Compute own factor scores using F063 instead of A006
+
+2. VARIABLE MAPPING ERRORS
+   - F028 in WVS TS V5 = Church attendance frequency (1-8), NOT "believe in heaven"
+   - F051 in WVS TS V5 might be "believe in life after death" (0/1), not "believe in hell"
+   - F052 = Believe in soul, F053 = Believe in hell, F054 = Believe in heaven, F055 = Believe in sin
+   - FIX: Use F054 for heaven, F053 for hell, F028 for church attendance
+
+3. WRONG SIGN ON CHURCH ATTENDANCE (r=-0.47 vs paper +0.75)
+   - F063 was being used for church attendance but it's actually God importance (1-10)
+   - F028 is the actual church attendance variable (1=weekly+, 8=never)
+   - Higher F028 = less frequent = more secular -> need to reverse or use % attending regularly
+   - FIX: Use F028, compute % attending at least monthly (F028 <= 4)
+
+4. ENVIRONMENTAL VARIABLE WRONG SIGN
+   - B008 is 1-3 scale, need to verify coding direction
+   - Paper says "My country's environmental problems can be solved without international agreements"
+   - This is a protectionist/nationalist view = traditional
+   - FIX: Check B008 coding carefully
+
+5. MISSING ITEMS (5 of 24):
+   - "Make parents proud" - no direct variable found
+   - "Parents duty to children" - might map to D054 area or A025 variant
+   - "Own preferences vs understanding others" - no variable found
+   - "Stricter limits on foreign goods" - G007_01 only has data in wave 2, limited countries
+   - "Clear guidelines good and evil" - F024 has very limited data (N=18623, few countries)
+
+6. LARGE DISCREPANCIES IN SPECIFIC ITEMS:
+   - Religion very important: 0.40 vs 0.89 (diff=0.49) - factor scores issue
+   - Believes in Heaven: 0.38 vs 0.88 (diff=0.50) - wrong variable (F051 vs F054)
+   - Divorce never justifiable: 0.32 vs 0.57 (diff=0.25) - factor scores issue
+
+PLAN FOR ATTEMPT 2:
+1. Compute own factor scores using F063 (God importance 1-10) instead of A006
+2. Fix variable mapping: F054=heaven, F053=hell, F028=church attendance
+3. Properly handle all item codings and directions
+4. Try to recover more items (G007_01 for foreign goods, F024 for clear guidelines)

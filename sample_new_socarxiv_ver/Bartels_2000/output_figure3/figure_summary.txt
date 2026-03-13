@@ -1,0 +1,20 @@
+Figure 3: Partisan Voting in Presidential Elections
+Title: "Estimated Impact of Party Identification on Presidential Vote Propensity"
+One panel. Single line with filled circles and jackknife standard error bars.
+X-axis: 1956 to 1996 (presidential election years)
+Y-axis: 0.0 to 2.0
+Note: "Average probit coefficients, major-party voters only, with jackknife standard error bars."
+
+The plotted value for each year is the AVERAGE probit coefficient = sum of (coefficient_i * proportion_i) for the three partisan categories (strong, weak, leaners).
+
+For each presidential year, compute:
+1. Run the Table 1 probit to get coefficients for strong, weak, leaners
+2. Compute proportions: fraction of the ELECTORATE (all voters + nonvoters with valid party ID) in each category:
+   - prop_strong = fraction with VCF0301 in {1,7} among all with valid VCF0301
+   - prop_weak = fraction with VCF0301 in {2,6}
+   - prop_leaners = fraction with VCF0301 in {3,5}
+3. Average coefficient = coef_strong * prop_strong + coef_weak * prop_weak + coef_leaners * prop_leaners
+
+The paper illustrates: for 1952, (1.600 * 0.391 + 0.928 * 0.376 + 0.902 * 0.176) = 1.133
+
+Jackknife standard errors: Computed by repeating the entire process on 10 random subsamples.

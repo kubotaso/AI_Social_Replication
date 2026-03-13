@@ -1,0 +1,46 @@
+Discrepancy Report - Attempt 3
+================================
+Score: 87/100 (no improvement from attempt 2)
+
+Configuration: ds=1959-01, trend='c', lags=6
+
+The detailed cell-by-cell comparison reveals:
+- Panel A: 23/56 cells within 3pp (41%)
+- Panel B: 29/56 cells within 3pp (52%)
+
+Key findings from paper's Data Appendix (p.920):
+- All data came from Data Resources, Inc. (DRI), a proprietary database
+- M1 = MNY1, M2 = MNY2 from DRI (different from modern FRED vintages)
+- Real variables in 1982 dollars from DRI
+- Unemployment = male 25-54 (HHM25@54 / labor force)
+
+Root cause analysis:
+1. M2 data vintage: The Federal Reserve significantly revised M2 in 1980
+   (adding MMDAs, overnight RPs, overnight Eurodollars). Current FRED M2
+   differs from 1992-vintage DRI M2. This causes M2 contribution to be
+   systematically too high in Panel A.
+
+2. M1 data vintage: M1 was also revised. Current M1 shows less variance
+   contribution than the paper's DRI vintage.
+
+3. CPI revisions: CPI methodology changed (owner's equivalent rent in 1983,
+   geometric means in 1999). This affects CPI contribution in the FEVD.
+
+4. Personal income & consumption: Real variables constructed from FRED
+   differ from DRI's pre-built real series in 1982 dollars.
+
+Configuration search results (all with lags=6):
+- ds=1959-01 t=c:  52/112 cells = 11.6/25
+- ds=1959-01 t=ct: 52/112 cells = 11.6/25
+- ds=1959-07 t=c:  48/112 cells = 10.7/25
+- ds=1959-07 t=ct: 51/112 cells = 11.4/25
+
+The data vintage ceiling appears to be around 52/112 cells (87/100 total).
+
+Strategies for attempt 4:
+1. Try using log(CPI) as the price variable instead of log_cpi - verify our
+   construction matches the paper.
+2. Try removing the constant from the VAR (some implementations differ).
+3. Try implementing the FEVD manually using Choleski decomposition to verify
+   statsmodels gives the same result.
+4. Accept that data vintage limits the score to ~87 and document this clearly.

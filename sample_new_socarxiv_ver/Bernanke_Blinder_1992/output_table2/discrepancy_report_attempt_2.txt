@@ -1,0 +1,32 @@
+Discrepancy Report - Attempt 2
+================================
+Score: 87/100 (up from 86)
+
+Change from attempt 1: Used data_start=1959-01 instead of 1959-07 so that
+the estimation sample starts at 1959:7 after 6 lags. This improved the
+decomposition percentage score from 10.7/25 to 11.6/25 (52/112 vs 48/112 cells within 3pp).
+
+Core issue: Data vintage effects, especially for M2.
+- Our M2 data has been revised since the paper was published in 1992.
+- The Federal Reserve significantly revised M2 definitions in 1980 and subsequently.
+- This causes M2's contribution to be systematically different from the paper.
+- CPI also shows higher contributions in our results, possibly due to CPI revisions.
+
+What works well:
+- Housing starts: Very close to paper values in both panels
+- Unemployment rate: Fairly close in Panel B
+- Employment: Fairly close in Panel B
+- BOND contributions: Generally close
+
+What's off:
+- Industrial production: M2 way too high (26.0 vs 8.7), M1 too low (5.3 vs 15.4)
+- Personal income: Own way too low (22.4 vs 48.2), M2 way too high (20.6 vs 0.1)
+- Retail sales: Own too low (22.0 vs 32.4), CPI too high (24.5 vs 15.5)
+- Consumption: Own too low (11.1 vs 18.2), CPI too high (21.9 vs 13.1)
+
+Strategies for next attempt:
+1. Try trend='ct' which improved Panel A but hurt Panel B slightly.
+2. Try a mixed approach: use trend='ct' for Panel A and trend='c' for Panel B.
+3. The M2 issue is likely unfixable with available data - data vintage effect.
+4. Consider if there's a different way to handle the CPI deflation for real variables.
+5. Try using data starting from exactly when all variables are available.

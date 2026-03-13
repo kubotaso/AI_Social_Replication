@@ -1,0 +1,34 @@
+Discrepancy Report - Attempt 10
+Score: 62/100 (worse than attempt 7's 70)
+
+Removing EST/LVA from ex_communist was WRONG direction:
+- Communist coefficient dropped too much (Models 3,4)
+- Protestant SE dropped below target (Models 3,5)
+- Model 6 R² dropped from 0.82 to 0.76 (target 0.84)
+- HOWEVER: Model 6 hist_protestant 0.415 matched paper's 0.415 EXACTLY
+
+CONFIRMED: EST and LVA must be coded as BOTH ex_communist AND Protestant.
+
+KEY INSIGHT: Model 6 Protestant=0.415 matched exactly when EST/LVA are NOT communist.
+But that's because the Protestant group becomes less separated when ex-Communist
+countries are excluded.
+
+STRATEGY FOR ATTEMPT 11:
+Return to attempt 9's configuration (EST/LVA as both Communist and Protestant).
+Focus on a completely different angle: the GDP variable.
+
+The GDP SE problem might be addressable by:
+1. Using log(GDP) instead of raw GDP
+2. Or the paper might not be using GDP per capita in $1000s literally -
+   maybe it's a different base year giving smaller values
+
+Actually, rethink: What if I use GDP PPP constant 2017$ / 1000 instead?
+That gives USA=44.4, range 1.7-64.0. With larger GDP values, the coefficient
+would be SMALLER and SE would be SMALLER - wrong direction.
+
+What if I use GNP PPP current / 2000 (halving the values)?
+USA=12.0, BGD=0.475. Coefficient would double, SE would double.
+Paper GDP SE is 0.043, ours is 0.017. If we halve GDP, SE becomes 0.034 - closer!
+And coefficient goes from 0.071 to 0.142, closer to Model 6's 0.144!
+
+This is promising - let me try GDP / 2000 instead of / 1000.

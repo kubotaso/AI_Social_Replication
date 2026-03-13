@@ -1,0 +1,55 @@
+Discrepancy Report - Attempt 2 (Score: 55.2/100)
+
+IMPROVEMENTS:
+- Corrected factor analysis using F063 (God importance 1-10) instead of A006
+- Fixed variable mapping: F054=heaven, F053=hell, F028=church attendance
+- F063 loading on trad_secrat: -0.692 (much better than 0.074 before)
+- Ordering improved significantly (Spearman rho from ~0.17 to ~0.55)
+
+REMAINING ISSUES:
+
+1. COMFORT FROM RELIGION: 0.28 vs paper 0.72 (diff=0.44)
+   - F050 = 0/1 (comfort from religion). NGA=1.00, SWE=0.56
+   - SWE=0.56 for comfort from religion seems too high
+   - Possibly the variable is actually something different in WVS TS V5
+   - Or the 0/1 coding means 0=no, 1=yes and NGA should NOT be 1.00
+   - Wait: F050 has only 62 countries with data vs 65 for many others
+   - The low correlation might be because F050 is not "comfort from religion" but something else
+   - FIX: Check if F050 is actually "Do you find that religion gives you comfort and strength"
+   - Also check if F059 might be the correct variable
+
+2. CHURCH ATTENDANCE: 0.44 vs paper 0.75 (diff=0.31)
+   - F028 with % attending at least once a month (<=3)
+   - Try different thresholds: <=4 (including Christmas/Easter) or <=2 (weekly+)
+   - Also check if the paper uses a different measure
+
+3. ENVIRONMENTAL VARIABLE: -0.21 vs paper 0.56 (WRONG SIGN)
+   - B008 (1-3 willingness to pay for environment) is NOT the same item as paper
+   - Paper: "My country's environmental problems can be solved without intl agreements"
+   - This is a different variable entirely - might not be in the dataset
+   - FIX: Drop B008, look for alternative, or accept as missing
+
+4. DIVORCE: 0.37 vs 0.57 (diff=0.20)
+   - Using mean of F119 (1-10), then correlating
+   - The lower correlation might be due to direction handling
+
+5. WOMAN EARNS MORE: 0.77 vs 0.53 (diff=0.24, OVER-estimating)
+   - Using % saying D054==1 (agree)
+   - The over-estimation suggests D054 is picking up more variance than in paper
+
+6. SUICIDE: 0.46 vs 0.61 (diff=0.15)
+   - Using mean of F121 (1-10), similar to divorce issue
+
+7. MISSING ITEMS (5):
+   - Make parents proud (0.81), Parents duty (0.60), Own preferences (0.56),
+     Foreign goods (0.63), Clear guidelines (0.56)
+   - G007_01 has data only in wave 2, very few countries
+   - F024 has data in limited countries
+   - Try to include them even with fewer countries
+
+PLAN FOR ATTEMPT 3:
+1. Check F050/F059 for comfort from religion
+2. Try using % saying "never" (==1) for justifiability items instead of means
+3. Remove B008 environmental item (wrong variable)
+4. Try to include G007_01 and F024 even with limited countries
+5. Explore whether using A006 (religion important, 1-4) alongside F063 improves results

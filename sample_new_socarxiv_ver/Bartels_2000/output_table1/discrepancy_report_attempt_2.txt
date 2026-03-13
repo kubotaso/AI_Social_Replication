@@ -1,0 +1,20 @@
+Discrepancy Report - Table 1, Attempt 2
+========================================
+Score: 91.6/100
+
+Strategy: Used individual 1996 study file. No improvement - results identical.
+
+Detailed Score Breakdown:
+- Coefficients: ~28.4/30 (1960 weak and 1996 strong/leaning off)
+- Standard errors: ~20/20 (all within 0.02)
+- Sample size N: 15/15 (all within 5%)
+- Variables present: 10/10
+- Log-likelihood: ~3.3/10 (main penalty - many years off by >1.0 due to N differences)
+- Pseudo-R2: ~14.4/15 (1960 off by 0.03)
+
+Root cause confirmed: Data vintage difference. The anesr CDF is version 2019-Sep-10.
+The paper used the 1995 version. The ANES revised VCF0301 between versions, introducing
+a few more NA values per year, which causes the N and log-likelihood differences.
+
+Remaining strategy: Try to acquire an older/different version of the CDF data, or
+accept the data vintage limitation (~91-92 as ceiling with current data).

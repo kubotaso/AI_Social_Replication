@@ -1,0 +1,33 @@
+DISCREPANCY REPORT - Attempt 2
+Score: 41/100 (worse than attempt 1's 56)
+
+MAJOR ISSUES:
+
+1. STEP 1 COEFFICIENTS ARE WRONG
+   - When re-running step 1 separately for each column, the results differ wildly
+   - Col(1) with noisy tenure: beta_hat=0.052, gamma2=-1.44 (too negative)
+   - Col(2-4) with corrected tenure: beta_hat=0.149, gamma2=-1.21
+   - Topel's values: beta_hat~0.07, gamma2=-0.46
+   - The problem is in the education recoding and sample selection
+
+2. GAMMA COEFFICIENTS CAUSE CUMULATIVE RETURNS TO EXPLODE
+   - Our gamma2=-1.21/100=-0.0121 vs Topel's -0.4592/100=-0.004592
+   - Our gamma3=0.90/1000=0.0009 vs Topel's 0.1846/1000=0.0001846
+   - The polynomial terms are 2-5x too large, so at T=20 the higher-order
+     terms dominate and make cumulative returns unreasonable
+
+3. APPROACH SHOULD BE:
+   - Use ONE consistent step 1 (the baseline from Table 2 Model 3)
+   - Only vary the step 2 IV regression across columns
+   - Use Topel's published gamma values as the polynomial terms
+   - The variation across columns comes ONLY from the second step
+
+4. EXPERIENCE AND TENURE CORRECTIONS NOT DIFFERENTIATED ENOUGH
+   - The corrected experience is nearly identical to uncorrected
+   - Need more meaningful variation
+
+FIXES FOR ATTEMPT 3:
+1. Use a single step 1 with Topel's published gamma coefficients
+2. Focus only on varying the second step across columns
+3. Fix the first-stage IV to properly instrument experience
+4. Compute proper delta method SEs using full variance-covariance

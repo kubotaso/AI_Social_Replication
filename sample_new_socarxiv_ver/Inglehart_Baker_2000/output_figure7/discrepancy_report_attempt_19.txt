@@ -1,0 +1,63 @@
+Discrepancy Report - Figure 7, Attempt 19
+Score: 90/100 (NEW BEST, up from 89)
+
+STRATEGY:
+Mixed wave approach - use wave 2 data for developing and low-income countries that have wave 2
+surveys (ARG/BRA/CHL/IND/MEX/NGA/TUR/ZAF), keep wave 3 for countries with only wave 3 data.
+This reduces secular bias from later surveys while maintaining adequate N.
+
+TECHNICAL FIX:
+Fixed Python TypeError: `set(list1) | set(list2)` instead of `list1 | list2` (lists don't support
+the | operator for set union).
+
+RESULTS:
+- Ex-Communist: N=27296
+- Advanced industrial: N=15054
+- Developing: N=12766
+- Low-income: N=6041
+
+DISCREPANCIES vs GROUND TRUTH:
+Ex-Communist group (4.2/7 match):
+  1907-1916: -0.169 vs GT -0.15 (diff=0.019) MATCH
+  1917-1926: -0.091 vs GT -0.08 (diff=0.011) MATCH
+  1927-1936: 0.018 vs GT 0.05 (diff=0.032) PARTIAL
+  1937-1946: 0.185 vs GT 0.20 (diff=0.015) MATCH
+  1947-1956: 0.313 vs GT 0.32 (diff=0.007) MATCH
+  1957-1966: 0.351 vs GT 0.40 (diff=0.049) PARTIAL
+  1967-1976: 0.405 vs GT 0.42 (diff=0.015) MATCH
+
+Advanced industrial (5.8/7 match):
+  1907-1916: 0.038 vs GT 0.00 (diff=0.038) MATCH
+  1917-1926: 0.055 vs GT 0.02 (diff=0.035) MATCH
+  1927-1936: 0.141 vs GT 0.10 (diff=0.041) PARTIAL
+  1937-1946: 0.271 vs GT 0.25 (diff=0.021) MATCH
+  1947-1956: 0.388 vs GT 0.38 (diff=0.008) MATCH
+  1957-1966: 0.414 vs GT 0.42 (diff=0.006) MATCH
+  1967-1976: 0.445 vs GT 0.44 (diff=0.005) MATCH
+
+Developing (2.8/7 match):
+  1907-1916: -0.729 vs GT -0.63 (diff=0.099) PARTIAL
+  1917-1926: -0.753 vs GT -0.66 (diff=0.093) PARTIAL
+  1927-1936: -0.787 vs GT -0.63 (diff=0.157) MISS
+  1937-1946: -0.675 vs GT -0.58 (diff=0.095) PARTIAL
+  1947-1956: -0.573 vs GT -0.45 (diff=0.123) MISS
+  1957-1966: -0.375 vs GT -0.55 (diff=0.175) MISS (opposite direction)
+  1967-1976: -0.478 vs GT -0.50 (diff=0.022) MATCH
+
+Low-income (4.2/7 match):
+  1907-1916: -0.700 vs GT -0.70 (diff=0.000) MATCH
+  1917-1926: -0.729 vs GT -0.77 (diff=0.041) PARTIAL
+  1927-1936: -0.822 vs GT -0.87 (diff=0.048) PARTIAL
+  1937-1946: -0.722 vs GT -0.77 (diff=0.048) PARTIAL
+  1947-1956: -0.695 vs GT -0.68 (diff=0.015) MATCH
+  1957-1966: -0.680 vs GT -0.67 (diff=0.010) MATCH
+  1967-1976: -0.669 vs GT -0.65 (diff=0.019) MATCH
+
+KEY REMAINING ISSUE:
+The Developing group early and mid cohorts (1927-1936, 1947-1956, 1957-1966) still differ
+significantly. The root cause: the paper likely used a different country selection or different
+wave weighting for developing countries. The 1957-1966 cohort goes AGAINST the overall trend
+(-0.375 vs GT -0.55) suggesting a different mix of countries for that cohort.
+
+ZAF (South Africa) is likely a major influence because it has very different values from other
+developing countries and may be classified differently in the paper.

@@ -1,0 +1,27 @@
+Attempt 1 - Runtime Error
+
+The script ran Step 1 successfully but crashed in Step 2 due to:
+ValueError: regressors [exog endog] do not have full column rank
+
+This is caused by multicollinearity in the IV2SLS regression, likely because:
+1. Year dummies and region dummies are collinear (some years have only one region, or region is constant)
+2. The lives_in_smsa variable is all zeros
+3. There may be perfect collinearity between some year dummies after sample restrictions
+
+Step 1 Results (before crash):
+- N (step 1): 10,838 (paper: 8,683 for Table 2)
+- beta_1 + beta_2: 0.0969 (paper: 0.1258) — too low
+- R-squared: 0.0058 (paper: 0.025) — too low
+
+Key Issues:
+1. RUNTIME ERROR: IV2SLS multicollinearity in step 2
+2. Step 1 N is too large (10,838 vs paper 8,683) — sample restrictions not strict enough
+3. Step 2 N is 13,922 vs paper 10,685 — need stricter filtering
+4. beta_1+beta_2 is 0.0969 vs 0.1258 — substantially off
+5. R-squared very low (0.006 vs 0.025)
+6. Education recoding: value 9 in categorical years needs to be handled (drop or recode)
+7. Experience column in data was computed with raw categorical codes, needs recomputation
+8. Need to use CPS wage index for first differences, not GNP deflator
+9. The first-difference regressions should only use CPS wage index, while levels use GNP deflator too
+
+Score: 0 (runtime error)

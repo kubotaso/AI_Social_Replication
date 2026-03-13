@@ -1,0 +1,31 @@
+Discrepancy Report - Table 1, Attempts 3-5
+============================================
+Score: 91.6/100 (unchanged across all 5 attempts)
+
+PLATEAU DIAGNOSIS:
+The score is capped at ~91.6 due to data vintage differences between the
+ANES CDF version 2019-Sep-10 (used here) and the 1995 CD-ROM version (used
+by Bartels). The remaining ~3.4 points are lost primarily in:
+
+1. Log-likelihood (6.7 points lost): Small N differences (1-26 per year)
+   cause LL to shift by 1-16 units. The LL criterion requires within 1.0
+   for full credit, but most years are off by 1-10 units.
+
+2. Coefficients (1.6 points lost): 1960 and 1996 show larger coefficient
+   differences, likely due to party ID recoding between CDF versions.
+   - 1960: weak coefficient 0.725 vs 0.822 (diff=0.097)
+   - 1996: leaning coefficient 1.066 vs 0.942 (diff=0.124)
+
+3. Pseudo-R2 (0.6 points lost): 1960 R2 is 0.41 vs 0.44.
+
+Strategies exhausted:
+- Used CDF data (identical results in Python and R)
+- Tried individual 1996 study file (no improvement)
+- Checked VCF0303 as fallback for missing VCF0301 (no additional obs)
+- Confirmed no individual year datasets available for 1952/1960 in anesr
+- ANES website blocked (403 error)
+
+The 1995 CD-ROM data is unavailable through automated means. The current
+score of 91.6 represents the best achievable with the 2019 CDF version.
+
+STATUS: PLATEAU

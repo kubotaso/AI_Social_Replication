@@ -1,0 +1,33 @@
+Discrepancy Report - Attempt 2
+Score: 78.9/100
+
+Using voters-only proportions improved Non-South somewhat but South remains very noisy.
+
+Key discrepancies:
+Non-South:
+- 1956: 1.17 vs ~1.32 (diff 0.15) - still too low
+- 1960: 1.19 vs ~1.30 (diff 0.11) - too low
+- 1968: 1.06 vs ~1.26 (diff 0.20) - much too low
+- 1988: 1.14 vs ~1.38 (diff 0.24) - much too low
+
+South:
+- 1952: 1.23 vs ~0.98 (diff 0.25) - too high
+- 1964: 1.16 vs ~0.95 (diff 0.21) - too high
+- 1968: 1.30 vs ~1.06 (diff 0.24) - too high
+- 1972: 0.53 vs ~0.63 (diff 0.10) - too low
+- 1984: 1.17 vs ~0.95 (diff 0.22) - too high
+- 1988: 1.49 vs ~1.14 (diff 0.35) - much too high
+
+Root cause analysis:
+1. Small Southern samples lead to unstable probit estimates
+2. Some years have extreme coefficient values (e.g., 1968 South strong=2.35)
+   that skew the weighted average
+3. Need to consider: maybe proportions should be computed among PARTISANS only
+   (excluding VCF0301=4 pure independents), since the average is meant to
+   represent the "average partisan impact"
+
+Strategy for attempt 3:
+- Use proportions among partisans only (exclude pure independents)
+- This means denominator is only those with VCF0301 in [1,2,3,5,6,7]
+- Also try computing from full PID sample (voters + nonvoters)
+  with partisan-only proportions

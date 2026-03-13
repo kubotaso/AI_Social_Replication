@@ -1,0 +1,52 @@
+Data Requirements for Bartels (2000) Replication
+=================================================
+
+Paper: Bartels, Larry M. (2000). "Partisanship and Voting Behavior, 1952-1996."
+       American Journal of Political Science, 44(1), 35-50.
+
+Dataset: American National Election Studies (ANES) Cumulative Data File
+Source: ANES / Inter-university Consortium for Political and Social Research (ICPSR)
+How obtained: Downloaded via R package 'anesr' (from jamesmartherus.r-universe.dev)
+File: anes_cumulative.csv (59,944 observations, 1,029 variables)
+
+The paper states: "My analysis is based on data from the Cumulative Data File
+issued on the American National Election Studies 1948-1994 CD-ROM (May 1995),
+supplemented with data from the 1956-58-60, 1972-74-76, and 1990-91-92 panel
+data files (on the same CD-ROM) and from the 1996 American National Election Study."
+
+The anesr cumulative file includes data through 2016, so it encompasses all
+years needed (1952-1996) including the 1996 study.
+
+Required Variables:
+-------------------
+1. VCF0004 - Year of Study
+2. VCF0301 - Party Identification, 7-point scale
+   1=Strong Democrat, 2=Weak Democrat, 3=Independent-Democrat,
+   4=Independent-Independent, 5=Independent-Republican,
+   6=Weak Republican, 7=Strong Republican
+3. VCF0704 - Presidential vote (1=Democrat, 2=Republican, 3=Third party)
+4. VCF0704a - Presidential vote, 2-party (1=Democrat, 2=Republican)
+5. VCF0706 - Vote and nonvote for President
+   (1=Democrat, 2=Republican, 3=Third party, 4=Other, 7=Did not vote)
+6. VCF0707 - Vote for Congressman (1=Democrat, 2=Republican)
+7. VCF0702 - Did respondent vote (1=No, 2=Yes)
+8. VCF0105a - Race-ethnicity, 7 categories (1=White non-Hispanic)
+9. VCF0113 - Political South/Nonsouth (1=South, 2=Nonsouth)
+10. VCF0902 - Type of U.S. House Race (incumbency coding)
+    12/13/14/19=Dem incumbent, 21/23/24/29=Rep incumbent, 40+=Open seat
+11. VCF0905 - Number of candidates in House race
+    (1=Unopposed, 2=Two or more candidates)
+
+Panel Data (for Tables 4 and 5):
+- 1956-58-60 panel: need lagged party ID from 1958 for 1960 respondents
+- 1972-74-76 panel: need lagged party ID from 1974 for 1976 respondents
+- 1990-91-92 panel: need lagged party ID from 1990 for 1992 respondents
+These require individual year datasets from the anesr package.
+
+Sample Restrictions:
+- Tables 1, 3, 4: Major-party presidential voters only (VCF0704a in {1,2})
+- Tables 2, 3, 5: Major-party congressional voters only (VCF0707 in {1,2})
+- Figures 3-6: Major-party voters only
+- Figure 1: All respondents with valid party ID
+- Figure 2: Respondents with valid party ID, split by presidential vote/nonvote
+- Minor party voters and abstainers omitted from probit analyses

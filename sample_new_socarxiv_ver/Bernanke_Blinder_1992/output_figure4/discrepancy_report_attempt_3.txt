@@ -1,0 +1,51 @@
+Discrepancy Report -- Figure 4, Attempt 3
+==========================================
+
+Score: 30/100
+
+KEY FINDING: Pre-computed log real variables differ from manual by ln(100)=4.605,
+confirming CPI base normalization difference. But this doesn't affect VAR dynamics.
+
+Three specifications tried:
+- Spec A: Standard (same as attempt 2)
+- Spec B: funds_rate/100 (made things worse)
+- Spec C: log vars * 100 (bank vars 100x larger, unemployment same)
+
+Values are still way too large:
+- Securities at month 8: my = -2.03 vs paper = -0.83 (2.4x)
+- Deposits at month 12: my = -2.14 vs paper = -0.80 (2.7x)
+- Loans at month 24: my = -3.40 vs paper = -1.35 (2.5x)
+- Unemployment at month 24: my = 54.2 vs paper = 0.17 (319x)
+
+KEY OBSERVATION: The bank variables are about 2.5x too large (consistent ratio).
+The unemployment is about 319x too large (completely different ratio).
+
+HYPOTHESIS: The bank variables being ~2.5x too large could be:
+1. Data vintage effect (current data revisions vs 1992 vintage)
+2. Wrong variable definition (checkable deposits vs total deposits)
+3. Different CPI deflation approach
+
+The unemployment being 319x too large is the critical puzzle.
+Factor = 319 ≈ 100 / 0.31
+If unemployment * 0.31 / 100 would give the right answer...
+0.5418 * 0.31 / 100 = 0.00168, which is very close to 0.0017 (paper's value).
+
+So: paper_unemp = my_raw_unemp * funds_std / 100
+This means: the paper might be plotting unemployment as a fraction (divided by 100)
+AND normalized by the shock size (divided by funds_std).
+
+But for bank variables: my_raw * 100 should give the plotted values (if in log points).
+my_raw_deposits * 100 = -2.14. Paper shows -0.80. Ratio = 2.67x.
+
+Unless the paper scales ALL variables by the same factor? Let's check:
+If paper = my * (0.31 / 0.3382) = my * 0.916, that gives -1.96 for deposits.
+Still too large.
+
+PLAN FOR ATTEMPT 4:
+1. Try computing the cumulated orthogonal MA representation manually
+2. Try normalizing the shock to exactly 0.31 pp instead of 1 std dev
+3. Try using the structural IRF approach
+4. Most importantly: check if the large unemployment response is because
+   the VAR is over-identified or mis-specified for this sample
+5. Try different deposits variable (total deposits where available)
+6. Maybe the paper uses log(deposits) not log(deposits/CPI)?

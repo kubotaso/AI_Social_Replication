@@ -1,0 +1,44 @@
+Discrepancy Report - Attempt 19
+Score: 50/100 (best remains 68 from attempt 18)
+
+Strategy: Drop Baltic states (EST, LVA, LTU), Moldova (MDA), and Slovenia (SVN)
+to reach N=49 (exactly matching paper's stated N).
+
+RESULT: CATASTROPHIC - score dropped from 68 to 50. N=49 does NOT improve results.
+
+WHY N=49 MADE THINGS WORSE:
+1. Dropping Baltics removed high-GDP/high-secular-rational countries from Ex-Communist zone
+   - EST, LVA, LTU are secular-rational and wealthy (by ex-communist standards)
+   - Without them, Ex-Communist zone dummy weakened (0.275 vs 0.424, PARTIAL)
+   - Ex-Communist lost significance ('' vs **)
+
+2. Dropping MDA (Moldova) and SVN (Slovenia) weakened Orthodox zone
+   - Orthodox zone now only 5 countries (BGR, BLR, ROU, RUS, UKR)
+   - Coefficient weakened (0.065 vs 0.152 for trad dummy)
+
+3. GDP coefficients got EVEN HIGHER with N=49:
+   - Latin America surv GDP: 0.729 vs 0.602 (MISS)
+   - Orthodox surv GDP: 0.713 vs 0.567 (PARTIAL)
+   - Africa trad GDP: 0.433 vs 0.211 (MISS)
+   The mechanism: fewer countries = less variation = GDP explains more proportionally.
+
+4. Confucian zone slightly better (0.215 vs attempt 18's 0.181) but still far from 0.397
+
+CONCLUSION: Paper's N=49 was NOT achieved by dropping these countries.
+The paper's N=49 likely reflects the available 1990s WVS dataset with 49 nations
+as independent units (pre-dissolution borders), not our reconfigured sample.
+
+THE FUNDAMENTAL TRUTH: Our current best is N=54, score=68 from attempt 18.
+The remaining gap comes from:
+1. Our factor scores differ from paper's (different PCA/varimax implementation)
+2. GDP data source differs (PWT 5.6 vs paper's WDI 1997)
+3. Employment data year differs (1991 vs paper's 1980)
+4. Country sample differs (our 54 vs paper's ~49 independent units from early 1990s)
+5. Confucian zone fundamentally underestimated due to factor score differences
+
+BEST ACHIEVABLE SCORE: ~68-70 given available data
+The paper's exact replication would require:
+- Original WVS Wave 2 country list with exactly N=49 countries
+- 1980 employment data from WB/ILO (not 1991)
+- Paper's exact factor analysis implementation
+- WDI 1997 GDP PPP data

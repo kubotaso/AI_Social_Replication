@@ -1,0 +1,106 @@
+Instruction Summary for Table 1 Replication
+Bernanke and Blinder (1992), Table 1
+
+================================================================================
+VARIABLE MAPPING: Paper Name → Dataset Column (bb1992_data.csv)
+================================================================================
+
+FORECASTED VARIABLES (dependent variables in each row's equation):
+
+  Paper Name                Dataset Column                  Units / Transform
+  -------------------------------------------------------------------------
+  Industrial production     log_industrial_production        log level
+  Capacity utilization      log_capacity_utilization         log level (see note)
+  Employment                log_employment                   log level
+  Unemployment rate         unemp_male_2554                  level (percent, NOT log)
+  Housing starts            log_housing_starts               log level
+  Personal income           log_personal_income_real         log level (deflated)
+  Retail sales              log_retail_sales_real            log level (deflated)
+  Consumption               log_consumption_real             log level (deflated)
+  Durable-goods orders      log_durable_goods_real           log level (deflated)
+                            *** MISSING from dataset — skip this row ***
+
+Note on capacity utilization: The dataset column is named "log_capacity_utilization"
+but capacity utilization is a rate (percent of capacity). The paper likely uses it
+in levels. Check the dataset to determine whether the column is actually in logs
+or in levels, and adjust accordingly.
+
+RIGHT-HAND SIDE VARIABLES (included in every equation):
+
+  Paper Name     Dataset Column      Units / Transform
+  ----------------------------------------------------
+  CPI            log_cpi             log level
+  M1             log_m1              log level
+  M2             log_m2              log level
+  BILL           tbill_3m            level (annualized percent)
+  BOND           treasury_10y        level (annualized percent)
+  FUNDS          funds_rate          level (annualized percent)
+
+================================================================================
+MODEL SPECIFICATION
+================================================================================
+
+For each forecasted variable Y:
+
+  Y_t = constant
+        + sum_{j=1}^{6} beta_Y,j * Y_{t-j}
+        + sum_{j=1}^{6} beta_CPI,j * log_cpi_{t-j}
+        + sum_{j=1}^{6} beta_M1,j * log_m1_{t-j}
+        + sum_{j=1}^{6} beta_M2,j * log_m2_{t-j}
+        + sum_{j=1}^{6} beta_BILL,j * tbill_3m_{t-j}
+        + sum_{j=1}^{6} beta_BOND,j * treasury_10y_{t-j}
+        + sum_{j=1}^{6} beta_FUNDS,j * funds_rate_{t-j}
+        + epsilon_t
+
+Total regressors: 1 (constant) + 6*7 (lags) = 43
+
+Estimation: OLS (ordinary least squares) for each equation separately.
+This is NOT a VAR system — each equation is estimated independently.
+
+================================================================================
+F-TEST SPECIFICATION
+================================================================================
+
+For each column variable X in {M1, M2, BILL, BOND, FUNDS}:
+
+  H0: beta_X,1 = beta_X,2 = ... = beta_X,6 = 0
+  H1: At least one beta_X,j != 0
+
+  Test: Standard F-test for joint significance of 6 restrictions.
+  F(6, T-43) where T is the number of observations.
+
+  Report: p-value of the F-statistic (marginal significance level).
+
+Note: CPI lags are always included but CPI is NOT one of the tested columns.
+The dependent variable's own lags are always included but not tested either.
+
+================================================================================
+SAMPLE PERIODS
+================================================================================
+
+Panel A: 1959-07-01 to 1989-12-01 (inclusive)
+  - Estimation sample starts 1959:7 (after losing 6 obs to lags from 1959:1)
+  - Approximately 366 monthly observations
+
+Panel B: 1959-07-01 to 1979-09-01 (inclusive, pre-Volcker)
+  - Same start date
+  - Approximately 243 monthly observations
+
+================================================================================
+IMPLEMENTATION NOTES
+================================================================================
+
+1. The dataset file is: bb1992_data.csv (located in project root)
+2. Interest rates (BILL, BOND, FUNDS) are in levels, NOT in logs.
+3. Real activity variables and CPI are in logs (as indicated by column names).
+4. Unemployment rate is in levels (percent), not logs.
+5. Durable-goods orders is MISSING from the dataset — skip this row. Report
+   results for 8 of the 9 variables only.
+6. Each equation is an independent OLS regression, not a VAR.
+7. The F-test uses 6 numerator degrees of freedom (number of restrictions)
+   and T-43 denominator degrees of freedom (residual df).
+8. Use statsmodels OLS or the f_test method to compute F-statistics and p-values.
+9. Ensure the date index is properly set with monthly frequency before slicing
+   the sample period.
+10. Handle any NaN values that arise from lagging (the first 6 observations
+    of the sample will be lost to lag construction).

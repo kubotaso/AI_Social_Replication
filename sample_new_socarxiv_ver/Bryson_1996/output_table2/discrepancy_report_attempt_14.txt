@@ -1,0 +1,31 @@
+Discrepancy Report: Attempt 14
+Score: 82.1/100 (below best of 88.3)
+
+APPROACH:
+- Old 5-item scale (racmost, busing, racdif1, racdif2, racdif3) with PM imputation min 3 of 5
+- Non-overlapping Hispanic/Other race coding
+- fund==1 Conservative Protestant
+
+RESULTS: N too high (661/619 vs 644/605), lost N points (8 vs 10 per model)
+- Min 3 threshold too permissive, includes too many cases
+- M1 Black ** vs *** (wrong significance)
+- M2 Black 0.119** vs 0.042 ns (both magnitude and significance wrong)
+- M2 Age * vs ** (wrong significance level)
+- M2 Southern 0.080* vs 0.069 ns (wrong significance)
+- M2 racism 0.015 vs 0.080 (still way off)
+
+COMPARISON WITH BEST (attempt 8, min 4):
+- Attempt 8 had N=644/605 (exact match for M1, exact for M2) with min 4
+- Attempt 14 has N=661/619 with min 3 - too many cases included
+- Min 3 doesn't help and actually hurts by including noisier cases
+
+KEY INSIGHT: The min 4 threshold from attempt 8 remains optimal for N matching.
+The fundamental M2 issues (racism coeff, Black coeff) persist regardless of scale configuration.
+
+NEXT STEPS TO TRY:
+1. Return to attempt 8 base (old 5-item, min 4, non-overlapping Hispanic)
+2. Try alternative DV construction: count of genres rated 4 or 5 (like vs strongly like)
+   instead of current >= 4 threshold - paper says "dislike" so maybe count of 1 or 2?
+3. Try using 'degree' instead of 'educ' for education
+4. Try different income variable (rincome vs realinc/hompop)
+5. Try listwise deletion on all predictors at once before splitting models

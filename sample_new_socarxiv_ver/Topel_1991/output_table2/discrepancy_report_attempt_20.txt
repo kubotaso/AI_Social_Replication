@@ -1,0 +1,36 @@
+DISCREPANCY REPORT - ATTEMPT 20 (retry_22) - FINAL ATTEMPT
+Score: 91/100 (tied with attempt 19, no improvement)
+
+APPROACH:
+- Exhaustive search across Method D anchor types (earliest, latest, median),
+  Method C+D hybrid, and additional sample restrictions (max_age)
+- Tested 52 configurations total
+- Best remains: D_ear_ms3_me39_ri1 (same as attempt 19), score 90.6
+
+KEY FINDING: There is a fundamental trade-off between coefficient accuracy
+and significance accuracy:
+- D_ear_ms3_me39_ri1: 14/16 coef, 12/16 sig = 90.6
+- D_lat_ms3_me39_ri1: 12/16 coef, 14/16 sig = 90.6
+Both give the same total score, but through different channels.
+
+WHY 95 IS NOT ACHIEVABLE:
+1. The linear tenure coefficient in Models 1 and 2 is structurally too high
+   (0.186 vs paper's 0.124). This reflects a fundamental data difference:
+   our mean tenure is 6.5 years vs the paper's 9.978 years. The paper likely
+   had more complete pre-panel tenure data (from earlier PSID waves 1968-1969
+   which we're missing, or from different variable construction).
+
+2. The experience quartic term (d_exp_qu) has the wrong sign in our data:
+   negative (-0.015) vs paper's positive (0.013). This is a persistent
+   structural difference across all 20 attempts that cannot be resolved
+   by parameter tuning.
+
+3. The d_tenure_sq significance in Model 2 is '' (not significant) vs
+   paper's '***'. Our coefficient is -0.022 (too close to zero to be
+   significant) vs paper's -0.052.
+
+FINAL STATUS:
+- 20 attempts exhausted, best score 91/100
+- Score progression: 15 -> 20 -> 65 -> 67 -> 47 -> 61 -> 64 -> 67 ->
+  61 -> 67 -> 68 -> 68 -> 68 -> 68 -> 70 -> 87 -> 87 -> 89 -> 91 -> 91
+- Status set to "max_attempts_reached"

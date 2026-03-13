@@ -1,0 +1,40 @@
+Discrepancy Report - Attempt 1
+Score: 37/100
+
+MAJOR ISSUES:
+
+1. N=58 instead of 49: We have too many countries. The paper uses 65 societies but reduces
+   to 49 with WB data. Key differences:
+   - Paper treats East Germany and West Germany as separate societies
+   - Paper includes N. Ireland as separate from Britain
+   - Paper includes Yugoslavia (separate from Serbia)
+   - Paper likely excludes countries not in the 1990-1998 WVS waves
+   - Countries like ALB, MNE, MLT, SLV should be excluded (not in original IB2000)
+   - Need to identify which exact 49 countries match
+
+2. Factor score scale: Paper's Figure 3 shows Trad/Sec-Rat axis from -2.2 to +1.8.
+   Our scores range from -3.85 to +3.72 - nearly double the range.
+   This affects all coefficients and SEs proportionally.
+   Need to rescale factor scores to match paper's scale.
+
+3. Model 2 failed: Education enrollment data too sparse (only 10-12 countries).
+   The paper uses "Percentage enrolled in primary, secondary, and tertiary education."
+   Need to find or approximate these values.
+
+4. GDP data: Paper uses "Penn World tables" for "Real GDP per capita, 1980."
+   We only have World Bank GDP PPP data from 1990 onward.
+   Need to use earlier year data or GNP per capita as proxy.
+   Could also try NY.GNP.PCAP.PP.CD indicator.
+
+5. Coefficient differences:
+   - GDP coef too small (0.043 vs 0.066 in paper) - related to factor scale
+   - Industrial coef too large (0.090 vs 0.052) - related to factor scale
+   - Ex-Communist dummy too large (1.63 vs 1.05)
+   - Catholic dummy too large (-1.43 vs -0.77)
+
+FIXES FOR ATTEMPT 2:
+1. Split Germany into East/West Germany
+2. Restrict to paper's ~65 societies, yielding ~49 with WB data
+3. Rescale factor scores (divide by ~2 or normalize to match paper range)
+4. Try GNP per capita instead of GDP PPP
+5. Handle education data for Model 2

@@ -1,0 +1,13 @@
+import pandas as pd
+df = pd.read_csv('panel_1992.csv')
+print('Columns:', df.columns.tolist())
+print()
+print('pid_current value counts:')
+print(df['pid_current'].value_counts().sort_index())
+print()
+print('vote_pres value counts:')
+print(df['vote_pres'].value_counts().sort_index())
+print()
+ct = pd.crosstab(df['pid_current'], df['vote_pres'])
+print('Crosstab pid_current vs vote_pres:')
+print(ct)

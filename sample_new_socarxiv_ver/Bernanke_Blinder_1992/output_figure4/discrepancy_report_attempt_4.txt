@@ -1,0 +1,29 @@
+Discrepancy Report -- Figure 4, Attempt 4
+==========================================
+
+Score: 30/100 (same issue, but CRITICAL BREAKTHROUGH found)
+
+BREAKTHROUGH:
+1. statsmodels irf.irfs gives NON-orthogonalized (reduced-form) MA representation.
+   This is the response to a 1-UNIT shock to the reduced-form equation.
+2. The ORTHOGONALIZED IRFs (Choleski) are in irf.orth_irfs.
+3. orth_irfs at h=0 gives P[:,0] (the Choleski factor column), confirming it's
+   the response to a 1-std-dev structural shock.
+
+KEY COMPARISON with orth_irfs:
+  My orth deposits at m12: -0.00731 => on x10^-2 axis: -0.731 (paper: -0.80) -- 9% off!
+  My orth securities at m8: -0.00700 => on x10^-2 axis: -0.700 (paper: -0.83) -- 16% off!
+  My orth unemployment at m24: 0.184 => if divided by 100: 0.00184 => displayed as 0.184 (paper: 0.17) -- 8% off!
+
+INTERPRETATION of x10^-2 axis:
+- All values are multiplied by 100 for display
+- Bank variables (log levels): raw orth_irfs * 100 = percentage change display
+- Unemployment (percentage points): raw orth_irfs / 100 * 100 = orth_irfs directly
+  (i.e., divide unemployment by 100 first to convert to fraction form, then multiply by 100)
+
+PLAN FOR ATTEMPT 5:
+1. Use irf.orth_irfs instead of irf.irfs
+2. For bank variables: plot orth_irfs * 100
+3. For unemployment: plot orth_irfs (without the *100, since it cancels with /100)
+4. Set y-axis range to match paper: +0.2 to -1.4
+5. This should give values very close to the paper

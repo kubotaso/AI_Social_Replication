@@ -1,0 +1,21 @@
+Discrepancy Report - Table 6, Attempt 1
+Score: 63/100
+
+CRITICAL FINDING:
+The script used the WRONG variable for church attendance.
+- F063 in WVS Time Series v5 = "How important is God in your life" (1-10 scale)
+- F063 in EVS = church attendance (1-8 scale: 1=more than once/week ... 8=never)
+- F028 in WVS Time Series v5 = "How often do you attend religious services" (1-8 scale)
+
+The EVS data already has the correct F063 column for church attendance.
+The WVS Time Series data needs F028 instead of F063.
+
+The EVS Wave 2 data produced correct results (Ireland=88, France=17, etc.) because
+F063 in the EVS file is correctly mapped to church attendance.
+
+FIX FOR ATTEMPT 2:
+1. Use F028 from WVS Time Series (not F063) for church attendance
+2. Keep using F063 from EVS (it maps to church attendance correctly)
+3. "At least once a month" = values 1, 2, or 3 in both variables
+4. Valid responses = values 1-8 (exclude negative values and 0)
+5. Need to handle Germany East/West split using G006

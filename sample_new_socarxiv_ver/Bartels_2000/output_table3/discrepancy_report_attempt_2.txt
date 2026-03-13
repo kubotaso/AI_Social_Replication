@@ -1,0 +1,35 @@
+Discrepancy Report - Attempt 2
+Score: 92.3/100 (up from 91.5)
+
+IMPROVEMENT FROM ATTEMPT 1:
+- 1992 now matches: N=1370 (was 1326), LL within 0.7, R2 matches
+- Fixed by including all non-null VCF0902 (code 85 now included as open seat)
+
+REMAINING DISCREPANCIES:
+
+1. YEAR 1974: N=739 vs paper=798 (7.4% gap)
+   - 59 voters have null VCF0902 in 2019 CDF vintage
+   - This is a data vintage issue - Bartels' original data had these values
+   - Coefficients affected: strong off by 0.097, const off by 0.078
+   - LL off by 34.2
+   - R2 off by 0.025
+   - CANNOT FIX without original data file. Could try treating null VCF0902 as open seat.
+
+2. YEAR 1996: N matches but coefficients differ
+   - Strong: gen=1.560 vs true=1.503 (diff=0.057)
+   - Weak: gen=0.800 vs true=0.865 (diff=0.065)
+   - Leaner: gen=0.801 vs true=0.874 (diff=0.073)
+   - LL: gen=-380.2 vs true=-373.4 (diff=6.8)
+   - Despite N matching, results differ. Possible explanations:
+     a) Different VCF0301 coding in Bartels' data vintage
+     b) Different VCF0902 coding for some cases
+     c) Weight differences
+   - Need to investigate further
+
+3. YEAR 1976: LL off by 3.1 despite N being close (1076 vs 1079)
+4. YEAR 1982: LL off by 1.8 despite N matching (712)
+
+STRATEGY FOR ATTEMPT 3:
+- For 1974: Try treating null VCF0902 as open seat (incumbency=0) to recover missing 59 cases
+- For 1996: Investigate if there's a different party ID variable or different coding
+- For 1976/1982: These may be data vintage differences that can't be fully resolved

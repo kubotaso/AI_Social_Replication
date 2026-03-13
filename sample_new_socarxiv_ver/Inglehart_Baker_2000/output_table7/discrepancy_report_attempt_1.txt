@@ -1,0 +1,45 @@
+Discrepancy Report - Attempt 1
+Score: 55/100
+
+SUMMARY:
+- 77 total cells in the paper
+- 38 exact matches, 18 close (within 2), 4 misses (diff >= 3), 17 missing
+- Missing cells are ALL 1981-era data for European countries (from EVS 1981 which we don't have)
+- Also missing: Korea 1981, Korea 1990-91, Latvia 1990-91
+
+KEY ISSUES:
+
+1. MISSING 1981 DATA (17 cells):
+   - Belgium 1981 (9), Canada 1981 (36), France 1981 (10), West Germany 1981 (16)
+   - Great Britain 1981 (20), Iceland 1981 (22), Ireland 1981 (29), N. Ireland 1981 (38)
+   - Italy 1981 (31), Netherlands 1981 (11), Norway 1981 (19), Spain 1981 (18)
+   - Sweden 1981 (9), USA 1981 (50), Korea 1981 (29)
+   - Korea 1990-91 (39), Latvia 1990-91 (9)
+   Cause: EVS 1981 data not available. Only EVS 1990 is available.
+   Korea has no F063 data in any WVS wave. Latvia not in WVS wave 2.
+   FIX: Cannot fix without additional data. These 1981 values were from EVS wave 1.
+
+2. EAST GERMANY coding (1990-91: 11 vs 13, 1995-98: 9 vs 6):
+   - G006 3+4 gives 10.6% for 1990 and 9.7% for 1995-98
+   - The split is not perfect. Paper likely used separate country codes.
+   FIX: Try different G006 combinations or look at other variables.
+
+3. INDIA 1990-91 (37 vs 44):
+   - Large discrepancy. Unweighted computation gives 37.4%.
+   - Paper may have used different data subset or different WVS version.
+   FIX: Investigate if a specific region/subsample was used.
+
+4. SOUTH AFRICA values off:
+   - 1981: 53 vs 50 (diff=3), 1990-91: 71 vs 74 (diff=3)
+   - Using S017 weight for wave 2 gives 73.1, closer to 74.
+   FIX: Try using survey weights (S017).
+
+5. NET CHANGES incorrect for many countries:
+   - Because 1981 data is missing, "earliest" becomes 1990-91 instead
+   - This changes the net change calculation for 15+ countries
+
+PLAN FOR NEXT ATTEMPT:
+1. Use S017 weights for computation
+2. Try to get closer on East Germany split
+3. Accept that 1981 data and Korea/Latvia data cannot be recovered without additional files
+4. Focus on getting all available cells as close to paper values as possible

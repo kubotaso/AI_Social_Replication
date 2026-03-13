@@ -1,0 +1,22 @@
+Discrepancy Report - Attempt 13
+Score: 86.0/100 (no improvement, same as attempts 11-12)
+
+Key findings:
+1. HAC standard errors are catastrophically bad (60.7) -- confirms the paper
+   used standard OLS F-tests, not HAC-robust tests.
+2. 6 lags is clearly optimal -- 4,5,7,8 all worse.
+3. unemp_male_2554 is correct (unemp_rate drops 3 points).
+4. First-differences lose 7 points -- confirms log-levels specification.
+5. Per-equation hybrid always selects OLS -- HAC never helps.
+
+The 86.0 plateau seems firm. The same 4 significance mismatches persist
+and 17 value mismatches remain. All are data-vintage driven.
+
+Remaining strategies:
+1. Check if the paper's Data Appendix mentions any specific transformations
+   that we might be missing (seasonal dummies, etc.)
+2. Try nominal variables instead of real for some series
+3. Try different CPI base year or deflation approach
+4. Try adding a time trend to the regressions
+5. Check if dropping CPI from the RHS (and using nominal LHS variables)
+   might match the paper's actual specification better

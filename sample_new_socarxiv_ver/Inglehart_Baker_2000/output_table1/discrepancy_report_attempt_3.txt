@@ -1,0 +1,35 @@
+Discrepancy Report - Attempt 3
+Score: 72/100 (improved from 58)
+
+MAJOR IMPROVEMENT: god_important now matches paper perfectly
+  Nation: 0.91 vs 0.91 (MATCH)
+  Individual: 0.70 vs 0.70 (MATCH)
+
+REMAINING CRITICAL ISSUE: autonomy_idx loading is way too low
+  Nation: 0.66 vs 0.89 (diff=0.23)
+  Individual: 0.36 vs 0.61 (diff=0.25)
+
+Root cause analysis for autonomy_idx:
+- Current construction: (obedience + relig_faith) - (independence + determination)
+- Range: -2 to +2, but most values cluster near 0
+- The binary nature of child quality items limits variance
+- The paper's loading of 0.89 is extremely high, suggesting the index has strong
+  correlation with other traditional values at the nation level
+
+Possible fixes to try:
+1. Use just (obedience + religious_faith) as a 0-2 index (drop the minus terms)
+   - Rationale: the positive terms may be what drives correlation with tradition
+2. Try the ratio: (obedience + relig_faith) / (obedience + relig_faith + independence + determination)
+3. Try a continuous proportion: at individual level, use a continuous index
+4. Check if the paper uses a different construction entirely
+5. Try using just obedience alone (A042) - simpler but may capture the essence
+
+Other issues:
+- Ordering still wrong (autonomy is too low, breaking the ordering)
+- Variance explained improving but not yet matching
+- N=66 vs paper's 65 (one extra country - likely MNE or SLV or ALB)
+- Individual N=140K vs 165K (still short)
+
+FIXES FOR ATTEMPT 4:
+1. Try autonomy_idx = (obedience + religious_faith) only (0 to 2 scale)
+2. Also experiment: scale autonomy to match the range of other variables

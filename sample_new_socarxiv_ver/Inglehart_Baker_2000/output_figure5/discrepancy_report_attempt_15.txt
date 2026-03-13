@@ -1,0 +1,64 @@
+Discrepancy Report - Attempt 15
+Score: 94.0/100 (NEW BEST)
+
+APPROACH: Same quantitative approach as attempt 14, improved visual quality:
+- Removed top/right spines (open box style)
+- Fixed label placement (moved "Historically Protestant" to avoid overlap)
+- Better tick label format (paper-style .3, .8, 1.3 etc.)
+- Larger font for axis labels (12pt)
+- Larger dot size (7px)
+
+RESULTS COMPARISON (all 12/12 within d<0.3, ordering 12/12):
+All same as attempt 14 - confirmed:
+DEU_W Protestant: (0.76, 1.15) d=0.222 GOOD
+DEU_W Catholic:   (0.60, 1.05) d=0.250 GOOD
+CHE Protestant:   (1.01, 0.41) d=0.229 GOOD
+CHE Catholic:     (0.77, 0.35) d=0.271 GOOD
+IND Hindu:        (-0.37, -0.51) d=0.067 GOOD
+IND Muslim:       (-0.58, -0.87) d=0.155 GOOD
+NGA Christian:    (-0.60, -1.42) d=0.115 GOOD
+NGA Muslim:       (-0.70, -1.92) d=0.220 GOOD
+USA Protestant:   (1.51, -0.88) d=0.226 GOOD
+USA Catholic:     (1.41, -0.90) d=0.209 GOOD
+NLD Protestant:   (1.35, 0.62) d=0.134 GOOD
+NLD Catholic:     (1.20, 0.35) d=0.206 GOOD
+
+VISUAL SCORING (34/40):
+4. Axis labels/ranges: 14/15 - correct labels, ranges, ticks; .3/.8 format matches paper
+5. Aspect ratio: 4/5 - square figure
+6. Visual elements: 8/10 - boundary line present, zone labels present, minor label overlap
+7. Overall layout: 8/10 - cleaner open-box style, good label placement overall
+
+REMAINING ISSUES (to get from 94 to 95+):
+1. CHE Catholic label overlaps with "Switzerland" country label (visible in figure)
+2. "West Germany" label partially touches Protestant dot
+3. Axis label format: paper appears to use no decimal on integer values
+   Our "0" tick shows "0" which is correct
+
+ATTEMPT 16 STRATEGY:
+Need 1 more point to reach 95. Options:
+1. Fix CHE label overlap: move CHE Catholic label to the LEFT of its dot
+   Currently: right at "Catholic" label is placed left of dot (-0.04)
+   Also "Switzerland" label starts at cx+0.06 (right of mean)
+   Fix: Place CHE Switzerland label ABOVE the dots, not to the right
+2. Improve axis label format to match paper more precisely
+3. Potentially adjust tick marks slightly
+4. Examine the Y-axis tick labels: paper shows "-2.2" at bottom,
+   but also shows ".3", ".8", "1.3", "1.8" without leading zeros
+   Our code produces this via fmt_y
+
+SPECIFIC VISUAL FIX FOR ATTEMPT 16:
+- CHE: Place "Switzerland" above both points (cy + 0.12, centered)
+  Place "Protestant" to the LEFT of Protestant dot (right of it won't work, too close to boundary)
+  Place "Catholic" to the LEFT of Catholic dot
+- NLD: Place "Netherlands" label to the RIGHT, vertically centered
+- DEU_W: Place "West Germany" label to the RIGHT, slightly below the centroid
+  But place "Protestant" ABOVE Protestant dot (using right-align to left of dot)
+- Reconsider tick marks: paper shows specific tick mark positions.
+  Looking at figure5.jpg y-axis: shows .8, 1.3, 1.8 at top; -2.2 at bottom
+  These are already in our implementation.
+
+The key issue: the score for "Overall layout" (item 7) and "Visual elements" (item 6)
+can be improved by 1 point each. Currently estimated at 8/10 each.
+Fixing the label overlap at CHE would help "overall layout" -> 9/10.
+Total: 14+4+8+9=35/40, score=35+60=95.

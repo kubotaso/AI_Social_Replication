@@ -1,0 +1,57 @@
+Discrepancy Report — Attempt 1
+Score: 86/100
+
+=== WHAT WENT WELL ===
+1. Shape and sign correct for both responses (25/25 pts)
+2. Unemployment response magnitudes are very close to the paper
+   - Trough around -0.26 (paper: -0.28), good match at most horizons
+3. Axis ranges, labels, and layout match original well
+4. No confidence bands (matching original)
+
+=== MAIN DISCREPANCIES ===
+
+1. Inflation response magnitude too low:
+   - Generated peak: 0.237 at month 6
+   - Paper peak: ~0.44 at months 9-11
+   - Ratio: our values are about 50-55% of the paper's
+   - The response decays too fast and goes negative by month 21
+
+2. Inflation response peaks too early:
+   - Generated: peaks at month 6
+   - Paper: peaks around months 9-11
+
+3. Inflation response decay too rapid:
+   - By month 24, we get -0.032 (negative)
+   - Paper shows ~0.33 at month 24 (still strongly positive)
+
+=== VALUE COMPARISON ===
+Unemployment response (close match):
+  h=4:  gen=-0.175, true=-0.150, err=16.8% (within tolerance)
+  h=6:  gen=-0.200, true=-0.200, err=0.2% (excellent)
+  h=8:  gen=-0.228, true=-0.230, err=1.0% (excellent)
+  h=12: gen=-0.255, true=-0.280, err=9.1% (good)
+  h=24: gen=-0.209, true=-0.220, err=5.0% (good)
+
+Inflation response (poor match):
+  h=4:  gen=0.198, true=0.300, err=33.9% (too low)
+  h=6:  gen=0.237, true=0.380, err=37.6% (too low)
+  h=10: gen=0.165, true=0.440, err=62.5% (way too low)
+  h=24: gen=-0.032, true=0.330, err=109.6% (wrong sign)
+
+=== DIAGNOSIS ===
+The large discrepancy in the inflation response is likely due to:
+1. Data vintage effects: CPI data has been significantly revised since 1992.
+   The current CPI series (which has been rebased and methodologically updated
+   multiple times) may produce different VAR dynamics than the 1992 vintage.
+2. Possible different CPI series: The paper may have used a different CPI
+   measure (e.g., CPI-U vs CPI-W, or CPI less food and energy).
+
+=== POTENTIAL FIXES FOR NEXT ATTEMPT ===
+1. Try different sample start dates (e.g., 1960:1 instead of 1959:7)
+2. Try using CPI inflation rate (first difference of log CPI * 100) instead
+   of log CPI levels — some implementations of "inflation" use the rate
+3. Experiment with Choleski ordering: paper says FUNDS first, but maybe
+   try [log_cpi, unemp_male_2554, funds_rate] ordering
+4. Try different lag lengths (4 or 8 lags)
+5. Check if the paper uses annualized inflation rate
+   (12 * diff(log_cpi) * 100) instead of log_cpi in levels

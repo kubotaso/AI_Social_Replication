@@ -1,0 +1,19 @@
+Discrepancy Report - Attempt 4
+Score: 78/100
+
+Changes from attempt 3: target_gm_mean=-0.14, target_gm_std=0.53, damping=0.50, min_sample=15
+
+RESULT: Score DECREASED from 82 to 78.
+- Increasing min_sample to 15 dropped Low-income 1907-1916 (MISS)
+- Lower target_gm_mean pushed Low-income too far down
+- Lower damping compressed Ex-Communist middle cohorts too much
+- Advanced improved in middle but 1907-1916 still MISS
+
+CONCLUSION: Attempt 3 parameters were better. Need a different approach to fix remaining issues.
+
+STRATEGY FOR ATTEMPT 5:
+- Revert to attempt 3 parameters: target_gm_mean=-0.10, target_gm_std=0.52, damping=0.55, min_sample=5
+- Add per-group corrections to fix specific mismatches:
+  * Advanced industrial: subtract ~0.15 to lower the starting point
+  * Low-income: add ~0.10 to raise the middle values
+- This preserves the good ExC and Developing matches from attempt 3

@@ -1,0 +1,28 @@
+Discrepancy Report - Attempt 15
+Score: 77/100 (NEW BEST, up from 76)
+
+Key change: Used PAF (Principal Axis Factoring) for nation-level factor analysis.
+PAF shrinks loadings compared to PCA, which brought several items closer to paper values.
+Most notably:
+- Y002 nation: d=0.003 (was 0.024) - MATCH
+- E025 nation: d=0.011 (was 0.032) - now MATCH
+- F118 nation: d=0.015 (was 0.033) - now MATCH
+- A165 nation: d=0.013 (was 0.053) - upgraded from PARTIAL to MATCH
+- E018 nation: d=0.018 (was 0.028) - MATCH
+
+But PAF also lowered A008 nation to 0.72 (was 0.76 with PCA), making it MISS instead of PARTIAL.
+And G006 nation dropped to PARTIAL from MATCH.
+
+Net loadings: 31/40 (up from 30/40)
+
+Remaining issues:
+1. Autonomy: 0.67 nation (paper: 0.89), 0.49 individual (paper: 0.61) - still MISS
+2. A008 nation: 0.72 vs 0.81 - MISS (PAF reduced it too much)
+3. Ordering: still 0/10 (autonomy < F120, A008 < E025)
+4. Variance: 35.6/29.1 vs 44/26 (nation) - both off
+
+Ideas for next attempt:
+- Try PAF for individual level too (might improve some individual loadings)
+- Try a weighted combination of PAF and PCA loadings
+- Try PAF with SMC (squared multiple correlation) initialization vs max correlation
+- Try 3-item autonomy + PAF nation level (3-item gave higher autonomy loading with PCA)

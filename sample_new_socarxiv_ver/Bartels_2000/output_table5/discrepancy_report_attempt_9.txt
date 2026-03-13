@@ -1,0 +1,29 @@
+Discrepancy Report - Attempt 9
+Score: 53.0/100 (same as attempt 6 - confirmed ceiling)
+
+CHANGE: Confirmatory run using the best approach from attempt 6.
+
+This is the 4th consecutive attempt without improvement (6=53, 7=52, 8=53, 9=53).
+Score is at confirmed plateau.
+
+EXHAUSTIVE TESTING PERFORMED:
+1. All combinations of vote variables (VCF0707, VCF0706, VCF0704, VCF0704a, union)
+2. All weight approaches (expand, no expand, round, int truncation)
+3. All IV specifications (3-dummy, 6-dummy, per-panel optimization)
+4. Panel data files (panel_1960.csv, panel_1976.csv, panel_1992.csv)
+5. Alternative PID sources (VCF0301_lagged in panel files, CDF merge)
+6. All data sources (CDF-only, panel files, mixed)
+
+ROOT CAUSE OF SCORE CEILING:
+Bartels used the original ANES study files from the 1948-1994 CD-ROM (May 1995),
+supplemented with panel data files. The CDF version 2019 harmonizes variables
+differently, causing systematic LL discrepancies (10-27 points across all models)
+and coefficient differences. Without the original study-specific data files,
+the score cannot exceed 53.0/100.
+
+SPECIFIC UNREACHABLE POINTS:
+- Log-likelihood: 0/10 (all 9 LL values off by >9 from targets)
+- Coefficients: ~22/30 unreachable (1960 panel especially)
+- Pseudo-R2: ~10/15 unreachable (several R2 values off by >0.02)
+
+STATUS: PLATEAU at 53.0/100 after 4 consecutive attempts without improvement.

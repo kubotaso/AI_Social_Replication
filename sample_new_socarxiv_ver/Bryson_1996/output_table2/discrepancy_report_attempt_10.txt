@@ -1,0 +1,24 @@
+Discrepancy Report: Attempt 10
+Score: 59.0/100 (far below best of 88.3)
+
+APPROACH:
+- Correct 5-item racism scale (racmost, busing, racdif1, racdif3-flipped, racdif4)
+- STRICT: require all 5 items valid (min_count=5)
+- Non-overlapping Hispanic/Other race coding
+- fund==1 Conservative Protestant
+
+FATAL PROBLEM: N dropped to 453/431 (vs paper's 644/605)
+- racdif4 was asked of fewer GSS respondents than other items
+- Requiring all 5 valid eliminates ~30% of the sample
+- This makes the correct 5-item scale unusable with strict validity
+
+GOOD SIGNS:
+- Racism coefficient very close: 0.128 vs 0.130 (diff=0.002)
+- Black coefficient better: 0.084(ns) vs 0.042(ns)
+- Many coefficients closer to paper values
+
+LESSON: The correct 5-item scale needs person-mean imputation (min 3 or 4 of 5)
+to maintain adequate sample size. But previous exploration showed that with
+imputation and this scale, N gets closer but coefficients diverge more.
+
+NEXT: Try correct 5-item scale with person-mean imputation (min 3 of 5 valid)

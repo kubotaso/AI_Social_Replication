@@ -1,0 +1,39 @@
+Discrepancy Report - Table 1, Attempt 1
+========================================
+Score: 91.6/100
+
+Summary: Most coefficients match well. Main discrepancies in 1960 and 1996.
+
+SAMPLE SIZES:
+All years show slightly lower N than the paper (by 1-26 observations).
+Largest gap: 1952 (1155 vs 1181, -26), 1976 (1314 vs 1322, -8).
+This suggests the anesr cumulative file may differ from the original 1995 CD-ROM
+in a few cases (possible recoding of party ID or vote variables across revisions).
+
+COEFFICIENT DISCREPANCIES (|diff| > 0.05):
+- 1952: strong 1.594 vs 1.600 (diff: -0.006) - OK
+- 1960: weak 0.725 vs 0.822 (diff: -0.097) - LARGE discrepancy
+- 1960: strong 1.585 vs 1.650 (diff: -0.065) - moderate
+- 1960: pseudo-R2 0.41 vs 0.44 (diff: -0.03)
+- 1996: strong 1.866 vs 1.946 (diff: -0.080) - moderate
+- 1996: leaning 1.066 vs 0.942 (diff: +0.124) - LARGE discrepancy
+- 1996: pseudo-R2 0.55 vs 0.54 (diff: +0.01) - OK
+
+ROOT CAUSE ANALYSIS:
+1. The paper notes: "supplemented with data from the 1956-58-60, 1972-74-76,
+   and 1990-91-92 panel data files." The cumulative file version from anesr
+   may differ from the specific 1995 CD-ROM used by Bartels.
+
+2. For 1960 specifically: The paper may have included panel respondents from
+   the 1956-58-60 panel that are coded differently in the cumulative file.
+
+3. For 1996: The paper explicitly used the standalone 1996 ANES study file.
+   The cumulative file's version of 1996 data may have undergone recoding.
+
+SUGGESTED FIXES:
+1. Try loading the individual timeseries_1996 dataset from anesr and compare
+   with the cumulative file's 1996 data.
+2. Check if the 1960 discrepancy is due to panel respondents having different
+   party ID coding in the cumulative file vs. the original panel file.
+3. Investigate whether the small N differences reflect a systematic recoding
+   issue (e.g., VCF0301 or VCF0704a coding changes in newer CDF versions).

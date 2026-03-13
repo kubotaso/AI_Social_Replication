@@ -1,0 +1,41 @@
+Discrepancy Report - Attempt 3
+Score: 43/100
+
+IMPROVEMENTS:
+- N=50 (close to 49, improved from 57-58)
+- Model 3 Adj R2 now matches (0.51 vs 0.50)
+- Some coefficients improved with rescaling
+
+REMAINING ISSUES:
+
+1. Confucian dummy: 0.53 vs 1.57 paper - WAY OFF
+   - Only 3 Confucian countries (JPN, KOR, CHN) since TWN excluded
+   - Paper likely includes TWN (4 Confucian countries)
+   - Need to impute WB data for Taiwan or find alternative data source
+   - With only 3 countries, the Confucian effect is unreliable
+
+2. Catholic dummy: -0.91 vs -0.77 in paper (too negative)
+   - May be affected by which countries are included
+   - 23 Catholic countries is a lot; check if all are correctly classified
+
+3. GDP coefficients: systematically smaller than paper
+   - Paper uses PWT "Real GDP per capita, 1980" in $1,000s US
+   - We use GNP PPP 1995, which has ~2x the absolute values of 1980 GDP
+   - Need to use GDP PPP constant $ and deflate to 1980-level values
+   - Try NY.GDP.PCAP.PP.KD (constant 2017 intl $) and scale down
+
+4. Standard errors: systematically different
+   - Related to factor score scaling and GDP scaling
+
+5. Model 2: Still failing - only 6 countries have education data
+   - Education enrollment data extremely sparse in our WB extract
+   - Would need external education data (UNESCO, etc.)
+
+6. Significance levels: Several mismatches (related to coefficient issues)
+
+FIXES FOR ATTEMPT 4:
+1. Include Taiwan with imputed data (GDP ~$10K PPP 1980, Industry ~40%)
+2. Use GDP PPP constant $ and scale to 1980 levels (divide by ~2-3x)
+3. Adjust country count to exactly 49
+4. Verify Catholic country classification
+5. Consider adjusting factor score normalization

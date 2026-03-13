@@ -1,0 +1,29 @@
+Discrepancy Report -- Figure 4, Attempt 6
+==========================================
+
+Score: 80/100 (same as attempt 5 -- configurations A/B/C give nearly identical results)
+
+KEY FINDINGS:
+- All three configs (with dummy, without dummy, pre-computed) give essentially
+  the same results. The dummy has minimal impact.
+- Pre-computed variables differ from manual by ln(100) constant, so no effect on VAR.
+
+REMAINING DISCREPANCIES:
+1. Loans: -1.00 at m24 vs paper -1.35 (26% off) -- consistently underestimated
+2. Securities: -0.21 at m24 vs paper -0.40 (48% off) -- recovers too much
+3. Securities: drops too fast initially (-0.44 at m1 vs paper ~0)
+4. Unemployment: rises too fast at early horizons (m12: 0.15 vs 0.07)
+5. Deposits: good match from month 8 onward
+
+These discrepancies are likely due to:
+1. Data vintage effects (current FRED data vs 1992 Federal Reserve historical data)
+2. bank_investments may not perfectly match the paper's "securities" definition
+3. bank_deposits_check (checkable deposits) may differ from "total deposits"
+
+PLAN FOR ATTEMPT 7:
+1. Try using the overall unemployment rate (unemp_rate) instead of male 25-54
+2. Try different lag lengths to see if 6 lags is optimal
+3. Try the full Choleski with deposits ordered differently to see effect
+4. Improve visual quality: text placement, line styles
+5. Try computing securities as the difference between a cumulated bank_credit_total
+   and bank_loans

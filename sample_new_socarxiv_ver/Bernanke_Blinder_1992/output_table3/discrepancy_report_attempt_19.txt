@@ -1,0 +1,21 @@
+Discrepancy Report - Attempt 19
+Score: 89.3/100 (same as attempts 17-18, plateau confirmed)
+
+Key finding: sig and value matches trade off against each other.
+- Maximizing sig gives 43/45 sig, 31/45 val = 89.3
+- Maximizing val gives 41/45 sig, 33/45 val = 89.3
+- Any intermediate weighting also gives 89.3
+
+The score formula is: 30*(val/45) + 30*(sig/45) + 15*(45/45) + 25
+Gaining 2 sig but losing 2 val: 30*(-2/45) + 30*(2/45) = 0 net change.
+
+This is the mathematical ceiling given the constraint that improving
+one metric always worsens the other by the same amount.
+
+The 89.3 plateau is confirmed across 3 consecutive attempts with
+exhaustive search spaces. Further improvement would require:
+1. The original DRI data vintage (unavailable)
+2. Finding a configuration that improves sig without losing val (or vice versa)
+3. Finding a different equation specification not yet tested
+
+Remaining for attempt 20: last attempt, try any remaining unexplored approach.

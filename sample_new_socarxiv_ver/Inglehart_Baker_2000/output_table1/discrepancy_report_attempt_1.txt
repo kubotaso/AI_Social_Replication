@@ -1,0 +1,42 @@
+Discrepancy Report - Attempt 1
+Score: 49/100
+
+CRITICAL ISSUES:
+
+1. A006 (God importance) has near-zero loading (-0.07 nation, -0.05 individual)
+   - Root cause: A006 in the WVS Time Series v5 is NOT the 1-10 "How important is God" variable.
+     It's a 1-4 scale variable (possibly "important things in life" series).
+   - The correct variable is F063 (1-10 scale: 1=Not important, 10=Very important).
+   - Evidence: Nigeria F063 mean=9.66, USA=8.22, Sweden=3.94 (makes sense)
+     vs A006: Nigeria=1.11, USA=1.63, Sweden=2.88 (doesn't make sense for God importance)
+   - For EVS data: A006 IS the correct 1-10 variable (Ireland=7.93 on A006)
+   - FIX: Use F063 from WVS data, A006 from EVS data. Create unified "god_important" variable.
+
+2. Autonomy index (A042) is just obedience, not the composite index
+   - Paper says: "Important for child to learn obedience and religious faith rather than
+     independence and determination"
+   - Currently using just A042 (obedience, binary 0/1)
+   - FIX: Construct autonomy index = (A042_obedience + A034_religious_faith) - (A029_independence + A032_determination)
+     where each is 0/1 (mentioned/not). Range: -2 to +2. Higher = more traditional.
+
+3. Individual-level N is too low (89,422 vs paper's 165,594)
+   - Likely because we're using "latest wave per country" which drops wave 2 data
+     when wave 3 exists for same country
+   - Paper likely uses ALL respondents from waves 2-3, not just latest
+   - FIX: For individual-level, use all respondents from both waves
+
+4. Variance explained is wrong
+   - Nation dim1: 31.0% (paper: 44%) - way off
+   - Nation dim2: 32.9% (paper: 26%) - off
+   - Individual dim1: 15.0% (paper: 26%) - way off
+   - Individual dim2: 20.1% (paper: 13%) - way off
+   - This is likely downstream of the A006/autonomy issues above
+
+5. Ordering is wrong within dimensions
+   - Will likely fix itself once loading values are correct
+
+FIXES FOR ATTEMPT 2:
+1. Replace A006 with F063 for WVS data (keep A006 for EVS where it's 1-10)
+2. Build proper Autonomy index from A029, A032, A034, A042
+3. For individual-level: use all respondents from waves 2 and 3 (not just latest per country)
+4. Keep nation-level as latest per country

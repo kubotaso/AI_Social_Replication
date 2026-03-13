@@ -1,0 +1,40 @@
+Discrepancy Report - Attempt 1
+Score: 79/100
+
+Key Issues:
+
+1. MAJOR SIGNIFICANCE MISMATCHES (6 cells):
+   - Capacity utilization / FUNDS: gen=0.0126** vs true=0.85 ns  -- HUGE mismatch
+   - Employment / CPBILL: gen=0.0043*** vs true=0.032** -- minor (both significant but different level)
+   - Unemployment rate / CPBILL: gen=0.1061 ns vs true=0.049** -- significance mismatch
+   - Unemployment rate / FUNDS: gen=0.0039*** vs true=0.28 ns -- HUGE mismatch
+   - Retail sales / M2: gen=0.0256** vs true=0.16 ns -- significance mismatch
+   - Consumption / CPBILL: gen=0.8783 ns vs true=0.021** -- HUGE mismatch
+   - Durable-goods orders / CPBILL: gen=0.5517 ns vs true=0.021** -- HUGE mismatch
+
+2. DURABLE GOODS DATA ISSUE:
+   - Only 96 observations (1961:7-1969:6) vs expected ~342
+   - The durable_goods_orders_hist column only has data through 1969
+   - Need to construct from other sources or accept lower score for this row
+
+3. VALUE MISMATCHES (many p-values differ substantially even when significance agrees):
+   - Multiple p-values off by more than 30% relative error
+   - This may be due to data vintage differences OR potential variable definition issues
+
+4. POSSIBLE ROOT CAUSES:
+   a) The cpbill_long variable in the dataset might not match what BB1992 used
+     - They define CPBILL = 6-month CP rate - 6-month T-bill rate
+     - Need to verify cpbill_long construction
+   b) The sample might need adjustments for lag initialization
+     - With 6 lags starting from 1961:7, the effective sample should start at 1962:1
+     - But the paper says "1961:7-1989:12" which likely means the estimation sample
+     - Currently getting N=342, which is exactly 1961:7 to 1989:12 = 342 months
+     - But with 6 lags, we'd need data from 1961:1, which is available
+   c) Potential issue with cpbill_long vs cpbill variable
+     - There's both 'cpbill' and 'cpbill_long' in the dataset
+
+5. FIXES TO TRY:
+   - Check if using 'cpbill' instead of 'cpbill_long' improves CPBILL column results
+   - Verify the sample period and N more carefully
+   - For durable goods: try constructing from available data or accept limitation
+   - Look at the exact variable definitions more carefully

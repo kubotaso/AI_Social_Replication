@@ -1,0 +1,15 @@
+Runtime Error - Table 1 Attempt 18
+Method: nation_means_5item - LinAlgError: Eigenvalues did not converge
+
+Traceback:
+  File "generated_analysis_retry_18.py", line 275, in run_analysis
+    indiv_load, iv1, iv2, _ = pca_varimax(data_i, ITEMS)
+  File "generated_analysis_retry_18.py", line 138, in pca_varimax
+    eigenvalues, eigenvectors = np.linalg.eigh(corr)
+numpy.linalg.LinAlgError: Eigenvalues did not converge
+
+Root cause: nation_means_5item method sets autonomy_idx to NaN at individual level
+(no individual-level coding for this method), making the individual correlation
+matrix have NaN values which causes eigenvalue decomposition to fail.
+
+Fix: Add error handling or skip individual-level analysis for this method.

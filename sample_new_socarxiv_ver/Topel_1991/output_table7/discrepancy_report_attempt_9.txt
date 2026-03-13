@@ -1,0 +1,86 @@
+Discrepancy Report - Attempt 9
+Score: 85/100 (same as attempt 8)
+Changes from attempt 8: Added OLS prediction for imputed CT (instead of hazard model)
+
+=== SCORING BREAKDOWN ===
+Coefficients: 17/25 (8 misses)
+  - tenure col(2): 0.005 vs -0.0015 (wrong sign, off by 0.0065)
+  - tenure col(4): 0.023 vs 0.006 (off by 0.017)
+  - x_censor col(2): 0.0004 vs -0.0025 (wrong sign)
+  - x_censor col(3): 0.0025 vs -0.0024 (wrong sign)
+  - imp_completed_tenure col(5): 0.023 vs 0.0067 (3.5x too large)
+  - exp_sq col(3): -0.00051 vs -0.00072 (29% relative error, exceeds 20% tolerance)
+  - exp_sq_interaction col(3): -0.000009 vs -0.00061 (~600x too small)
+  - exp_sq_interaction col(5): +0.000002 vs -0.00075 (wrong sign, ~600x too small)
+
+SEs: 15/15 (all pass with generous tolerance from scoring function)
+N: 15/15 (13183 vs 13128, 0.4% error)
+Significance: 18/25 (7 misses)
+  - tenure col(1): *** vs ** (we get more significant)
+  - tenure col(2): * vs ns (we get significant)
+  - tenure col(4): *** vs ns (we get highly significant)
+  - x_censor col(3): * vs ns (we get significant)
+  - imp_ct col(4): ** vs ns (we get significant)
+  - imp_ct col(5): *** vs ns (we get significant)
+  - exp_sq_int col(5): ns vs *** (we miss significance)
+
+Variables: 10/10 (all present)
+R-squared: 10/10 (all 5 match within tolerance)
+
+=== KEY REMAINING ISSUES ===
+
+1. INTERACTION TERMS (ct_x_exp_sq): This is the single biggest structural problem.
+   Our coefficient is -0.000009 (col 3) vs target -0.00061. This is a ~67x discrepancy.
+   Similarly col(5): +0.000002 vs -0.00075.
+   DIAGNOSIS: The interaction of completed tenure with experience^2 should capture how
+   wage-tenure profiles vary with experience. In our data, this interaction is essentially
+   zero because completed_tenure and exp^2 don't interact meaningfully. This suggests
+   the paper may use a different definition of the interaction variable, or there's a
+   scaling/specification difference we haven't identified.
+
+2. TENURE COEFFICIENTS: Consistently too large across columns 2,4,5.
+   - Col(2): 0.005 vs -0.0015 (wrong sign)
+   - Col(4): 0.023 vs 0.006 (nearly 4x too large)
+   This is linked to the interaction terms issue - when ct_x_exp_sq doesn't absorb
+   variance, the other coefficients compensate.
+
+3. CENSOR INTERACTION: Wrong sign in both cols 2,3.
+   Our: +0.0004 (col 2), +0.0025 (col 3) vs target: -0.0025, -0.0024
+   The censor variable may need to be defined differently (e.g., 0 for censored instead
+   of 1, or based on a different criterion).
+
+4. SIGNIFICANCE MISMATCHES: 7 out of 25 coefficients have wrong significance.
+   Most of these stem from our coefficients being too large (tenure, imp_ct) making
+   them significant when they shouldn't be, or from interaction terms being too small
+   (exp_sq_interaction col 5) making them insignificant when they should be ***.
+
+=== COMPARISON WITH ATTEMPT 8 ===
+Attempt 8 score: 85 (same as attempt 9)
+Key difference: Attempt 9 uses OLS prediction for imputed CT; attempt 8 uses hazard model.
+- imp_ct col(4): attempt 9 = 0.0050 (target 0.0053); attempt 8 = 0.0059 (target 0.0053)
+  Both pass within 20% tolerance, but attempt 9 is slightly closer.
+- imp_ct col(5): attempt 9 = 0.0233 (target 0.0067); attempt 8 = 0.0200 (target 0.0067)
+  Both miss. Attempt 8 slightly better.
+- Net effect: No score change.
+
+=== STRATEGIES FOR ATTEMPT 10 ===
+
+The score has plateaued at 85 for 2 consecutive attempts (8 and 9). The remaining 15
+points are concentrated in:
+- Coefficient mismatches (8 pts lost): Mostly structural issues with interaction terms
+  and tenure coefficients
+- Significance mismatches (7 pts lost): Mostly downstream from coefficient issues
+
+Potential strategies:
+1. **Alternative censor definition**: Try censor = 0 for jobs still active in 1983
+   (inverted). This would flip the sign of ct_x_censor.
+2. **Different interaction variable construction**: Instead of ct_obs * exp_sq, try
+   (ct_obs - mean(ct_obs)) * exp_sq or ct_obs * (exp_sq - mean(exp_sq)).
+3. **Scale ct_x_exp_sq differently**: Maybe the paper's exp^2 interaction uses exp/10
+   squared, not raw exp^2.
+4. **Re-examine the unrestricted model specification**: The paper's equation (18) may
+   imply a different parameterization than what we're using.
+5. **Try removing year dummies from interaction columns**: The interaction terms might
+   behave differently without year fixed effects.
+6. **Examine if the paper uses a different sample for cols 2-3 vs 4-5**: Perhaps only
+   uncensored jobs appear in observed CT columns.

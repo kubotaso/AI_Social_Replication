@@ -1,0 +1,35 @@
+Discrepancy Report - Attempt 6
+Score: 78.8/100
+
+Approach: Separate white regional probits + voter proportions (incl pure ind)
+
+Key findings:
+1. Non-South values generally reasonable but systematically 0.05-0.15 below GT
+   for several years (1956: 1.17 vs 1.33, 1960: 1.19 vs 1.30, 1968: 1.06 vs 1.26)
+2. South values extremely noisy due to small samples (127-280 per year):
+   - 1952: 1.23 vs GT 0.99 (high by 0.24)
+   - 1968: 1.30 vs GT 1.05 (high by 0.25)
+   - 1988: 1.49 vs GT 1.14 (high by 0.35)
+3. The South line is much more "ragged" than the original figure
+4. The separate probit approach produces unstable Southern estimates
+
+Comprehensive diagnostic (12 probit/proportion combinations tested):
+- No single approach matches all years well
+- For Non-South: voter proportions work best, but values still 0.1-0.2 below GT
+  for 1956, 1960, 1968, 1988
+- For South: pooled probits (all-voter or all-white) produce more stable but
+  often too-similar lines; separate probits produce correct separation but wild noise
+- The "all_voter_incl" approach (all-voter probit + voter proportions incl ind)
+  produced the best overall data score (26.8/40) in the comprehensive diagnostic
+
+Root cause analysis:
+- Non-South gaps may be due to ANES cumulative file version differences from
+  Bartels' original 1999 data
+- South noise is inherent to small-sample separate probits
+- The paper's Figure 4 likely used a data version producing more stable estimates
+
+Strategy for attempt 7:
+- Use ALL-voter probit (same probit that Table 1 reports) instead of separate probits
+- Apply white regional voter proportions (incl pure ind) to create separation
+- This produces smoother lines while maintaining regional differentiation
+- The "all_voter_incl" approach scored best in comprehensive testing

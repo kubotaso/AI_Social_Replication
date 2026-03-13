@@ -1,0 +1,29 @@
+Variable mapping:
+Forecasted variables (same as Tables 1-2):
+- Industrial production → log_industrial_production
+- Capacity utilization → log_capacity_utilization
+- Employment → log_employment
+- Unemployment rate → unemp_male_2554
+- Housing starts → log_housing_starts
+- Personal income → log_personal_income_real
+- Retail sales → log_retail_sales_real
+- Consumption → log_consumption_real
+- Durable-goods orders → log_durable_goods_real (MISSING)
+
+RHS variables:
+- CPI → log_cpi
+- M1 → log_m1
+- M2 → log_m2
+- CPBILL → cpbill_long (= cpaper_6m_long - tbill_6m, from bb1992_data.csv)
+- TERM → term (= treasury_10y - treasury_1y)
+- FUNDS → funds_rate
+
+Model specification:
+- OLS regression
+- Constant + 6 lags of dep var + 6 lags CPI + 6 lags M1 + 6 lags M2 + 6 lags CPBILL + 6 lags TERM + 6 lags FUNDS
+- Total regressors: 1 + 6*7 = 43
+- F-test p-values for each column variable
+
+Sample: 1961-07-01 to 1989-12-01
+
+Dataset: bb1992_data.csv

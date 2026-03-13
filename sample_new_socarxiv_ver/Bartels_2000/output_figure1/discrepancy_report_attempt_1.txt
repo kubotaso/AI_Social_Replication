@@ -1,0 +1,64 @@
+Discrepancy Report - Attempt 1
+Score: 77/100
+
+=== Data Value Discrepancies ===
+Comparing computed values with values read from the original Figure 1:
+
+The computed "Weak" identifiers line is consistently higher than in the original figure:
+- 1952: Computed 0.398 vs Original ~0.39 (close)
+- 1966: Computed 0.434 vs Original ~0.37 (significant difference)
+- 1972: Computed 0.386 vs Original ~0.36 (moderate difference)
+- 1978: Computed 0.368 vs Original ~0.33 (moderate difference)
+
+The "Strong" identifiers line is close but some years diverge:
+- 1952: Computed 0.375 vs Original ~0.35 (slight difference)
+- 1958: Computed 0.397 vs Original ~0.35 (notable difference)
+- 1966: Computed 0.279 vs Original ~0.28 (close)
+
+The bottom panel (Leaners and Pure Independents) is reasonably close:
+- Pure Ind 1952: Computed 0.049 vs Original ~0.06 (different but both low)
+- Leaners generally match well
+
+POSSIBLE CAUSES:
+1. The paper may use presidential election years only (every 4 years) rather than all even years. Looking at the original figure, there appear to be data points for all even years (23 points visible), so this is likely not the issue.
+2. The paper's ANES data might be a different version or have different coding for some years.
+3. The values I'm reading from the original figure may have some error since they're approximations.
+
+=== Visual/Layout Discrepancies ===
+1. LEGEND STYLE: In the original, the legend uses a specific format with bullet markers next to text. The markers in legend should match the line markers more closely. In the original:
+   - "Strong" Identifiers has a filled circle marker
+   - "Weak" Identifiers has an open circle marker
+   - Independent "Leaners" has an open circle marker (in bottom panel, listed FIRST)
+   - "Pure" Independents has a filled circle marker (in bottom panel, listed SECOND)
+
+2. LEGEND POSITION:
+   - Top panel: legend in lower-right area
+   - Bottom panel: legend in upper-left area
+   Current implementation has these roughly correct but styling needs work.
+
+3. FIGURE TITLE: The original has "FIGURE 1 The Distribution of Party Identification, 1952-1996" as a bold header, then "Proportions of National Election Study Sample" as a subtitle. My version only has the subtitle.
+
+4. PANEL BORDERS: The original has clear box borders around each panel.
+
+5. LINE STYLE: The solid lines use filled circles, dashed lines use open circles. This is correct but marker sizes could be adjusted.
+
+6. X-AXIS: Top panel should not show year labels; only bottom panel shows them. Currently correct.
+
+7. The overall figure needs to be more compact/narrower to match the original's aspect ratio.
+
+=== Scoring Breakdown ===
+- Plot type and series: 14/15 (all correct)
+- Data accuracy: 30/40 (trends match but specific values differ notably for Weak and Strong in some years)
+- Axis labels: 13/15 (mostly correct)
+- Visual elements: 10/15 (legend style/position needs improvement, missing figure header)
+- Layout: 10/15 (needs more compact layout, better panel separation)
+
+=== Fixes for Next Attempt ===
+1. Add proper figure header ("FIGURE 1 The Distribution of Party Identification, 1952-1996")
+2. Improve legend styling to better match original (use specific marker symbols in legend)
+3. Make figure narrower (more like 4.5 x 7)
+4. Add panel borders (box frames)
+5. In bottom panel, list "Independent Leaners" FIRST, then "Pure Independents" SECOND in legend
+6. Adjust marker sizes to better match original
+7. Try using weights (VCF0009z) to see if it helps with data accuracy
+8. Consider if the version of ANES affects the values

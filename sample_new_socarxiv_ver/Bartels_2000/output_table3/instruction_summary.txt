@@ -1,0 +1,50 @@
+Instruction Summary for Table 3: Party Identification, Incumbency, and Congressional Votes, 1970-1996
+
+Variable Mapping (same as Table 2, plus incumbency):
+
+1. Dependent Variable: Congressional Vote
+   Paper name: Vote for U.S. House of Representatives
+   Dataset field: VCF0707
+   Coding:
+     VCF0707 = 1 -> Democrat (code as 0)
+     VCF0707 = 2 -> Republican (code as 1)
+   Missing/excluded: VCF0707 = 0 (did not vote, not reported, etc.) or any other value
+   Only major-party voters are included.
+
+2. Independent Variable: Party Identification
+   Dataset field: VCF0301 (7-point party identification scale)
+   Coding into three dummy variables (same as Table 2):
+     Strong partisan: VCF0301 = 1 (Strong Democrat) -> -1; VCF0301 = 7 (Strong Republican) -> +1; all others -> 0
+     Weak partisan: VCF0301 = 2 (Weak Democrat) -> -1; VCF0301 = 6 (Weak Republican) -> +1; all others -> 0
+     Leaner: VCF0301 = 3 (Independent-Democrat) -> -1; VCF0301 = 5 (Independent-Republican) -> +1; all others -> 0
+   Pure independents (VCF0301 = 4) serve as the reference category (all three dummies = 0).
+   Missing: VCF0301 = 0 or missing -> exclude observation.
+
+3. Independent Variable: Incumbency (NEW in Table 3)
+   Dataset field: VCF0902 (Type of U.S. House Race)
+   Coding:
+     VCF0902 values 12, 13, 14, 19 = Democratic incumbent running -> incumbency = -1
+     VCF0902 values 21, 23, 24, 29 = Republican incumbent running -> incumbency = +1
+     VCF0902 values 40-59 (open seat, no incumbent running) -> incumbency = 0
+   Missing: Exclude observations where VCF0902 is missing or does not fit the above categories.
+
+4. Year Variable
+   Dataset field: VCF0004 (Year of study)
+   Years included: 1970, 1974, 1976, 1978, 1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996
+   Note: 1972 is excluded because incumbency data is not available in the NES Cumulative Data File for that year.
+   From the paper: "Since incumbency only appears in the NES Cumulative Data File for congressional elections after 1970 (and not in 1972), Table 3 includes only thirteen of the twenty-two elections included in Table 2."
+
+Statistical Method:
+  Probit regression estimated separately for each election year.
+  Dependent variable: Republican House vote (1) vs. Democratic House vote (0)
+  Independent variables: Strong partisan, Weak partisan, Leaner, Incumbency
+  Model includes an intercept (constant term).
+
+Sample Restrictions:
+  - Only major-party House voters (VCF0707 = 1 or 2)
+  - Only respondents with valid party identification (VCF0301 in {1,2,3,4,5,6,7})
+  - Only respondents with valid incumbency data (VCF0902 in recognized categories)
+  - Only the 13 election years listed above
+
+Output Format:
+  For each year, report: N, coefficients and standard errors for Strong, Weak, Leaners, Incumbency, and Intercept, plus Log Likelihood and Pseudo R-squared.

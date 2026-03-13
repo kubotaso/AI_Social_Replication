@@ -1,0 +1,31 @@
+Discrepancy Report: Attempt 9
+Score: 87.4/100 (below best of 88.3)
+
+APPROACH:
+- Old 5-item racism scale + person-mean imputation (min 4 of 5)
+- Non-overlapping Hispanic/Other race coding (from attempt 8)
+- denom==1 (Baptist) for Conservative Protestant (from attempt 7)
+
+RESULTS:
+- denom==1 fixed M2 Black: 0.079(ns) vs paper 0.042(ns) - correct direction and significance
+- But denom==1 broke M2 Conservative Protestant: 0.109* vs paper 0.048(ns) - wrong significance
+- M1 Black also shifted: -0.148*** vs paper -0.132*** (diff=0.016, was 0.003 in attempt 8)
+- Net effect: M2 gained on Black but lost on Conservative Protestant, M1 lost on Black
+
+KEY INSIGHT: denom==1 identifies Baptists specifically, which overlaps heavily with Black
+respondents in the South. This creates a correlation between Black and Conservative Protestant
+that distorts both coefficients. fund==1 (fundamentalist) is a better proxy because it
+captures conservative theology across denominations without the racial concentration.
+
+SCORE COMPONENTS:
+M1: coeff=11.6 + N=10 + sig=15.0 + R2=5.0 + vars=5 = 46.6/50
+M2: coeff=9.7 + N=10 + sig=13.1 + R2=3.0 + vars=5 = 40.8/50
+
+CONCLUSION: denom==1 is NOT an improvement over fund==1. Return to fund==1 approach.
+
+NEXT STRATEGIES:
+1. Try correct 5-item scale (racmost, busing, racdif1, racdif3-flipped, racdif4) with
+   non-overlapping Hispanic/Other race + fund==1
+2. Try 3-item minimum for racism scale instead of 4 to include more cases
+3. Explore whether age coding (GSS codes 89 as 89+) affects results
+4. Try log(income_pc) instead of raw income_pc

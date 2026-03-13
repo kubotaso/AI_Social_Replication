@@ -1,0 +1,100 @@
+TABLE 6: Effects of Measurement Error and Alternative Instrumental Variables
+on Estimated Returns to Job Tenure
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983
+Sample: White males
+This table examines sensitivity of results to measurement error corrections
+and alternative instrument choices.
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: IV / Two-step estimation table with specification variations
+Layout: Two panels
+
+Top panel: Main effect of job tenure beta_2 (4 columns)
+Bottom panel: Cumulative returns at 5, 10, 15, 20 years (4 columns x 4 rows)
+
+Column descriptions (instruments used):
+  (1): Original tenure data, instruments = (X, T-T_bar, Time)
+  (2): Corrected tenure data, instruments = (X, T-T_bar, Time)
+  (3): Corrected tenure data, instruments = (X^c, T-T_bar, Time)
+  (4): Corrected tenure data, instruments = (X^c, T-T_bar)
+
+Where:
+  X = total labor market experience
+  T = job tenure
+  T_bar = mean tenure in the job spell
+  Time = calendar time (year dummies)
+  X^c = experience corrected for measurement error
+  "Corrected" tenure uses the panel structure to correct for reporting errors
+
+==============================================================================
+GROUND-TRUTH VALUES - TOP PANEL: Main Effect of Job Tenure (beta_2)
+(standard errors in parentheses)
+==============================================================================
+
+                    (1)              (2)              (3)              (4)
+                    Original         Corrected        Corrected        Corrected
+                    Tenure Data      Tenure Data      (X^c,T-Tbar,    (X^c,T-Tbar)
+                    (X,T-Tbar,Time)  (X,T-Tbar,Time)  Time)
+
+Main effect         .030 (.007)      .032 (.006)      .035 (.007)      .045 (.007)
+(beta_2):
+
+==============================================================================
+GROUND-TRUTH VALUES - BOTTOM PANEL: Cumulative Returns at Tenure
+(standard errors in parentheses)
+==============================================================================
+
+                    (1)              (2)              (3)              (4)
+
+5 years:            .078 (.0206)     .098 (.017)      .121 (.019)      .155 (.021)
+10 years:           .074 (.025)      .122 (.024)      .177 (.022)      .223 (.025)
+15 years:           .052 (.031)      .131 (.028)      .211 (.020)      .264 (.024)
+20 years:           .052 (.039)      .161 (.035)      .252 (.018)      .316 (.024)
+
+==============================================================================
+NOTES
+==============================================================================
+
+- Basic specification identical to the baseline table (Table 3)
+- Other second-step regressors include: education, union membership,
+  disability, residence in SMSA, census region indicators
+- Column (1) uses original (uncorrected) tenure data and the baseline
+  instrument set; this yields lower estimates than the baseline Table 3
+  because it uses different instruments
+- Column (2) corrects tenure for measurement error using panel data
+  (if tenure reported in year t and t+1 differ by more than 1 year,
+  the panel-consistent value is used)
+- Column (3) additionally corrects experience for measurement error
+- Column (4) drops calendar time from the instrument set, relying only
+  on corrected experience and within-job tenure deviation
+- The estimates increase from column (1) to (4), suggesting that
+  measurement error in tenure and experience attenuates the estimated
+  returns, and that calendar time may be a weak instrument
+- The baseline estimates in Table 3 (beta_2 = .0545) are between
+  columns (3) and (4), suggesting moderate measurement error effects
+
+==============================================================================
+STATISTICAL METHOD
+==============================================================================
+
+Same two-step procedure as Table 3, with variations in:
+1. Tenure data: original vs. panel-corrected
+2. Experience data: original vs. corrected
+3. Instrument set: varying combinations of experience, tenure deviation
+   from job-spell mean, and calendar time
+
+The measurement error correction for tenure uses the panel structure:
+if a worker reports tenure T_t in year t and T_{t+1} in year t+1,
+and |T_{t+1} - T_t - 1| > 0, the tenure sequence is adjusted for
+internal consistency.

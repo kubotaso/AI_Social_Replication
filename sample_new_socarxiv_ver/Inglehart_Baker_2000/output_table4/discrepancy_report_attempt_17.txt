@@ -1,0 +1,62 @@
+Discrepancy Report - Attempt 17
+Score: 65/100 (best still 65 from attempt 5)
+
+Strategy: Remove CHN from Confucian zone (CHN is Ex-Communist per paper text).
+Confucian = JPN, KOR, TWN only.
+
+KEY FINDING: Removing CHN from Confucian made things WORSE, not better.
+- Confucian trad zone: 0.090 vs 0.397 (d=0.307) - WORSE than attempt 5 (0.170)
+- With only 3 countries (JPN, KOR, TWN), the dummy has less statistical power
+- The Confucian zone dummy needs CHN to be significant because with 4 countries
+  (incl. CHN at gdp=0.972), the contrast with non-Confucian GDP is sharpened
+- CHN's very low GDP makes JPN/KOR/TWN stand out more as secular-rational relative to GDP
+
+COMPARISON WITH ATTEMPT 5:
+- Everything else is IDENTICAL to attempt 5 (same N=62, same GDP data, etc.)
+- Score did not improve despite CHN change
+
+PERSISTENT SYSTEMATIC ISSUES:
+1. GDP coefficients too high across all zones (N=62 vs paper's N=49)
+   - Our larger N gives GDP more statistical power to explain variation
+   - Need to reduce N to ~49 by dropping ~13 countries, but previous attempts to do
+     this (attempt 14) made things WORSE
+
+2. Significance levels inflated by N=62:
+   - Protestant Europe zone: *** vs paper's **
+   - Ex-Communist zone: *** vs **
+   - Ex-Communist ind: *** vs (none)
+   - Latin America zone: *** vs **
+
+3. Confucian zone dummy underestimated in BOTH attempts 5 and 17:
+   - With CHN: 0.170 vs 0.397 (MISS)
+   - Without CHN: 0.090 vs 0.397 (MISS, worse)
+   - Root cause: our factor scores differ from paper's; Japan/Korea/Taiwan don't
+     appear as distinctively secular-rational in our computation
+
+4. Service employment coefficients too high for Latin America surv:
+   - Our srv: 0.399 vs paper: 0.224
+   - GDP: 0.427 vs paper: 0.602 - coefficient imbalance
+
+ANALYSIS OF WHY WE'RE STUCK AT 65:
+The scoring breakdown shows 116/176 points:
+- Coefficient matches (within 0.05): we get credit for many zone dummies and ind/srv
+- Significance matches: we systematically miss because N=62 gives too many ***
+- The pattern suggests the paper used N=49 specifically, not N=62
+
+ROOT CAUSE HYPOTHESIS:
+The paper used the ACTUAL WVS Wave 2-3 dataset with only 43-49 countries that existed
+in early 1990s WVS. Our dataset has expanded coverage with successor states that didn't
+have 1990 WVS data (Armenia, Azerbaijan, Bosnia, Croatia, etc.) but we have economic
+data for them. Dropping these post-Soviet successor states would reduce N closer to 49.
+
+The successor states to drop to get N~49:
+- Not in original WVS Wave 1-3: ARM, AZE, BIH, HRV, MKD, MDA, SRB, SVN (8 countries)
+- Also: EST, LVA, LTU (Baltics not separate in early WVS), GEO, BLR, UKR...
+
+RECOMMENDATION FOR ATTEMPT 18:
+Try using only countries that were in ORIGINAL WVS Wave 2 (1990-1993) as independent
+nations, dropping the post-Soviet successor states that split after 1991.
+Core ex-Communist countries for WVS Wave 2: BLR, BGR, CZE (Czechoslovakia), EST,
+HUN, LVA, LTU, POL, ROU, RUS, SVK (via CZE), SVN (via YUG), UKR
+Drop: ARM, AZE, BIH, HRV, MKD, MDA, SRB, GEO
+This might get N closer to 49 and reduce GDP's statistical dominance.

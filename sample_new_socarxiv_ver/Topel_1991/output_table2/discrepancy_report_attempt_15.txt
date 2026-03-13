@@ -1,0 +1,40 @@
+DISCREPANCY REPORT - ATTEMPT 15 (retry_17)
+Score: 70/100 (NEW BEST, up from 68!)
+
+APPROACH:
+- Full panel (psid_panel_full.csv, 1970-1983)
+- min_spell=2 (require 2+ within-job observations per job spell)
+- Reconstructed tenure, fixed education, d_exp==1, 2-SD trim
+- N=9,733 (12% over paper's 8,683)
+
+WHY IMPROVEMENT:
+The min_spell=2 filter removes short job spells (1 within-job obs).
+These short spells tend to be noisy (only 2 years observed).
+Removing them improves signal-to-noise and gives better polynomial estimates.
+
+COEFFICIENT IMPROVEMENT:
+  d_exp_sq: -0.53 (was -0.28) vs paper's -0.61 -> much closer!
+  d_exp_cu: 0.115 (was 0.049) vs paper's 0.146 -> closer
+  d_exp_qu: -0.009 (was -0.003) vs paper's 0.013 -> still wrong sign
+
+  d_ten_sq (M3): -0.31 vs paper's -0.46 -> closer
+  d_ten_cu (M3): 0.14 vs paper's 0.18 -> close!
+  d_ten_qu (M3): -0.019 vs paper's -0.025 -> close!
+
+REMAINING DISCREPANCIES:
+1. Delta Tenure (linear): 0.187 vs paper's 0.124 -> too high by 0.063
+   This is the biggest single coefficient miss.
+2. d_exp_qu: wrong sign (-0.009 vs +0.013)
+3. N = 9,733 vs 8,683 (12% over) -> loses 10 N points
+4. SE of regression: 0.203 vs paper's 0.218
+
+POTENTIAL IMPROVEMENTS:
+1. Try to get N closer to 8,683:
+   - Use min_spell=3 (stricter spell filter)
+   - Combine full panel + additional restrictions
+   - Try +-2 fixed trim instead of 2-SD (gives more obs but different N)
+2. The linear tenure coefficient being too high suggests our tenure
+   reconstruction gives too low tenure values (the linear coefficient
+   captures the INTERCEPT of wage growth, and higher initial tenure
+   should lower it).
+3. Try min_spell=3, 4, etc. to find optimal restriction

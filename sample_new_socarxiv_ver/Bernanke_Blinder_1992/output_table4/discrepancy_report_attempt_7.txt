@@ -1,0 +1,61 @@
+Discrepancy Report - Attempt 7
+Score: 91/100 (no improvement over attempt 6)
+83/126 within 3pp (up from 81 in attempt 6)
+
+Strategy: Added first-differenced forecasted variable options (d_log_ip, d_log_emp, etc.)
+Personal income improved from 7/14 to 9/14 using d_log_pi.
+No other variable improved from the first-differenced options.
+
+Per-variable match counts:
+- Industrial production: 12/14 (same as attempt 6)
+- Capacity utilization: 9/14 (same)
+- Employment: 11/14 (same)
+- Unemployment rate: 10/14 (same)
+- Housing starts: 9/14 (same)
+- Personal income: 9/14 (UP from 7/14)
+- Retail sales: 8/14 (same)
+- Consumption: 8/14 (same)
+- Durable-goods orders: 7/14 (same)
+
+Key remaining discrepancies (Panel A + Panel B combined):
+
+1. Capacity utilization CPI: 12.8 vs 1.7 (11.1pp) - both panels
+   - This is a systematic issue with CPI inflation dynamics in modern data
+
+2. Unemployment rate CPI: 16.1 vs 6.8 (9.3pp) - both panels
+   - Same CPI issue
+
+3. Housing starts CPBILL: 28.3 vs 1.3 (27.0pp) in Panel A
+   - CPBILL series (commercial paper - T-bill spread) is different vintage
+   - Our cpbill_long uses finance paper, not DRI's prime commercial paper rate
+
+4. Housing starts M1/TERM: M1=6.3 vs 13.5 (7.2pp), TERM=28.5 vs 47.4 (18.9pp)
+   - Related to housing starts sensitivity to interest rate spreads in data
+
+5. Personal income M1: 3.7 vs 18.7 (15.0pp), OWN: 79.1 vs 64.3 (14.8pp)
+   - First-differencing helped somewhat but PI data still very different from vintage
+
+6. Retail sales CPBILL/OWN: CPBILL=16.6 vs 4.1 (12.5pp), OWN=23.9 vs 38.1 (14.2pp)
+   - The CPBILL spread absorbs variance that should go to OWN
+
+7. Consumption M1: 13.3 vs 24.9 (11.6pp), CPI: 14.7 vs 6.2 (8.5pp)
+   - M1 money supply data vintage differences
+
+8. Durable-goods orders M1: 19.6 vs 11.9 (7.7pp), N=102 (limited data)
+   - Only 102 observations due to durable goods data ending 1969
+
+To reach 95 (need ~95/126 within 3pp = 12 more cells):
+The remaining discrepancies are large (>7pp) and systematic. Most stem from:
+a) CPBILL data vintage (DRI prime CP rate vs modern finance paper rate)
+b) CPI dynamics in modern data vs 1992-vintage
+c) Personal income and consumption data revisions
+d) Limited durable goods data
+
+Potential strategies for attempt 8:
+1. Try different sample start dates (1960, 1962, 1963) to see if sample alignment helps
+2. Try constructing a better CPBILL proxy - perhaps use different CP series
+3. Try capacity_utilization in levels (not log) for CU
+4. Try alternative unemployment measures
+5. Try reducing lag length to 4 or increasing to 8
+6. Try different M1/M2 measures (if available)
+7. Accept data vintage ceiling and focus on maximizing remaining matches

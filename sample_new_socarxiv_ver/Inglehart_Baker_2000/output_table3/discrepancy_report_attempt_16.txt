@@ -1,0 +1,79 @@
+Discrepancy Report - Table 3, Attempt 16
+Score: 65.5/100 (BELOW best of 66.2, no improvement)
+
+STRATEGY: Used Figure 1 extracted x-coordinates as factor scores instead of computing them.
+
+COMPARISON WITH ATTEMPT 15 (66.2):
+- Democracy +0.45 vs +0.45 (target 0.45): CLOSE - same as paper (minor improvement)
+- Tolerance +0.58 vs +0.56 (attempt 15): CLOSE - slight improvement
+- State ownership +0.64 vs +0.54 (attempt 15): PARTIAL - better
+- Govt ownership +0.62 vs +0.54 (attempt 15): BUT target is 0.55, so overcorrelating now
+- Govt provision OVERCORRELATING: +0.78 vs target 0.68 (was 0.72 in attempt 15)
+- Heavy drinkers STILL overcorrelating: +0.74 vs target 0.64 (was 0.77)
+- Friends: +0.53 vs 0.56 (worse than attempt 15's 0.49)
+
+CLOSE ITEMS (10, within 0.05):
+1. Men leaders: 0.83 vs 0.86 (diff=0.03)
+2. Health: 0.73 vs 0.73 (diff=0.00)
+3. Men jobs: 0.71 vs 0.69 (diff=0.02)
+4. Hard work: 0.67 vs 0.65 (diff=0.02)
+5. Free choice: 0.66 vs 0.67 (diff=0.01)
+6. Tolerance: 0.58 vs 0.62 (diff=0.04)
+7. Boycott: 0.55 vs 0.56 (diff=0.01)
+8. Friends: 0.53 vs 0.56 (diff=0.03)
+9. Democracy: 0.45 vs 0.45 (diff=0.00)
+10. Hard work, Boycott, Friends: same as above
+
+PARTIAL ITEMS (9, within 0.10):
+- Dissatisfied: 0.75 vs 0.83 (diff=0.08) - worse than attempt 15
+- Job motivation: 0.64 vs 0.74 (diff=0.10)
+- State ownership: 0.64 vs 0.74 (diff=0.10)
+- Parents: 0.64 vs 0.71 (diff=0.07)
+- Govt provision: OVERCORRELATING +0.78 vs 0.68 (diff=0.10)
+- Govt ownership: +0.62 vs 0.55 (diff=0.07)
+- Money: 0.59 vs 0.66 (diff=0.07)
+- Leisure: 0.53 vs 0.60 (diff=0.07)
+- Strong leader: 0.50 vs 0.58 (diff=0.08)
+
+STILL MISSES (most problematic):
+1. DATA LIMITATIONS (6 items, cannot fix):
+   - Technology: -0.03 vs 0.78 (WRONG SIGN with figure scores)
+   - Recycled: 0.16 vs 0.76 (13 countries, some coverage with figure scores)
+   - Env meeting: 0.07 vs 0.75
+   - Both parents: 0.05 vs 0.73
+   - Prostitution: 0.01 vs 0.69 (12 countries)
+   - Economic aid: NOT_FOUND
+
+2. REMAINING FIXABLE MISSES (5 items):
+   - Woman children: 0.70 vs 0.83 (diff=0.13)
+   - Outgroup: 0.69 vs 0.81 (diff=0.12)
+   - Criminal records: 0.41 vs 0.66 (diff=0.25)
+   - Imagination: 0.31 vs 0.62 (diff=0.31)
+   - Science: 0.39 vs 0.60 (diff=0.21)
+   - University boy: 0.26 vs 0.67 (diff=0.41)
+
+CONCLUSION: The Figure 1 extracted scores approach did NOT improve over computed factor scores.
+The Figure 1 scores are visually estimated and introduce error. The computed factor scores
+from attempt 15 remain the best foundation.
+
+KEY FINDING: The order score dropped (2.3 vs 2.7) because Government provision now
+ranks TOO HIGH (2nd overall) instead of its paper position (15th).
+
+NEXT STRATEGY FOR ATTEMPT 17:
+1. Return to computed factor scores (they work better)
+2. For EVS prostitution (F119): EVS has this variable - try combining with WVS F125
+   to get full country coverage and potentially fix the prostitution item
+3. For Both parents (D022): EVS does NOT have D022, but might have a similar item
+4. For criminal records (A124_08): try increasing min_obs to 50+ to select only countries
+   with high-quality data, which might change the correlation
+5. For imagination (A032): the coding 1=mentioned/0=not mentioned - "not important"
+   means 0. Try using different wave or combining with EVS data
+6. For science (E015): check if E015 coding interpretation is: 1=makes things better,
+   2=no effect, 3=makes things worse. If survival values = think science HELPS, then
+   we want pct_helps = (x==1), reversed. Need to test multiple codings.
+7. The key remaining items that could push from 65 to 75+ are:
+   - Prostitution (if EVS F119 works): +3-4 points
+   - Criminal records: +2-3 points
+   - Imagination: +3-4 points
+   - Science: +2-3 points
+   - University boy: +3-4 points

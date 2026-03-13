@@ -1,0 +1,104 @@
+Discrepancy Report - Table 2, Attempt 11
+Score: 76.5/100 (below best of 76.8)
+
+KEY FINDINGS FROM THRESHOLD EXPLORATION:
+
+1. EUTHANASIA CEILING CONFIRMED:
+   - pct_never (==1) = 0.81
+   - pct_le2 (<=2)   = 0.81
+   - pct_le3 (<=3)   = 0.81
+   - pct_le5 (<=5)   = 0.81
+   - inv_mean        = 0.79
+   Paper target: 0.66
+   CONCLUSION: All thresholds give 0.79-0.81. Cannot reduce this with current approach.
+   The euthanasia item is fundamentally overloaded on the Traditional factor because it is
+   extremely correlated with religious practices across nations. The paper value of 0.66
+   might use a different variable (F123 = God important justifies euthanasia?) or a
+   different factor solution.
+
+2. SUICIDE CEILING CONFIRMED:
+   - pct_never = 0.47 (best)
+   - inv_mean  = 0.46
+   - pct_le2   = 0.46
+   - pct_le3   = 0.45
+   Paper target: 0.61
+   CONCLUSION: All values are too low (0.45-0.47 vs 0.61). Suicide doesn't load high enough
+   on the Traditional factor in our data. The paper may include more countries with wave 2 data
+   where suicide attitudes were more strongly correlated with traditional values.
+
+3. DIVORCE CEILING CONFIRMED:
+   - pct_never = 0.41 (best)
+   - pct_le2   = 0.39
+   - inv_mean  = 0.39
+   - pct_le3   = 0.36
+   Paper target: 0.57
+   Same pattern as suicide - the value is systematically too low.
+
+4. LOVE/RESPECT PARENTS STUCK:
+   - Binary ==1        = 0.68
+   - inv_mean (4-A025) = 0.68
+   Paper target: 0.49
+   Both coding strategies give the exact same value. The A025 variable has very low variance
+   (nearly everyone reports wanting love/respect from their children) making it correlate
+   highly with traditional values.
+
+5. ARMY RULE: NO MIDDLE GROUND:
+   - E114 pct<=2 = 0.21 (too low)
+   - E116 pct==1 = 0.65 (too high)
+   - E116 pct<=2 = 0.64 (too high)
+   Paper target: 0.43
+   The gap between E114 (0.21) and E116 (0.64) suggests different country coverage.
+   E116 may have more countries, E114 fewer. Need to check if there's a combined approach.
+
+ANALYSIS: WHY THESE ITEMS ARE HARD TO MATCH:
+The paper's factor solution has specific properties:
+- Suicide/Divorce at 0.57-0.61 suggests these items load moderately on Traditional
+- In our factor solution, they seem to load lower
+- POSSIBLE EXPLANATION: The paper uses a POLYCHORIC correlation matrix (for ordinal data)
+  rather than Pearson correlations. Polychoric correlations for ordinal items (1-10 scale)
+  can produce different factor scores than treating items as continuous.
+
+ALTERNATIVE HYPOTHESES:
+1. The paper uses polychoric correlations in the factor analysis
+2. The paper uses raw mean (not pct) for euthanasia/suicide/divorce
+3. The paper uses a different wave of WVS (e.g., including wave 1)
+4. Country exclusions differ (e.g., excluding outliers)
+
+PLAN FOR ATTEMPT 12:
+1. Try computing country means for euthanasia/suicide/divorce as RAW MEAN values (1-10 scale)
+   then correlating with the factor score. inv_mean currently does this but gives 0.79/0.46/0.39.
+   Wait - the raw mean IS the inv_mean direction. Need to think differently.
+
+2. KEY INSIGHT: The factor score computation method affects everything. Try recomputing the
+   factor scores with DIFFERENT normalization. The factor score weights euthanasia very heavily
+   because euthanasia correlates strongly with GOD_IMP (0.90 loading). If we use a factor score
+   that down-weights the religious cluster, all the moral items would shift.
+
+3. TRY: Compute the factor score using only 3 items (G006, F120, E018) = pure Traditional axis
+   without euthanasia. Then correlate all 24 items with this "reduced" factor score.
+
+4. TRY: Compute factor score using regression method (Bartlett) rather than Thomson (regression)
+
+5. TRY: Use weighted factor scores where euthanasia is down-weighted
+
+6. For ordering improvement: the current ordering score is 7.7/10. Check which items are out of
+   order and adjust the variable selection accordingly.
+
+SCORE BREAKDOWN:
+Items present:      19.2/20 (23/24 items - still missing "Own preferences vs understanding")
+Value accuracy:     21.7/40 (9 close, 8 moderate - same as attempt 10)
+Dimension correct:  20.0/20 (no wrong signs)
+Ordering:           7.7/10 (slightly worse than attempt 10's 8.3/10)
+Sample size:        8.0/10 (slightly better)
+TOTAL:              76.5/100
+
+ORDERING ISSUES vs attempt 10 (8.3 -> 7.7):
+The auto-selection of best_match picked different items for some slots, disrupting ordering.
+In the final output, Euthanasia=0.81 is ranked 4th but paper has it 9th (0.66).
+This inflates all ranks above it, causing ordering errors.
+
+RECOMMENDATION FOR ATTEMPT 12:
+Focus on the factor score methodology. Try using Bartlett factor scores vs regression scores.
+Also try using just 5 "core Traditional" items for the factor (excluding euthanasia/suicide/divorce
+which are the correlated items) - this might give a "cleaner" Traditional dimension that
+better matches the paper's factor scores.

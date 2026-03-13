@@ -1,0 +1,33 @@
+Discrepancy Report - Attempt 9
+Score: 48/100
+
+WORSE than best attempt 5 (65). Switching from PWT 1980 GDP to 1995 GNP PPP was harmful.
+Using updated shared_factor_analysis (GOD_IMP, AUTONOMY) and excluding Catholic Europe.
+
+KEY PROBLEMS:
+1. GDP coefficients in Survival/Self-Expression regressions systematically TOO HIGH:
+   - Average surv GDP coeff: 0.73 vs paper average: 0.49
+   - 1995 GNP PPP has more spread (1.2k-31.5k) causing GDP to dominate
+
+2. Service employment coefficients systematically TOO LOW:
+   - Average srv coeff: 0.14 vs paper average: 0.28
+   - GDP absorbs variance that should go to service employment
+
+3. R-squared values too HIGH on survival side (0.74-0.84 vs paper: 0.59-0.80)
+
+4. Confucian zone dummy STILL too low: 0.119 vs 0.397
+
+CRITICAL INSIGHT FROM PAPER TEXT (p.34):
+"the relationship between these values and the relative size of the service sector
+resembles a J-curve, with the impact of the service sector growing stronger as
+its value increases; consequently, we use the SQUARE of the percentage of the
+service sector in these regressions."
+
+This means: For Surv/Self-Exp regressions, srv_emp should be SQUARED BEFORE standardization.
+
+STRATEGY FOR ATTEMPT 10:
+1. Return to PWT 1980 RGDPCH (better source for 1980 data)
+2. Use updated factor scores (GOD_IMP, AUTONOMY)
+3. Use SQUARED service employment for Surv/Self-Exp regressions
+4. Include all countries with complete data (including Catholic Europe as zone=0)
+5. Keep 1991 WB employment data

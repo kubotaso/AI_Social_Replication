@@ -1,0 +1,94 @@
+INSTRUCTION SUMMARY: Table 7 — OLS Models with Completed Job Tenure
+====================================================================
+
+DATA SOURCE: PSID Panel Dataset (data/psid_panel.csv)
+COMMON VARIABLES: See output_table2/instruction_summary.txt and output_table3/instruction_summary.txt
+
+================================================================
+TABLE 7 SPECIFIC INSTRUCTIONS
+================================================================
+
+This table tests whether completed job tenure (total length of the job spell)
+affects current wages, controlling for current tenure. It uses OLS on
+wage LEVELS (not first differences, not the two-step procedure).
+
+DEPENDENT VARIABLE: log_real_wage (log average hourly earnings, deflated)
+
+FUNCTIONAL FORM: Only quadratic in experience and LINEAR in tenure
+(not the quartic polynomial used in Tables 2-6). This matches Abraham
+and Farber (1987) for comparison purposes.
+
+FIVE MODEL SPECIFICATIONS:
+
+Column (1): Baseline OLS
+  log_real_wage = beta_x * experience + beta_x2 * experience^2
+                  + beta_t * tenure + controls + error
+
+Column (2): Restricted model with observed completed tenure
+  Add: completed_tenure_observed + completed_tenure * censor_dummy
+  (Equation 17 in the paper)
+
+Column (3): Unrestricted model with observed completed tenure
+  Add: completed_tenure_observed + completed_tenure * censor_dummy
+       + completed_tenure * experience^2 (interaction)
+       + completed_tenure * tenure (interaction)
+  (Equation 18 in the paper)
+
+Column (4): Restricted model with imputed completed tenure
+  Replace observed completed tenure with imputed (predicted) completed tenure
+
+Column (5): Unrestricted model with imputed completed tenure
+  Same interactions as Column (3) but with imputed completed tenure
+
+COMPLETED TENURE CONSTRUCTION:
+
+Observed completed tenure:
+  For each job_id, compute total_job_duration = max(year) - min(year) + 1
+  OR total_job_duration = max(tenure_topel) + 1
+
+  censor_dummy = 1 if the job is still active at the end of the panel
+  (i.e., max year in job == 1983)
+
+Imputed completed tenure (Columns 4-5):
+  Predicted from a discrete-time proportional hazards model of job endings.
+  The hazard rate: lambda = exp(Z * gamma)
+  where Z includes the full vector of regressors.
+
+  PRACTICAL APPROACH: Fit a logistic/probit model for job ending in each year,
+  using the same covariates as the wage model. Then predict expected remaining
+  tenure and add to current tenure to get imputed completed tenure.
+
+  Alternatively, use a simpler prediction model:
+  Regress actual completed tenure on observable characteristics for jobs that
+  ended during the panel, then predict for censored jobs.
+
+CONTROLS (same as Table 4 note):
+  - Education (years)
+  - Marital status (married)
+  - SMSA residence
+  - Union membership
+  - Disability
+  - Census region dummies (8 regions, but we have 4 region dummies)
+
+INTERACTION TERMS (Columns 3 and 5):
+  "Experience^2 (interaction)" = completed_tenure * experience^2
+  "Tenure (interaction)" = completed_tenure * tenure
+
+================================================================
+VARIABLE MAPPING
+================================================================
+All standard PSID variables (see Table 3 instruction_summary)
+Plus:
+  completed_tenure = total years the job lasts in the panel
+  censor_dummy = 1 if job ongoing at end of panel (1983)
+  imputed_completed_tenure = predicted from hazard model
+
+================================================================
+SCORING NOTES
+================================================================
+Key values:
+- Experience, Experience^2, Tenure coefficients + SEs for 5 columns
+- Completed tenure coefficients (observed/imputed) + SEs
+- Interaction term coefficients + SEs
+- R^2 for 5 columns (.422, .428, .432, .433, .435)
+- N not reported but should be ~13,128

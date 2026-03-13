@@ -1,0 +1,70 @@
+INSTRUCTION SUMMARY: Table 5 — Returns by Occupation and Union Status
+=====================================================================
+
+DATA SOURCE: PSID Panel Dataset (data/psid_panel.csv)
+COMMON VARIABLES: See output_table2/instruction_summary.txt and output_table3/instruction_summary.txt
+
+================================================================
+TABLE 5 SPECIFIC INSTRUCTIONS
+================================================================
+
+Same two-step procedure as Table 3, applied to three subsamples defined
+by occupation and union status.
+
+SUBSAMPLES:
+  Column (1): Professional and Service workers — N = 4,946
+  Column (2): Craftsmen/Operatives/Laborers, Nonunion — N = 2,642
+  Column (3): Craftsmen/Operatives/Laborers, Union — N = 2,741
+
+OCCUPATION CLASSIFICATION:
+  Panel column: occ_1digit
+  Professional/Service: broad white-collar + service occupations
+    Typically PSID occupation codes for professional, technical, managerial,
+    clerical, sales, and service workers
+  Craftsmen/Operatives/Laborers: blue-collar occupations
+    Typically PSID codes for craftsmen, operatives, and laborers
+
+  The exact mapping depends on the PSID occupation coding:
+  - 1-digit codes in the panel: 0-9 typically
+  - Professional/managers: ~1-3
+  - Sales/clerical: ~4
+  - Craftsmen: ~5
+  - Operatives: ~6-7
+  - Service: ~8
+  - Laborers: ~9
+
+  Try groupings that produce sample sizes close to the paper's Ns.
+
+UNION STATUS:
+  Panel column: union_member
+  Union = 1 if union member
+
+  Note from paper (footnote 18): "Jobs were categorized as 'union' if the
+  respondent indicated union membership in more than half of the years of
+  the job." This means union status should be computed at the JOB level,
+  not the observation level.
+
+PROCEDURE:
+  For each subsample independently:
+  1. Run Step 1 (within-job wage growth) on that subsample's data
+  2. Run Step 2 (IV regression of adjusted wages on experience) on that subsample
+  3. Compute beta_1, beta_2, and cumulative returns
+
+TOP PANEL: Report beta_1, beta_2, and beta_1+beta_2 for each column.
+BOTTOM PANEL: Cumulative returns at 5, 10, 15, 20 years.
+  Column (4) = Union relative to Nonunion = Union cumulative return
+               compared to what the same worker would earn in nonunion sector
+
+================================================================
+VARIABLE MAPPING
+================================================================
+occ_1digit    -> 1-digit occupation code
+union_member  -> union membership indicator
+
+================================================================
+SCORING NOTES
+================================================================
+Key values:
+- 9 main effects + SEs in top panel (3 per column x 3 columns)
+- 16 cumulative returns + SEs in bottom panel (4 per column x 4 columns)
+- Sample sizes: 4,946; 2,642; 2,741

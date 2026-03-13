@@ -1,0 +1,38 @@
+Discrepancy Report - Attempt 2
+Score: 58/100
+
+CHANGES FROM ATTEMPT 1:
+- Reversed PID coding for 1992 (pid = 8 - pid) to convert from 1=StrongRep to 1=StrongDem
+- Also reversed vote coding for 1992 (vote = vote_pres==1 instead of vote_pres==2)
+
+RESULT: The two reversals canceled each other out! Coefficients are still negative.
+However, the intercept sign now matches (-0.080 vs -0.073) because BOTH were reversed.
+
+ANALYSIS:
+The 1992 data has:
+- pid: 1=StrongRep, 7=StrongDem (confirmed by crosstab)
+- vote_pres: 1=Dem, 2=Rep (per task description)
+
+With standard dummy construction (7=+1 for Strong):
+- Strong=+1 for pid=7 (Strong Dem)
+- vote=1 for vote_pres=2 (Rep)
+- Strong Dems don't vote Rep -> negative coefficient
+
+FIX FOR ATTEMPT 3:
+Only reverse the PID coding (8-pid) but keep vote=(vote_pres==2).
+This way:
+- pid_std = 8 - pid: 1=StrongDem, 7=StrongRep (standard)
+- Strong=+1 for pid_std=7 (Strong Rep)
+- vote=1 for vote_pres=2 (Rep)
+- Strong Reps DO vote Rep -> POSITIVE coefficient
+- Intercept should be positive since 437/728=60% vote Rep
+
+But ground truth has intercept=-0.073. So maybe vote_pres=1 is actually Rep?
+
+ALTERNATIVE: Keep original PID (don't reverse) but use vote=(vote_pres==1).
+- Strong=+1 for pid=7 (Strong Dem)
+- vote=1 for vote_pres=1 (Dem)
+- Strong Dems DO vote Dem -> POSITIVE coefficient
+- intercept: 291/728=40% vote Dem -> negative probit intercept
+
+This seems correct! Let me try this approach.

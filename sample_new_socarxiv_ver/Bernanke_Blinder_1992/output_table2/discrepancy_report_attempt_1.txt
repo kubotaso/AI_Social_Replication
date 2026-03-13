@@ -1,0 +1,96 @@
+Discrepancy Report - Attempt 1
+================================
+Score: 86/100
+
+Summary: The structural components (horizons, variables, sums, ordering, sample) are all correct.
+The main issue is the decomposition percentages: only 10.7/25 points.
+
+Detailed comparison (Panel A: 1959:7-1989:12):
+-------------------------------------------------------------------
+Variable                  Component  Generated  Paper    Diff
+-------------------------------------------------------------------
+Industrial production     Own         33.1      36.6    -3.5  MISS
+Industrial production     CPI         10.7       3.1    +7.6  MISS
+Industrial production     M1           5.3      15.4   -10.1  MISS
+Industrial production     M2          27.7       8.7   +19.0  MISS
+Industrial production     BILL         2.2       8.0    -5.8  MISS
+Industrial production     BOND         1.5       0.8    +0.7  OK
+Industrial production     FUNDS       19.5      27.4    -7.9  MISS
+
+Capacity utilization      Own         35.6      39.7    -4.1  MISS
+Capacity utilization      CPI          9.9       1.3    +8.6  MISS
+Capacity utilization      M1          14.4      21.0    -6.6  MISS
+Capacity utilization      M2           1.1       3.5    -2.4  OK
+Capacity utilization      BILL         8.3       9.5    -1.2  OK
+Capacity utilization      BOND         2.9       1.7    +1.2  OK
+Capacity utilization      FUNDS       27.7      23.3    +4.4  MISS
+
+Employment                Own         33.8      38.9    -5.1  MISS
+Employment                CPI          3.4       7.0    -3.6  MISS
+Employment                M1           7.9      10.5    -2.6  OK
+Employment                M2          12.7       0.6   +12.1  MISS
+Employment                BILL         3.6       9.8    -6.2  MISS
+Employment                BOND         0.9       2.7    -1.8  OK
+Employment                FUNDS       37.7      30.6    +7.1  MISS
+
+Unemployment rate         Own         38.1      31.9    +6.2  MISS
+Unemployment rate         CPI         14.1       7.2    +6.9  MISS
+Unemployment rate         M1           5.0      10.5    -5.5  MISS
+Unemployment rate         M2           0.4       0.6    -0.2  OK
+Unemployment rate         BILL         5.7       9.9    -4.2  MISS
+Unemployment rate         BOND         3.7       1.9    +1.8  OK
+Unemployment rate         FUNDS       33.0      37.9    -4.9  MISS
+
+Housing starts            Own         27.0      28.8    -1.8  OK
+Housing starts            CPI          0.7       1.4    -0.7  OK
+Housing starts            M1           3.0       3.9    -0.9  OK
+Housing starts            M2           6.1       1.8    +4.3  MISS
+Housing starts            BILL        40.6      38.6    +2.0  OK
+Housing starts            BOND        13.8      14.3    -0.5  OK
+Housing starts            FUNDS        8.9      11.2    -2.3  OK
+
+Personal income           Own         22.8      48.2   -25.4  MISS
+Personal income           CPI         17.1       4.3   +12.8  MISS
+Personal income           M1           4.4      20.8   -16.4  MISS
+Personal income           M2          20.9       0.1   +20.8  MISS
+Personal income           BILL        10.0       6.9    +3.1  MISS
+Personal income           BOND        11.9       3.3    +8.6  MISS
+Personal income           FUNDS       12.9      16.3    -3.4  MISS
+
+Retail sales              Own         21.2      32.4   -11.2  MISS
+Retail sales              CPI         24.0      15.5    +8.5  MISS
+Retail sales              M1           7.4       5.1    +2.3  OK
+Retail sales              M2           9.2       4.4    +4.8  MISS
+Retail sales              BILL        23.8      27.4    -3.6  MISS
+Retail sales              BOND         3.0       1.1    +1.9  OK
+Retail sales              FUNDS       11.4      14.1    -2.7  OK
+
+Consumption               Own         11.3      18.2    -6.9  MISS
+Consumption               CPI         20.5      13.1    +7.4  MISS
+Consumption               M1           6.6      16.0    -9.4  MISS
+Consumption               M2          16.5       2.2   +14.3  MISS
+Consumption               BILL        22.9      28.4    -5.5  MISS
+Consumption               BOND         5.6       5.3    +0.3  OK
+Consumption               FUNDS       16.6      16.8    -0.2  OK
+
+Panel B shows similar patterns of discrepancy.
+
+Analysis of discrepancy patterns:
+1. M2 is consistently OVER-estimated, M1 is consistently UNDER-estimated compared to paper.
+   This suggests that our M1 and M2 data may differ from what the paper used.
+   The paper likely used M1 and M2 data vintages from 1992, which have been revised.
+
+2. CPI contribution is consistently higher than the paper. This may be due to CPI revisions.
+
+3. Own variable contributions are generally lower than the paper.
+
+4. FUNDS contributions tend to be lower in our results, suggesting the monetary variables
+   (especially M2) are absorbing variance that should go to FUNDS.
+
+Possible fixes to try:
+1. The data vintage issue is likely the main driver. We cannot fix this directly.
+2. Check if the VAR trend specification matters (constant vs. constant+trend).
+3. Try using nominal variables instead of real for personal income/retail sales/consumption
+   (though the paper says real).
+4. Check if the paper might be using log levels for some variables where we're using levels.
+5. Check statsmodels FEVD computation - the decomp array ordering may differ from expectation.

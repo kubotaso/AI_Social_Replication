@@ -1,0 +1,81 @@
+Figure 1: The Effect of Being Musically Tolerant on Disliking Each Music Genre Compared to the Educational Composition of Genre Audiences
+
+Structure: Dual-axis line plot
+- X-axis: 18 music genres, ordered by the musical tolerance coefficient (from most negative to least negative)
+- Left Y-axis: Coefficients for Musical Tolerance (solid line with dots)
+- Right Y-axis: Mean Educational Level of Respondents Who Reported Liking Each Music Genre (dashed line)
+
+The figure also shows a horizontal reference line at the sample mean education level.
+
+=== CONSTRUCTION METHOD ===
+
+Step 1: For each of the 18 music genres, run a LOGISTIC REGRESSION:
+- DV: Whether respondent dislikes that genre (1 = dislike or dislike very much [rating 4 or 5], 0 = otherwise [rating 1, 2, or 3])
+  EXCLUDE the genre being predicted from the tolerance score calculation
+- IV1: Musical tolerance score = number of genres NOT disliked (out of remaining 17 genres)
+  This is the REVERSE of the exclusiveness score minus the current genre
+  Specifically: tolerance = (17 - count of OTHER genres rated 4 or 5)
+  Or equivalently: tolerance = count of OTHER genres rated 1, 2, or 3
+- IV2: Education (years)
+- The coefficient of interest is the one for musical tolerance (the log odds)
+
+Step 2: Rank genres by their musical tolerance coefficient (ascending, most negative first)
+
+Step 3: For each genre, compute the mean education of respondents who reported LIKING that genre
+- "Liking" = rating of 1 (like very much) or 2 (like it)
+- Paper says "mean educational level of respondents who reported liking each music genre"
+
+Step 4: Plot both series:
+- X-axis: genres in order from Step 2
+- Left Y-axis: musical tolerance coefficients (solid line), approximately range -0.5 to -0.1
+- Right Y-axis: mean education of fans (dashed line), approximately range 12 to 15
+- Horizontal dotted line at sample mean education
+
+=== EXPECTED DATA VALUES (approximate from figure) ===
+
+Genre order (left to right, from figure):
+Latin/Salsa, Jazz, Blues/R&B, Show Tunes, Oldies, Classical, Reggae, New Age/Space, Swing, Opera, Bluegrass, Folk, Easy Listening, Pop/Rock, Rap, Heavy Metal, Country, Gospel
+
+Tolerance coefficients (approximate, all negative, from figure):
+Latin/Salsa: ~-0.13
+Jazz: ~-0.15
+Blues/R&B: ~-0.17
+Show Tunes: ~-0.18
+Oldies: ~-0.22
+Classical: ~-0.22
+Reggae: ~-0.23
+New Age: ~-0.24
+Swing: ~-0.25
+Opera: ~-0.25
+Bluegrass: ~-0.28
+Folk: ~-0.30
+Easy Listening: ~-0.32
+Pop/Rock: ~-0.35
+Rap: ~-0.37
+Heavy Metal: ~-0.42
+Country: ~-0.45
+Gospel: ~-0.48
+
+Mean education of fans (approximate, years):
+Latin/Salsa: ~14.0
+Jazz: ~14.3
+Blues/R&B: ~13.3
+Show Tunes: ~14.0
+Oldies: ~12.7
+Classical: ~14.7
+Reggae: ~13.5
+New Age: ~13.7
+Swing: ~12.7
+Opera: ~14.7
+Bluegrass: ~12.6
+Folk: ~14.0
+Easy Listening: ~12.5
+Pop/Rock: ~13.0
+Rap: ~12.8
+Heavy Metal: ~12.2
+Country: ~12.5
+Gospel: ~12.7
+
+Note: All coefficients from the logistic regressions are significant at p < .0001.
+The paper states: "All coefficients are significant at p < .0001."
+The label "Sample Mean Education" with a horizontal line appears in the figure.

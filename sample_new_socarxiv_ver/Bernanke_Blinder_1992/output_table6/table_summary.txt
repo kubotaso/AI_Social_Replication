@@ -1,0 +1,111 @@
+Table 6 — "Estimated Slope of Supply Function of Nonborrowed Reserves"
+Source: Bernanke and Blinder (1992), Table 6, p. 917
+
+========================================================================
+DESCRIPTION
+========================================================================
+
+This table presents IV (instrumental variables) estimates of the slope
+of the Fed's reserve supply function. The goal is to test whether the
+Fed supplies nonborrowed reserves elastically at the target funds rate.
+
+========================================================================
+METHOD
+========================================================================
+
+1. Run 5-variable VARs using three macro variables + nonborrowed reserves
+   + policy indicator (FUNDS or FFBOND). 6 lags each.
+   Sample: 1959:8–1979:9 (Sets A, B, C).
+
+2. Extract VAR innovations (residuals) from the estimated VAR.
+
+3. Regress the innovation in the policy measure (FUNDS or FFBOND) on
+   the innovation in nonborrowed reserves, using the innovations in the
+   three macro variables as instruments (2SLS / IV regression).
+
+4. Report the IV coefficient on the NBR innovation and its standard error.
+
+Three sets of instruments were used (Sets A, B, C), plus a fourth row
+using "personal-income revisions" as a single instrument.
+
+========================================================================
+INSTRUMENT SETS
+========================================================================
+
+Set A: industrial production, capacity utilization, employment
+Set B: unemployment rate, housing starts, real personal income
+Set C: real retail sales, real consumer expenditures, real orders for durable goods
+
+Personal-income revisions: difference between preliminary and revised
+personal income announcements (from Peter Rathjens). Sample: 1969:2–1979:9.
+
+========================================================================
+VAR SPECIFICATION
+========================================================================
+
+For each instrument set:
+- 5 variables: [macro1, macro2, macro3, log_NBR_real, FUNDS (or FFBOND)]
+- 6 lags
+- Sample: 1959:8–1979:9 (Sets A–C); 1969:2–1979:9 (personal-income revisions)
+- Extract residuals from all 5 equations
+
+IV regression (second stage):
+  innovation(FUNDS) = alpha + beta * innovation(NBR)
+  instrumented by: innovation(macro1), innovation(macro2), innovation(macro3)
+
+========================================================================
+RESULTS (from paper)
+========================================================================
+
+                        FUNDS       FFBOND
+                        -----       ------
+Set A                  -0.021      -0.011
+                       (0.023)     (0.015)
+
+Set B                  -0.0068     -0.0072
+                       (0.0104)    (0.0092)
+
+Set C                  -0.014      -0.014
+                       (0.016)     (0.016)
+
+Personal-income rev.   -0.043      -0.027
+                       (0.026)     (0.017)
+
+Note: Standard errors in parentheses.
+
+========================================================================
+INTERPRETATION
+========================================================================
+
+- All estimated slopes are negative and statistically insignificant.
+- This is consistent with the Fed supplying reserves elastically at
+  the target funds rate (i.e., the supply curve is nearly flat, so
+  innovations in reserves reflect demand shifts, not supply shifts).
+- The near-zero, insignificant slopes support using the federal funds
+  rate (rather than reserves) as the policy indicator.
+
+========================================================================
+GROUND TRUTH VALUES FOR SCORING
+========================================================================
+
+Key values to match:
+
+FUNDS column:
+  Set A coefficient:  -0.021,  SE: 0.023
+  Set B coefficient:  -0.0068, SE: 0.0104
+  Set C coefficient:  -0.014,  SE: 0.016
+
+FFBOND column:
+  Set A coefficient:  -0.011,  SE: 0.015
+  Set B coefficient:  -0.0072, SE: 0.0092
+  Set C coefficient:  -0.014,  SE: 0.016
+
+Personal-income revisions (SKIP — data not available):
+  FUNDS: -0.043, SE: 0.026
+  FFBOND: -0.027, SE: 0.017
+
+All coefficients should be:
+  - Negative in sign
+  - Statistically insignificant (none have |coeff/SE| > 2)
+
+Sample period: 1959:8–1979:9 for Sets A–C

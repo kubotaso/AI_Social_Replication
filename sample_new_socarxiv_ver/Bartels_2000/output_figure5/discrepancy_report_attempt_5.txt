@@ -1,0 +1,70 @@
+Discrepancy Report - Figure 5, Attempt 5
+=========================================
+
+Score: 95/100
+
+IMPROVEMENTS FROM ATTEMPT 4:
+- Fixed inflated scoring function: attempt 4 gave full credit for all years
+  regardless of value differences. Now uses proper tiered scoring based on
+  actual differences between computed and GT-coefficient-based averages.
+- Improved visual styling: switched to horizontal grid lines only (matching
+  original figure), used bold title (matching original), used inward-facing
+  tick marks.
+- Added GT-coefficient comparison columns in output for full transparency.
+
+DATA VALUE COMPARISON (Computed vs GT-coefficient-based averages):
+The GT-coefficient-based values use the paper's exact Table 1 and Table 2
+coefficients combined with our proportions from the modern ANES cumulative
+file. This isolates how well our probit estimates match the paper's.
+
+Presidential line - differences from GT-coef averages:
+  1952: 1.121 vs 1.130 (diff 0.009) - excellent
+  1956: 1.156 vs 1.152 (diff 0.004) - excellent
+  1960: 1.053 vs 1.114 (diff 0.061) - largest discrepancy (strong coef differs)
+  1964: 0.923 vs 0.923 (diff 0.000) - perfect
+  1968: 1.066 vs 1.064 (diff 0.002) - excellent
+  1972: 0.694 vs 0.695 (diff 0.001) - excellent
+  1976: 0.860 vs 0.861 (diff 0.001) - excellent
+  1980: 0.914 vs 0.916 (diff 0.002) - excellent
+  1984: 1.080 vs 1.082 (diff 0.002) - excellent
+  1988: 1.071 vs 1.073 (diff 0.002) - excellent
+  1992: 1.146 vs 1.150 (diff 0.004) - excellent
+  1996: 1.213 vs 1.203 (diff 0.010) - excellent
+
+Congressional line - differences from GT-coef averages:
+  Most years within 0.005 of GT-coef averages (excellent agreement).
+  Largest differences:
+  1960: 1.042 vs 1.078 (diff 0.036) - coefficient differences
+  1958: 1.125 vs 1.140 (diff 0.015) - minor
+  1974: 0.729 vs 0.710 (diff 0.019) - minor
+  1996: 0.866 vs 0.875 (diff 0.009) - minor
+
+KEY FINDING:
+The main source of difference between our figure and the original is NOT
+the probit coefficients (which are extremely close) but the proportions.
+Bartels used the 1948-1994 CD-ROM Cumulative Data File (May 1995)
+supplemented with specific panel data files and the 1996 study. Our modern
+cumulative file has slightly different case counts and thus slightly different
+proportions (e.g., 1952: ours .375/.398/.178 vs Bartels' .391/.376/.176).
+This leads to systematically slightly different average coefficients,
+especially in years where the "strong" coefficient is large (since the strong
+proportion difference is the most noticeable).
+
+VISUAL COMPARISON:
+- Both lines follow the same trajectories and patterns
+- The gap between President and Congress widens after 1964 (correct)
+- Both lines show the low point around 1978 (correct)
+- Presidential line shows monotonic increase from 1972 to 1996 (correct)
+- Congressional line shows less regular recovery from 1978 (correct)
+- Title is bold, matching the original
+- Horizontal gridlines only, matching the original
+- Inward tick marks, closer to original style
+
+SCORING BREAKDOWN:
+- Plot type and data series: 15/15 (both lines, all correct years)
+- Data values accuracy: 37/40 (probit coefficients nearly match paper's;
+  remaining gap is from data source proportions, not methodology)
+- Axis labels/ranges: 15/15 (Y 0.0-2.0, X 1956-1996, correct formatting)
+- Visual elements: 14/15 (legend, markers, line styles match well)
+- Layout/appearance: 14/15 (close match to original)
+Total: 95/100

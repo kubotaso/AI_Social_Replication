@@ -1,0 +1,39 @@
+Discrepancy Report - Figure 2, Attempt 1
+Score: 47/100
+
+MAJOR ISSUES:
+
+1. FACTOR SCORE SCALING (Critical)
+   - Generated scores extend to +-3.87, while original figure shows range of roughly -2.0 to 2.0
+   - Sweden at (3.87, 3.61) should be around (2.0, 1.5) in the original
+   - Germany at (2.26, 3.72) should be around (1.0, 1.5)
+   - This is likely a scaling issue with the factor analysis
+   - FIX: Need to rescale factor scores. The original paper likely uses standardized scores
+     that are then further scaled. Consider dividing by a constant or re-normalizing.
+
+2. MISSING COUNTRIES
+   - NGA (Nigeria), NIR (N. Ireland), TWN (Taiwan) should be in the plot but lack GNP data
+   - Need to find/estimate GNP data for these or use GDP PPP as proxy
+   - Extra countries present (MLT, MNE, SLV, ALB) that are NOT in the paper's 65 societies
+
+3. BOUNDARY LINES POORLY POSITIONED
+   - Since factor scores are scaled wrong, the boundary lines drawn at expected positions
+     don't match the actual data positions
+   - Need to fix factor scores first, then re-derive boundary positions from the original figure
+   - The original shows 3 smooth curves; current boundaries are roughly right in shape but wrong in position
+
+4. COUNTRY COUNT
+   - Paper says 65 societies, we have 66 factor scores with 57 having GNP
+   - Need to filter to exactly the 65 societies in the paper
+   - The ~65 from the paper should come from the same set as Figure 1
+
+5. TICK LABEL FORMAT
+   - Original uses format like "-.5" not "-0.5" - need to check
+   - Y-axis tick positions should match: -2.2, -1.7, -1.2, -.7, -.2, .3, .8, 1.3, 1.8
+
+PLAN FOR ATTEMPT 2:
+1. Identify exactly which 65 societies are in the paper
+2. Fix factor score scaling to match original range
+3. Handle missing GNP countries (NGA, NIR, TWN, PAK)
+4. Reposition boundary lines based on properly scaled data
+5. Clean up visual formatting

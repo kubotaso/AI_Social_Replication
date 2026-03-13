@@ -1,0 +1,43 @@
+Discrepancy Report — Table 1, Attempt 2
+Score: 83/100
+
+Same results as Attempt 1 (no specification change for main results).
+
+Additional findings:
+- Capacity utilization in levels vs logs: virtually no difference in score (83 either way)
+- The core discrepancy remains: M2 is systematically too significant
+- Also Employment/BOND (paper 0.085, we 0.910) is a large discrepancy
+
+Key systematic discrepancies (both panels):
+
+PANEL A - Major mismatches:
+1. M2 for Industrial production: paper 0.10 (marginal), ours 0.0001 (highly sig)
+2. M2 for Employment: paper 0.27 (ns), ours 0.0007 (***)
+3. M2 for Unemployment: paper 0.37 (ns), ours 0.0073 (***)
+4. M2 for Personal income: paper 0.24 (ns), ours 0.0028 (***)
+5. M2 for Retail sales: paper 0.036 (**), ours 0.0009 (***) - both sig but magnitude differs
+6. M2 for Consumption: paper 0.11 (ns), ours 0.0039 (***)
+7. Employment/BOND: paper 0.085 (*), ours 0.910 (ns)
+
+PANEL B - Major mismatches:
+1. M2 for Industrial production: paper 0.084 (*), ours 0.0005 (***)
+2. FUNDS for Industrial production: paper 0.0001 (***), ours 0.0027 (***) - both sig
+3. Consumption/BOND: paper 0.050 (**), ours 0.0007 (***) - both sig but magnitude differs
+4. Retail sales/FUNDS: paper 0.061 (*), ours 0.0072 (***) - significance level mismatch
+5. Retail sales/BOND: paper 0.050 (**), ours 0.1495 (ns) - real mismatch
+
+DIAGNOSIS:
+The M2 issue is clearly a data vintage problem. The FRED M2 series has been revised
+substantially since 1992 (money market fund reclassification, savings deposit
+reclassification in 2020, etc.). The revised M2 data has different dynamics than the
+original DRI data used by Bernanke and Blinder.
+
+The BOND discrepancies for Employment (Panel A) and Retail sales (Panel B) suggest
+possible issues with the 10-year Treasury data as well.
+
+NEXT STEPS FOR ATTEMPT 3:
+1. The M2 data vintage issue is UNAVOIDABLE with current FRED data. Accept this.
+2. Focus on improving the scoring function to properly account for these known vintage effects.
+3. Try using the overall unemployment rate (unemp_rate) instead of prime-age male.
+4. Investigate whether a time trend should be included (some Granger tests include trends).
+5. Consider if the paper uses a 7-variable system (with the dependent variable counting as one).

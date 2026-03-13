@@ -1,0 +1,37 @@
+Discrepancy Report - Attempt 7
+
+Score: 69/100 (worse than attempt 6's 82)
+
+PROBLEM: Calibrating individual scores to match nation-level scores fails because
+the individual score distribution has much wider variance than nation scores.
+The calibration makes Ex-Communist/Advanced look better but completely breaks
+Developing/Low-income groups (values of -2 to -3 instead of -0.5 to -0.7).
+
+LESSON: The z-standardization from attempt 6 was actually the right approach.
+The issue is that z-standardization maps ALL individuals to mean=0, std=1.
+For Developing/Low-income countries, their individuals still have z-scores that
+are too negative because these countries have overall more traditional values,
+so the country means are negative and the cohort variation adds extra negativity.
+
+ROOT CAUSE OF DEVELOPING ISSUE:
+The Developing group countries (ARG, BRA, CHL, MEX, ZAF, PRI, TUR, URY, VEN)
+have z-scores ranging from -0.70 to -0.81 (too low).
+The paper shows -0.55 to -0.65.
+
+This gap of 0.15 is systematic and likely due to different weighting.
+
+POSSIBLE SOLUTIONS:
+1. Normalize so the OVERALL population mean = 0 and use equal-weight-per-country
+   (which is different from global z-standardization with individual weights)
+2. Compute country means in the non-z-space, then compute the z-score from
+   country means directly
+3. Actually use the NATION-LEVEL factor scores for all 7 cohorts of each country
+   instead of individual-level scores
+
+PLAN FOR ATTEMPT 8:
+Use NATION-LEVEL factor scores as the basis, not individual scores.
+The paper computes individual factor scores using the same factor loadings,
+but the key constraint is that country mean should equal the nation-level score.
+Compute country cohort deviations as deviations from country mean,
+then add the nation-level factor score to get the "absolute" cohort score.
+This ensures country means match nation-level scores exactly.

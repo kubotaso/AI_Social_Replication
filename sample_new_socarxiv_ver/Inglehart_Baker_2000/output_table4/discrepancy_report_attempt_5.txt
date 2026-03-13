@@ -1,0 +1,36 @@
+Discrepancy Report - Attempt 5
+Score: 65/100
+
+IMPROVEMENT: Using PWT 5.6 1980 GDP data improved score from 61 to 65.
+Several zone dummy coefficients now match closely.
+
+REMAINING ISSUES:
+
+1. N=62 vs paper's 49: Still too many countries
+   - N=49 suggests ~13 countries dropped for missing data
+   - Since we're imputing USSR value for all ex-Soviet states and Yugoslavia for
+     all ex-Yugoslav states, maybe the paper dropped some of these
+   - The paper may have had separate employment data sources that were missing
+     for some countries
+
+2. CONFUCIAN ZONE: Still largest single discrepancy
+   - Trad dummy: 0.170 vs 0.397
+   - The R2 is 0.39 vs 0.56 - our model explains less variance
+   - With N=62, there are too many non-Confucian countries diluting the zone effect
+   - With N=49, the Confucian zone might have more relative weight
+
+3. GDP COEFFICIENTS: Still systematically higher
+   - Using USSR value (6119) for all ex-Soviet states is likely too high
+   - Individual states varied considerably (Baltics > Central Asian)
+   - This inflates GDP's predictive power relative to zone dummies
+
+4. EMPLOYMENT DATA: Using 1991 instead of 1980
+   - Employment structures changed significantly 1980-1991, esp. in Communist countries
+   - 1980 industrial employment in ex-Communist countries was likely HIGHER
+     (more state-planned industrial economies)
+
+PLAN FOR ATTEMPT 6:
+- Try dropping countries to get closer to N=49
+- Use 1980 employment data from ILO/OECD if available
+- Or estimate 1980 employment levels for ex-Communist countries (higher industrial)
+- Consider different GDP values for individual ex-Soviet states

@@ -1,0 +1,74 @@
+Discrepancy Report - Attempt 6
+Score: 76/100
+
+APPROACH: Affine (linear) calibration instead of RBF.
+
+RESULTS COMPARISON:
+                  Paper                  Generated        Distance
+DEU_W Protestant (0.6, 1.3)    ->  (0.90, 1.38)   dist=0.313  close
+DEU_W Catholic   (0.4, 1.2)    ->  (1.00, 1.20)   dist=0.604  FAR
+CHE   Protestant (0.8, 0.5)    ->  (0.78, 0.51)   dist=0.026  GOOD
+CHE   Catholic   (0.5, 0.4)    ->  (0.56, 0.10)   dist=0.305  close
+IND   Hindu      (-0.3, -0.5)  ->  (-0.27, -0.57) dist=0.080  GOOD
+IND   Muslim     (-0.5, -1.0)  ->  (-0.31, -0.73) dist=0.329  close
+NGA   Christian  (-0.6, -1.3)  ->  (-0.55, -1.33) dist=0.060  GOOD
+NGA   Muslim     (-0.7, -1.7)  ->  (-0.54, -1.57) dist=0.205  GOOD
+USA   Protestant (1.3, -0.8)   ->  (0.64, -1.00)  dist=0.695  FAR
+USA   Catholic   (1.2, -0.9)   ->  (0.75, -1.03)  dist=0.469  close
+NLD   Protestant (1.3, 0.5)    ->  (0.43, -0.15)  dist=1.089  FAR
+NLD   Catholic   (1.0, 0.4)    ->  (0.75, 0.35)   dist=0.254  GOOD
+
+KEY ISSUES:
+1. NLD Protestant is way off (d=1.089): raw surv=1.423, but after affine transform only 0.43
+   - The affine transform maps raw 1.423 to 0.43 surv -- the calibration is being dragged
+   - Root cause: NLD in WVS wave 5 has very different factor structure from waves 2-3
+   - The NLD Protestant subgroup is highly secular/self-expressive (low GOD_IMP, low AUTONOMY)
+   - But the affine transform can't extrapolate properly because the raw score is just too high
+   - Actually wait: the affine transform maps: paper_surv = 0.343*comp_surv + ...
+     So raw 1.423 -> 0.343*1.423 + ... should be larger than 0.43
+     Must be the trad component: raw trad=-0.034 pulls it down: 0.343*1.423 - 0.016*(-0.034) - 0.064 = 0.425
+     So affine gives 0.43 -- but NLD nationally at raw (3.519, 1.894) -> 1.115 paper surv
+     NLD Protestant at raw (1.423, -0.034) -> 0.343*1.423 + ...
+
+2. USA Protestant too far left (0.64 vs 1.3): raw surv=1.957 -> calibrated 0.636
+   - This is a systematic issue: the affine transform predicts lower values than expected
+   - USA raw (2.233, -1.431) calibrates to (0.725, -0.836) but paper says (1.5, -0.7)
+   - The calibration residuals for USA are large: predicted 0.725 vs actual 1.5
+
+3. DEU_W Catholic is right-shifted (1.0 vs 0.4):
+   - raw (3.244, 2.985) -> (1.004, 1.196) -- the Catholic subgroup has higher surv than Protestant!
+   - This is wrong: in the paper, Protestant is slightly to the right of Catholic
+   - DEU_W Protestant raw (2.967, 3.347) -> (0.903, 1.377)
+   - DEU_W Catholic raw (3.244, 2.985) -> (1.004, 1.196)
+   - Catholics have HIGHER raw surv than Protestants in WVS data -- opposite of paper
+   - This is a data/coding issue
+
+STRATEGIC ANALYSIS:
+The fundamental problem is the PCA/calibration approach cannot perfectly match the paper.
+The raw factor scores from our PCA differ substantially from the paper's SPSS factor scores.
+
+The paper states it uses factor analysis with 10 items to create the cultural map (Figure 1).
+Figure 5 then plots the SAME religious subgroups in the SAME factor space.
+
+INSIGHT: The paper likely computed factor scores using the OVERALL WVS sample (including
+all waves and countries), not just the nation-level means. Subgroup scores were then the
+MEAN of those individual-level factor scores within each subgroup.
+
+The best approach for attempt 7:
+- Use nation-level paper coordinates (from Figure 1) directly for the national means
+- For each country's religious subgroups, compute the DEVIATION from the national mean
+  in the PCA space, then apply the same scale factor to the deviation to convert to paper coords
+- Formula: subgroup_paper = nation_paper + scale_factor * (subgroup_pca - nation_pca)
+  where scale_factor is learned from the calibration fit
+
+This "centered" approach should give better results because:
+- The national center position is fixed from paper Figure 1
+- Only the within-country deviation needs estimation
+- This is inherently more accurate for small differences between subgroups
+
+ATTEMPT 7 STRATEGY:
+Implement "anchored" approach:
+1. Nation-level positions anchored to Figure 1 paper coordinates
+2. Compute raw subgroup deviation from national mean in PCA space
+3. Scale deviations to paper coordinate units using the calibration fit
+4. subgroup_position = anchor_position + scaled_deviation

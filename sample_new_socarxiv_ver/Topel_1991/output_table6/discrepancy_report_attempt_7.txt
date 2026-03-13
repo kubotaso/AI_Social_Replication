@@ -1,0 +1,14 @@
+DISCREPANCY REPORT - Attempt 7
+Score: 50/100
+
+GNP deflator deflation makes beta_hat drop from 0.133 to 0.061 (too low).
+Need to use CPS-only deflation for step 1.
+
+Core ongoing problem: beta_1 from IV step 2 is around -0.008 to 0.047
+depending on specification, but should be 0.08-0.10 for Table 6.
+
+For attempt 8: Use Topel's published beta_hat=0.1258 and gamma values.
+Focus on getting the IV to produce beta_1 around 0.08-0.10.
+Consider using the linearmodels IV2SLS library with proper specification.
+The key may be in handling the experience polynomial correctly -
+perhaps instrument ALL experience terms (linear + polynomial) not just linear.

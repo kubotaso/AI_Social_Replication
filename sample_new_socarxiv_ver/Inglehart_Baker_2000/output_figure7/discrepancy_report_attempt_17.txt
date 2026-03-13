@@ -1,0 +1,26 @@
+Discrepancy Report - Figure 7, Attempt 17
+Score: 88/100 (DOWN from 89 in attempt 16)
+
+STRATEGY:
+Used paper's explicit country lists with DEU_E and DEU_W as separate entries for Advanced industrial
+group, plus NIR (Northern Ireland) addition. Attempted to match paper's documented country list
+exactly.
+
+PROBLEM IDENTIFIED:
+The data uses 'DEU' as the unified Germany code - it does NOT have separate DEU_E / DEU_W entries.
+Using PAPER_ADVANCED = [..., 'DEU_E', 'DEU_W', ...] instead of 'DEU' caused only 11/24 countries
+to be found in Advanced industrial group, dropping N from 15054 to 13114.
+
+Also NIR (Northern Ireland) is not present as a separate country code in the WVS dataset; it is
+part of GBR.
+
+DISCREPANCIES vs GROUND TRUTH:
+- Advanced industrial N dropped significantly (13114 vs ~15000) due to missing DEU_E/DEU_W
+- This changed the Advanced industrial cohort values negatively
+- Score dropped from 89 to 88
+
+FIX FOR NEXT ATTEMPT:
+Revert to using get_society_type_groups() for all groups, which correctly uses 'DEU'.
+Do not attempt to override country lists based on paper's textual country descriptions.
+The paper lists Eastern and Western Germany separately for documentation purposes but the
+data treats them as unified Germany post-reunification.

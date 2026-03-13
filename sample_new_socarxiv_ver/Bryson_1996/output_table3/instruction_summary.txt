@@ -1,0 +1,53 @@
+Instruction Summary: Table 3 Variable Mapping and Construction
+
+DATASET: gss1993_clean.csv
+
+This is a frequency distribution table. For each of 18 music genres, count:
+- (1) Like very much: value == 1
+- (2) Like it: value == 2
+- (3) Mixed feelings: value == 3
+- (4) Dislike it: value == 4
+- (5) Dislike very much: value == 5
+- (M) Don't know much about it: NA (these are coded as NA in our dataset)
+- (M) No answer: also NA
+
+IMPORTANT: The "Don't know" and "No answer" categories are both coded as NA in our CSV.
+The paper distinguishes between them, showing separate rows. In the original GSS, "Don't know"
+is typically coded 0 or 8, and "No answer" is coded 9 or 0. Since gssr converts these to NA,
+we cannot distinguish between them. We should report the combined NA count.
+
+MUSIC GENRE COLUMNS (in table order):
+Panel 1: latin, jazz, blues, musicals, oldies, classicl
+Panel 2: reggae, bigband, newage, opera, blugrass, folk
+Panel 3: moodeasy, conrock, rap, hvymetal, country, gospel
+
+DISPLAY LABELS (matching paper):
+latin → Latin/Salsa
+jazz → Jazz
+blues → Blues/R&B
+musicals → Show Tunes
+oldies → Oldies
+classicl → Classical/Chamber
+reggae → Reggae
+bigband → Swing/Big Band
+newage → New Age/Space
+opera → Opera
+blugrass → Bluegrass
+folk → Folk
+moodeasy → Easy Listening
+conrock → Pop/Contemporary Rock
+rap → Rap
+hvymetal → Heavy Metal
+country → Country/Western
+gospel → Gospel
+
+COMPUTATION:
+For each genre:
+1. Count values 1, 2, 3, 4, 5 separately
+2. Count NAs (combined "don't know" + "no answer")
+3. Compute mean of valid (1-5) responses
+
+Total N = 1,606 for all genres
+
+SCORING NOTE: The "Don't know" and "No answer" sums should add up to the NA count.
+Paper's values: Don't know + No answer for Latin/Salsa = 221 + 12 = 233 (our NA count = 233). Match confirmed.

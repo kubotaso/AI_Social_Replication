@@ -1,0 +1,136 @@
+TABLE 7: Least-Squares Models Conditioning on (Estimated) Completed Job Tenure,
+PSID White Males
+
+Source: Topel (1991), "Specific Capital, Mobility, and Wages: Wages Rise with Job Seniority,"
+Journal of Political Economy, Vol. 99, No. 1, pp. 145-176.
+Table appears on page 171 of the paper.
+
+==============================================================================
+DATA AND SAMPLE
+==============================================================================
+
+Data source: Panel Study of Income Dynamics (PSID), 1968-1983
+Sample: White males
+Dependent variable: Log average hourly earnings (levels, not first-differenced)
+
+==============================================================================
+TABLE STRUCTURE
+==============================================================================
+
+Type: OLS regression table (cross-sectional wage levels)
+Layout: 5 model columns
+
+These models test the prediction that, if wages rise with tenure due to
+specific capital accumulation, then completed job tenure (total length of
+the job spell) should have a positive effect on wages even after controlling
+for current tenure, since it signals a longer period of investment returns.
+
+Columns (2) and (4): Restricted model (equation 17 in the paper)
+Columns (3) and (5): Unrestricted model (equation 18 in the paper)
+
+The difference between columns (2)-(3) and (4)-(5) is whether "observed"
+or "imputed" completed tenure is used.
+
+==============================================================================
+GROUND-TRUTH VALUES (standard errors in parentheses)
+==============================================================================
+
+                                (1)           (2)           (3)           (4)           (5)
+
+Experience:                     .0418         .0379         .0345         .0397         .0401
+                               (.0013)       (.0014)       (.0015)       (.0013)       (.0014)
+
+Experience^2:                  -.00079       -.00069       -.00072       -.00074       -.00073
+                               (.00003)      (.000032)     (.000069)     (.000030)     (.000069)
+
+Tenure:                         .0138        -.0015         .0137         .0060         .0163
+                               (.0052)       (.0015)       (.0038)       (.0073)       (.0038)
+
+Imputed completed tenure:       ...           ...           ...           .0053         .0067
+                                                                        (.0036)       (.0042)
+
+Observed completed tenure:      ...           .0165         .0316         ...           ...
+                                                           (.0016)       (.0022)
+
+x censor:                       ...          -.0025        -.0024         ...           ...
+                                             (.0073)       (.0073)
+
+Experience^2 (interaction):     ...           ...          -.00061        ...          -.00075
+                                                           (.000036)                   (.000033)
+
+Tenure (interaction):           ...           ...           .0142         ...           .0429
+                                                           (.0033)                     (.0016)
+
+R^2:                            .422          .428          .432          .433          .435
+
+==============================================================================
+NOTES
+==============================================================================
+
+- See note to Table 4 for other regressors (education, marital status,
+  SMSA, union, disability, census region dummies)
+- Columns (2) and (4) implement the restricted model (equation 17):
+  the effect of completed tenure enters only as a level shift
+- Columns (3) and (5) implement the unrestricted model (equation 18):
+  completed tenure is allowed to interact with current tenure and
+  experience, permitting the wage profile to vary with expected job length
+- "Observed completed tenure" is the actual observed duration of the job
+  spell in the PSID panel (for jobs that end during the panel) or a
+  censored measure (for jobs still ongoing at panel's end)
+- "Imputed completed tenure" is predicted completed tenure based on a
+  hazard model of job ending
+- "x censor" is an interaction of completed tenure with a dummy for
+  right-censored job spells (job ongoing at end of panel)
+- The positive coefficient on completed tenure supports the specific
+  capital model: workers in longer-lasting jobs earn more at every
+  tenure level, consistent with more investment in specific capital
+- Column (1) is a baseline OLS model with no completed tenure controls
+- The paper does NOT report N (sample size) for Table 7. The main PSID
+  sample has 13,128 person-year observations (p. 148). All 5 columns
+  use the same sample.
+- NOTE ON Experience^2 interaction SEs: Both columns (3) and (5) have
+  6-decimal-place SEs (.000036 and .000033 respectively), matching the
+  scale of the main Experience^2 SEs (e.g., .000069, .000030). The PDF
+  typography makes it easy to misread the number of leading zeros.
+- The paper's note says: "See note to table 4 for other regressors.
+  Dependent variable is log average hourly earnings. Standard errors
+  are in parentheses. Cols. 2 and 4 implement versions of the restricted
+  model given by eq. (17). Estimates in cols. 3 and 5 are based on the
+  unrestricted model (18)."
+
+==============================================================================
+STATISTICAL METHOD
+==============================================================================
+
+OLS regressions of log wage levels on experience, tenure, completed tenure,
+and controls. This is a cross-sectional approach (not the two-step estimator)
+that tests implications of the specific capital model by examining whether
+completed job tenure affects current wages.
+
+Column (1): Basic OLS
+  w = X*beta_1 + X^2*beta_x2 + T*beta_2 + controls + epsilon
+  (No completed tenure variable)
+
+Columns (2) and (4) - Restricted (equation 17):
+  w = X*beta_1 + X^2*beta_x2 + T*beta_2 + T_bar*delta + controls + epsilon
+  where T_bar is completed tenure (observed in col 2, imputed in col 4)
+  "x censor" (col 2 only): interaction of observed completed tenure with a
+  dummy for right-censored job spells
+
+Columns (3) and (5) - Unrestricted (equation 18):
+  w = X*beta_1 + X^2*beta_x2 + T*beta_2 + T_bar*delta
+      + T_bar*X^2*gamma_x + T_bar*T*gamma_t + controls + epsilon
+  Allows completed tenure to interact with Experience^2 and Tenure
+
+Other regressors (see Table 4 note): education, marital status (married),
+union membership, SMSA, disability, census region dummies (8 regions).
+
+For the purposes of this table, the models use only a quadratic in
+experience and a LINEAR term in tenure (not the higher-order polynomial
+used in Tables 3-6). This is the functional form used by Abraham and
+Farber (1987) for comparison purposes (p. 171).
+
+Imputed completed tenure (cols 4-5) is predicted from a discrete-time
+proportional hazards model of job endings (footnote 24, p. 171). The
+hazard rate is lambda = exp(Z*gamma), where Z includes the full vector
+of regressors used in the wage models.

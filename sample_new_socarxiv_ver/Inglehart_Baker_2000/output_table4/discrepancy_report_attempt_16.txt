@@ -1,0 +1,40 @@
+Discrepancy Report - Attempt 16
+Score: 53/100 (best remains 65 from attempt 5)
+
+Strategy: PWT 1980 GDP + SQUARED service employment (srv^2/100)
+N=62
+
+CRITICAL FINDING: Squared service employment makes survival regressions WORSE.
+- The squaring causes srv_emp_sq to have much higher variance for high-service countries
+- This absorbs variance that should be attributed to GDP
+- Result: srv coefficients too high, GDP coefficients too low across ALL zones
+
+SURVIVAL SIDE PROBLEMS (squared srv):
+- Latin America: GDP 0.241 vs 0.602 (MISS), srv 0.602 vs 0.224 (MISS) - completely inverted
+- Africa: GDP 0.240 vs 0.502 (MISS), srv 0.596 vs 0.320 (MISS)
+- South Asia: GDP 0.308 vs 0.469 (MISS), srv 0.661 vs 0.455 (MISS)
+- English-speaking: GDP 0.256 vs 0.434 (MISS), srv 0.540 vs 0.319 (MISS)
+- Protestant Europe: GDP 0.191 vs 0.362 (MISS), srv 0.544 vs 0.331 (MISS)
+
+CONCLUSION: Do NOT use squared service employment. Despite paper p.34 stating this,
+the raw service employment (attempt 5 approach) produces much better results.
+The paper may have used a different transformation or the squaring reference
+may apply to a different analysis.
+
+TRAD SIDE (same as attempt 5, unaffected):
+- Zone dummies mostly match well except Confucian (0.170 vs 0.397)
+- GDP coefficients systematically too high (0.35-0.52 vs 0.02-0.50)
+- Industrial employment mostly matches
+
+KEY PERSISTENT ISSUES (across all attempts):
+1. Confucian zone dummy: 0.170 vs 0.397 - our GDP explains too much Confucian trad variance
+2. GDP coefficients on trad side: systematically high (N=62 gives GDP more power)
+3. Significance: N=62 gives *** where paper has ** or * (paper had N=49)
+
+NEXT STRATEGY IDEAS:
+- Try using different GDP for different regressions (1990 GNP for surv, PWT for trad)
+- Try log(GDP) instead of raw GDP
+- Try excluding Catholic Europe countries from the sample
+- Try using 1980 employment data (imputed or from ILO historical)
+- Focus on getting Confucian zone right - maybe China should NOT be in Confucian zone
+  (it's listed in Ex-Communist in the paper's zone assignments)

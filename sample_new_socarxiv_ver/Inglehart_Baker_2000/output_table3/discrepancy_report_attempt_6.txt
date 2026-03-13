@@ -1,0 +1,57 @@
+Discrepancy Report - Table 3, Attempt 6
+Score: 64/100 (best so far)
+
+IMPROVEMENTS OVER PREVIOUS BEST (61):
+- Outgroup index: +0.65 -> +0.73 (using A124_01+A124_03+A124_07 instead of A124_03+A124_06+A124_07)
+- Men right to job: +0.60 -> +0.66 (using reversed mean 4-x instead of pct agree)
+- Free choice: +0.67 -> +0.70 (using pct <=4 instead of reversed mean)
+- Not less money: +0.50 -> +0.60 (using pct more emphasis instead of pct NOT less)
+- Friends: +0.35 -> +0.49 (using raw mean instead of pct >=3)
+- Strong leader: +0.54 -> +0.60 (using reversed mean 5-x instead of pct good)
+- Boycott: +0.61 -> +0.66 (using raw mean instead of pct would never)
+- Democracy: +0.29 -> +0.34 (using raw mean instead of pct bad)
+
+ITEMS CLOSE (9): Men leaders (.01), Job motivation (.02), Love parents (.03), Men job (.03),
+  Govt provision (.02), Free choice (.03), Hard work (.01), Strong leader (.02), Govt own inc (.01)
+
+ITEMS PARTIAL (8): Dissatisfied (.09), Outgroup (.08), Health (.07), Not less money (.06),
+  Tolerance (.07), Leisure (.08), Friends (.07), Boycott (.10)
+
+ITEMS MISS - FIXABLE (6):
+  - Woman needs children: +0.71 vs +0.83 (gap=0.12, need better D018 coding or more countries)
+  - State ownership: +0.51 vs +0.74 (gap=0.23, E036 mean only reaches 0.51)
+  - University for boy: +0.40 vs +0.67 (gap=0.27, D058 pct agree only reaches 0.40)
+  - Heavy drinkers: +0.78 vs +0.64 (OVER-correlating by 0.14)
+  - Imagination: +0.36 vs +0.62 (gap=0.26, A032 limited variation)
+  - Science: +0.34 vs +0.60 (gap=0.26, E015 coding unclear)
+  - Criminal records: +0.42 vs +0.66 (gap=0.24)
+  - Democracy: +0.34 vs +0.45 (gap=0.11)
+
+ITEMS MISS - DATA LIMITED (6):
+  - Technology: +0.10 vs +0.78 (E019: near-zero variation, 90%+ say "good thing")
+  - Recycled: -0.11 vs +0.76 (B003: only 13 countries, wave 2 only)
+  - Env meeting: +0.08 vs +0.75 (B002: near-zero correlation)
+  - Child both parents: +0.06 vs +0.73 (D022: compressed 0/1 coding in harmonized dataset)
+  - Prostitution: -0.04 vs +0.69 (F125: only 12 countries, wave 2 only)
+  - Economic aid: NOT FOUND (G008 not in WVS integrated dataset)
+
+ROOT CAUSE ANALYSIS:
+The systematic gap (~0.05-0.15) on most items is due to:
+1. Missing 12 EVS-only countries (AUT, BEL, CAN, DNK, FRA, IRL, ISL, ITA, MLT, NIR, NLD, PRT)
+   from item computations. These are mostly high self-expression countries whose absence
+   reduces the range of both X (survival scores) and Y (item values), attenuating correlations.
+2. The harmonized WVS integrated dataset uses different variable codings than the original
+   country-specific datasets the authors used.
+3. Some items (E019, B003, D022, B002, F125) have fundamentally different data availability
+   in the harmonized dataset.
+
+NEXT STRATEGY:
+The score is approaching the maximum achievable with available data. Further improvements possible:
+1. Try computing factor scores using ONLY the ~52 countries that have item data (instead of all 66)
+   This would ensure the survival dimension is optimized for the same set of countries.
+2. Try using individual-level factor scores (compute per-person, then aggregate to country means)
+   instead of nation-level factor scores
+3. For E036 (state ownership): the paper gets r=0.74 - try using a completely different approach
+   like the percentage favoring government ownership strongly (>=8)
+4. For A032 (imagination): the paper's "Imagination is NOT important" might use a different coding
+5. Check if E015 (science) might be miscoded (1=harm vs 3=help, or reversed)

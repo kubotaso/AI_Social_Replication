@@ -1,0 +1,41 @@
+Discrepancy Report - Attempt 2
+Score: 93.0/100 (no change from attempt 1)
+
+This attempt used the same specification as attempt 1 but added diagnostic output.
+The diagnostics confirm:
+
+1. N differences are consistently small (0-22 across all 22 years)
+2. PID distributions look reasonable across all years
+3. Vote distributions are as expected
+
+The same discrepancies remain:
+- 1960 weak coefficient: 0.941 vs 1.059 (MISS)
+- 1960 intercept: 0.008 vs -0.065 (PARTIAL)
+- 1974 strong coefficient: 1.262 vs 1.148 (MISS)
+- 1958 leaners coefficient: 0.721 vs 0.653 (PARTIAL)
+- 1996 weak coefficient: 0.697 vs 0.749 (PARTIAL)
+- Log-likelihood: 6 MISS, 12 PARTIAL, 4 OK out of 22 years
+
+ANALYSIS OF COEFFICIENT DISCREPANCIES:
+For 1960, the PID distribution for voters is:
+  Strong Dem (1): 178, Weak Dem (2): 175, Lean Dem (3): 45,
+  Pure Ind (4): 66, Lean Rep (5): 53, Weak Rep (6): 107, Strong Rep (7): 134
+  Missing PID: 14
+
+The 14 missing PID voters are excluded. In Bartels' 1995 data, these may have had
+valid PID values, or conversely some of our valid PID voters may have been coded
+differently. With only 1 N difference (758 vs 759), it's a specific respondent-level
+coding change that shifts the weak coefficient substantially.
+
+For 1974, the 8-observation N difference (790 vs 798) suggests 8 voters had their PID
+recoded to missing in the 2019 CDF. If those 8 were predominantly strong partisans
+who voted with their party, removing them could inflate the strong coefficient (1.262
+vs paper's 1.148).
+
+PLAN FOR ATTEMPT 3:
+The score of 93.0 appears to be the ceiling achievable with the 2019 ANES CDF.
+The remaining discrepancies are all driven by data vintage differences that cannot
+be resolved through code changes. However, I will try:
+1. Using VCF0305 (pre/post election wave indicator) to see if filtering by wave helps
+2. Checking if the 1960 study had a different sample structure in the CDF
+3. Checking if any weight variable (VCF0009x etc.) could help match the paper's sample

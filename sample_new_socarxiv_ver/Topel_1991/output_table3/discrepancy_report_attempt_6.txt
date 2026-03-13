@@ -1,0 +1,41 @@
+DISCREPANCY REPORT - Attempt 6
+Score: 70.8/100
+
+IMPROVEMENTS:
+1. Head-of-household (pnum in {1,170}) gives 1,438 persons, N=9,432
+   - Paper has 10,685, so we're 11.7% low (from 28% too high)
+   - Got partial N credit (4.9/15)
+2. beta_2 SE = 0.0100 (paper: 0.0079) - within 30%, gets full credit
+3. All significance tests pass
+
+REMAINING ISSUES:
+1. beta_1 = 0.0799 vs 0.0713 (err 0.0086):
+   - Gets full credit (within 0.01) but makes beta_2 too low
+   - beta_2 = 0.0459 vs 0.0545 (err 0.0086)
+   - This compounds in cumulative returns
+
+2. beta_1 SE = 0.0061 vs 0.0181:
+   - Bootstrap used OWN step 1 (not paper's)
+   - Need to fix: either bootstrap with paper step 1 or compute analytical SE
+
+3. Cumulative returns off:
+   - Two-step: 0.1599 at 10yr vs 0.2459 (off by 0.086)
+   - Driven by beta_2 being 0.009 too low -> 0.09 at 10yr
+   - OLS returns also off at 15/20yr due to different sample
+
+4. N still 12% off:
+   - 9,432 vs 10,685
+   - Missing ~1,250 obs
+   - Paper uses 1968-1983 (16 years), we have 1971-1983 (13)
+   - Missing 3 years of data contributes to lower N
+   - Also, our pnum restriction may be too strict
+
+PLAN FOR ATTEMPT 7:
+1. Include more person types: pnum in {1, 3, 170, 171} (heads + sons)
+   to increase N
+2. Or include all persons but apply other restrictions
+3. Try different wage deflation for levels
+4. Investigate why beta_1 = 0.080 instead of 0.071
+   - Try using GNP+CPS deflation for levels
+   - Try different control specifications
+5. Compute SE using bootstrap with FIXED paper step 1

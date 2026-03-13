@@ -1,0 +1,45 @@
+DISCREPANCY REPORT - Attempt 7
+================================
+Score: 81.0/100 (same as attempt 6)
+
+OLS prediction for imputed CT: gained 1 coef match, lost 1 sig match.
+
+KEY DIFFERENCES FROM ATTEMPT 6:
+- imp_ct col(4): 0.0059 vs 0.0053 -> NOW MATCHES (was 0.0156, MISS)
+- tenure col(4): 0.0228 vs 0.0060 -> MISS (was 0.003, also miss)
+- imp_ct col(5): 0.0202 vs 0.0067 -> still MISS
+- tenure col(4) significance: *** vs target= -> SIG MISS (new)
+- imp_ct col(4) significance: *** vs target= -> SIG MISS (new)
+
+REMAINING 7 COEFFICIENT MISMATCHES:
+1. tenure col(2): 0.0053 vs -0.0015 (wrong sign)
+2. tenure col(4): 0.0228 vs 0.0060 (3.8x too large)
+3. x_censor col(2): -0.0003 vs -0.0025 (88% off)
+4. x_censor col(3): 0.0020 vs -0.0024 (wrong sign)
+5. imp_ct col(5): 0.0202 vs 0.0067 (3x too large)
+6. exp_sq_interaction col(3): -0.000001 vs -0.00061 (600x too small)
+7. exp_sq_interaction col(5): 0.000008 vs -0.00075 (wrong sign!)
+
+SIGNIFICANCE MISMATCHES: 7
+- tenure col(1): *** vs ** (over-significant)
+- tenure col(2): * vs = (should be insig)
+- tenure col(4): *** vs = (should be insig)
+- imp_ct col(4): *** vs = (should be insig)
+- imp_ct col(5): *** vs = (should be insig)
+- exp_sq_int col(3): = vs *** (should be sig)
+- exp_sq_int col(5): ** vs *** (close)
+
+ANALYSIS:
+The OLS imputed CT approach helps col(4) imp_ct coefficient but makes col(4) tenure
+worse and creates new significance mismatches. The hazard model approach (attempt 6)
+is better overall for significance matching.
+
+PLAN FOR ATTEMPT 8:
+- Go back to attempt 6 (hazard model) as base
+- Try combining: use hazard model for imputed CT but adjust alpha
+- Focus on fixing significance mismatches -- particularly tenure col(1)
+  which is *** but should be **. This might require adjusting tenure SE.
+- Look at the tenure SE: ours is 0.0015 but target is 0.0052.
+  This huge SE difference causes the significance mismatch.
+  Paper shows tenure SE=0.0052 in col(1) but we get 0.0015.
+  This suggests the paper may use clustered SEs or HC SEs.

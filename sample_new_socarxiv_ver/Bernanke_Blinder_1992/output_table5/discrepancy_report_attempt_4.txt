@@ -1,0 +1,48 @@
+Discrepancy Report - Attempt 4
+================================
+
+Score: 92/100 (up from 88)
+
+Key improvement: Using total unemployment rate (unemp_rate) instead of male 25-54.
+This dramatically improved the chi-squared from 31 to 41.13 (paper: 40.21).
+
+Chi-squared now nearly perfect: 41.13 vs 40.21 (2.3% error), p=0.008 vs 0.010.
+
+Remaining Discrepancies (after optimal scaling):
+
+1. Coefficient magnitudes (scaled):
+   The scaling factor from MD to paper units is about 0.39x.
+   After scaling:
+   U(-1): -35.5*0.39 = -13.8 vs -5.0  (off by ~170%)
+   U(-2): -53.4*0.39 = -20.8 vs -65.9  (off by 68%)
+   U(-3): -16.6*0.39 = -6.5 vs -18.6  (off by 65%)
+   U(-4): 10.9*0.39 = 4.2 vs 12.2  (off by 65%)
+   U(-5): 19.5*0.39 = 7.6 vs 1.4  (off by 440%!)
+   U(-6): -4.3*0.39 = -1.7 vs -13.3  (off by 87%)
+
+   The U coefficients show large discrepancies even after scaling.
+   The INFL coefficients are much better:
+   INFL(-1): 6.3*0.39 = 2.5 vs 7.9  (off but sign correct)
+
+   Actually, looking at raw values: the MD estimator gives raw coefficients
+   that when scaled by optimal factor produce reasonable INFL but not U.
+
+2. The problem: MIMIC coefficients are identified up to a single scale factor.
+   But the relative pattern of U vs INFL matters. The paper shows:
+   - U(-2) is the largest in magnitude (-65.9)
+   - U(-1) is small (-5.0)
+   - U(-5) is very small (1.4)
+   Our estimates show U(-1) = -35.5 (much larger than paper's -5.0 relative to U(-2))
+   and U(-5) = 19.5 (much larger than paper's 1.4 relative to U(-2)).
+
+3. Data vintage is the most likely explanation for the U coefficient discrepancies.
+   The unemployment rate has been revised multiple times since 1992.
+
+Possible fixes:
+1. The NBR_growth variable doesn't seem to matter (configs A=C, B=D).
+   The key variable is which unemployment rate to use.
+2. Try using CPI-U vs CPI-W for inflation
+3. Maybe scale/convert indicator variables differently
+4. Try treating the INFL measure as percent (not decimal) and see if that helps
+5. Consider that the paper may define INFL differently
+6. Try to improve the MD optimizer further with analytical gradients

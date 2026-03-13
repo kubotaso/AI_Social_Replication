@@ -1,0 +1,50 @@
+Discrepancy Report - Attempt 2
+Score: 41/100
+
+Same results as attempt 1 - the code is functionally identical.
+Explored several alternative approaches during this attempt:
+
+1. CDF approach for 1960/1976: Same N as panel CSV (634 and 552).
+   The panel CSVs were derived from the CDF, so no additional respondents.
+
+2. VCF0013 panel indicator: Filtering by VCF0013=1 gives same N=759 for 1992.
+
+3. V925609 (party of candidate): Attempted to use this to map V925701
+   ballot position to party. The approach failed:
+   - Only N=503 valid cases
+   - Coefficients had wrong signs
+   - V925609 does not appear to be "party of candidate voted for"
+
+4. CDF approach for 1992: Confirmed as the correct approach.
+   VCF0707 properly codes 1=Dem, 2=Rep.
+   N=759 (target 760 - off by 1).
+
+== FUNDAMENTAL DATA LIMITATIONS ==
+The panel CSV files (from CDF) have significantly fewer respondents than
+Bartels' original ICPSR panel study files:
+- 1960: 634 vs 911 (30% smaller)
+- 1976: 552 vs 682 (19% smaller)
+- 1992: 759 vs 760 (0.1% - almost exact)
+
+These N differences are structural and cannot be resolved with available data.
+They affect:
+- Log-likelihood (proportional to N)
+- Pseudo-R2 (slightly)
+- Coefficient estimates (somewhat, due to different sample composition)
+- Standard errors (larger with smaller N)
+
+== THEORETICAL MAXIMUM SCORE ==
+Given data limitations:
+- Coefficients (30pts): ~50-60% achievable for 1960/1976, ~85% for 1992 = ~20pts
+- SEs (20pts): ~50-60% for 1960/1976, ~85% for 1992 = ~13pts
+- N (15pts): 0.1+0.4+1.0 = 1.5/3 → 7.5pts
+- Variables (10pts): 10/10 = 10pts
+- LL (10pts): 0+0+maybe = ~1pt
+- R2 (15pts): ~50% for 1960/1976, ~50% for 1992 = ~7pts
+THEORETICAL MAX ≈ 58 pts
+
+== STRATEGY ==
+- Accept data limitations
+- Focus on methodological refinements
+- Consider if any variable construction changes could improve results
+- The score ceiling is approximately 55-65 given data constraints

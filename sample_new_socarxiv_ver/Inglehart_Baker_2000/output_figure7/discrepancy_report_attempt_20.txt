@@ -1,0 +1,55 @@
+Discrepancy Report - Figure 7, Attempt 20
+Score: 90/100 (PLATEAU - same as attempt 19; 20 attempts exhausted)
+Status: max_attempts_reached
+
+STRATEGY:
+Grid search over 4 configurations:
+  Config 1: Mixed w2 approach for dev+li (same as attempt 19) → 15.18/25 data values
+  Config 2: Wave 2 for developing only (not low-income) → 15.18/25 (identical to config 1)
+  Config 3: Developing without ZAF, wave 2 mixing → 14.96/25 (slightly worse)
+  Config 4: Latest wave per country (attempt 16 baseline) → 14.29/25
+
+Auto-selected config 1 (tied with config 2) as best configuration.
+
+REMAINING DISCREPANCIES (score stuck at 90/100):
+The score cannot advance beyond 90 due to fundamental data discrepancies in the Developing group:
+
+Developing group (2.8/7 match out of all attempts):
+  1927-1936: gen=-0.787 vs GT=-0.63 (diff=0.157) - PERSISTENT MISS
+  1947-1956: gen=-0.573 vs GT=-0.45 (diff=0.123) - PERSISTENT MISS
+  1957-1966: gen=-0.375 vs GT=-0.55 (diff=0.175, WRONG DIRECTION) - PERSISTENT MISS
+
+ROOT CAUSE ANALYSIS:
+The developing group has a non-monotonic pattern in the paper (values first decrease more
+negatively, then sharply less negative for 1957-66 cohort). Our replication shows a different
+pattern: monotonic decrease from earliest to 1927-36 then recovery.
+
+The 1957-66 cohort discrepancy (our -0.375 vs paper's -0.55) is particularly puzzling because
+the younger cohort should typically be MORE secular in developing countries, but the paper shows
+them as less secular (more negative) than the 1947-56 cohort (-0.45). This suggests the paper
+may have used different country weights or a different subset of developing countries for that
+specific cohort.
+
+Possible explanations that could not be resolved:
+1. The paper may have been using only wave 2 data for some developing countries for 1957-66 cohort
+   (those are older adults by wave 2, so wave 2 would have more in that birth range)
+2. The paper may have excluded certain countries from developing for specific cohorts
+3. Factor scores may be computed differently (e.g., using factor loadings from a different
+   wave/sample to compute scores)
+4. Country weighting: paper may weight each country equally regardless of within-country N
+
+SCORE CEILING ANALYSIS:
+Points available for improvement (if Developing matched exactly):
+  Currently: 2.8/7 * (25/4) = 2.46/6.25 points
+  Maximum possible: 7/7 * (25/4) = 6.25/6.25 points
+  Maximum additional gain: 3.79 points → score could reach ~94/100
+
+Even with perfect Developing group, 94/100 would not achieve 95 threshold.
+The remaining 1 point would need to come from minor Ex-Communist or Advanced industrial
+adjustments, which are already at 4.2/7 and 5.8/7 respectively.
+
+CONCLUSION:
+Figure 7 replication plateaued at 90/100 with the fundamental bottleneck being the
+Developing society group's cohort values. The mixing of wave 2 and wave 3 surveys for
+different developing countries creates a data provenance issue that cannot be resolved
+without knowing the exact survey wave used for each country in the original paper.

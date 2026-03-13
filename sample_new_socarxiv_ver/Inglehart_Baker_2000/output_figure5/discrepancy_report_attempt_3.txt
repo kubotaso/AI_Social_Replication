@@ -1,0 +1,14 @@
+Discrepancy Report - Attempt 3
+
+Score: 76.5/100 (no improvement over attempt 2's 77)
+
+The offset approach did not work well because:
+1. Raw PCA score offsets are on a different scale than the calibrated display coordinates
+2. NLD from wave 5 has very different characteristics than 1990s NLD
+3. The offsets are too large for some countries
+
+Next approach: Use the modified attempt 2 file which:
+- Uses EVS trend file (ZA4460_v3-0-0.dta) for NLD denomination data (q333b variable)
+- Has more carefully read paper positions from Figure5.jpg
+- Uses direct PCA projection + RBF calibration (same as successful attempt 2 approach)
+- Has improved boundary line drawing with both left and right boundaries

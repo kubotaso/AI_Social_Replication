@@ -1,0 +1,21 @@
+Discrepancy Report - Attempt 3
+Score: 27/100
+
+REGRESSION from attempt 2 (score 60). Using 1980 current USD GDP was a bad choice:
+1. N dropped to 41 (vs paper's 49) because ex-Communist countries lack 1980 WB data
+2. Current USD GDP (not PPP) distorted the GDP variable massively
+3. GDP became overly dominant predictor, drowning out zone dummies and employment
+4. All GDP coefficients inflated; service employment coefficients collapsed
+5. R² values too high (0.55-0.84 vs paper's 0.40-0.80)
+
+KEY INSIGHT: The paper must have used PPP-adjusted GDP data for 1980, likely from the Penn
+World Table, which covered Communist countries. Since we cannot obtain that data, we should
+go back to using 1990 PPP GDP from our WB file (approach from attempt 2) which was much
+closer (score 60).
+
+PLAN FOR ATTEMPT 4:
+- Return to 1990 PPP GDP data (which has all 60+ countries)
+- Focus on getting the right sample size (~49)
+- Try to reduce N by excluding countries the paper likely didn't have
+- Consider using log(GDP) which may better match the paper's approach
+- Better handle East/West Germany

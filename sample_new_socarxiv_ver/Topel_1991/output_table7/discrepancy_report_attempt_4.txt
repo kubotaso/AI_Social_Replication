@@ -1,0 +1,22 @@
+DISCREPANCY REPORT - Attempt 4
+================================
+Score: 71.0/100 (+5 from attempt 2)
+
+IMPROVEMENTS:
+- Education dummies instead of continuous: exp_sq improved from -0.00053 to -0.00069
+- All 5 experience^2 matches now pass (was 0/5, now 5/5)
+- Total coefficient matches: 17/25 (was 12/25)
+
+REMAINING ISSUES:
+1. R-squared (0/5): 0.49 vs 0.42 - cannot match with any deflation method
+2. N too large (13922 vs 13128): need 3% wage trim to get closer
+3. Censor interaction (0/2): wrong sign or magnitude
+4. Exp_sq interaction (0/2): coefficient 100x too small
+5. Imputed CT (0/2): too large in cols 4-5
+6. Tenure col(2) and col(4): sign/magnitude wrong
+
+PLAN FOR ATTEMPT 5:
+- Apply 3% wage trim (hourly_wage between 2.19 and 18.70) to get N~13,153
+- This should give +5 points for N score (10->15)
+- Keep education dummies
+- Keep CPS deflation

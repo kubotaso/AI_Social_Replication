@@ -1,0 +1,68 @@
+Data Requirements for Bryson (1996) Replication
+=============================================
+
+Dataset: General Social Survey (GSS), 1993
+Source: NORC at the University of Chicago
+N: ~1,606 respondents (full sample); varies by model due to missing data
+
+Required Variables:
+------------------
+
+DEPENDENT VARIABLES:
+- Musical exclusiveness: Count of "dislike" and "dislike very much" responses across 18 music genres
+  (Likert scale: 1=Like very much, 2=Like it, 3=Mixed feelings, 4=Dislike it, 5=Dislike very much, M=Don't know, M=No answer)
+- Sub-counts: Dislike of 6 minority-associated genres (rap, reggae, blues/R&B, jazz, gospel, Latin/salsa)
+- Sub-counts: Dislike of 12 remaining genres
+
+18 MUSIC GENRE VARIABLES (each on 1-5 Likert scale):
+1. Latin/Salsa
+2. Jazz
+3. Blues/R&B
+4. Show Tunes
+5. Oldies
+6. Classical/Chamber
+7. Reggae
+8. Swing/Big Band
+9. New Age/Space
+10. Opera
+11. Bluegrass
+12. Folk
+13. Easy Listening
+14. Pop/Contemporary Rock
+15. Rap
+16. Heavy Metal
+17. Country/Western
+18. Gospel
+
+INDEPENDENT VARIABLES:
+- Education (years of schooling)
+- Household income (per capita)
+- Occupational prestige
+- Female (gender dummy)
+- Age
+- Black (race dummy)
+- Hispanic (ethnicity dummy)
+- Other race
+- Conservative Protestant
+- No religion
+- Southern (region)
+- Political intolerance (count of intolerant responses to 15 civil liberties questions)
+- Racism scale (composite of racial attitude questions, range 0-5)
+
+RACISM SCALE ITEMS (dichotomous):
+1. "Would you object to sending your children to a school where more than half the children are Black?"
+2. "Do you favor or oppose the busing of Black and White school children?"
+3. "On average Blacks have worse jobs, income, and housing than White people. Do you think these differences are mainly due to discrimination?"
+4. "...because most Blacks don't have the chance for education that it takes to rise out of poverty?"
+5. "...because most Blacks just don't have the motivation or will power to pull themselves up out of poverty?"
+
+POLITICAL INTOLERANCE ITEMS:
+- 15 dichotomous questions about willingness to allow 5 groups (anti-religious, racist, communist, militarist, homosexual) to:
+  (1) make a speech in your community
+  (2) teach in a college or university
+  (3) have a book in your public library
+- Scale range: 0-15
+
+Data Acquisition Method:
+- R package: gssr (from kjhealy r-universe)
+- Will extract 1993 GSS data and save as CSV

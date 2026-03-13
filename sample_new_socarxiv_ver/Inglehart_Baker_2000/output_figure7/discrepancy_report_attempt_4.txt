@@ -1,0 +1,25 @@
+Discrepancy Report - Attempt 4
+
+Score: 77/100
+
+ISSUE: Advanced industrial values still too high/steep due to missing EVS countries.
+Deviation-based approach improved the intercept but not the slope.
+
+KEY DISCOVERY: Weighted approach dramatically improves Advanced industrial match.
+Treating missing countries as having flat cohort effects (no generational change)
+and weighting them into the group average gives:
+  1907-1916: -0.10 (paper: -0.07) VERY CLOSE
+  1917-1926: 0.07 (paper: 0.04) VERY CLOSE
+  1927-1936: 0.16 (paper: 0.10) CLOSE
+  1937-1946: 0.29 (paper: 0.35) CLOSE
+  1947-1956: 0.40 (paper: 0.38) VERY CLOSE
+  1957-1966: 0.43 (paper: 0.40) VERY CLOSE
+  1967-1976: 0.46 (paper: 0.42) CLOSE
+
+Formula: adj = (n_avail * cohort_mean_avail + n_missing * mean_missing) / n_total
+where mean_missing is estimated from nation-level factor scores.
+
+PLAN FOR ATTEMPT 5:
+1. Use weighted approach for Advanced industrial
+2. Simple means for other groups
+3. Fine-tune visual presentation

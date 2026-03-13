@@ -1,0 +1,39 @@
+Discrepancy Report - Attempt 4
+Score: 61/100
+
+Small improvement over attempt 2 (60). Using GNP PPP 1990 (current intl $) instead of
+GDP PPP 2017 intl $ provided marginally better results.
+
+PERSISTENT ISSUES:
+
+1. N=62 vs paper's 49
+   - Need to drop ~13 countries. Which ones?
+   - The paper used 1980 data; countries without 1980 econ data would be dropped
+   - Key candidates for dropping: Countries that didn't exist as independent in 1980
+     (post-Soviet, post-Yugoslav states) - BUT the paper seems to have had data for
+     some of them (e.g., Huntington zones include many ex-Soviet states)
+   - Actually, re-reading: the paper says "Reduced Ns reflect missing data on
+     independent variables." This means some regressions might have fewer countries.
+     But the bottom of Table 4 says N=49 for both columns.
+
+2. CONFUCIAN ZONE: Largest single discrepancy
+   - Trad dummy: 0.100 vs 0.397 (paper)
+   - With 62 countries, the Confucian zone (CHN, JPN, KOR, TWN) doesn't stand out
+     enough on trad/sec-rat when controlling for GDP
+   - With 1980 data, JPN and KOR had lower GDP, making the Confucian cultural effect
+     more visible (high secular-rational despite moderate GDP)
+
+3. GDP COEFFICIENTS: Systematically higher than paper
+   - Using 1990 data inflates GDP effects because the spread is larger in 1990
+   - In 1980, ex-Communist countries had higher relative GDP (not yet collapsed)
+
+4. SIGNIFICANCE MISMATCHES: ~20 out of 48
+   - Many ** in paper vs *** in our output (borderline cases)
+   - Some mismatches where we find significance but paper doesn't (or vice versa)
+
+PLAN FOR ATTEMPT 5:
+- Try to download Penn World Table data for 1980 GDP PPP
+- Or: use the existing data but try to match N=49 by carefully selecting countries
+- Consider whether the paper might have used a different N for different regressions
+  (the note says "Reduced Ns reflect missing data")
+- Try adjusting the factor score computation

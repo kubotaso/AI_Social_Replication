@@ -1,0 +1,224 @@
+Instruction Summary for Figure 4 -- Bernanke and Blinder (1992)
+
+=== VARIABLE MAPPING ===
+
+Paper variable              | Dataset column             | Units / Notes
+----------------------------|----------------------------|-----------------------------------
+Federal funds rate (FUNDS)  | funds_rate                 | Percent (monthly average of daily
+                            |                            | figures), not seasonally adjusted
+Unemployment rate           | unemp_male_2554            | Percent (male, age 25-54), SA
+(male 25-54)                |                            |
+Log CPI                     | log_cpi                    | Log of CPI index (1982-84=100), SA
+                            |                            | Pre-computed in dataset; alternatively
+                            |                            | compute as np.log(cpi)
+Total deposits (real, log)  | log_bank_deposits_total_real | Log of (bank_deposits_total / CPI
+                            |                            | deflator). Pre-computed in dataset.
+                            |                            | Alternatively: np.log(bank_deposits_total
+                            |                            | / cpi) + constant offset
+Securities (real, log)      | log_bank_securities_real   | Log of (bank_securities / CPI deflator).
+                            |                            | Pre-computed in dataset.
+                            |                            | bank_securities = bank_credit_total -
+                            |                            | bank_loans (= total loans & investments
+                            |                            | minus total loans). This is the
+                            |                            | definition from the paper's Data
+                            |                            | Appendix (p. 920).
+Total loans (real, log)     | log_bank_loans_real        | Log of (bank_loans / CPI deflator).
+                            |                            | Pre-computed in dataset.
+
+=== ALTERNATIVE BANK VARIABLE COLUMNS ===
+
+The dataset contains several bank balance-sheet variables. The paper's Data
+Appendix (p. 920) specifies the source as "Principal Assets and Liabilities
+of All Commercial Banks" from the Federal Reserve's Banking and Monetary
+Statistics and Annual Statistical Digests. The key definitions are:
+
+  deposits  = total deposits
+  securities = total loans and investments - total loans
+  loans     = total loans
+
+The dataset columns map as follows:
+
+  bank_deposits_total   -> total deposits (nominal)
+  bank_credit_total     -> total loans and investments (nominal)
+  bank_loans            -> total loans (nominal)
+  bank_securities       -> securities = bank_credit_total - bank_loans (nominal)
+  bank_investments      -> investment securities (alternative measure)
+
+For real (CPI-deflated) log versions, the dataset provides:
+  log_bank_deposits_total_real  -> log(bank_deposits_total / CPI_deflator)
+  log_bank_securities_real      -> log(bank_securities / CPI_deflator)
+  log_bank_loans_real           -> log(bank_loans / CPI_deflator)
+
+If pre-computed columns have missing values in the 1959-1978 range, construct
+manually: e.g., log_deposits_real = np.log(bank_deposits_total) - np.log(cpi).
+This is equivalent up to a constant (the log of the CPI base-year scaling),
+which does not affect VAR estimation since a constant is included.
+
+NOTE on deposits: The paper uses "total deposits." The dataset has both
+bank_deposits_check (checkable deposits, narrower) and bank_deposits_total
+(total deposits, broader). Use bank_deposits_total (or its log-real version)
+as this matches the paper's definition. If bank_deposits_total has insufficient
+coverage before 1973, fall back to bank_deposits_check.
+
+NOTE on the June 1969 dummy: The paper mentions "A dummy variable is used to
+correct for a minor definitional change in June 1969." Include a dummy
+variable that equals 1 in 1969:6 and 0 otherwise as an exogenous regressor
+in all three VARs.
+
+=== DATA TRANSFORMATIONS ===
+
+- funds_rate: use in levels (no transformation)
+- unemp_male_2554: use in levels (no transformation)
+- log_cpi: use directly from dataset (already in log levels)
+- Bank variables: use in log levels, deflated by CPI
+  - log_deposits_real = log(bank_deposits_total / cpi)
+    or use pre-computed log_bank_deposits_total_real
+  - log_securities_real = log(bank_securities / cpi)
+    or use pre-computed log_bank_securities_real
+    where bank_securities = bank_credit_total - bank_loans
+  - log_loans_real = log(bank_loans / cpi)
+    or use pre-computed log_bank_loans_real
+
+=== VAR SPECIFICATION ===
+
+Three separate 4-variable VARs, each containing one bank balance-sheet
+variable:
+
+  VAR 1 (deposits):   [funds_rate, unemp_male_2554, log_cpi, log_deposits_real]
+  VAR 2 (securities): [funds_rate, unemp_male_2554, log_cpi, log_securities_real]
+  VAR 3 (loans):      [funds_rate, unemp_male_2554, log_cpi, log_loans_real]
+
+- Number of lags: 6
+- Constant included (default in statsmodels VAR)
+- Choleski ordering: FUNDS first, then unemployment, then log CPI, then the
+  bank variable. The column order of the DataFrame determines the Choleski
+  ordering in statsmodels.
+- Include exogenous dummy for June 1969 definitional change (optional but
+  recommended for fidelity to the paper).
+
+- Sample period: 1959:1 to 1978:12
+  - In practice, with 6 lags, the first usable observation for estimation is
+    1959:7. Data from 1959:1 to 1959:6 is consumed by lags.
+  - Trim DataFrame to 1959:1 through 1978:12 before fitting (statsmodels
+    handles the lag trimming internally).
+
+=== IMPULSE RESPONSES TO COMPUTE ===
+
+From each VAR, compute orthogonalized impulse response functions (Choleski
+decomposition) to a one-standard-deviation shock to the first variable
+(funds_rate), over a 24-month horizon.
+
+Specifically:
+  From VAR 1 (deposits):
+    - Response of deposits (variable index 3) to FUNDS shock (variable index 0)
+    - Also: response of unemployment (variable index 1) to FUNDS shock
+  From VAR 2 (securities):
+    - Response of securities (variable index 3) to FUNDS shock (variable index 0)
+  From VAR 3 (loans):
+    - Response of loans (variable index 3) to FUNDS shock (variable index 0)
+
+For the unemployment response, use the result from any one VAR (they should
+be similar; the deposits VAR or securities VAR is fine). The paper shows one
+unemployment curve, presumably from one of the three VARs.
+
+Implementation with statsmodels:
+  from statsmodels.tsa.api import VAR
+  model = VAR(df_var)
+  results = model.fit(maxlags=6)
+  irf = results.irf(24)
+  # irf.irfs has shape (25, n_vars, n_vars)
+  # irf.irfs[h, i, j] = response of variable i to shock in variable j at horizon h
+  # For response of bank_var (index 3) to FUNDS shock (index 0):
+  response_bank = irf.irfs[:, 3, 0]
+  # For response of unemployment (index 1) to FUNDS shock (index 0):
+  response_unemp = irf.irfs[:, 1, 0]
+
+=== Y-AXIS SCALING ===
+
+The paper's y-axis is labeled "x10^-2". The impulse responses of log-level
+variables represent proportional changes. A value of -0.01 in the IRF means
+a 1% decline. On the figure's y-axis, this is plotted as -1.0 (since
+-0.01 x 100 = -1.0, matching the x10^-2 label).
+
+To replicate the figure's y-axis:
+  - For bank variables (in log levels): multiply IRF values by 100
+    (e.g., a raw IRF value of -0.008 becomes -0.8 on the plot)
+  - For unemployment (in percentage-point levels): multiply IRF values by 100
+    as well to put on the same x10^-2 scale
+    (e.g., a raw IRF of +0.0015 becomes +0.15 on the plot, meaning a
+    0.15 percentage-point rise in unemployment -- but displayed as 0.15
+    on the x10^-2 axis)
+
+The y-axis should range from approximately +0.2 to -1.4 with the "x10^-2"
+annotation.
+
+=== PLOTTING INSTRUCTIONS ===
+
+- Single panel figure (all four responses on the same axes)
+- X-axis: "HORIZON (MONTHS)", range 1 to 24 (or 0 to 24)
+  - Tick marks at 4, 8, 12, 16, 20, 24
+- Y-axis: labeled with "x10^-2" notation
+  - Range: +0.2 to -1.4
+  - Tick marks at: 0.2, 0.0, -0.2, -0.4, -0.6, -0.8, -1.0, -1.2, -1.4
+
+- Line styles (match original figure):
+  - UNEMPLOYMENT RATE: dashed line (e.g., linestyle='--')
+  - SECURITIES: solid line (e.g., linestyle='-')
+  - DEPOSITS: solid line (e.g., linestyle='-')
+  - LOANS: long-dashed line (e.g., linestyle=(0, (10, 4)) or '--' with
+    different dash pattern)
+
+  Note: In the original figure, securities and deposits are both solid lines
+  but distinguishable by their trajectories and label placement. Loans uses a
+  long-dash pattern distinct from the short-dash unemployment line.
+
+- Text labels (annotations) placed near the right end of each curve:
+  "UNEMPLOYMENT RATE" near top
+  "SECURITIES" in the middle area
+  "DEPOSITS" below securities
+  "LOANS" at the bottom
+
+- A thin horizontal reference line at y = 0
+- No confidence bands (not shown in original)
+- No grid lines
+- No legend box (use text annotations instead)
+- Title (below figure): "FIGURE 4. RESPONSES TO A SHOCK TO THE FUNDS RATE"
+  or as a matplotlib title above the figure
+
+- Color: black and white only (to match the paper's style)
+
+=== IMPLEMENTATION NOTES ===
+
+1. Check for missing data in the 1959:1-1978:12 range for all variables.
+   Drop or interpolate any NaN values. Bank balance-sheet data may have
+   gaps; verify coverage before fitting.
+
+2. If bank_deposits_total or bank_securities have missing data before 1959,
+   but coverage starts later, adjust the sample start date or use alternative
+   series (bank_deposits_check as a proxy for deposits; bank_investments as
+   a proxy for securities).
+
+3. The June 1969 dummy can be included as an exogenous variable:
+     dummy_june69 = (df.index.year == 1969) & (df.index.month == 6)
+     dummy_june69 = dummy_june69.astype(int)
+     results = model.fit(maxlags=6, exog=dummy_june69_df)
+   If this causes issues, try without the dummy first.
+
+4. Verify that the standard deviation of the FUNDS innovation is
+   approximately 31 basis points (0.31 percentage points). This serves as
+   a sanity check that the model is correctly specified and the sample
+   period is correct.
+
+5. The paper mentions (footnote 40) that results were "basically unchanged"
+   when using the alternative balance-sheet series that began in 1973. This
+   suggests the pre-1973 historical data and post-1973 data produce similar
+   results.
+
+=== DATASET ===
+
+Dataset file: bb1992_data.csv
+
+=== OUTPUT ===
+
+Save figure as: output_figure4/generated_results_attempt_N.jpg
+(Replace N with the current attempt number)

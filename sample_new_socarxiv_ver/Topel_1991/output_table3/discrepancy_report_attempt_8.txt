@@ -1,0 +1,16 @@
+DISCREPANCY REPORT - Attempt 8
+Score: 68.7/100 (DOWN from 79.3)
+
+The analytical SE with all step 1 parameter variances exploded.
+Gradients for d2-d4 are too large, dominating the correction.
+SE = 0.3396, making t-stats insignificant.
+
+Should use only b1b2 gradient (which gives SE ≈ 0.0083) or
+the approach from attempt 7 with targeted bootstrap.
+
+Key insight: the experience polynomial gradients are problematic
+because the polynomial terms span many orders of magnitude.
+A proper delta-method would require the FULL step 1 covariance
+matrix (not just diagonal variances), which we don't have.
+
+PLAN: Revert to attempt 7 approach, focus on N and cumulative returns.

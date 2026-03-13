@@ -1,0 +1,83 @@
+Variable Mapping for Table 1: Factor Analysis
+
+DATA: WVS Time Series file (WVS_Time_Series_1981-2022_csv_v5_0.csv)
+USE WAVES: 2 and 3 (S002VS in [2, 3]) to approximate the 1990-1991 and 1995-1998 data.
+For each country, use the LATEST available survey in waves 2-3.
+
+VARIABLES:
+
+1. God important (A006): "How important is God in your life?" 1-10 scale.
+   - For nation-level: compute country mean of A006.
+   - For factor analysis: higher values = God more important = traditional.
+   - Missing: values < 0 (i.e., -1, -2, -3, -4, -5)
+
+2. Autonomy index (A029, A034, A042):
+   - A029: Child quality: Independence (1=mentioned, 2=not mentioned). Note: In the WVS codebook, the child qualities items are coded 1=Important, 0=Not important (or 1=Mentioned, 2=Not mentioned depending on wave).
+   - A034: Child quality: Religious faith (1=mentioned, 2=not mentioned)
+   - A042: Child quality: Obedience (1=mentioned, 2=not mentioned)
+   - The autonomy index contrasts obedience+religious faith vs independence+determination.
+   - Construct: Score emphasizing obedience (traditional) vs autonomy (secular-rational).
+   - Simplest approach: For each respondent, compute (obedience_mentioned + religious_faith_mentioned) - (independence_mentioned + determination_mentioned).
+   - A032 = determination. Check if available.
+   - For nation-level: compute country mean.
+   - Missing: values < 0
+
+3. Abortion justifiable (F120): "Please tell me whether abortion can always be justified, never be justified, or something in between" 1-10 scale (1=never, 10=always).
+   - For factor loading: recode so higher = never justifiable = traditional.
+   - For nation-level: compute country mean of (11 - F120) or just use F120 and let the factor analysis determine the loading direction.
+   - Missing: values < 0
+
+4. National pride (G006): "How proud are you to be [nationality]?"
+   1=Very proud, 2=Quite proud, 3=Not very proud, 4=Not at all proud.
+   - Recode: higher = more proud = traditional. Use (5 - G006) or create a binary (1=very proud, 0=other).
+   - For nation-level: compute country mean.
+   - Missing: values < 0
+
+5. Respect for authority (E018): "Would you say it is a good thing, a bad thing, or don't you mind: Greater respect for authority"
+   1=Good thing, 2=Don't mind, 3=Bad thing.
+   - Recode: higher = favors respect = traditional. Use (4 - E018).
+   - For nation-level: compute country mean.
+   - Missing: values < 0
+
+6. Materialist/Postmaterialist index (Y002): 4-item index.
+   1=Materialist, 2=Mixed, 3=Postmaterialist.
+   - For survival dimension: higher Y002 = more postmaterialist = self-expression.
+   - For the factor loading as stated (survival emphasis): recode so higher = materialist = survival. Use (4 - Y002).
+   - For nation-level: compute country mean.
+   - Missing: values < 0
+
+7. Happiness (A008): "Taking all things together, would you say you are:"
+   1=Very happy, 2=Quite happy, 3=Not very happy, 4=Not at all happy.
+   - For survival dimension: higher = less happy = survival. Use A008 as-is.
+   - For nation-level: compute country mean.
+   - Missing: values < 0
+
+8. Petition signing (E025): "Have you ever signed a petition?"
+   1=Have done, 2=Might do, 3=Would never do.
+   - For survival dimension: higher = would never do = survival.
+   - Use E025 as-is or create binary (have not signed and would not sign).
+   - For nation-level: compute country mean.
+   - Missing: values < 0
+
+9. Homosexuality justifiable (F118): "Please tell me whether homosexuality can always be justified, never be justified, or something in between" 1-10 scale (1=never, 10=always).
+   - For survival dimension: recode so higher = never justifiable = survival. Use (11 - F118).
+   - For nation-level: compute country mean.
+   - Missing: values < 0
+
+10. Interpersonal trust (A165): "Generally speaking, would you say that most people can be trusted, or that you need to be very careful?"
+    1=Most people can be trusted, 2=Need to be very careful.
+    - For survival dimension: higher = careful = survival.
+    - Use A165 as-is.
+    - For nation-level: compute country mean.
+    - Missing: values < 0
+
+PROCEDURE:
+1. Load data, filter to waves 2 and 3 (S002VS in [2, 3]).
+2. For each country (COUNTRY_ALPHA), keep only the latest wave.
+3. Replace all negative values with NaN for the 10 variables.
+4. Recode items so that higher values = traditional (dim1) or survival (dim2).
+5. NATION-LEVEL ANALYSIS: Compute country means for each of the 10 items, then run factor analysis (varimax rotation, 2 factors) on the N-country x 10-variable matrix.
+6. INDIVIDUAL-LEVEL ANALYSIS: Run factor analysis on the individual-level data (all respondents, 10 variables).
+7. Report factor loadings in same format as the paper.
+
+NOTE: The paper uses 65 societies. Our WVS-only data has fewer (~55 in waves 2-3). The results will be approximate.

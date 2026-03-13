@@ -1,0 +1,43 @@
+Discrepancy Report - Attempt 3
+Score: 59/100
+
+IMPROVEMENTS:
+- N=50 (very close to 49 target) - N matching now works
+- GDP coefficient in Model 5 nearly matches: 0.096 vs 0.098
+- Service_sq coefficients are reasonable
+- Model 5 R² = 0.76 exactly matches
+- Model 2 R² = 0.61 close to 0.63 (but N=7 vs 46)
+
+REMAINING ISSUES:
+
+1. FACTOR SCORE SCALE: SD=1.69, range -2.89 to +3.80
+   - Paper's scores likely have SD~1.0 (standard PCA scores)
+   - This makes ALL dummy variable coefficients ~1.7x too large
+   - Protestant: 1.355 vs 0.672 (ratio 2.0)
+   - Ex-communist: -1.203 vs -0.920 (ratio 1.3)
+   - Orthodox: -1.363 vs -1.182 (ratio 1.15)
+   - Need to normalize factor scores to SD=1
+
+2. GDP COEFFICIENT: 0.133 vs 0.090 in Model 1
+   - Our GDP values in 1995$ are higher than paper's 1980$ values
+   - If paper used 1980 PWT values, they'd be lower by factor of ~1.5-2
+
+3. R² TOO HIGH for Models 1, 3:
+   - Model 1: 0.70 vs 0.63
+   - Model 3: 0.83 vs 0.66
+   - This could be from factor score scale or country composition
+
+4. EDUCATION DATA (Model 2): N=7 vs 46
+   - Still only 7-8 countries have education data
+   - Need alternative education data source
+
+5. PROTESTANT CLASSIFICATION:
+   - May need to narrow - paper might not include all 13 countries
+   - IRL classified as Protestant? No, Catholic.
+   - All 13 seem correct for the paper
+
+FIXES FOR ATTEMPT 4:
+1. Divide factor scores by their SD to normalize
+2. Adjust GDP scale to approximate 1980 values
+3. Try to find/construct education data for more countries
+4. Re-examine which one country to drop (N=50 vs 49)

@@ -1,0 +1,20 @@
+Attempt 4 - Score: 64.1
+
+Key finding: Using paper's step 1 coefficients gives much better results!
+
+  beta_1: 0.0787 (SE: 0.0008) [Paper: 0.0713 (0.0181)]
+  b1+b2: 0.1258 (0.0161) [Paper: 0.1258 (0.0161)] - PERFECT (using paper's value)
+  beta_2: 0.0471 (0.0161) [Paper: 0.0545 (0.0079)]
+  N: 13,666 [Paper: 10,685]
+
+OLS tenure: 0.0858
+OLS bias: 0.0387 [Paper: 0.0020]
+
+Two-step cumulative: 5yr=0.1420, 10yr=0.1715, 15yr=0.1716, 20yr=0.1891
+Paper two-step:      5yr=0.1793, 10yr=0.2459, 15yr=0.2832, 20yr=0.3375
+
+Remaining issues:
+1. N too large (27.9% off)
+2. SE for beta_1 way too small (0.0008 vs 0.0181) - need two-step correction
+3. Cumulative returns off - need own step 1 to match paper
+4. OLS cumulative returns very wrong at 15/20yr
