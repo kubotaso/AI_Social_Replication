@@ -2,7 +2,7 @@
 
 **Kubota, Yakura, Yamada, Nakamura and Coavoux (2026)**
 
-[Download the paper (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v1) | [Older API-based version (arXiv)](http://arxiv.org/abs/2602.18453)
+[Download the paper (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v2) | [Older API-based version (arXiv)](http://arxiv.org/abs/2602.18453)
 
 ---
 
