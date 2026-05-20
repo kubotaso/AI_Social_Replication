@@ -1,6 +1,6 @@
 # LLM-Assisted Replication as Scientific Infrastructure
 
-**Kubota, Yakura, Yamada, Nakamura and Coavoux (2026)**
+**Kubota, Yakura, Yamada, Nakamura, Werner and Coavoux (2026)**
 
 [Download the paper (SocArXiv)](https://osf.io/preprints/socarxiv/qtgx8_v2) | [Older API-based version (arXiv)](http://arxiv.org/abs/2602.18453)
 
